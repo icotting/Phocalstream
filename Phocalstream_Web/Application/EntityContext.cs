@@ -18,7 +18,15 @@ namespace Phocalstream_Web.Application
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Photo>()
+                .HasRequired<CameraSite>(p => p.Site)
+                .WithMany(s => s.Photos)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<MetaDatum>()
+                .HasOptional<Photo>(m => m.Photo)
+                .WithMany(p => p.AdditionalExifProperties)
+                .WillCascadeOnDelete(true);
         }
     }
 }

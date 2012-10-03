@@ -1,0 +1,46 @@
+﻿<Window x:Class="Phocalstream_Importer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="660" Width="970">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="292*"/>
+            <RowDefinition Height="337*"/>
+        </Grid.RowDefinitions>
+        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="230" Margin="515,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="416"/>
+        <Button Content="Begin Import" HorizontalAlignment="Left" Margin="22,108,0,0" VerticalAlignment="Top" Width="93" Click="BeginImport" Height="28" Grid.Row="1"/>
+        <ProgressBar x:Name="Progress" HorizontalAlignment="Left" Height="31" Margin="22,53,0,0" VerticalAlignment="Top" Width="461" Grid.Row="1" Minimum="0" Maximum="{Binding ProgressTotal}" Value="{Binding ProgressValue}"/>
+        <Label x:Name="StatusLabel" Content="{Binding CurrentStatus}" HorizontalAlignment="Left" Margin="22,22,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.053,0.192" Width="461" Grid.Row="1"/>
+        <Canvas HorizontalAlignment="Left" Height="230" VerticalAlignment="Top" Width="416" Margin="515,29,0,0">
+            <Label Content="Container Info" Canvas.Left="10" Canvas.Top="10" FontWeight="Bold"/>
+            <Label Content="Site Name" Canvas.Left="23" Canvas.Top="52"/>
+            <Label Content="Latitude" Canvas.Left="23" Canvas.Top="93"/>
+            <Label Content="Longitude" Canvas.Left="23" Canvas.Top="132"/>
+            <TextBox Text="{Binding SiteName}" Height="23" Canvas.Left="150" TextWrapping="Wrap" Canvas.Top="54" Width="226"/>
+            <TextBox Text="{Binding Latitude}" Height="23" Canvas.Left="150" TextWrapping="Wrap" Canvas.Top="96" Width="226"/>
+            <TextBox Text="{Binding Longitude}" Height="23" Canvas.Left="150" TextWrapping="Wrap" Canvas.Top="136" Width="226"/>
+            <TextBox x:Name="ContainerName" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding ContainerName}" VerticalAlignment="Top" Width="224" Canvas.Left="152" Canvas.Top="175" />
+            <Label Content="Container Name" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="23" Canvas.Top="171"/>
+        </Canvas>
+        <Canvas HorizontalAlignment="Left" Height="204" Margin="0,10,0,0" VerticalAlignment="Top" Width="509">
+            <Label Content="Storage Account Name" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="18" Canvas.Top="48"/>
+            <Label Content="Storage Account Key" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="18" Canvas.Top="89"/>
+            <TextBox x:Name="AccountName" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding StorageAccountName}" VerticalAlignment="Top" Width="302" Canvas.Left="166" Canvas.Top="52"/>
+            <TextBox x:Name="AccountKey" HorizontalAlignment="Left" Height="95" TextWrapping="Wrap" Text="{Binding StorageAccountKey}" VerticalAlignment="Top" Width="302" Canvas.Left="166" Canvas.Top="93"/>
+            <Label Content="Image Path" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="18" Canvas.Top="232"/>
+            <TextBox x:Name="ImagePath" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding ImagePath}" VerticalAlignment="Top" Width="302" Canvas.Left="166" Canvas.Top="232"/>
+            <Label Content="Azure Account Info" Canvas.Left="18" Canvas.Top="10" FontWeight="Bold"/>
+        </Canvas>
+        <ListView ItemsSource="{Binding Path=SiteList}" Name="Sites" HorizontalAlignment="Left" Height="248" Margin="525,22,0,0" Grid.Row="1" VerticalAlignment="Top" Width="406">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="140" Header="Site Name"
+         DisplayMemberBinding="{Binding Name}"  />
+                    <GridViewColumn Width="140" Header="Photo Count"  
+         DisplayMemberBinding="{Binding PhotoCount}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Content="Delete Selected" HorizontalAlignment="Left" Margin="838,286,0,0" VerticalAlignment="Top" Width="93" Click="DeleteSelected" Height="28" Grid.Row="1"/>
+    </Grid>
+</Window>

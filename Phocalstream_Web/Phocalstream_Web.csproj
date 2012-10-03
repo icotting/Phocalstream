@@ -129,6 +129,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CameraSite.cs" />
+    <Compile Include="Models\MetaDatum.cs" />
     <Compile Include="Models\Photo.cs" />
     <Compile Include="Models\PhotoAnnotation.cs" />
     <Compile Include="Models\User.cs" />

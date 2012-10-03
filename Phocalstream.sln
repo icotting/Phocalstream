@@ -14,6 +14,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8C1A82
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phocalstream_Importer", "Phocalstream_Importer\Phocalstream_Importer\Phocalstream_Importer.csproj", "{F8F69E99-D476-4B2E-8264-1E30F6B309CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6169FD56-AD24-47D2-B511-D2937B760E06}"
+	ProjectSection(SolutionItems) = preProject
+		License.txt = License.txt
+		README = README
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +40,10 @@ Global
 		{CA56E948-DDD9-47BC-AA01-EB1EA8E0FE5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA56E948-DDD9-47BC-AA01-EB1EA8E0FE5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA56E948-DDD9-47BC-AA01-EB1EA8E0FE5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F69E99-D476-4B2E-8264-1E30F6B309CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F69E99-D476-4B2E-8264-1E30F6B309CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F69E99-D476-4B2E-8264-1E30F6B309CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F69E99-D476-4B2E-8264-1E30F6B309CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

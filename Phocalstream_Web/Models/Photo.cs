@@ -13,6 +13,18 @@ namespace Phocalstream_Web.Models
         public string BlobID { get; set; }
         public DateTime Captured { get; set; }
 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public double Altitude { get; set; }
+        public string UserComments { get; set; }
+        public double ExposureTime { get; set; }
+        public string ShutterSpeed { get; set; }
+        public double MaxAperture { get; set; }
+        public double FocalLength { get; set; }
+        public bool Flash { get; set; }
+        public int ISO { get; set; }
+
+        public ICollection<MetaDatum> AdditionalExifProperties { get; set; }
         public ICollection<PhotoAnnotation> Annotations { get; set; }
         public CameraSite Site { get; set; }
     }
