@@ -1,0 +1,13 @@
+.DS_Store
+ServiceConfiguration.Cloud.cscfg
+Phocalstream/bin
+Phocalstream/obj
+Phocalstream_Web.Tests/bin
+Phocalstream_Web.Tests/obj
+Web.Release.config
+Phocalstream_Web/bin
+Phocalstream_Web/obj
+packages
+Phocalstream_Importer/Phocalstream_Importer/bin
+Phocalstream_Importer/Phocalstream_Importer/obj
+app.config
