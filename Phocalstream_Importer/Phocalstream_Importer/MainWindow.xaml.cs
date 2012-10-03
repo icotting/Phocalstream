@@ -70,6 +70,9 @@ namespace Phocalstream_Importer
             }
         }
 
+        private Object lockObj = new Object();
+        int available = 5;
+
         private void BeginImport(object sender, RoutedEventArgs e)
         {
             ThreadStart t = delegate()
@@ -95,98 +98,136 @@ namespace Phocalstream_Importer
                             ctx.Sites.Add(_viewModel.Site);
                         }
                     }
+                    ctx.SaveChanges();
+                }
 
-                    CloudStorageAccount account = CloudStorageAccount.Parse(
-                        String.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", _viewModel.StorageAccountName, _viewModel.StorageAccountKey));
+                CloudStorageAccount account = CloudStorageAccount.Parse(
+                    String.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", _viewModel.StorageAccountName, _viewModel.StorageAccountKey));
 
-                    CloudBlobClient client = account.CreateCloudBlobClient();
+                CloudBlobClient client = account.CreateCloudBlobClient();
 
-                    CloudBlobContainer container = client.GetContainerReference(_viewModel.ContainerName);
-                    container.CreateIfNotExist();
+                CloudBlobContainer container = client.GetContainerReference(_viewModel.ContainerName);
+                container.CreateIfNotExist();
 
-                    string[] files = Directory.GetFiles(_viewModel.ImagePath, "*.JPG", SearchOption.AllDirectories);
-                    _viewModel.ProgressTotal = files.Length;
-                    _viewModel.ProgressValue = 0;
+                string[] files = Directory.GetFiles(_viewModel.ImagePath, "*.JPG", SearchOption.AllDirectories);
+                _viewModel.ProgressTotal = files.Length;
+                _viewModel.ProgressValue = 0;
 
-                    foreach (string file in files)
+                BlobRequestOptions opts = new BlobRequestOptions() { Timeout = TimeSpan.FromMinutes(20) };
+
+                foreach (string file in files)
+                {
+                    while (available < 1)
                     {
-                        _viewModel.CurrentStatus = String.Format("Processing image {0} ...", file);
-                        using (var fileStream = System.IO.File.OpenRead(file))
-                        {
-                            System.Drawing.Image img = new Bitmap(fileStream);
-                            PropertyItem[] propItems = img.PropertyItems;
-                            Photo photo = new Photo();
-                            photo.BlobID = Guid.NewGuid().ToString();
-                            photo.Site = _viewModel.Site;
-                            ctx.Photos.Add(photo);
-
-                            photo.AdditionalExifProperties = new List<MetaDatum>();
-                            int len = propItems.Length;
-                            for ( var i = 0; i < len; i++ ) {
-                                PropertyItem propItem = propItems[i];
-
-                                switch (propItem.Id)
-                                {
-                                    case 0x829A: // Exposure Time
-                                        photo.ExposureTime = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
-                                        photo.ShutterSpeed = String.Format("{0}/{1}", BitConverter.ToUInt32(propItem.Value, 0), BitConverter.ToUInt32(propItem.Value, 4));
-                                        break;
-                                    case 0x0132: // Date
-                                        string[] parts = System.Text.Encoding.ASCII.GetString(propItem.Value).Split(':', ' ');
-                                        int year = int.Parse(parts[0]);
-                                        int month = int.Parse(parts[1]);
-                                        int day = int.Parse(parts[2]);
-                                        int hour = int.Parse(parts[3]);
-                                        int minute = int.Parse(parts[4]);
-                                        int second = int.Parse(parts[5]);
-
-                                        photo.Captured = new DateTime(year, month, day, hour, minute, second);
-                                        break;
-                                    case 0x010F: // Manufacturer
-                                        photo.AdditionalExifProperties.Add(new MetaDatum() { 
-                                            Photo = photo, Name = "Manufacturer", Type = "EXIF", 
-                                            Value = System.Text.Encoding.ASCII.GetString(propItem.Value)});
-                                        break;
-                                    case 0x5090: // Luminance
-                                        photo.AdditionalExifProperties.Add(new MetaDatum() { 
-                                            Photo = photo, Name = "White Balance", Type = "EXIF", 
-                                            Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))});
-                                        break;
-                                    case 0x5091: // Chrominance
-                                        photo.AdditionalExifProperties.Add(new MetaDatum() { 
-                                            Photo = photo, Name = "Color Space", Type = "EXIF", 
-                                            Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))});
-                                        break;
-                                    case 0x9205: // Max Aperture
-                                        photo.MaxAperture = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
-                                        break;
-                                    case 0x920A: // Focal Length
-                                        photo.FocalLength = BitConverter.ToInt32(propItem.Value, 0) / BitConverter.ToInt32(propItem.Value, 4);
-                                        break;
-                                    case 0x9209: // Flash
-                                        photo.Flash = Convert.ToBoolean(BitConverter.ToUInt16(propItem.Value, 0));
-                                        break;
-                                    case 0x9286: // Comment
-                                        photo.UserComments = System.Text.Encoding.ASCII.GetString(propItem.Value);
-                                        break;
-                                    case 0x8827: // ISO Speed
-                                        photo.ISO = BitConverter.ToUInt16(propItem.Value, 0);
-                                        break;
-                                }
-                            }
-                            ctx.SaveChanges();
-                            _viewModel.Site.Photos.Add(photo);
-
-                            CloudBlob blob = container.GetBlobReference(photo.BlobID);
-                            blob.UploadFromStream(fileStream);
-
-                            _viewModel.ProgressValue = _viewModel.ProgressValue + 1;
-                            img.Dispose();
-                        }
+                        Thread.Sleep(500);
                     }
+                    new Thread(() => ProcessFile(file, container, opts)).Start();
                 }
             };
             new Thread(t).Start();
+        }
+
+        private void ProcessFile(string fileName, CloudBlobContainer container, BlobRequestOptions opts)
+        {
+            System.Console.WriteLine("Processing file {0}", fileName);
+            lock (lockObj)
+            {
+                available--;
+            }
+            _viewModel.CurrentStatus = String.Format("Processing image {0} ...", fileName);
+            using (var fileStream = System.IO.File.OpenRead(fileName))
+            {
+                using (EntityContext ctx = new EntityContext())
+                {
+                    CameraSite site = (from s in ctx.Sites where s.ID == _viewModel.Site.ID select s).First<CameraSite>();
+                    System.Drawing.Image img = new Bitmap(fileStream);
+                    PropertyItem[] propItems = img.PropertyItems;
+                    Photo photo = new Photo();
+                    photo.BlobID = Guid.NewGuid().ToString();
+                    photo.Site = site;
+                    ctx.Photos.Add(photo);
+
+                    photo.AdditionalExifProperties = new List<MetaDatum>();
+                    int len = propItems.Length;
+                    for (var i = 0; i < len; i++)
+                    {
+                        PropertyItem propItem = propItems[i];
+
+                        switch (propItem.Id)
+                        {
+                            case 0x829A: // Exposure Time
+                                photo.ExposureTime = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
+                                photo.ShutterSpeed = String.Format("{0}/{1}", BitConverter.ToUInt32(propItem.Value, 0), BitConverter.ToUInt32(propItem.Value, 4));
+                                break;
+                            case 0x0132: // Date
+                                string[] parts = System.Text.Encoding.ASCII.GetString(propItem.Value).Split(':', ' ');
+                                int year = int.Parse(parts[0]);
+                                int month = int.Parse(parts[1]);
+                                int day = int.Parse(parts[2]);
+                                int hour = int.Parse(parts[3]);
+                                int minute = int.Parse(parts[4]);
+                                int second = int.Parse(parts[5]);
+
+                                photo.Captured = new DateTime(year, month, day, hour, minute, second);
+                                break;
+                            case 0x010F: // Manufacturer
+                                photo.AdditionalExifProperties.Add(new MetaDatum()
+                                {
+                                    Photo = photo,
+                                    Name = "Manufacturer",
+                                    Type = "EXIF",
+                                    Value = System.Text.Encoding.ASCII.GetString(propItem.Value)
+                                });
+                                break;
+                            case 0x5090: // Luminance
+                                photo.AdditionalExifProperties.Add(new MetaDatum()
+                                {
+                                    Photo = photo,
+                                    Name = "White Balance",
+                                    Type = "EXIF",
+                                    Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))
+                                });
+                                break;
+                            case 0x5091: // Chrominance
+                                photo.AdditionalExifProperties.Add(new MetaDatum()
+                                {
+                                    Photo = photo,
+                                    Name = "Color Space",
+                                    Type = "EXIF",
+                                    Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))
+                                });
+                                break;
+                            case 0x9205: // Max Aperture
+                                photo.MaxAperture = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
+                                break;
+                            case 0x920A: // Focal Length
+                                photo.FocalLength = BitConverter.ToInt32(propItem.Value, 0) / BitConverter.ToInt32(propItem.Value, 4);
+                                break;
+                            case 0x9209: // Flash
+                                photo.Flash = Convert.ToBoolean(BitConverter.ToUInt16(propItem.Value, 0));
+                                break;
+                            case 0x9286: // Comment
+                                photo.UserComments = System.Text.Encoding.ASCII.GetString(propItem.Value);
+                                break;
+                            case 0x8827: // ISO Speed
+                                photo.ISO = BitConverter.ToUInt16(propItem.Value, 0);
+                                break;
+                        }
+                    }
+                    site.Photos.Add(photo);
+                    ctx.SaveChanges();
+
+                    CloudBlob blob = container.GetBlobReference(photo.BlobID);
+                    blob.UploadFromStream(fileStream, opts);
+                    img.Dispose();
+                }
+            }
+
+            lock (lockObj)
+            {
+                _viewModel.ProgressValue = _viewModel.ProgressValue + 1;
+                available++;
+            }
         }
     }
 }
