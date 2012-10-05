@@ -15,6 +15,7 @@ namespace Phocalstream_Importer.ViewModels
 
         private int _progressTotal;
         private int _progressValue;
+        private string _progressColor;
         private CameraSite _site;
 
         public CameraSite Site
@@ -39,6 +40,12 @@ namespace Phocalstream_Importer.ViewModels
         {
             get { return _progressTotal; }
             set { _progressTotal = value; this.RaisePropertyChanged("ProgressTotal"); }
+        }
+
+        public string ProgressColor
+        {
+            get { return _progressColor; }
+            set { _progressColor = value; this.RaisePropertyChanged("ProgressColor"); }
         }
 
         public string SiteName

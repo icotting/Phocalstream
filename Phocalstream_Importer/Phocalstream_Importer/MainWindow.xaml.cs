@@ -22,6 +22,8 @@ using System.Drawing.Imaging;
 using Phocalstream_Importer.ViewModels;
 using System.Data;
 using System.Collections.ObjectModel;
+using Microsoft.DeepZoomTools;
+using Ionic.Zip;
 
 namespace Phocalstream_Importer
 {
@@ -36,7 +38,6 @@ namespace Phocalstream_Importer
         {
             _viewModel.Site = new CameraSite();
             _viewModel.ProgressTotal = 1;
-
             using (EntityContext ctx = new EntityContext())
             {
                 _viewModel.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.Include("Photos").ToList<CameraSite>());
@@ -71,7 +72,7 @@ namespace Phocalstream_Importer
         }
 
         private Object lockObj = new Object();
-        int available = 5;
+        int available = 7;
 
         private void BeginImport(object sender, RoutedEventArgs e)
         {
@@ -114,22 +115,34 @@ namespace Phocalstream_Importer
                 _viewModel.ProgressValue = 0;
 
                 BlobRequestOptions opts = new BlobRequestOptions() { Timeout = TimeSpan.FromMinutes(20) };
+                int len = files.Length;
+                int current = 0;
 
-                foreach (string file in files)
+                while ( current < len || (available != 7 || current == 0))
                 {
-                    while (available < 1)
+                    lock (lockObj)
                     {
-                        Thread.Sleep(500);
+                        if (available > 0 && current < len)
+                        {
+                            new Thread(() => ProcessFile(files[current++], container, opts)).Start();
+                        }
                     }
-                    new Thread(() => ProcessFile(file, container, opts)).Start();
+                    Thread.Sleep(500);
                 }
+
+                _viewModel.ProgressColor = "Gray";
+                _viewModel.Site = new CameraSite();
+                using (EntityContext ctx = new EntityContext())
+                {
+                    _viewModel.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.Include("Photos").ToList<CameraSite>());
+                }
+                MessageBox.Show("Import process complete");
             };
             new Thread(t).Start();
         }
 
         private void ProcessFile(string fileName, CloudBlobContainer container, BlobRequestOptions opts)
         {
-            System.Console.WriteLine("Processing file {0}", fileName);
             lock (lockObj)
             {
                 available--;
@@ -217,8 +230,32 @@ namespace Phocalstream_Importer
                     site.Photos.Add(photo);
                     ctx.SaveChanges();
 
-                    CloudBlob blob = container.GetBlobReference(photo.BlobID);
-                    blob.UploadFromStream(fileStream, opts);
+                    string rootPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), photo.BlobID);
+                    Directory.CreateDirectory(rootPath);
+                    File.Copy(fileName, System.IO.Path.Combine(rootPath, "raw.JPG"));
+
+                    ImageCreator creator = new ImageCreator();
+                    creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
+                    creator.TileOverlap = 1;
+                    creator.TileSize = 256;
+                    creator.Create(fileName, System.IO.Path.Combine(rootPath, "source.dzi"));
+
+                    using (MemoryStream pstream = new MemoryStream())
+                    {
+                        using (ZipFile zip = new ZipFile())
+                        {
+                            zip.AddDirectory(rootPath);
+                            zip.CompressionLevel = Ionic.Zlib.CompressionLevel.BestCompression;
+                            zip.Save(pstream);
+                        }
+
+                        pstream.Position = 0;
+
+                        CloudBlob blob = container.GetBlobReference(photo.BlobID);
+                        blob.UploadFromStream(pstream, opts);
+                    }
+
+                    Directory.Delete(rootPath, true);
                     img.Dispose();
                 }
             }
@@ -228,6 +265,10 @@ namespace Phocalstream_Importer
                 _viewModel.ProgressValue = _viewModel.ProgressValue + 1;
                 available++;
             }
+        }
+
+        private void Sites_Selected_1(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

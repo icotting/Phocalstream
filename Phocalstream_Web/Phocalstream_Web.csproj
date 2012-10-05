@@ -151,6 +151,7 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Application\IO\" />
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
