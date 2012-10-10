@@ -79,7 +79,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Util\RelayCommand.cs" />
     <Compile Include="ViewModels\BindableObject.cs" />
     <Compile Include="ViewModels\CameraSiteViewModel.cs" />
     <Page Include="MainWindow.xaml">
