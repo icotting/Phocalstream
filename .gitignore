@@ -11,3 +11,9 @@ packages
 Phocalstream_Importer/Phocalstream_Importer/bin
 Phocalstream_Importer/Phocalstream_Importer/obj
 app.config
+Phocalstream_Web/App_Data/DbConnection.mdf
+Phocalstream_Web/App_Data/DbConnection_log.ldf
+DeepZoomProcessor/bin
+DeepZoomProcessor/obj
+Phocalstream_Web/Properties/PublishProfiles/VM Deployment.pubxml
+Phocalstream_Web/Properties/PublishProfiles/VM Deployment.pubxml.user

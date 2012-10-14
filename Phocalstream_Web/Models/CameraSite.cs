@@ -15,7 +15,7 @@ namespace Phocalstream_Web.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string ContainerID { get; set; }
-
+        
         [NotMapped]
         public int PhotoCount { get { return Photos == null ? 0 : Photos.Count; } }
 

@@ -26,6 +26,6 @@ namespace Phocalstream_Web.Models
 
         public ICollection<MetaDatum> AdditionalExifProperties { get; set; }
         public ICollection<PhotoAnnotation> Annotations { get; set; }
-        public CameraSite Site { get; set; }
+        public virtual CameraSite Site { get; set; }
     }
 }
