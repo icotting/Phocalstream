@@ -1,27 +1,10 @@
 Distributed under the Apache License v. 2.0.  See License.txt for details.
 
 Basic Setup:
-The project is missing an Azure configuration file which will need to be 
-supplied containing the account connection information.  An example 
-configuration file looks like: 
-
-<?xml version="1.0" encoding="utf-8"?>
-<ServiceConfiguration serviceName="Phocalstream" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="1" osVersion="*" schemaVersion="2012-05.1.7">
-  <Role name="Phocalstream_Web">
-    <Instances count="1" />
-    <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=[Account Name];AccountKey=[Account Key]" />
-    </ConfigurationSettings>
-  </Role>
-</ServiceConfiguration>
-
-The file path for the Azure config file should be 'Phocalstream/ServiceConfiguration.Cloud.cscfg'
-
-In addition to the cloud service configuration, the Phocalstream_Web 
-project is missing the Web.Release.config file.  This file will is 
-required to build a release version of the project for deployment
-and should contain the connection string for the remote SQL Server
-instance.  See http://blogs.msdn.com/b/webdev/archive/2010/10/26/asp-net-web-projects-web-debug-config-amp-web-release-config.aspx
+The Phocalstream_Web project is missing the Web.Release.config file.  
+This file will is required to build a release version of the project 
+for deploymentand should contain the connection string for the remote
+SQL Server instance.  See http://blogs.msdn.com/b/webdev/archive/2010/10/26/asp-net-web-projects-web-debug-config-amp-web-release-config.aspx
 for more details. 
 
 Lastly, for developers who will run Phocalstream_Importer, an app.config file will need to be provided with a valid connection string 

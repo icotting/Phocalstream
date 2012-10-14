@@ -22,8 +22,6 @@ using System.Drawing.Imaging;
 using Phocalstream_Importer.ViewModels;
 using System.Data;
 using System.Collections.ObjectModel;
-using Microsoft.DeepZoomTools;
-using Ionic.Zip;
 
 namespace Phocalstream_Importer
 {

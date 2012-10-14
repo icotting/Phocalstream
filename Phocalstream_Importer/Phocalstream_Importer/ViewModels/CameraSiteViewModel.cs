@@ -1,6 +1,4 @@
-﻿using Ionic.Zip;
-using Microsoft.DeepZoomTools;
-using Microsoft.WindowsAzure;
+﻿using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
 using Phocalstream_Importer.Commands;
 using Phocalstream_Web.Application;
@@ -110,13 +108,14 @@ namespace Phocalstream_Importer.ViewModels
         {
             using (EntityContext ctx = new EntityContext())
             {
+                // create a new container if one has not been provided
                 if (this.ContainerName == null || this.ContainerName.Trim() == "")
                 {
                     this.ContainerName = String.Format("prtlp-{0}", DateTime.Now.Ticks);
                     this.Site.Photos = new List<Photo>();
                     ctx.Sites.Add(this.Site);
                 }
-                else
+                else // if the container was provided, load the contents
                 {
                     List<CameraSite> sites = (from s in ctx.Sites where s.ContainerID == this.ContainerName select s).ToList<CameraSite>();
                     if (sites.Count == 1)
@@ -132,36 +131,44 @@ namespace Phocalstream_Importer.ViewModels
                 ctx.SaveChanges();
             }
 
+            // get a connection to the blob storage account
             CloudStorageAccount account = CloudStorageAccount.Parse(
                 String.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", this.StorageAccountName, this.StorageAccountKey));
 
             CloudBlobClient client = account.CreateCloudBlobClient();
 
+            // create a reference to the container for this image site
             CloudBlobContainer container = client.GetContainerReference(this.ContainerName);
-            container.CreateIfNotExist();
+            BlobRequestOptions options = new BlobRequestOptions();
+            options.UseFlatBlobListing = true;
+            container.CreateIfNotExist(); // create it on the cloud if it isn't already there
 
+            // set permissions to be public so anyone can access the image sets
+            BlobContainerPermissions blobContainerPermissions = new BlobContainerPermissions();
+            blobContainerPermissions.PublicAccess = BlobContainerPublicAccessType.Container;
+            container.SetPermissions(blobContainerPermissions);
+
+            // grab all of the raw images from the provided root directory
             string[] files = Directory.GetFiles(this.ImagePath, "*.JPG", SearchOption.AllDirectories);
             this.ProgressTotal = files.Length;
             this.ProgressValue = 0;
 
+            // set the timeout for upload to 30min to allow enough time for high latencey and/or big files
             BlobRequestOptions opts = new BlobRequestOptions() { Timeout = TimeSpan.FromMinutes(20) };
 
-            ImageCreator creator = new ImageCreator();
-            creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-            creator.TileOverlap = 1;
-            creator.TileSize = 256;
-
+            // setup the producer consumer queue to control the number of running threads
             ConcurrentQueue<Task> waitLine = new ConcurrentQueue<Task>();
-            BlockingCollection<Task> queue = new BlockingCollection<Task>(waitLine, 5);
+            BlockingCollection<Task> queue = new BlockingCollection<Task>(waitLine, 25);
             Task.Factory.StartNew(() =>
             {
                 foreach ( string file in files)
                 {
-                    Task task = new Task(() => ProcessFile(file, container, opts, creator));
-                    queue.Add(task);
+                    // for each raw image, create a processing task
+                    Task task = new Task(() => ProcessFile(file, container, opts));
+                    queue.Add(task); // add the task to the queue - this will block the thread if the queue is full
                     task.Start(); // when the task is done, it will be removed from the queue
                 }
-                queue.CompleteAdding();
+                queue.CompleteAdding(); // notify the consumer that all tasks have been processed
             });
 
             Task.Factory.StartNew(() =>
@@ -169,7 +176,7 @@ namespace Phocalstream_Importer.ViewModels
                 while (queue.IsCompleted == false)
                 {
                     Task check;
-                    waitLine.TryPeek(out check);
+                    waitLine.TryPeek(out check); // peek at the task at the head of the queue
                     if ( check != null && check.IsCompleted )
                     {
                         queue.Take(); // if the task is finished, remove it from the waiting queue
@@ -180,30 +187,38 @@ namespace Phocalstream_Importer.ViewModels
                 this.Site = new CameraSite();
                 using (EntityContext ctx = new EntityContext())
                 {
+                    // update the ViewModel site list
                     this.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.Include("Photos").ToList<CameraSite>());
                 }
                 queue.Dispose();
             });
         }
 
-        private void ProcessFile(string fileName, CloudBlobContainer container, BlobRequestOptions opts, ImageCreator creator)
+        private void ProcessFile(string fileName, CloudBlobContainer container, BlobRequestOptions opts)
         {
-            this.CurrentStatus = String.Format("Processing image {0} ...", fileName);
+            // open a stream to the raw image
             using (var fileStream = System.IO.File.OpenRead(fileName))
             {
+                // get an entity context for adding the photo entity for this image
                 using (EntityContext ctx = new EntityContext())
                 {
+                    // find the camera site for this photo (bound to this entity context)
                     CameraSite site = (from s in ctx.Sites where s.ID == this.Site.ID select s).First<CameraSite>();
 
+                    // open a Bitmap for the image to parse the meta data from
                     using (System.Drawing.Image img = new Bitmap(fileStream))
                     {
+                        // get image mea data
                         PropertyItem[] propItems = img.PropertyItems;
+
+                        // create a new photo with a GUID id for the cloud blob
                         Photo photo = new Photo();
                         photo.BlobID = Guid.NewGuid().ToString();
                         photo.Site = site;
+                        photo.AdditionalExifProperties = new List<MetaDatum>();
                         ctx.Photos.Add(photo);
 
-                        photo.AdditionalExifProperties = new List<MetaDatum>();
+                        // walk the image properties and set the appropriate fields on the image for the various meta data types (EXIF)
                         int len = propItems.Length;
                         for (var i = 0; i < len; i++)
                         {
@@ -270,29 +285,12 @@ namespace Phocalstream_Importer.ViewModels
                                     break;
                             }
                         }
-                        ctx.SaveChanges();
+                        ctx.SaveChanges(); // persist the photo to the db
 
-                        string rootPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), photo.BlobID);
-                        Directory.CreateDirectory(rootPath);
-                        File.Copy(fileName, System.IO.Path.Combine(rootPath, "raw.JPG"));
-
-                        creator.Create(fileName, System.IO.Path.Combine(rootPath, "source.dzi"));
-
-                        String packetPath = System.IO.Path.Combine(rootPath, "packet.zip");
-                        using (ZipFile zip = new ZipFile())
-                        {
-                            zip.AddDirectory(rootPath);
-                            zip.CompressionLevel = Ionic.Zlib.CompressionLevel.BestCompression;
-                            zip.Save(packetPath);
-                        }
-
-                        using (FileStream stream = System.IO.File.OpenRead(packetPath))
-                        {
-                            CloudBlob blob = container.GetBlobReference(photo.BlobID);
-                            blob.UploadFromStream(stream, opts);
-                        }
-
-                        Directory.Delete(rootPath, true);
+                        // reset the file stream so it can be uploaded to the cloud
+                        fileStream.Position = 0;
+                        CloudBlob blob = container.GetBlobReference(String.Format("{0}/Image.jpg", photo.BlobID));
+                        blob.UploadFromStream(fileStream, opts); // upload the raw image
                     }
                 }
             }
@@ -305,12 +303,7 @@ namespace Phocalstream_Importer.ViewModels
 
         protected void DeleteSelected()
         {
-            new Task(() => DoDelete(this.SelectedSiteIndex)).Start();
-        }
-
-        private void DoDelete(int index)
-        {
-            CameraSite selected = this.SiteList.ElementAt<CameraSite>(index);
+            CameraSite selected = this.SiteList.ElementAt<CameraSite>(this.SelectedSiteIndex);
             if (selected != null)
             {
                 using (EntityContext ctx = new EntityContext())
