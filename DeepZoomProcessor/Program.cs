@@ -37,44 +37,6 @@ namespace ServerImageProcessor
                 ccreator.TileOverlap = 1; 
                 ccreator.TileSize = 256;
 
-                Console.WriteLine("Generating DeepZoom Tiles ...");
-                using (SqlConnection conn = new SqlConnection(_dbConnection))
-                {
-                    string containerID = null;
-                    List<string> files = null;
-                    conn.Open();
-              	    using (SqlCommand command = new SqlCommand("select BlobID,ContainerID from Photos p inner join CameraSites s on p.Site_ID = s.ID order by ContainerID", conn))
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            if (containerID == null || containerID != reader.GetString(1))
-                            {
-                                if (files != null)
-                                {
-                                    Console.WriteLine(String.Format("Building DeepZoom Collection for {0}...", containerID));
-                                    // generate the collection
-                                    ccreator.Create(files, System.IO.Path.Combine(System.IO.Path.GetTempPath(), containerID, "da.dzc")); 
-                                }
-                                files = new List<string>();
-                                containerID = reader.GetString(1);
-                            }
-
-                            // create a directory in which to store the DeepZoom tiles for the image
-                            string rootPath = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.GetTempPath(), @"dzgen"), reader.GetString(1));
-                            Directory.CreateDirectory(rootPath);
-
-                            CloudBlob imageBlob = client.GetBlobReference(reader.GetString(1) + "/" + reader.GetString(0) + "/Image.jpg");
-                            string fileName = System.IO.Path.Combine(rootPath, reader.GetString(0)+".jpg");
-                            imageBlob.DownloadToFile(fileName);
-                            files.Add(fileName);
-
-                            creator.Create(fileName, System.IO.Path.Combine(rootPath, reader.GetString(0)+".dzi")); // create the DeepZoom tileset
-                            File.Delete(fileName);
-                        }
-                    }
-                }
-
                 // create a reference to the container for this image site
                 CloudBlobContainer container = client.GetContainerReference("dzsource");
                 container.CreateIfNotExist(); // create it on the cloud if it isn't already there
@@ -87,12 +49,56 @@ namespace ServerImageProcessor
                 blobContainerPermissions.PublicAccess = BlobContainerPublicAccessType.Container;
                 container.SetPermissions(blobContainerPermissions);
 
-                string processRoot = System.IO.Path.Combine(System.IO.Path.GetTempPath(), @"dzgen");
-                DirectoryInfo rootInfo = new DirectoryInfo(processRoot);
+                Console.WriteLine("Generating DeepZoom Tiles ...");
+                using (SqlConnection conn = new SqlConnection(_dbConnection))
+                {
+                    string containerID = null;
+                    List<string> files = null;
+                    conn.Open();
+                    string rootPath = "";
+              	    using (SqlCommand command = new SqlCommand("select BlobID,ContainerID from Photos p inner join CameraSites s on p.Site_ID = s.ID order by ContainerID", conn))
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (containerID == null || containerID != reader.GetString(1))
+                            {
+                                if (files != null)
+                                {
+                                    Console.WriteLine(String.Format("Building DeepZoom Collection for {0}...", containerID));
+                                    // generate the collection
+                                    ccreator.Create(files, System.IO.Path.Combine(rootPath, "da.dzc"));
 
-                Console.WriteLine("Uploading data to Azure ...");
-                IterateFolders(rootInfo, container, processRoot, processRoot); // upload all of the generated image tiles
-                Directory.Delete(processRoot, true); // delete the local DeepZoom tiles
+                                    DirectoryInfo rootInfo = new DirectoryInfo(rootPath);
+
+                                    Console.WriteLine("Uploading data to Azure ...");
+                                    IterateFolders(rootInfo, container, rootPath, rootPath); // upload all of the generated image tiles
+                                    Console.WriteLine(String.Format("Cleaning up for {0} ...", containerID));
+                                    Directory.Delete(rootPath, true); // delete the local DeepZoom tiles
+                                }
+                                
+                                // create a directory in which to store the DeepZoom tiles for the image
+                                rootPath = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.GetTempPath(), @"dzgen"), reader.GetString(1));
+                                Directory.CreateDirectory(rootPath);
+                                files = new List<string>();
+                                containerID = reader.GetString(1);
+                                Console.WriteLine(String.Format("Starting process in {0}", rootPath));
+                            }
+
+                            string fileName = System.IO.Path.Combine(rootPath, reader.GetString(0) + ".jpg");
+                            string dziFile = System.IO.Path.Combine(rootPath, reader.GetString(0) + ".dzi");
+                            files.Add(dziFile);
+
+                            if (File.Exists(dziFile) == false) // if the file is already there, don't recreate it
+                            {
+                                CloudBlob imageBlob = client.GetBlobReference(reader.GetString(1) + "/" + reader.GetString(0) + "/Image.jpg");
+                                imageBlob.DownloadToFile(fileName);
+                                creator.Create(fileName, dziFile); // create the DeepZoom tileset
+                                File.Delete(fileName);
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception e) 
             { 
