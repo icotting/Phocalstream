@@ -15,7 +15,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
-using Phocalstream_Web.Models;
+using Phocalstream_Web.Models.Entity;
 using Phocalstream_Web.Application;
 using System.Drawing;
 using System.Drawing.Imaging;

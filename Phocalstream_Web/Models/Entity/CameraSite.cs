@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
-namespace Phocalstream_Web.Models
+namespace Phocalstream_Web.Models.Entity
 {
     public class CameraSite
     {

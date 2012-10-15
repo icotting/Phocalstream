@@ -2,7 +2,7 @@
 using Microsoft.WindowsAzure.StorageClient;
 using Phocalstream_Importer.Commands;
 using Phocalstream_Web.Application;
-using Phocalstream_Web.Models;
+using Phocalstream_Web.Models.Entity;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

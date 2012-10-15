@@ -1,4 +1,6 @@
-﻿@{
+﻿@model Phocalstream_Web.Models.ViewModels.CollectionViewModel
+
+@{
     Layout = null;
 }
 
@@ -19,6 +21,12 @@
 <body>
     <div>
         <h1>Phocalstream</h1>
+        <ul class="two-columns clearfix">
+            @foreach (var collection in Model.Collections)
+            {
+            <li>@collection.Name</li>
+            }
+        </ul>
     </div>
 </body>
 </html>

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace Phocalstream_Web.Models
+namespace Phocalstream_Web.Models.Entity
 {
     public class Photo
     {
@@ -26,6 +26,7 @@ namespace Phocalstream_Web.Models
 
         public ICollection<MetaDatum> AdditionalExifProperties { get; set; }
         public ICollection<PhotoAnnotation> Annotations { get; set; }
+        public ICollection<Collection> FoundIn { get; set; }
         public virtual CameraSite Site { get; set; }
     }
 }
