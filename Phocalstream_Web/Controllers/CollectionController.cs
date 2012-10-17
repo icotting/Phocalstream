@@ -1,0 +1,35 @@
+﻿using Phocalstream_Web.Application;
+using Phocalstream_Web.Models.Entity;
+using Phocalstream_Web.Models.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace Phocalstream_Web.Controllers
+{
+    public class CollectionController : Controller
+    {
+        public ActionResult Index(long siteID)
+        {
+            using (EntityContext ctx = new EntityContext())
+            {
+                CollectionViewModel model = new CollectionViewModel();
+                model.Collection = (from c in ctx.Collections where c.Site.ID == siteID select c).First();
+                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/{3}", Request.Url.Scheme,
+                    Request.Url.Host,
+                    Request.Url.Port,
+                    model.Collection.Site.ID);
+                model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
+
+                List<Photo> photos = ctx.Photos.Where(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
+                model.PhotoCount = photos.Count();
+                model.StartDate = photos.Select(p => p.Captured).First().ToString(@"MMM dd, yyyy");
+                model.EndDate = photos.Select(p => p.Captured).Last().ToString(@"MMM dd, yyyy");
+                return View(model);
+            }
+        }
+
+    }
+}

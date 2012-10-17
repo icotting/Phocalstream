@@ -1,4 +1,4 @@
-﻿@model Phocalstream_Web.Models.ViewModels.CollectionViewModel
+﻿@model Phocalstream_Web.Models.ViewModels.HomeViewModel
 
 @{
     Layout = null;
@@ -12,19 +12,43 @@
     <title>Phocalstream</title>
     <style>
         body {
-            background-color: black;
-            color: white;
+            background-color: white;
+            color: black;
             font-family: Arial;
+            font-size: 10pt;
+        }
+
+        ul {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+            ul li {
+                padding-bottom: 10px;
+            }
+
+        a {
+            color: #3072ce;
         }
     </style>
 </head>
 <body>
     <div>
         <h1>Phocalstream</h1>
+        <p>Welcome to the Phocalstream web site.  This site represents the first release of a project being 
+            developed in partnership between the Robert B. Daugherty Global Water for Food Institute and the
+            Jeffrey S. Raikes School of Computer Science and Management.  The site will see regular updates
+            over the next several months that will bring planned functionality.  In the mean time, the photo
+            collections that we are building can be browsed below. 
+        </p>
+        <p>
+            This project is being developed as an open source project.  Code can be found in our <a href="https://github.com/icotting/Phocalstream">Github repository</a>.
+        </p>
+        <h2>Photo Collection Sites</h2>
         <ul class="two-columns clearfix">
             @foreach (var collection in Model.Collections)
             {
-            <li>@collection.Name</li>
+            <li><a href="collection?siteId=@collection.Site.ID">@collection.Name</a></li>
             }
         </ul>
     </div>

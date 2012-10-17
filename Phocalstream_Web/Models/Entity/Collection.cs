@@ -11,7 +11,7 @@ namespace Phocalstream_Web.Models.Entity
         [Key]
         public long ID { get; set; }
         public string Name { get; set; }
-        public CameraSite Site { get; set; }
+        public virtual CameraSite Site { get; set; }
         public User Owner { get; set; }
         public ICollection<Photo> Photos { get; set; }
 

@@ -19,3 +19,5 @@ Phocalstream_Web/Properties/PublishProfiles/VM Deployment.pubxml.user
 ._.DS_Store
 Phocalstream_Importer/._.DS_Store
 Phocalstream_Importer/Phocalstream_Importer/app.config
+Phocalstream_PivotView/Bin
+Phocalstream_PivotView/obj

@@ -17,14 +17,13 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult Index()
         {
-            CollectionViewModel model = new CollectionViewModel();
+            HomeViewModel model = new HomeViewModel();
 
             using (EntityContext ctx = new EntityContext())
             {
-                model.Collections = (from c in ctx.Collections select c).ToList<Collection>();
+                model.Collections = ctx.Collections.Include("Site").ToList<Collection>();
+                return View(model);
             }
-
-            return View(model);
         }
 
     }
