@@ -5,24 +5,24 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{845BAD36-AE55-4513-8811-C3E1A58198AE}</ProjectGuid>
+    <ProjectGuid>{4538DE27-ED02-4BA1-BA77-85BC596B3908}</ProjectGuid>
     <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Phocalstream_PivotView</RootNamespace>
-    <AssemblyName>Phocalstream_PivotView</AssemblyName>
+    <RootNamespace>Phocalstream_PhotoView</RootNamespace>
+    <AssemblyName>Phocalstream_PhotoView</AssemblyName>
     <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>true</SilverlightApplication>
     <SupportedCultures>
     </SupportedCultures>
     <XapOutputs>true</XapOutputs>
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
-    <XapFilename>Phocalstream_PivotView.xap</XapFilename>
+    <XapFilename>Phocalstream_PhotoView.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
-    <SilverlightAppEntry>Phocalstream_PivotView.App</SilverlightAppEntry>
-    <TestPageFileName>Phocalstream_PivotViewTestPage.html</TestPageFileName>
+    <SilverlightAppEntry>Phocalstream_PhotoView.App</SilverlightAppEntry>
+    <TestPageFileName>Phocalstream_PhotoViewTestPage.html</TestPageFileName>
     <CreateTestPage>true</CreateTestPage>
     <ValidateXaml>true</ValidateXaml>
     <EnableOutOfBrowser>false</EnableOutOfBrowser>
@@ -67,26 +67,6 @@
       <HintPath>$(TargetFrameworkDirectory)System.Core.dll</HintPath>
     </Reference>
     <Reference Include="System.Net" />
-    <Reference Include="System.Windows.Pivot, Version=1.0.6079.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\System.Windows.Pivot.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Pivot.Model, Version=1.0.6079.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\System.Windows.Pivot.Model.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Pivot.SharedUI, Version=1.0.6079.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\System.Windows.Pivot.SharedUI.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Pivot.StringResources, Version=1.0.6079.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\System.Windows.Pivot.StringResources.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Pivot.Utilities, Version=1.0.6079.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\System.Windows.Pivot.Utilities.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
@@ -97,7 +77,6 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PhocalstreamPivotViewer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

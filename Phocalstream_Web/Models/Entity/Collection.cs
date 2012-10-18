@@ -17,11 +17,18 @@ namespace Phocalstream_Web.Models.Entity
 
         // if the type is SITE then the Photos collection will be empty
         public CollectionType Type { get; set; }
+        public CollectionStatus Status { get; set; }
     }
 
     public enum CollectionType
     {
         SITE,
         USER
+    }
+
+    public enum CollectionStatus
+    {
+        PROCESSING, 
+        COMPLETE
     }
 }

@@ -9,9 +9,30 @@ using System.Web.Mvc;
 
 namespace Phocalstream_Web.Controllers
 {
-    public class CollectionController : Controller
+    public class PhotoController : Controller
     {
-        public ActionResult Index(long siteID)
+        public ActionResult Index(long photoID)
+        {
+            PhotoViewModel model = new PhotoViewModel();
+            using (EntityContext ctx = new EntityContext())
+            {
+                model.Photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
+            }
+
+            if (model.Photo == null)
+            {
+                return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
+            }
+
+            model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}-dz/{4}.dzi", Request.Url.Scheme,
+                    Request.Url.Host,
+                    Request.Url.Port,
+                    model.Photo.Site.ContainerID,
+                    model.Photo.BlobID);
+            return View(model);
+        }
+
+        public ActionResult CameraCollection(long siteID)
         {
             using (EntityContext ctx = new EntityContext())
             {

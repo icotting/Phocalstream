@@ -115,7 +115,7 @@ namespace Phocalstream_Web.Controllers.Api
 
             XmlElement item = doc.CreateElement("Item");
             item.SetAttribute("Img", String.Format("#{0}", Id));
-            item.SetAttribute("Id", Id);
+            item.SetAttribute("Id", Convert.ToString(photo.ID));
             item.SetAttribute("Name", string.Format("{0} {1}", photo.Site.Name, photo.Captured.ToString("MMM dd, yyyy hh:mm tt")));
 
             //item.SetAttribute("Href", string.Format("dzc/{0}/{1}/Image.jpg", photo.Site.ContainerID, photo.BlobID));

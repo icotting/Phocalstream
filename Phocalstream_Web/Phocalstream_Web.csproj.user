@@ -26,6 +26,7 @@
           <AlwaysStartWebServerOnDebug>True</AlwaysStartWebServerOnDebug>
           <ProjectOutputReferences>
             <Ref Project="{845BAD36-AE55-4513-8811-C3E1A58198AE}" Folder="ClientBin">Phocalstream_PivotView.xap</Ref>
+            <Ref Project="{4538DE27-ED02-4BA1-BA77-85BC596B3908}" Folder="ClientBin">Phocalstream_PhotoView.xap</Ref>
           </ProjectOutputReferences>
         </WebProjectProperties>
       </FlavorProperties>

@@ -23,7 +23,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
-    <SilverlightApplicationList>{845BAD36-AE55-4513-8811-C3E1A58198AE}|..\Phocalstream_PivotView\Phocalstream_PivotView.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{845BAD36-AE55-4513-8811-C3E1A58198AE}|..\Phocalstream_PivotView\Phocalstream_PivotView.csproj|ClientBin|False,{4538DE27-ED02-4BA1-BA77-85BC596B3908}|..\Phocalstream_PhotoView\Phocalstream_PhotoView.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -128,8 +128,8 @@
     <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="Application\EntityContext.cs" />
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
-    <Compile Include="Controllers\CollectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -141,6 +141,10 @@
     <Compile Include="Migrations\201210150203568_AddCollection.Designer.cs">
       <DependentUpon>201210150203568_AddCollection.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201210181443275_CollectionStatus.cs" />
+    <Compile Include="Migrations\201210181443275_CollectionStatus.Designer.cs">
+      <DependentUpon>201210181443275_CollectionStatus.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entity\CameraSite.cs" />
     <Compile Include="Models\Entity\Collection.cs" />
@@ -150,15 +154,16 @@
     <Compile Include="Models\Entity\User.cs" />
     <Compile Include="Models\ViewModels\CollectionViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
+    <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="ClientBin\Phocalstream_PhotoView.xap" />
     <Content Include="ClientBin\Phocalstream_PivotView.xap" />
     <Content Include="Global.asax" />
-    <Content Include="PivotView.html" />
     <Content Include="Content\Scripts\Silverlight.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -184,7 +189,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\VM Deployment.pubxml" />
-    <Content Include="Views\Collection\Index.cshtml" />
+    <Content Include="Views\Photo\Index.cshtml" />
+    <Content Include="Views\Photo\CameraCollection.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201210111459021_InitialCreate.resx">
@@ -192,6 +198,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201210150203568_AddCollection.resx">
       <DependentUpon>201210150203568_AddCollection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201210181443275_CollectionStatus.resx">
+      <DependentUpon>201210181443275_CollectionStatus.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

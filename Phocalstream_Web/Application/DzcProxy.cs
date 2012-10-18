@@ -54,21 +54,4 @@ namespace Phocalstream_Web.Application
         public void Dispose()
         { }
     }
-
-    public class Filter : MemoryStream
-    {
-        private Stream outputStream = null;
-        private string requestedResource;
-
-        public Filter(Stream output, string requestedResource)
-        {
-            this.outputStream = output;
-            this.requestedResource = requestedResource;
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-
-        }
-    }
 }

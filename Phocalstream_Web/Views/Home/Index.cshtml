@@ -36,10 +36,10 @@
     <div>
         <h1>Phocalstream</h1>
         <p>Welcome to the Phocalstream web site.  This site represents the first release of a project being 
-            developed in partnership between the Robert B. Daugherty Global Water for Food Institute and the
+            developed in partnership between the Robert B. Daugherty Water for Food Institute at the University of Nebraska and the
             Jeffrey S. Raikes School of Computer Science and Management.  The site will see regular updates
             over the next several months that will bring planned functionality.  In the mean time, the photo
-            collections that we are building can be browsed below. 
+            collections that we are building from the Platte River Time-Lapse Photography Project can be browsed below. 
         </p>
         <p>
             This project is being developed as an open source project.  Code can be found in our <a href="https://github.com/icotting/Phocalstream">Github repository</a>.
@@ -48,7 +48,7 @@
         <ul class="two-columns clearfix">
             @foreach (var collection in Model.Collections)
             {
-            <li><a href="collection?siteId=@collection.Site.ID">@collection.Name</a></li>
+            <li><a href="photo/cameracollection?siteId=@collection.Site.ID">@collection.Name</a></li>
             }
         </ul>
     </div>
