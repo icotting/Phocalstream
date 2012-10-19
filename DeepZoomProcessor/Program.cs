@@ -66,68 +66,7 @@ namespace ServerImageProcessor
                     {
                         if (files != null)
                         {
-                            // create a reference to the container for this image site
-                            CloudBlobContainer container = client.GetContainerReference(String.Format("{0}-dz", containerID));
-                            container.CreateIfNotExist(); // create it on the cloud if it isn't already there
-
-                            BlobRequestOptions options = new BlobRequestOptions();
-                            options.UseFlatBlobListing = true;
-
-                            // set permissions to be public so anyone can access the image sets
-                            BlobContainerPermissions blobContainerPermissions = new BlobContainerPermissions();
-                            blobContainerPermissions.PublicAccess = BlobContainerPublicAccessType.Container;
-                            container.SetPermissions(blobContainerPermissions);
-
-                            using (SqlConnection conn = new SqlConnection(_dbConnection))
-                            {
-                                conn.Open();
-                                Boolean create = false;
-                                using (SqlCommand command = new SqlCommand("select ID from Collections where Site_ID = @Site", conn))
-                                {
-                                    command.Parameters.AddWithValue("@Site", siteId);
-                                    using (SqlDataReader reader = command.ExecuteReader())
-                                    {
-                                        if (reader.HasRows == false) // there is no collection for this site
-                                        {
-                                            create = true;
-                                        }
-                                    }
-                                }
-
-                                if (create)
-                                {
-                                    Console.WriteLine(String.Format("Building DeepZoom Collection for {0}...", containerID));
-                                    // generate the collection
-                                    ccreator.Create(files, System.IO.Path.Combine(rootPath, "da.dzc"));
-
-                                    using (SqlCommand insert = new SqlCommand("insert into Collections (Name,Type,Site_ID,Status) values (@Name,@Type,@Site_ID,@Status)", conn))
-                                    {
-                                        insert.Parameters.AddWithValue("@Name", siteName);
-                                        insert.Parameters.AddWithValue("@Type", 0);
-                                        insert.Parameters.AddWithValue("@Site_ID", siteId);
-                                        insert.Parameters.AddWithValue("@Status", 0);
-                                        insert.ExecuteNonQuery();
-                                    }
-                                }
-                                conn.Close();
-                            }
-                            DirectoryInfo rootInfo = new DirectoryInfo(rootPath);
-
-                            Console.WriteLine("Uploading data to Azure ...");
-                            IterateFolders(rootInfo, container, rootPath, rootPath); // upload all of the generated image tiles
-                            Console.WriteLine(String.Format("Cleaning up for {0} ...", containerID));
-
-                            using (SqlConnection conn = new SqlConnection(_dbConnection))
-                            {
-                                conn.Open();
-                                using (SqlCommand command = new SqlCommand("update Collections set Status = 1 where Site_ID = @Site", conn))
-                                {
-                                    command.Parameters.AddWithValue("@Site", siteId);
-                                    command.ExecuteNonQuery();
-                                }
-                                conn.Close();
-                            }
-                            Directory.Delete(rootPath, true); // delete the local DeepZoom tiles
+                            CompleteContainer(files, client, containerID, siteName, siteId, rootPath, ccreator);
                         }
 
                         // create a directory in which to store the DeepZoom tiles for the image
@@ -155,6 +94,7 @@ namespace ServerImageProcessor
                         File.Delete(fileName);
                     }
                 }
+                CompleteContainer(files, client, containerID, siteName, siteId, rootPath, ccreator);
             }
             catch (Exception e) 
             { 
@@ -164,6 +104,72 @@ namespace ServerImageProcessor
 
             Console.Write("Process complete.  Press any key to continue");
             Console.ReadKey();
+        }
+
+        private static void CompleteContainer(List<string> files, CloudBlobClient client, string containerID, string siteName, long siteId, string rootPath, CollectionCreator ccreator)
+        {
+                // create a reference to the container for this image site
+                CloudBlobContainer container = client.GetContainerReference(String.Format("{0}-dz", containerID));
+                container.CreateIfNotExist(); // create it on the cloud if it isn't already there
+
+                BlobRequestOptions options = new BlobRequestOptions();
+                options.UseFlatBlobListing = true;
+
+                // set permissions to be public so anyone can access the image sets
+                BlobContainerPermissions blobContainerPermissions = new BlobContainerPermissions();
+                blobContainerPermissions.PublicAccess = BlobContainerPublicAccessType.Container;
+                container.SetPermissions(blobContainerPermissions);
+
+                using (SqlConnection conn = new SqlConnection(_dbConnection))
+                {
+                    conn.Open();
+                    Boolean create = false;
+                    using (SqlCommand command = new SqlCommand("select ID from Collections where Site_ID = @Site", conn))
+                    {
+                        command.Parameters.AddWithValue("@Site", siteId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows == false) // there is no collection for this site
+                            {
+                                create = true;
+                            }
+                        }
+                    }
+
+                    if (create)
+                    {
+                        Console.WriteLine(String.Format("Building DeepZoom Collection for {0}...", containerID));
+                        // generate the collection
+                        ccreator.Create(files, System.IO.Path.Combine(rootPath, "da.dzc"));
+
+                        using (SqlCommand insert = new SqlCommand("insert into Collections (Name,Type,Site_ID,Status) values (@Name,@Type,@Site_ID,@Status)", conn))
+                        {
+                            insert.Parameters.AddWithValue("@Name", siteName);
+                            insert.Parameters.AddWithValue("@Type", 0);
+                            insert.Parameters.AddWithValue("@Site_ID", siteId);
+                            insert.Parameters.AddWithValue("@Status", 0);
+                            insert.ExecuteNonQuery();
+                        }
+                    }
+                    conn.Close();
+                }
+                DirectoryInfo rootInfo = new DirectoryInfo(rootPath);
+
+                Console.WriteLine("Uploading data to Azure ...");
+                IterateFolders(rootInfo, container, rootPath, rootPath); // upload all of the generated image tiles
+                Console.WriteLine(String.Format("Cleaning up for {0} ...", containerID));
+
+                using (SqlConnection conn = new SqlConnection(_dbConnection))
+                {
+                    conn.Open();
+                    using (SqlCommand command = new SqlCommand("update Collections set Status = 1 where Site_ID = @Site", conn))
+                    {
+                        command.Parameters.AddWithValue("@Site", siteId);
+                        command.ExecuteNonQuery();
+                    }
+                    conn.Close();
+                }
+                Directory.Delete(rootPath, true); // delete the local DeepZoom tiles
         }
 
         // this method was taken from http://blogs.msdn.com/b/jbarnes/archive/2011/12/07/hosting-wp7-deep-zoom-content-in-azure-blob-storage.aspx 
