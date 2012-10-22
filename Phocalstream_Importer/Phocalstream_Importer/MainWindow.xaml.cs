@@ -22,6 +22,8 @@ using System.Drawing.Imaging;
 using Phocalstream_Importer.ViewModels;
 using System.Data;
 using System.Collections.ObjectModel;
+using System.Data.SqlClient;
+using System.Configuration;
 
 namespace Phocalstream_Importer
 {
@@ -37,9 +39,42 @@ namespace Phocalstream_Importer
             _viewModel.Site = new CameraSite();
             _viewModel.ProgressTotal = 1;
             _viewModel.SelectedSiteIndex = -1;
+
+            _viewModel.StorageAccountKey = ConfigurationManager.AppSettings["storageAccountKey"];
+            _viewModel.StorageAccountName = ConfigurationManager.AppSettings["storageAccountName"];
+
+            Dictionary<long, int> counts = new Dictionary<long, int>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand command = new SqlCommand("select s.ID, count(P.ID) from Photos as p inner join CameraSites s on p.Site_ID = s.ID group by s.ID", conn))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                counts[reader.GetInt64(0)] = reader.GetInt32(1);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
             using (EntityContext ctx = new EntityContext())
             {
-                _viewModel.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.Include("Photos").ToList<CameraSite>());
+                _viewModel.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.ToList<CameraSite>());
+                
+                 foreach ( CameraSite site in _viewModel.SiteList )
+                 {
+                    site.PhotoCount = counts[site.ID];
+                 }
             }
 
             InitializeComponent();

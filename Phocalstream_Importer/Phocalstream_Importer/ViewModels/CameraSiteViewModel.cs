@@ -294,6 +294,7 @@ namespace Phocalstream_Importer.ViewModels
                     }
                 }
             }
+            File.Delete(fileName);
 
             lock (lockObj)
             {

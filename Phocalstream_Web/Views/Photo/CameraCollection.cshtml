@@ -1,124 +1,118 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.CollectionViewModel
 
 @{
-    Layout = null;
+    ViewBag.Title = Model.Collection.Site.Name;
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@Html.DisplayFor(model => model.Collection.Site.Name) Photo Collection</title>
-
-       <style type="text/css">
-    html, body {
-	    height: 100%;
-	    overflow: auto;
-    }
-    body {
-	    padding: 0;
-	    margin: 0;
-    }
-    #silverlightControlHost {
-	    height: 100%;
-	    text-align:center;
-    }
-    #header { 
-	    position: absolute;
-	    top: 0;
-	    left: 0;
-	    background-color: rgba(0,0,0,0.5);
-	    height: 150px;
-	    width: 100%;
-	    padding-top: 10px;
-	    z-index: 200;
-    }
-
-           h1 {
-               padding-left: 50px;
-               color: white;
-               font-family: Arial;
-               font-size: 28pt;
-           }
-
-           #header div {
-            position: relative; 
-            top: -20px;
-            color: white; 
-            padding-left: 50px;
-            font-size: 10pt;
-            font-family: Arial;
-           }
-
-    </style>
-    <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
-    <script type="text/javascript">
-        function onSilverlightError(sender, args) {
-            var appSource = "";
-            if (sender != null && sender != 0) {
-                appSource = sender.getHost().Source;
+    @section Styles
+    {
+         <style type="text/css">
+            #silverlightControlHost {
+	            height: 100%;
+	            text-align:center;
+            }
+            #pageHeader { 
+	            position: relative;
+	            top: 0;
+	            left: 0;
+	            background-color: rgba(0,0,0,0.4);
+	            height: 140px;
+	            width: 100%;
+	            padding-top: 10px;
+	            z-index: 200;
             }
 
-            var errorType = args.ErrorType;
-            var iErrorCode = args.ErrorCode;
-
-            if (errorType == "ImageError" || errorType == "MediaError") {
-                return;
+            #pageHeader h1 {
+                padding-left: 50px;
+                color: white;
+                font-family: Arial;
+                font-size: 28pt;
             }
 
-            var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
-
-            errMsg += "Code: " + iErrorCode + "    \n";
-            errMsg += "Category: " + errorType + "       \n";
-            errMsg += "Message: " + args.ErrorMessage + "     \n";
-
-            if (errorType == "ParserError") {
-                errMsg += "File: " + args.xamlFile + "     \n";
-                errMsg += "Line: " + args.lineNumber + "     \n";
-                errMsg += "Position: " + args.charPosition + "     \n";
+            #pageHeader div {
+                position: relative; 
+                color: white; 
+                padding-left: 50px;
+                font-size: 10pt;
+                font-family: Arial;
             }
-            else if (errorType == "RuntimeError") {
-                if (args.lineNumber != 0) {
+
+             #subhead {
+                position: relative; 
+                top: -20px;
+             }
+            </style>
+        }
+
+    @section Scripts 
+    {
+        <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+        <script type="text/javascript">
+            function onSilverlightError(sender, args) {
+                var appSource = "";
+                if (sender != null && sender != 0) {
+                    appSource = sender.getHost().Source;
+                }
+
+                var errorType = args.ErrorType;
+                var iErrorCode = args.ErrorCode;
+
+                if (errorType == "ImageError" || errorType == "MediaError") {
+                    return;
+                }
+
+                var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
+
+                errMsg += "Code: " + iErrorCode + "    \n";
+                errMsg += "Category: " + errorType + "       \n";
+                errMsg += "Message: " + args.ErrorMessage + "     \n";
+
+                if (errorType == "ParserError") {
+                    errMsg += "File: " + args.xamlFile + "     \n";
                     errMsg += "Line: " + args.lineNumber + "     \n";
                     errMsg += "Position: " + args.charPosition + "     \n";
                 }
-                errMsg += "MethodName: " + args.methodName + "     \n";
+                else if (errorType == "RuntimeError") {
+                    if (args.lineNumber != 0) {
+                        errMsg += "Line: " + args.lineNumber + "     \n";
+                        errMsg += "Position: " + args.charPosition + "     \n";
+                    }
+                    errMsg += "MethodName: " + args.methodName + "     \n";
+                }
+
+                throw new Error(errMsg);
             }
-
-            throw new Error(errMsg);
-        }
-    </script>
-    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+        </script>
+        <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
 	
-	<script type="text/javascript">
-	    function loadMap() {
-	        var mapOptions = {
-	            credentials: "AvikYUpjcBjzTZDMq41HatI4Val4on1Qp45zwxkOVVEB_tQ-dP-fpTuV5axCkTkW",
-	            mapTypeId: Microsoft.Maps.MapTypeId.aerial,
-	            showDashboard: false
-	        }
+	    <script type="text/javascript">
+	        function loadMap() {
+	            var mapOptions = {
+	                credentials: "AvikYUpjcBjzTZDMq41HatI4Val4on1Qp45zwxkOVVEB_tQ-dP-fpTuV5axCkTkW",
+	                mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+	                showDashboard: false
+	            }
 
-	        var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
-	        // Define the pushpin location
-	        var loc = new Microsoft.Maps.Location(@Html.DisplayFor(model => model.SiteCoords));
+	            var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
+	            // Define the pushpin location
+	            var loc = new Microsoft.Maps.Location(@Html.DisplayFor(model => model.SiteCoords));
 
-	        // Add a pin to the map
-	        var pin = new Microsoft.Maps.Pushpin(loc); map.entities.push(pin);
-	        var center = new Microsoft.Maps.Location(loc.latitude, loc.longitude - 0.005);
-	        map.setView({ center: center, zoom: 16 });
+	            // Add a pin to the map
+	            var pin = new Microsoft.Maps.Pushpin(loc); map.entities.push(pin);
+	            var center = new Microsoft.Maps.Location(loc.latitude, loc.longitude - 0.005);
+	            map.setView({ center: center, zoom: 16 });
+            }
+	    </script>
         }
-	</script>
-</head>
-<body onload="loadMap()">
-    <div id="header">
+
+    <div id="pageHeader">
         <h1>@Html.DisplayFor(model => model.Collection.Site.Name)</h1>
-        <div>
+        <div id="subhead">
             @Html.DisplayFor(model => model.PhotoCount) photos from @Html.DisplayFor(model => model.StartDate) to @Html.DisplayFor(model => model.EndDate)
         </div>
     </div>
-    <div id="map" style="z-index: 10; position: absolute; width: 100%; height: 150px; top: 0px; left: 0px;"></div>
-    <form id="form1" runat="server" style="position: absolute; top: 150px; bottom: 5px; width: 100%; z-index: 300;">
+    <div id="map" style="z-index: 10; position: relative; width: 100%; height: 150px; top: -150px; left: 0px;"></div>
+    <form id="form1" runat="server" style="position: absolute; top: 280px; bottom: 5px; width: 80%; min-width: 900px; z-index: 300;">
         <div style="height: 100%;" id="silverlightControlHost">
         <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
 		  <param name="source" value="/ClientBin/Phocalstream_PivotView.xap"/>
@@ -132,5 +126,6 @@
 		  </a>
 	    </object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe></div>
     </form>
-</body>
-</html>
+    <script type="text/javascript">
+        loadMap();
+    </script>

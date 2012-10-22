@@ -1,56 +1,45 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.HomeViewModel
 
 @{
-    Layout = null;
+    ViewBag.Title = "Home";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Phocalstream</title>
+@section styles 
+{
     <style>
-        body {
-            background-color: white;
-            color: black;
-            font-family: Arial;
-            font-size: 10pt;
-        }
-
         ul {
             list-style: none;
-            margin-top: 20px;
+            padding: 0px;
+            margin: 0px;
         }
 
-            ul li {
-                padding-bottom: 10px;
-            }
-
-        a {
-            color: #3072ce;
+        li {
+            float: left; 
+            width: 250px;
+            font-weight: 100;
+            font-size: 15pt;
+            background: url('/Content/Images/Marker.png') no-repeat top left;
+            height: 50px;
+            padding-left: 50px;
+            margin: 0px;
+            padding-top: 8px;
         }
     </style>
-</head>
-<body>
-    <div>
-        <h1>Phocalstream</h1>
-        <p>Welcome to the Phocalstream web site.  This site represents the first release of a project being 
-            developed in partnership between the Robert B. Daugherty Water for Food Institute at the University of Nebraska and the
-            Jeffrey S. Raikes School of Computer Science and Management.  The site will see regular updates
-            over the next several months that will bring planned functionality.  In the mean time, the photo
-            collections that we are building from the Platte River Time-Lapse Photography Project can be browsed below. 
-        </p>
-        <p>
-            This project is being developed as an open source project.  Code can be found in our <a href="https://github.com/icotting/Phocalstream">Github repository</a>.
-        </p>
-        <h2>Photo Collection Sites</h2>
-        <ul class="two-columns clearfix">
-            @foreach (var collection in Model.Collections)
-            {
-            <li><a href="photo/cameracollection?siteId=@collection.Site.ID">@collection.Name</a></li>
-            }
-        </ul>
-    </div>
-</body>
-</html>
+}
+
+<p>Welcome to the Phocalstream web site.  This site represents the first release of a project being 
+    developed in partnership between the Robert B. Daugherty Water for Food Institute at the University of Nebraska and the
+    Jeffrey S. Raikes School of Computer Science and Management.  The site will see regular updates
+    over the next several months that will bring planned functionality.  In the mean time, the photo
+    collections that we are building from the Platte River Time-Lapse Photography Project can be browsed below. 
+</p>
+<p>
+    This project is being developed as an open source project.  Code can be found in our <a href="https://github.com/icotting/Phocalstream">Github repository</a>.
+</p>
+<h2>Photo Collection Sites</h2>
+<ul class="two-columns clearfix">
+    @foreach (var collection in Model.Collections)
+    {
+    <li><a href="photo/cameracollection?siteId=@collection.Site.ID">@collection.Name</a></li>
+    }
+</ul>

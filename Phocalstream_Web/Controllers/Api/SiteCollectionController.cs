@@ -80,7 +80,7 @@ namespace Phocalstream_Web.Controllers.Api
 
                 XmlElement items = doc.CreateElement("Items");
                 items.SetAttribute("ImgBase", string.Format("/dzc/{0}-dz/da.dzc", site.ContainerID));
-                    //items.SetAttribute("HrefBase", "http://phocalstream.blob.core.windows.net/");
+
                     XmlElement item = null;
                     // to get the photo meta data for the DeepZoom referenced image, the photo will need to be looked up by BlobID (not ideal)
                     using (XmlReader collectionReader = XmlReader.Create(dzCollection))
@@ -117,8 +117,6 @@ namespace Phocalstream_Web.Controllers.Api
             item.SetAttribute("Img", String.Format("#{0}", Id));
             item.SetAttribute("Id", Convert.ToString(photo.ID));
             item.SetAttribute("Name", string.Format("{0} {1}", photo.Site.Name, photo.Captured.ToString("MMM dd, yyyy hh:mm tt")));
-
-            //item.SetAttribute("Href", string.Format("dzc/{0}/{1}/Image.jpg", photo.Site.ContainerID, photo.BlobID));
             
             XmlElement facets = doc.CreateElement("Facets");
             XmlElement facet = doc.CreateElement("Facet");

@@ -163,6 +163,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="ClientBin\Phocalstream_PhotoView.xap" />
     <Content Include="ClientBin\Phocalstream_PivotView.xap" />
+    <Content Include="Content\Images\Marker.png" />
+    <Content Include="Content\Images\Phocalstream.png" />
+    <Content Include="Content\Site.css" />
     <Content Include="Global.asax" />
     <Content Include="Content\Scripts\Silverlight.js" />
     <Content Include="Web.config">
@@ -191,6 +194,8 @@
     <None Include="Properties\PublishProfiles\VM Deployment.pubxml" />
     <Content Include="Views\Photo\Index.cshtml" />
     <Content Include="Views\Photo\CameraCollection.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201210111459021_InitialCreate.resx">

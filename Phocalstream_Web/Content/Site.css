@@ -1,0 +1,43 @@
+﻿body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial; 
+    font-size: 10pt;
+    padding: 0px;
+    margin: 0px;
+}
+
+#container {
+    width: 80%;
+    min-width: 900px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 10px;
+}
+
+
+#head {
+    height: 100px;
+}
+
+#head h1 {
+    color: #2f2f2f;
+    padding-top: 30px;
+    position: relative; 
+    left: -10px;
+}
+
+#head img {
+    width: 110px;
+    float: left;
+}
+
+a {
+    color: #1560d7;
+}
+
+a:visited {
+    color: #1560d7;
+}
+
+img {
+    border: none;
+}

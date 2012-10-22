@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Phocalstream - @ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/Site.css" type="text/css" />
+    @RenderSection("Styles", required: false)
+    @RenderSection("Scripts", required: false)
+</head>
+<body>
+    <div id="container">
+        <div id="head">
+            <div style="position: relative; top: -15px;">
+                <a href="~/"><img src="~/Content/Images/Phocalstream.png" /></a>
+                <h1>Phocalstream</h1>
+                <div style="clear: left;"></div>
+            </div>
+        </div>
+        <div>
+            @RenderBody()
+        </div>
+     </div>
+</body>
+</html>

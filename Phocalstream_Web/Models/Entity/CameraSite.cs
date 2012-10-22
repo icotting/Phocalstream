@@ -17,7 +17,7 @@ namespace Phocalstream_Web.Models.Entity
         public string ContainerID { get; set; }
         
         [NotMapped]
-        public int PhotoCount { get { return Photos == null ? 0 : Photos.Count; } }
+        public int PhotoCount { get; set; }
 
         public ICollection<Photo> Photos { get; set; }
     }
