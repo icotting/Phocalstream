@@ -16,6 +16,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <phocalstream:PhocalstreamPivotViewer x:Name="Pivot" Grid.Row="0"/>
+        <phocalstream:PhocalstreamPivotViewer x:Name="Pivot" Grid.Row="0" Visibility="Collapsed"/>
+        <MultiScaleImage x:Name="Image" Visibility="Collapsed" />
     </Grid>
 </UserControl>

@@ -23,7 +23,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
-    <SilverlightApplicationList>{845BAD36-AE55-4513-8811-C3E1A58198AE}|..\Phocalstream_PivotView\Phocalstream_PivotView.csproj|ClientBin|False,{4538DE27-ED02-4BA1-BA77-85BC596B3908}|..\Phocalstream_PhotoView\Phocalstream_PhotoView.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{845BAD36-AE55-4513-8811-C3E1A58198AE}|..\Phocalstream_PivotView\Phocalstream_PivotView.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

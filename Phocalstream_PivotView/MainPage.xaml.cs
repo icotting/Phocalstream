@@ -22,15 +22,34 @@ namespace Phocalstream_PivotView
 
         protected void MainPage_Loaded(object sender, RoutedEventArgs e) 
         {
-            string collection = App.Current.Host.InitParams["collection"].ToString();
-            try
+
+            if (App.Current.Host.InitParams.ContainsKey("collection"))
             {
-                Pivot.LoadCollection(collection, string.Empty);
+                string collection = App.Current.Host.InitParams["collection"].ToString();
+                Pivot.Visibility = System.Windows.Visibility.Visible;
+                try
+                {
+                    Pivot.LoadCollection(collection, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    Console.WriteLine(ex.ToString());
+                }
             }
-            catch (Exception ex)
+            else if (App.Current.Host.InitParams.ContainsKey("photo"))
             {
-                MessageBox.Show(ex.Message);
-                Console.WriteLine(ex.ToString());
+                string photo = App.Current.Host.InitParams["photo"].ToString();
+                Image.Visibility = System.Windows.Visibility.Visible;
+                try
+                {
+                    Image.Source = new DeepZoomImageTileSource(new Uri(photo));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
     }
