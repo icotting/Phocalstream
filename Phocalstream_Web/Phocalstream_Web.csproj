@@ -125,6 +125,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\Data\DroughtMonitorImporter.cs" />
     <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="Application\EntityContext.cs" />
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
