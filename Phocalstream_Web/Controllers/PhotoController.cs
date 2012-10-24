@@ -29,6 +29,10 @@ namespace Phocalstream_Web.Controllers
                     Request.Url.Port,
                     model.Photo.Site.ContainerID,
                     model.Photo.BlobID);
+            model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
+            model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
+            model.SiteCoords = string.Format("{0}, {1}", model.Photo.Site.Latitude, model.Photo.Site.Longitude);
+
             return View(model);
         }
 

@@ -10,5 +10,8 @@ namespace Phocalstream_Web.Models.ViewModels
     {
         public Photo Photo { get; set; }
         public string ImageUrl { get; set; }
+        public string PhotoDate { get; set; }
+        public string PhotoTime { get; set; }
+        public string SiteCoords { get; set; }
     }
 }
