@@ -11,5 +11,13 @@ namespace Phocalstream_Web.Models.Entity
         public string GoogleID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public UserRole Role { get; set; }
+    }
+
+    public enum UserRole
+    {
+        ADMIN,
+        REVIEWER,
+        STANDARD
     }
 }

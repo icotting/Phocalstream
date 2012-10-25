@@ -146,6 +146,10 @@
     <Compile Include="Migrations\201210181443275_CollectionStatus.Designer.cs">
       <DependentUpon>201210181443275_CollectionStatus.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201210251512529_UserRole.cs" />
+    <Compile Include="Migrations\201210251512529_UserRole.Designer.cs">
+      <DependentUpon>201210251512529_UserRole.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entity\CameraSite.cs" />
     <Compile Include="Models\Entity\Collection.cs" />
@@ -207,6 +211,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201210181443275_CollectionStatus.resx">
       <DependentUpon>201210181443275_CollectionStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201210251512529_UserRole.resx">
+      <DependentUpon>201210251512529_UserRole.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

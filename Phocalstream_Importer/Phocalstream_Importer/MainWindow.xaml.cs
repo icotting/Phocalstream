@@ -67,16 +67,22 @@ namespace Phocalstream_Importer
                 Console.WriteLine(e.ToString());
             }
 
-            using (EntityContext ctx = new EntityContext())
+            try
             {
-                _viewModel.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.ToList<CameraSite>());
-                
-                 foreach ( CameraSite site in _viewModel.SiteList )
-                 {
-                    site.PhotoCount = counts[site.ID];
-                 }
-            }
+                using (EntityContext ctx = new EntityContext())
+                {
+                    _viewModel.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.ToList<CameraSite>());
 
+                    foreach (CameraSite site in _viewModel.SiteList)
+                    {
+                        site.PhotoCount = counts[site.ID];
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
             InitializeComponent();
             base.DataContext = _viewModel;
         }
