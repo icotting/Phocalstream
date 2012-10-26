@@ -1,5 +1,5 @@
 ﻿using Phocalstream_Web.Application;
-using Phocalstream_Web.Models.Entity;
+using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +15,7 @@ namespace Phocalstream_Web.Controllers.Api
     public class SiteCollectionController : ApiController
     {
         // GET api/collection/5
+        [AllowAnonymous]
         public HttpResponseMessage Get(int id)
         {
             using (EntityContext ctx = new EntityContext())

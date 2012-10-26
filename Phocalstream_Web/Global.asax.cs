@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using WebMatrix.WebData;
 
 namespace Phocalstream_Web
 {
@@ -22,6 +23,9 @@ namespace Phocalstream_Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             RouteTable.Routes.MapHttpRoute(name: "DZC Controller", routeTemplate: "api/dzc/{resource}", defaults: new { controller = "DzcController" });
+
+            AuthConfig.RegisterAuth();
+            WebSecurity.InitializeDatabaseConnection("DbConnection", "Users", "ID", "GoogleID", true);
         }
     }
 }

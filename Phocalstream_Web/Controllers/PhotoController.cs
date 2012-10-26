@@ -1,5 +1,5 @@
 ﻿using Phocalstream_Web.Application;
-using Phocalstream_Web.Models.Entity;
+using Phocalstream_Web.Models;
 using Phocalstream_Web.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ namespace Phocalstream_Web.Controllers
 {
     public class PhotoController : Controller
     {
+        [AllowAnonymous]
         public ActionResult Index(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
@@ -36,6 +37,7 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         public ActionResult CameraCollection(long siteID)
         {
             using (EntityContext ctx = new EntityContext())

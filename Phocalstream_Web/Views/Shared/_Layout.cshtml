@@ -16,6 +16,19 @@
                 <h1>Phocalstream</h1>
                 <div style="clear: left;"></div>
             </div>
+            <div style="position: absolute; bottom: 200px; left: 50px;">
+                    @using (@Html.BeginForm("Login", "Account"))
+                    {
+                        @Html.AntiForgeryToken()
+                        <fieldset id="socialLoginList">
+                        <legend>Log in using another service</legend>
+                        <p>
+                        <button type="submit" name="provider" value="Login" title="Log in using your Google account">Login</button>
+                        </p>
+                        </fieldset>
+                    }
+                   
+                </div>
         </div>
         <div>
             @RenderBody()
