@@ -360,7 +360,7 @@ namespace Phocalstream_Importer.ViewModels
                     ccreator.TileOverlap = 1;
                     ccreator.TileSize = 256;
 
-                    this.CurrentStatus = "Generating DeepZoom Tiles ...";
+                    this.CurrentStatus += "Generating DeepZoom Tiles ...\n";
                     string rootPath = "";
                     string containerID = null;
                     string siteName = null;
@@ -402,12 +402,11 @@ namespace Phocalstream_Importer.ViewModels
                             siteId = site.Item3;
                             siteName = site.Item4;
 
-                            this.CurrentStatus = String.Format("Starting process in {0}", rootPath);
+                            this.CurrentStatus += String.Format("Starting process in {0}\n", rootPath);
                         }
 
                         string fileName = System.IO.Path.Combine(rootPath, site.Item1 + ".jpg");
                         string dziFile = System.IO.Path.Combine(rootPath, site.Item1 + ".dzi");
-                        files.Add(dziFile);
 
                         if (File.Exists(dziFile) == false) // if the file is already there, don't recreate it
                         {
@@ -417,10 +416,11 @@ namespace Phocalstream_Importer.ViewModels
                                 imageBlob.DownloadToFile(fileName);
                                 creator.Create(fileName, dziFile); // create the DeepZoom tileset
                                 File.Delete(fileName);
+                                files.Add(dziFile);
                             }
                             catch (Exception e)
                             {
-                                this.CurrentStatus = String.Format("Could not process file {0} due to {1}", fileName, e.Message);
+                                this.CurrentStatus += String.Format("Could not process file {0} due to {1}\n", fileName, e.Message);
                             }
                         }
                     }
@@ -428,15 +428,15 @@ namespace Phocalstream_Importer.ViewModels
                 }
                 catch (Exception e)
                 {
-                    this.CurrentStatus = String.Format("Error: {0}", e.Message);
-                    Console.WriteLine(e.ToString());
+                    this.CurrentStatus += String.Format("Error: {0}\n", e.Message);
+                    this.CurrentStatus += String.Format("Error: {0}\n", e.ToString());
                 }
 
-                this.CurrentStatus = "Deep Zoom Process complete";            
+                this.CurrentStatus += "Deep Zoom Process complete\n";            
             }).Start();
         }
 
-        private static void CompleteContainer(List<string> files, CloudBlobClient client, string containerID, string siteName, long siteId, string rootPath, CollectionCreator ccreator)
+        private void CompleteContainer(List<string> files, CloudBlobClient client, string containerID, string siteName, long siteId, string rootPath, CollectionCreator ccreator)
         {
                 // create a reference to the container for this image site
                 CloudBlobContainer container = client.GetContainerReference(String.Format("{0}-dz", containerID));
@@ -468,7 +468,7 @@ namespace Phocalstream_Importer.ViewModels
 
                     if (create)
                     {
-                        Console.WriteLine(String.Format("Building DeepZoom Collection for {0}...", containerID));
+                        this.CurrentStatus += String.Format("Building DeepZoom Collection for {0}...", containerID);
                         // generate the collection
                         ccreator.Create(files, System.IO.Path.Combine(rootPath, "da.dzc"));
 
@@ -485,9 +485,9 @@ namespace Phocalstream_Importer.ViewModels
                 }
                 DirectoryInfo rootInfo = new DirectoryInfo(rootPath);
 
-                Console.WriteLine("Uploading data to Azure ...");
+                this.CurrentStatus += "Uploading data to Azure ...\n";
                 IterateFolders(rootInfo, container, rootPath, rootPath); // upload all of the generated image tiles
-                Console.WriteLine(String.Format("Cleaning up for {0} ...", containerID));
+                this.CurrentStatus += String.Format("Cleaning up for {0} ...\n", containerID);
 
                 using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
                 {

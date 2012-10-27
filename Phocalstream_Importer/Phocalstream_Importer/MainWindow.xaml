@@ -8,9 +8,8 @@
             <RowDefinition Height="337*"/>
         </Grid.RowDefinitions>
         <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="230" Margin="515,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="416"/>
-        <Button Content="Begin Import" Command="{Binding ImportPhotos}" HorizontalAlignment="Left" Margin="22,108,0,0" VerticalAlignment="Top" Width="93" Height="28" Grid.Row="1"/>
-        <ProgressBar x:Name="Progress" HorizontalAlignment="Left" Height="31" Margin="22,53,0,0" VerticalAlignment="Top" Width="461" Grid.Row="1" Minimum="0" Maximum="{Binding ProgressTotal}" Value="{Binding ProgressValue}"  Background="{Binding ProgressColor}"/>
-        <Label x:Name="StatusLabel" Content="{Binding CurrentStatus}" HorizontalAlignment="Left" Margin="22,22,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.053,0.192" Width="461" Grid.Row="1" Height="26"/>
+        <Button Content="Begin Import" Command="{Binding ImportPhotos}" HorizontalAlignment="Left" Margin="22,69,0,0" VerticalAlignment="Top" Width="93" Height="28" Grid.Row="1"/>
+        <ProgressBar x:Name="Progress" HorizontalAlignment="Left" Height="31" Margin="22,22,0,0" VerticalAlignment="Top" Width="461" Grid.Row="1" Minimum="0" Maximum="{Binding ProgressTotal}" Value="{Binding ProgressValue}"  Background="{Binding ProgressColor}"/>
         <Canvas HorizontalAlignment="Left" Height="230" VerticalAlignment="Top" Width="416" Margin="515,29,0,0">
             <Label Content="Container Info" Canvas.Left="10" Canvas.Top="10" FontWeight="Bold"/>
             <Label Content="Site Name" Canvas.Left="23" Canvas.Top="52"/>
@@ -42,6 +41,15 @@
             </ListView.View>
         </ListView>
         <Button Command="{Binding DeleteSite}" Content="Delete Selected" HorizontalAlignment="Left" Margin="838,286,0,0" VerticalAlignment="Top" Width="93" Height="28" Grid.Row="1"/>
-        <Button Content="Begin Deep Zoom Process" Command="{Binding RunDeepZoomProcess}" HorizontalAlignment="Left" Margin="142,108,0,0" VerticalAlignment="Top" Width="185" Height="28" Grid.Row="1"/>
+        <Button Content="Begin Deep Zoom Process" Command="{Binding RunDeepZoomProcess}" HorizontalAlignment="Left" Margin="150,69,0,0" VerticalAlignment="Top" Width="185" Height="28" Grid.Row="1"/>
+        <Canvas Margin="22,115,479,23" Grid.Row="1">
+            <FlowDocumentScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="199" Width="461">
+                <FlowDocument PageWidth="800" FontSize="10">
+                    <Paragraph>
+                        <TextBlock Text="{Binding CurrentStatus}"/>
+                    </Paragraph>
+                </FlowDocument>
+            </FlowDocumentScrollViewer>
+        </Canvas>
     </Grid>
 </Window>
