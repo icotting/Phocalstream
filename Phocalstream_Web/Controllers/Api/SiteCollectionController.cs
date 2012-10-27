@@ -155,11 +155,11 @@ namespace Phocalstream_Web.Controllers.Api
             {
                 timeOfDay = "Night";
             }
-            else if (hour >= 5 && hour < 11)
+            else if (hour >= 5 && hour < 12)
             {
                 timeOfDay = "Morning";
             }
-            else if (hour >= 11 && hour < 17)
+            else if (hour >= 12 && hour < 17)
             {
                 timeOfDay = "Afternoon";
             }

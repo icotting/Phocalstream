@@ -185,9 +185,13 @@
     <Content Include="ClientBin\Phocalstream_PhotoView.xap" />
     <Content Include="ClientBin\Phocalstream_PivotView.xap" />
     <Content Include="Content\Images\About.png" />
+    <Content Include="Content\Images\Collections.png" />
+    <Content Include="Content\Images\Like.png" />
     <Content Include="Content\Images\Login.png" />
     <Content Include="Content\Images\Marker.png" />
     <Content Include="Content\Images\Phocalstream.png" />
+    <Content Include="Content\Images\Settings.png" />
+    <Content Include="Content\Images\User.png" />
     <Content Include="Content\Site.css" />
     <Content Include="Global.asax" />
     <Content Include="Content\Scripts\Silverlight.js" />
