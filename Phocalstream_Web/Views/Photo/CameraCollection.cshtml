@@ -19,7 +19,7 @@
 	            height: 140px;
 	            width: 100%;
 	            padding-top: 10px;
-	            z-index: 200;
+	            z-index: 20;
             }
 
             #pageHeader h1 {
@@ -90,7 +90,13 @@
 	            var mapOptions = {
 	                credentials: "AvikYUpjcBjzTZDMq41HatI4Val4on1Qp45zwxkOVVEB_tQ-dP-fpTuV5axCkTkW",
 	                mapTypeId: Microsoft.Maps.MapTypeId.aerial,
-	                showDashboard: false
+	                showDashboard: false,
+	                disableKeyboardInput: true,
+	                disableMouseInput: true,
+	                disablePanning: true,
+	                disableTouchInput: true, 
+	                disableUserInput: true,
+	                disableZooming: true
 	            }
 
 	            var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
