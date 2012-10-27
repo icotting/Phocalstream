@@ -1,0 +1,89 @@
+﻿@model Phocalstream_Web.Models.UserManageModel
+
+@{
+    ViewBag.Title = "UserProfile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+    <style>
+        .profile {
+            width: 50%;
+            margin-bottom: 20px;
+            margin-left: 15px;
+            font-size: 12pt;
+        }
+
+        .notice {
+            color: #63dc30;
+            font-weight: 500;
+            font-size: 10pt;
+            margin-bottom: 10px;
+        }
+    </style>
+}
+
+<h2>User Profile Management</h2>
+<div class="notice">@Html.DisplayFor(model => model.Status)</div>
+
+
+@using (@Html.BeginForm("UserProfile", "Account"))
+{
+<table class="profile">
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.User.FirstName)
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.User.FirstName)
+        </td>
+        <td>
+            @Html.ValidationMessageFor(m => m.User.FirstName)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.User.LastName)
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.User.LastName)
+        </td>
+        <td>
+            @Html.ValidationMessageFor(m => m.User.LastName)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.User.EmailAddress)
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.User.EmailAddress)
+        </td>
+        <td>
+            @Html.ValidationMessageFor(m => m.User.EmailAddress)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.User.Organization)
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.User.Organization)
+        </td>
+        <td>
+            @Html.ValidationMessageFor(m => m.User.Organization)
+        </td>
+    </tr>
+</table>
+    @Html.HiddenFor(m => m.User.ID)
+    @Html.HiddenFor(m => m.User.GoogleID)
+<input type="submit" value="Update Profile" />
+}
+<div style="margin-top: 20px;">
+@using (@Html.BeginForm("LogOff", "Account"))
+{
+    @Html.AntiForgeryToken()
+    <input type="submit" value="Logoff" />
+}
+</div>

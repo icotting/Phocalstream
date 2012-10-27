@@ -12,23 +12,13 @@
     <div id="container">
         <div id="head">
             <div style="position: relative; top: -15px;">
-                <a href="~/"><img src="~/Content/Images/Phocalstream.png" /></a>
+                <a href="~/"><img class="logo" src="~/Content/Images/Phocalstream.png" /></a>
                 <h1>Phocalstream</h1>
                 <div style="clear: left;"></div>
             </div>
-            <div style="position: absolute; bottom: 200px; left: 50px;">
-                    @using (@Html.BeginForm("Login", "Account"))
-                    {
-                        @Html.AntiForgeryToken()
-                        <fieldset id="socialLoginList">
-                        <legend>Log in using another service</legend>
-                        <p>
-                        <button type="submit" name="provider" value="Login" title="Log in using your Google account">Login</button>
-                        </p>
-                        </fieldset>
-                    }
-                   
-                </div>
+            <div style="position: absolute; top: 10px; right: 20px; background-color: #efefef; padding: 2px; border: 1px solid #808080">
+               @Html.Partial("_MenuBarPartial")
+            </div>
         </div>
         <div>
             @RenderBody()

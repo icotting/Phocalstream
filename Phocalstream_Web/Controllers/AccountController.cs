@@ -4,23 +4,74 @@ using Phocalstream_Web.Application;
 using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Objects;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using WebMatrix.WebData;
 
 namespace Phocalstream_Web.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
-        //
-        // GET: /Account/
+        public ActionResult UserProfile()
+        {
+            User user;
+            using (EntityContext ctx = new EntityContext())
+            {
+                user = ctx.Users.Where(u => u.GoogleID == this.User.Identity.Name).FirstOrDefault<User>();
+            }
 
-        public ActionResult Index()
+            return View(new UserManageModel() { User = user });
+        }
+
+        [AllowAnonymous]
+        public ActionResult LoginFailure()
         {
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult LogOff()
+        {
+            WebSecurity.Logout();
+
+            return RedirectToAction("Index", "Home");
+        }
+
+
+        [HttpPost]
+        public ActionResult UserProfile(UserManageModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    using (EntityContext ctx = new EntityContext())
+                    {
+                        ctx.Entry<User>(model.User).State = System.Data.EntityState.Modified;
+                        ctx.SaveChanges();
+                    }
+                    model.Status = "Profile updated";
+                }
+                catch (Exception e)
+                {
+                    model.Status = String.Format("An error occurred: {0}", e.Message);
+                }
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult Login(string returnUrl)
+        {
+            return new ExternalLoginResult("Google", Url.Action("LoginCallback", new { ReturnUrl = returnUrl }));
+        }
+
 
         [HttpPost]
         [AllowAnonymous]
@@ -84,6 +135,7 @@ namespace Phocalstream_Web.Controllers
                     {
                         // Insert name into the profile table
                         model.User.GoogleID = model.ProviderUserName;
+                        model.User.Role = UserRole.STANDARD;
                         ctx.Users.Add(model.User);
                         ctx.SaveChanges();
 

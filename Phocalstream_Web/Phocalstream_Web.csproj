@@ -184,6 +184,8 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="ClientBin\Phocalstream_PhotoView.xap" />
     <Content Include="ClientBin\Phocalstream_PivotView.xap" />
+    <Content Include="Content\Images\About.png" />
+    <Content Include="Content\Images\Login.png" />
     <Content Include="Content\Images\Marker.png" />
     <Content Include="Content\Images\Phocalstream.png" />
     <Content Include="Content\Site.css" />
@@ -219,6 +221,9 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Account\RegisterAccount.cshtml" />
+    <Content Include="Views\Shared\_MenuBarPartial.cshtml" />
+    <Content Include="Views\Account\UserProfile.cshtml" />
+    <Content Include="Views\Account\LoginFailure.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

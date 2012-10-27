@@ -16,6 +16,12 @@ namespace Phocalstream_Web.Models
         public User User { get; set; }
     }
 
+    public class UserManageModel
+    {
+        public string Status { get; set; }
+        public User User { get; set; }
+    }
+
     public class User
     {
         [Key]

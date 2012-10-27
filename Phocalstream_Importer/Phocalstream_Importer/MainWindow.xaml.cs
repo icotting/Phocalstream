@@ -15,15 +15,15 @@ using System.IO;
 using System.Threading;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
-using Phocalstream_Web.Models.Entity;
+using Phocalstream_Web.Models;
 using Phocalstream_Web.Application;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Phocalstream_Importer.ViewModels;
 using System.Data;
 using System.Collections.ObjectModel;
-using System.Data.SqlClient;
 using System.Configuration;
+using System.Data.SqlClient;
 
 namespace Phocalstream_Importer
 {

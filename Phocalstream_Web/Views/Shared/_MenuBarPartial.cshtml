@@ -1,0 +1,32 @@
+﻿<table>
+    <tr>
+        <td>
+                <img style="width: 30px;" src="~/Content/Images/Like.png" alt="Like us on Facebook" />
+        </td>
+        <td>
+                <img style="width: 30px;" src="~/Content/Images/About.png" alt="About" />
+        </td>
+        @if (Request.IsAuthenticated)
+        {
+        <td>
+            <img style="width: 30px;" src="~/Content/Images/Collections.png" alt="About" />
+        </td>
+        }
+        @if (Request.IsAuthenticated)
+        {
+        <td>
+            <a href="/account/userprofile"><img style="width: 30px;" src="~/Content/Images/User.png" alt="About" /></a>
+        </td>
+        }
+        else
+        {
+        <td>
+            @using (@Html.BeginForm("Login", "Account"))
+            {
+                @Html.AntiForgeryToken()
+                <input style="width: 30px;" type="image" src="~/Content/Images/Login.png" alt="Login" />
+            }
+        </td>
+        }
+    </tr>
+</table>
