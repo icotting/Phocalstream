@@ -1,4 +1,6 @@
-﻿using Phocalstream_Web.Application;
+﻿using Phocalstream_Shared;
+using Phocalstream_Shared.Models;
+using Phocalstream_Web.Application;
 using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;

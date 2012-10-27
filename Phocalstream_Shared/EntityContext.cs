@@ -1,11 +1,11 @@
-﻿using Phocalstream_Web.Models;
+﻿using Phocalstream_Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
 
-namespace Phocalstream_Web.Application
+namespace Phocalstream_Shared
 {
     public class EntityContext : DbContext
     {

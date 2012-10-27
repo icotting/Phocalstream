@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
-namespace Phocalstream_Web.Models
+namespace Phocalstream_Shared.Models
 {
     public class CameraSite
     {
@@ -94,5 +94,36 @@ namespace Phocalstream_Web.Models
         public Photo Photo { get; set; }
         public DateTime Added { get; set; }
         public User Author { get; set; }
+    }
+
+    public class User
+    {
+        [Key]
+        public int ID { get; set; }
+        public string GoogleID { get; set; }
+
+        [Display(Name = "First name")]
+        [Required]
+        public string FirstName { get; set; }
+
+        [Display(Name = "Last name")]
+        [Required]
+        public string LastName { get; set; }
+
+        public UserRole Role { get; set; }
+
+        [Display(Name = "Preferred email address")]
+        [Required]
+        public string EmailAddress { get; set; }
+
+        [Display(Name = "Affiliated organization or school")]
+        public string Organization { get; set; }
+    }
+
+    public enum UserRole
+    {
+        ADMIN,
+        REVIEWER,
+        STANDARD
     }
 }

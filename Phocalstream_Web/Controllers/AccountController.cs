@@ -1,7 +1,8 @@
 ﻿using DotNetOpenAuth.AspNet;
 using Microsoft.Web.WebPages.OAuth;
+using Phocalstream_Shared;
 using Phocalstream_Web.Application;
-using Phocalstream_Web.Models;
+using Phocalstream_Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using WebMatrix.WebData;
+using Phocalstream_Web.Models;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -106,7 +108,7 @@ namespace Phocalstream_Web.Controllers
                 // User is new, ask for their desired membership name
                 string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
                 ViewBag.ReturnUrl = returnUrl;
-                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = new Models.User()});
+                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = new Phocalstream_Shared.Models.User()});
             }
         }
 
@@ -128,7 +130,7 @@ namespace Phocalstream_Web.Controllers
                 // Insert a new user into the database
                 using (EntityContext ctx = new EntityContext())
                 {
-                    Phocalstream_Web.Models.User user = ctx.Users.FirstOrDefault(u => u.GoogleID == model.ProviderUserName);
+                    Phocalstream_Shared.Models.User user = ctx.Users.FirstOrDefault(u => u.GoogleID == model.ProviderUserName);
 
                     // Check if user already exists
                     if (user == null)
