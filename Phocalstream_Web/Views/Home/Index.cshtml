@@ -7,24 +7,44 @@
 @section styles 
 {
     <style>
-        ul {
-            list-style: none;
-            padding: 0px;
-            margin: 0px;
+        #map {
+            width: 600px;
+            height: 400px;
+            float: left;
         }
 
-        li {
-            float: left; 
-            width: 250px;
-            font-weight: 100;
-            font-size: 15pt;
-            background: url('/Content/Images/Marker.png') no-repeat top left;
-            height: 50px;
-            padding-left: 50px;
-            margin: 0px;
-            padding-top: 8px;
+        #siteList {
+            width: 320px;
+            float: right;
         }
+
+        #siteList h1 {
+            font-weight: 100;            
+            font-size: 30pt;
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            line-height: 30px;
+        }
+
+        .detailsSub {
+            font-size: 14pt;
+            font-weight: 200;
+            margin-top: 15px;
+        }
+
+        #siteContainer { width: 100%; }
     </style>
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        var siteList = @Html.Raw(Json.Encode(Model.Collections));
+    </script>
+    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+    <script type="text/javascript" src="~/Content/Scripts/SiteSelection.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
 }
 
 <p>Welcome to the Phocalstream web site.  This site represents the first release of a project being 
@@ -36,10 +56,17 @@
 <p>
     This project is being developed as an open source project.  Code can be found in our <a href="https://github.com/icotting/Phocalstream">Github repository</a>.
 </p>
-<h2>Photo Collection Sites</h2>
-<ul class="two-columns clearfix">
-    @foreach (var collection in Model.Collections)
-    {
-    <li><a href="photo/cameracollection?siteId=@collection.Site.ID">@collection.Name</a></li>
-    }
-</ul>
+<div id="sitesContainer">
+    <div id="map">
+
+    </div>
+    <div id="siteList">
+        <h1>Photo Collections</h1>
+        <p>
+            Using the map to the left, select from the available camera sites to view
+            time-lapse photos and information about the site.
+        </p>
+    </div>
+    <div style="clear: both;"></div>
+
+</div>

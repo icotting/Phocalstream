@@ -52,44 +52,9 @@
     @section Scripts 
     {
             <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+            <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
             <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
             <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
-            <script type="text/javascript">
-                function onSilverlightError(sender, args) {
-                    var appSource = "";
-                    if (sender != null && sender != 0) {
-                        appSource = sender.getHost().Source;
-                    }
-
-                    var errorType = args.ErrorType;
-                    var iErrorCode = args.ErrorCode;
-
-                    if (errorType == "ImageError" || errorType == "MediaError") {
-                        return;
-                    }
-
-                    var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
-
-                    errMsg += "Code: " + iErrorCode + "    \n";
-                    errMsg += "Category: " + errorType + "       \n";
-                    errMsg += "Message: " + args.ErrorMessage + "     \n";
-
-                    if (errorType == "ParserError") {
-                        errMsg += "File: " + args.xamlFile + "     \n";
-                        errMsg += "Line: " + args.lineNumber + "     \n";
-                        errMsg += "Position: " + args.charPosition + "     \n";
-                    }
-                    else if (errorType == "RuntimeError") {
-                        if (args.lineNumber != 0) {
-                            errMsg += "Line: " + args.lineNumber + "     \n";
-                            errMsg += "Position: " + args.charPosition + "     \n";
-                        }
-                        errMsg += "MethodName: " + args.methodName + "     \n";
-                    }
-
-                    throw new Error(errMsg);
-                }
-            </script>
 
             <script type="text/javascript">
                 function fullScreen() {

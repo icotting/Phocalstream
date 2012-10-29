@@ -194,6 +194,7 @@
     <Content Include="Content\Images\Settings.png" />
     <Content Include="Content\Images\User.png" />
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
+    <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
     <Content Include="Content\Scripts\jquery-ui-1.8.20.min.js" />
     <Content Include="Content\Scripts\jquery.unobtrusive-ajax.min.js" />
@@ -201,6 +202,7 @@
     <Content Include="Content\Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\Scripts\knockout-2.1.0.js" />
     <Content Include="Content\Scripts\modernizr-2.5.3.js" />
+    <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Site.css" />
     <Content Include="Global.asax" />
     <Content Include="Content\Scripts\Silverlight.js" />
@@ -216,6 +218,7 @@
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\Settings\_DmImportPartial.cshtml" />
+    <Content Include="Views\Home\_SiteDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Application\IO\" />
