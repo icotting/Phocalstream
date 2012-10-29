@@ -1,0 +1,52 @@
+﻿@model Phocalstream_Web.Models.ViewModels.SettingsViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Site Settings</h2>
+
+<div style="width: 600px;">
+<table style="width: 100%">
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Organization</th>
+        <th>Actions</th>
+    </tr>
+@foreach (var user in Model.UserList)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(model => user.User.FirstName) @Html.DisplayFor(model => user.User.LastName)
+        </td>
+        <td>
+            @Html.DisplayFor(model => user.User.EmailAddress)
+        </td>
+        <td>
+            @Html.DisplayFor(model => user.User.Organization)
+        </td>
+        <td>
+            @if ( user.isCurrentUser )
+            {
+                <span>--</span>
+            }
+            else 
+            {
+                @Html.ActionLink("Delete", "Delete", new { id = user.User.ID })
+                <text>&nbsp;&nbsp;|&nbsp;</text>
+                if (user.isAdmin)
+                {
+                    @Html.ActionLink("Remove from admin group", "RemoveAdmin", new { id = user.User.ID })
+                }
+                else
+                {
+                    @Html.ActionLink("Add to admin group", "AddAdmin", new { id = user.User.ID })
+                }
+            }
+        </td>
+    </tr>
+}
+</table>
+</div>

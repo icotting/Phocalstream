@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.Mvc;
 using WebMatrix.WebData;
 using Phocalstream_Web.Models;
+using System.Web.Security;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -35,8 +36,7 @@ namespace Phocalstream_Web.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
         public ActionResult LogOff()
         {
             WebSecurity.Logout();
@@ -143,6 +143,12 @@ namespace Phocalstream_Web.Controllers
 
                         OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.ProviderUserName);
                         OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
+
+                        if (ctx.Users.Count() == 1)
+                        {
+                            Roles.CreateRole("Admin");
+                            Roles.AddUserToRole(model.ProviderUserName, "Admin");
+                        }
 
                         return RedirectToLocal(returnUrl);
                     }

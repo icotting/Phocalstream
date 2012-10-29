@@ -28,8 +28,7 @@
 <div class="notice">@Html.DisplayFor(model => model.Status)</div>
 
 
-@using (@Html.BeginForm("UserProfile", "Account"))
-{
+@Html.BeginForm("UserProfile", "Account")
 <table class="profile">
     <tr>
         <td>
@@ -78,12 +77,5 @@
 </table>
     @Html.HiddenFor(m => m.User.ID)
     @Html.HiddenFor(m => m.User.GoogleID)
-<input type="submit" value="Update Profile" />
-}
-<div style="margin-top: 20px;">
-@using (@Html.BeginForm("LogOff", "Account"))
-{
-    @Html.AntiForgeryToken()
-    <input type="submit" value="Logoff" />
-}
-</div>
+    <input type="submit" value="Update Profile" /> |
+    @Html.ActionLink("Logoff", "Logoff")

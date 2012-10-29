@@ -42,3 +42,7 @@ a:visited {
 img {
     border: none;
 }
+
+th {
+    text-align: left;
+}
