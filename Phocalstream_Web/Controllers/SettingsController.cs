@@ -81,5 +81,12 @@ namespace Phocalstream_Web.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public ActionResult StartDmImport(string type)
+        {
+
+            return PartialView("_DmImportPartial", new DmImportProc() { Running = true});
+        }
+
     }
 }

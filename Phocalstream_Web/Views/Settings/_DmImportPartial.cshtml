@@ -1,0 +1,14 @@
+﻿@model Phocalstream_Web.Models.ViewModels.DmImportProc
+
+<h3>Drought Monitor Import</h3>
+
+@if (Model.Running)
+{
+    <span>Import is running</span>
+} 
+else 
+{
+    @Ajax.ActionLink("Run Weekly", "StartDmImport", new { type = "weekly"}, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <text> | </text> 
+    @Ajax.ActionLink("Run Full", "StartDmImport", new { type = "full"}, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}

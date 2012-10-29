@@ -17,4 +17,9 @@ namespace Phocalstream_Web.Models.ViewModels
         public bool isAdmin { get; set; }
         public bool isCurrentUser { get; set; }
     }
+
+    public class DmImportProc
+    {
+        public bool Running { get; set; }
+    }
 }
