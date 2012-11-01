@@ -114,7 +114,7 @@
     <div id="pageHeader">
         <h1>@Html.DisplayFor(model => model.Collection.Site.Name)</h1>
         <div id="subhead">
-            @Html.DisplayFor(model => model.PhotoCount) photos from @Html.DisplayFor(model => model.StartDate) to @Html.DisplayFor(model => model.EndDate)
+            @Html.DisplayFor(model => model.SiteDetails.PhotoCount) photos from @Html.DisplayFor(model => model.SiteDetails.First) to @Html.DisplayFor(model => model.SiteDetails.Last)
         </div>
     </div>
     <div id="map" style="z-index: 10; position: relative; width: 100%; height: 150px; top: -150px; left: 0px;"></div>

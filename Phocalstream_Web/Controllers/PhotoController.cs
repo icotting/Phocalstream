@@ -53,9 +53,7 @@ namespace Phocalstream_Web.Controllers
                 model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
 
                 List<Photo> photos = ctx.Photos.Where(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
-                model.PhotoCount = photos.Count();
-                model.StartDate = photos.Select(p => p.Captured).First().ToString(@"MMM dd, yyyy");
-                model.EndDate = photos.Select(p => p.Captured).Last().ToString(@"MMM dd, yyyy");
+                model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
                 return View(model);
             }
         }
