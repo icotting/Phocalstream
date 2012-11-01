@@ -26,7 +26,7 @@ namespace Phocalstream_Web.Controllers
             {
                 user = ctx.Users.Where(u => u.GoogleID == this.User.Identity.Name).FirstOrDefault<User>();
             }
-
+            
             return View(new UserManageModel() { User = user });
         }
 

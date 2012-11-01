@@ -7,15 +7,19 @@
 @section styles 
 {
     <style>
-        #map {
-            width: 600px;
+        #mapcontainer {
+            width: 100%;
+            min-width: 300px;
             height: 400px;
-            float: left;
+            position: relative;
+            margin-right: 300px;
         }
 
         #siteList {
-            width: 320px;
-            float: right;
+            width: 300px;
+            position: absolute;
+            top: 0px;
+            right: 0px;
         }
 
         #siteList h1 {
@@ -32,7 +36,7 @@
             margin-top: 15px;
         }
 
-        #siteContainer { width: 100%; }
+        #sitesContainer { padding-right: 330px; left: 0px; right: 0px; position: relative;}
     </style>
 }
 
@@ -45,6 +49,7 @@
     <script type="text/javascript" src="~/Content/Scripts/SiteSelection.js"></script>
     <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
     <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
+    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
 }
 
 <p>Welcome to the Phocalstream web site.  This site represents the first release of a project being 
@@ -57,8 +62,10 @@
     This project is being developed as an open source project.  Code can be found in our <a href="https://github.com/icotting/Phocalstream">Github repository</a>.
 </p>
 <div id="sitesContainer">
-    <div id="map">
+    <div id="mapcontainer">
+        <div id="map">
 
+        </div>
     </div>
     <div id="siteList">
         <h1>Photo Collections</h1>

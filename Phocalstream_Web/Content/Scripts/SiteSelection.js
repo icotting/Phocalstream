@@ -4,8 +4,6 @@
         credentials: "AvikYUpjcBjzTZDMq41HatI4Val4on1Qp45zwxkOVVEB_tQ-dP-fpTuV5axCkTkW",
         mapTypeId: Microsoft.Maps.MapTypeId.road,
         showDashboard: true,
-        width: 600,
-        height: 400
     }
 
     var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
