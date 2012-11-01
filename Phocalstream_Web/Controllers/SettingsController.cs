@@ -1,5 +1,6 @@
 ﻿using Phocalstream_Shared;
 using Phocalstream_Shared.Models;
+using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ namespace Phocalstream_Web.Controllers
         public ActionResult Index()
         {
             SettingsViewModel model = new SettingsViewModel();
+            model.DmProcess = getDMModel();
+
             List<User> users;
             using (EntityContext ctx = new EntityContext())
             {
@@ -84,9 +87,32 @@ namespace Phocalstream_Web.Controllers
         [HttpGet]
         public ActionResult StartDmImport(string type)
         {
+            DmImportProc model = getDMModel();
+            model.Running = true;
 
-            return PartialView("_DmImportPartial", new DmImportProc() { Running = true});
+            DroughtMonitorImporter.getInstance().RunDMImport(type);
+            
+            return PartialView("_DmImportPartial", model);
         }
+
+        [HttpGet]
+        public ActionResult CheckDMImport()
+        {
+            return PartialView("_DmImportPartial", getDMModel());
+        }
+
+        private DmImportProc getDMModel()
+        {
+            DmImportProc model = new DmImportProc();
+            DroughtMonitorImporter importer = DroughtMonitorImporter.getInstance();
+
+            model.Running = importer.ImportRunning;
+            model.StartDate = importer.FirstDate;
+            model.EndDate = importer.LastDate;
+
+            return model;
+        }
+
 
     }
 }

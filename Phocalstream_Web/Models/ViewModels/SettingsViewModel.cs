@@ -9,6 +9,7 @@ namespace Phocalstream_Web.Models.ViewModels
     public class SettingsViewModel
     {
         public List<ManagedUser> UserList { get; set; }
+        public DmImportProc DmProcess { get; set; }
     }
 
     public class ManagedUser
@@ -20,6 +21,8 @@ namespace Phocalstream_Web.Models.ViewModels
 
     public class DmImportProc
     {
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
         public bool Running { get; set; }
     }
 }

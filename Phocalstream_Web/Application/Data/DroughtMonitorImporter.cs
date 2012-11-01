@@ -5,6 +5,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Phocalstream_Web.Application.Data
@@ -19,20 +21,89 @@ namespace Phocalstream_Web.Application.Data
 
     public class DroughtMonitorImporter
     {
-        public void ImportAllDMData()
+        private static DroughtMonitorImporter _instance;
+
+        private bool _importRunning;
+        private String _firstDate;
+        private String _lastDate;
+
+        public bool ImportRunning
+        {
+            get { return _importRunning; }
+        }
+        public String FirstDate
+        {
+            get { return _firstDate; }
+        }
+        public String LastDate
+        {
+            get { return _lastDate; }
+        }
+
+        private DroughtMonitorImporter()
+        {
+            this._firstDate = "None";
+            this._lastDate = "None";
+            this._importRunning = false;
+            this.SetDates();
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static DroughtMonitorImporter getInstance()
+        {
+            if (_instance == null)
+            {
+                _instance = new DroughtMonitorImporter();
+            }
+            return _instance;
+        } //End getInstance
+
+        public void RunDMImport(string type)
+        {
+            switch (type)
+            {
+                case "full":
+                    // Import All DM data
+                    this.RunDMImportAll();
+                    break;
+                case "current":
+                    // Import Current week
+                    this.RunDMImport(DateTime.Now);
+                    break;
+                default:
+                    this.RunDMImport(DateTime.Now);
+                    break;
+            }
+        } //End RunDMImport (type)
+
+        public void RunDMImportAll()
         {
             DateTime startDate = new DateTime(2009, 1, 6);
             DateTime endDate = DateTime.UtcNow;
+            this.RunDMImport(startDate, endDate);
+        } //End RunDMImportAll
 
-            this.ImportDMData(startDate, endDate);
-        }
-
-        public void ImportDMData(DateTime date)
+        public void RunDMImport(DateTime date)
         {
-            this.ImportDMData(date, date);
-        }
+            this.RunDMImport(date, date);
+        } //End RunDMImport (one date)
 
-        public void ImportDMData(DateTime startDate, DateTime endDate)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void RunDMImport(DateTime start, DateTime end)
+        {
+            if (!ImportRunning)
+            {
+                new Task(() =>
+                {
+                    this._importRunning = true;
+                    this.ImportDMData(start, end);
+                    this.SetDates(); //Reset the first and last dates to the new dates in the DB
+                    this._importRunning = false;
+                }).Start();
+            }
+        } //End RunDMImport (two dates)
+
+        private void ImportDMData(DateTime startDate, DateTime endDate)
         {
             startDate = this.ConvertDateToTuesday(startDate);
             endDate = this.ConvertDateToTuesday(endDate);
@@ -63,8 +134,9 @@ namespace Phocalstream_Web.Application.Data
                         this.WriteData(type, rows, week);
                     }
                 }
-            }
-        }
+            } //End foreach week in importDates
+             
+        } //End ImportDMData (two dates)
 
         private bool AlreadyImported(DateTime week)
         {
@@ -88,7 +160,7 @@ namespace Phocalstream_Web.Application.Data
                 }
                 return true;
             }
-        }
+        } //End AlreadyImported
 
         private void WriteData(DMDataType type, List<string> rows, DateTime date)
         {
@@ -178,7 +250,7 @@ namespace Phocalstream_Web.Application.Data
                 }
             }
             return countyID;
-        }
+        } //End GetCountyID
 
         private long AddCounty(SqlConnection conn, string county, int FIPS, string state)
         {
@@ -194,7 +266,7 @@ namespace Phocalstream_Web.Application.Data
             command.Parameters.Clear();
             command.CommandText = "SELECT @@IDENTITY";
             return Convert.ToInt64(command.ExecuteScalar());
-        }
+        } //End AddCounty
 
         private long GetStateID(SqlConnection conn, string state)
         {
@@ -215,7 +287,7 @@ namespace Phocalstream_Web.Application.Data
                 }
             }
             return stateID;
-        }
+        } //End GetStateID
 
         private long AddState(SqlConnection conn, string state)
         {
@@ -229,10 +301,11 @@ namespace Phocalstream_Web.Application.Data
             command.Parameters.Clear();
             command.CommandText = "SELECT @@IDENTITY";
             return Convert.ToInt64(command.ExecuteScalar());
-        }
+        } //End AddState
 
         private DateTime ConvertDateToTuesday(DateTime date)
         {
+            TimeSpan span = DateTime.Now - date;
             switch (date.DayOfWeek)
             {
                 case DayOfWeek.Sunday:
@@ -240,9 +313,23 @@ namespace Phocalstream_Web.Application.Data
                 case DayOfWeek.Monday:
                     return date.AddDays(-6);
                 case DayOfWeek.Tuesday:
-                    return date;
+                    if (span.Days > 7) 
+                    {
+                        return date;
+                    }
+                    else  // If current week, then go back to the previous Tuesday
+                    {
+                        return date.AddDays(-7);
+                    }
                 case DayOfWeek.Wednesday:
-                    return date.AddDays(-1);
+                    if (span.Days > 7) 
+                    {
+                        return date.AddDays(-1);
+                    }
+                    else // If current week, then go back to the previous Tuesday
+                    {
+                        return date.AddDays(-8);
+                    }
                 case DayOfWeek.Thursday:
                     return date.AddDays(-2);
                 case DayOfWeek.Friday:
@@ -251,7 +338,34 @@ namespace Phocalstream_Web.Application.Data
                     return date.AddDays(-4);
                 default:
                     return date;
+            } //End Switch on Day of Week
+        } //End ConvertDateToTuesday
+
+        private void SetDates()
+        {
+            // Get the ConnectionString by using the configuration ConnectionStrings property to read the connectionString. 
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DMConnection"].ConnectionString))
+            {
+                conn.Open();
+                using (SqlCommand dateLookup = new SqlCommand(string.Format("select top 1 PublishedDate from USDMValues order by PublishedDate"), conn))
+                using (SqlDataReader reader = dateLookup.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        this._firstDate = reader.GetDateTime(0).ToString("MM/dd/yyyy");
+                    }
+                    reader.Close();
+                }
+                using (SqlCommand dateLookup = new SqlCommand(string.Format("select top 1 PublishedDate from USDMValues order by PublishedDate desc"), conn))
+                using (SqlDataReader reader = dateLookup.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        this._lastDate = reader.GetDateTime(0).ToString("MM/dd/yyyy");
+                    }
+                    reader.Close();
+                }
             }
-        }
+        } //End SetDates
     }
 }
