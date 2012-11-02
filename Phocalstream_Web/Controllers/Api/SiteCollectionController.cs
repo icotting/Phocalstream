@@ -51,21 +51,6 @@ namespace Phocalstream_Web.Controllers.Api
                     facets.AppendChild(facet);
 
                     facet = doc.CreateElement("FacetCategory");
-                    facet.SetAttribute("Name", "ISO");
-                    facet.SetAttribute("Type", "Number");
-                    facets.AppendChild(facet);
-
-                    facet = doc.CreateElement("FacetCategory");
-                    facet.SetAttribute("Name", "Focal Length");
-                    facet.SetAttribute("Type", "Number");
-                    facets.AppendChild(facet);
-
-                    facet = doc.CreateElement("FacetCategory");
-                    facet.SetAttribute("Name", "Shutter Speed");
-                    facet.SetAttribute("Type", "String");
-                    facets.AppendChild(facet);
-
-                    facet = doc.CreateElement("FacetCategory");
                     facet.SetAttribute("Name", "Time of Day");
                     facet.SetAttribute("Type", "String");
                     facets.AppendChild(facet);
@@ -128,28 +113,6 @@ namespace Phocalstream_Web.Controllers.Api
             facetValue.SetAttribute("Value", photo.Captured.ToString("yyyy-MM-ddThh:mm:ss"));
             facet.AppendChild(facetValue);
             facets.AppendChild(facet);
-
-            facet = doc.CreateElement("Facet");
-            facet.SetAttribute("Name", "ISO");
-            facetValue = doc.CreateElement("Number");
-            facetValue.SetAttribute("Value", Convert.ToString(photo.ISO));
-            facet.AppendChild(facetValue);
-            facets.AppendChild(facet);
-
-            facet = doc.CreateElement("Facet");
-            facet.SetAttribute("Name", "Shutter Speed");
-            facetValue = doc.CreateElement("String");
-            facetValue.SetAttribute("Value", Convert.ToString(photo.ShutterSpeed));
-            facet.AppendChild(facetValue);
-            facets.AppendChild(facet);
-
-            facet = doc.CreateElement("Facet");
-            facet.SetAttribute("Name", "Focal Length");
-            facetValue = doc.CreateElement("Number");
-            facetValue.SetAttribute("Value", Convert.ToString(photo.FocalLength));
-            facet.AppendChild(facetValue);
-            facets.AppendChild(facet);
-
 
             int hour = photo.Captured.Hour;
             string timeOfDay = "";
