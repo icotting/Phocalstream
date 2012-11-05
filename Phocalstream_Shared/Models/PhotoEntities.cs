@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace Phocalstream_Shared.Models
 {
@@ -14,11 +15,13 @@ namespace Phocalstream_Shared.Models
         public string Name { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public int CountyFips { get; set; }
         public string ContainerID { get; set; }
 
         [NotMapped]
         public int PhotoCount { get; set; }
 
+        [ScriptIgnore]
         public ICollection<Photo> Photos { get; set; }
     }
 

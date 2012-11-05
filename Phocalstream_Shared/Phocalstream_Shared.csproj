@@ -43,6 +43,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,12 +52,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EntityContext.cs" />
+    <Compile Include="Migrations\201211052038402_CameraSiteCountyFips.cs" />
+    <Compile Include="Migrations\201211052038402_CameraSiteCountyFips.Designer.cs">
+      <DependentUpon>201211052038402_CameraSiteCountyFips.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\PhotoEntities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201211052038402_CameraSiteCountyFips.resx">
+      <DependentUpon>201211052038402_CameraSiteCountyFips.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
