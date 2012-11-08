@@ -8,17 +8,11 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
+using Phocalstream_Shared.Models;
 
 namespace Phocalstream_Web.Application.Data
 {
                 
-    public enum DMDataType
-    {
-        COUNTY,
-        STATE,
-        US
-    }
-
     public class DroughtMonitorImporter
     {
         private static DroughtMonitorImporter _instance;
@@ -105,8 +99,8 @@ namespace Phocalstream_Web.Application.Data
 
         private void ImportDMData(DateTime startDate, DateTime endDate)
         {
-            startDate = this.ConvertDateToTuesday(startDate);
-            endDate = this.ConvertDateToTuesday(endDate);
+            startDate = DroughtMonitorWeek.ConvertDateToTuesday(startDate);
+            endDate = DroughtMonitorWeek.ConvertDateToTuesday(endDate);
 
             DateTime importWeek = startDate;
             List<DateTime> importDates = new List<DateTime>();
@@ -302,44 +296,6 @@ namespace Phocalstream_Web.Application.Data
             command.CommandText = "SELECT @@IDENTITY";
             return Convert.ToInt64(command.ExecuteScalar());
         } //End AddState
-
-        private DateTime ConvertDateToTuesday(DateTime date)
-        {
-            TimeSpan span = DateTime.Now - date;
-            switch (date.DayOfWeek)
-            {
-                case DayOfWeek.Sunday:
-                    return date.AddDays(-5);
-                case DayOfWeek.Monday:
-                    return date.AddDays(-6);
-                case DayOfWeek.Tuesday:
-                    if (span.Days > 7) 
-                    {
-                        return date;
-                    }
-                    else  // If current week, then go back to the previous Tuesday
-                    {
-                        return date.AddDays(-7);
-                    }
-                case DayOfWeek.Wednesday:
-                    if (span.Days > 7) 
-                    {
-                        return date.AddDays(-1);
-                    }
-                    else // If current week, then go back to the previous Tuesday
-                    {
-                        return date.AddDays(-8);
-                    }
-                case DayOfWeek.Thursday:
-                    return date.AddDays(-2);
-                case DayOfWeek.Friday:
-                    return date.AddDays(-3);
-                case DayOfWeek.Saturday:
-                    return date.AddDays(-4);
-                default:
-                    return date;
-            } //End Switch on Day of Week
-        } //End ConvertDateToTuesday
 
         private void SetDates()
         {
