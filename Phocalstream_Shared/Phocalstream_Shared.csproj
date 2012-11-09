@@ -56,6 +56,14 @@
     <Compile Include="Migrations\201211052038402_CameraSiteCountyFips.Designer.cs">
       <DependentUpon>201211052038402_CameraSiteCountyFips.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201211081713444_PhotoWidth.cs" />
+    <Compile Include="Migrations\201211081713444_PhotoWidth.Designer.cs">
+      <DependentUpon>201211081713444_PhotoWidth.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201211081715106_PhotoHeight.cs" />
+    <Compile Include="Migrations\201211081715106_PhotoHeight.Designer.cs">
+      <DependentUpon>201211081715106_PhotoHeight.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\PhotoEntities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +75,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201211052038402_CameraSiteCountyFips.resx">
       <DependentUpon>201211052038402_CameraSiteCountyFips.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201211081713444_PhotoWidth.resx">
+      <DependentUpon>201211081713444_PhotoWidth.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201211081715106_PhotoHeight.resx">
+      <DependentUpon>201211081715106_PhotoHeight.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,57 +6,9 @@
     @section Styles
     {
         <style type="text/css">
-            #siteInfo h1 {
-                font-weight: 100;            
-                font-size: 30pt;
-                margin-bottom: 0px;
-                padding-bottom: 0px;
-                line-height: 0px;
-            }
-
-            #siteInfo h3 {
-                font-weight: 300;
-                font-size: 16pt;
-                margin-bottom: 0px;
-                padding-bottom: 0px;
-            }
-
             .value {
                 font-size: 10pt;
                 padding-left: 5px;
-            }
-
-            li {
-                font-size: 12pt;
-            }
-
-            ul {
-                margin-top: 20pt;
-                list-style: none;
-                margin-left: 0px;
-                padding-left: 30px;
-            }
-
-            #imageCell {
-                width: 100%;
-                min-width: 300px;
-                height: 400px;
-                position: relative;
-                margin-right: 300px;
-            }
-
-            #siteInfo {
-                width: 300px;
-                position: absolute;
-                top: 0px;
-                right: 0px;
-            }
-
-            #imageContainer {
-                width: 100%;
-                height: 600px;
-                background-color: #f6f6f6;
-                border: 1px solid #a7a7a7;
             }
 
             #table { padding-right: 330px; left: 0px; right: 0px; position: relative;}
@@ -97,23 +49,7 @@
         </script>
     </div>
     <div id="siteInfo">
-        <h1>@Html.DisplayFor(model => model.PhotoTime)</h1>
-        <h3>@Html.DisplayFor(model => model.PhotoDate)</h3>
-        <ul>
-            <li style="padding-bottom: 20px;">Camera Site: <span class="value">@Html.DisplayFor(model => model.Photo.Site.Name)</span></li>
-            <li>Exposure Time: <span class="value">@Html.DisplayFor(model => model.Photo.ExposureTime)</span></li>
-            <li>
-                @(Model.Photo.Flash ? "Flash" : "No Flash")
-
-            </li>
-            <li>Focal Length: <span class="value">@Html.DisplayFor(model => model.Photo.FocalLength)</span></li>
-            <li>ISO Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ISO)</span></li>
-            <li>Max Aperture: <span class="value">@Html.DisplayFor(model => model.Photo.MaxAperture)</span></li>
-            <li>Shutter Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ShutterSpeed)</span></li>
-        </ul>
-        <div style="margin-top: 20px;">
-
-        </div>
+        @Html.Partial("_PhotoInfo", Model)
     </div>
     <div style="clear: both;"></div>
 </div>

@@ -164,14 +164,16 @@
     <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\Api\SiteCollectionController.cs" />
+    <Compile Include="Controllers\Api\PhotoCollectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\SearchModels.cs" />
     <Compile Include="Models\ViewModels\CollectionViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
@@ -219,6 +221,9 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\Settings\_DmImportPartial.cshtml" />
     <Content Include="Views\Home\_SiteDetails.cshtml" />
+    <Content Include="Views\Search\Index.cshtml" />
+    <Content Include="Views\Search\_SearchResults.cshtml" />
+    <Content Include="Views\Photo\_PhotoInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Application\IO\" />

@@ -78,6 +78,8 @@ namespace Phocalstream_Shared.Models
         public double FocalLength { get; set; }
         public bool Flash { get; set; }
         public int ISO { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
 
         public ICollection<MetaDatum> AdditionalExifProperties { get; set; }
         public ICollection<PhotoAnnotation> Annotations { get; set; }

@@ -14,11 +14,26 @@ using System.Xml;
 
 namespace Phocalstream_Web.Controllers.Api
 {
-    public class SiteCollectionController : ApiController
+    public class PhotoCollectionController : ApiController
     {
+
+        public HttpResponseMessage GetForPhotos(string photoList)
+        {
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+
+            return message;
+        }
+
+        public HttpResponseMessage GetDeepZoomCollection(string photoList)
+        {
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+
+            return message;
+        }
+
         // GET api/collection/5
         [AllowAnonymous]
-        public HttpResponseMessage Get(int id)
+        public HttpResponseMessage GetForSite(int id)
         {
             using (EntityContext ctx = new EntityContext())
             {

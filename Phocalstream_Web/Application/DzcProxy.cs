@@ -20,8 +20,12 @@ namespace Phocalstream_Web.Application
             HttpApplication application = (HttpApplication)source;
             HttpContext context = application.Context;
             string resource = application.Request.RawUrl;
+
             if (resource.Contains("/dzc/"))
             {
+                string blobRequest = string.Format("http://phocalstream.blob.core.windows.net/{0}",
+                        resource.Substring(resource.IndexOf("/dzc/") + 5));
+
                 string extension = (resource.IndexOf(".") > -1) ? resource.Substring(resource.LastIndexOf(".")) : "";
                 switch (extension)
                 {
@@ -37,8 +41,7 @@ namespace Phocalstream_Web.Application
                 try
                 {
                     WebClient client = new WebClient();
-                    byte[] responseContent = client.DownloadData(string.Format("http://phocalstream.blob.core.windows.net/{0}",
-                        resource.Substring(resource.IndexOf("/dzc/") + 5)));
+                    byte[] responseContent = client.DownloadData(blobRequest);
 
                     application.Context.Response.StatusCode = 200;
                     application.Context.Response.OutputStream.Write(responseContent, 0, responseContent.Length);
@@ -47,7 +50,7 @@ namespace Phocalstream_Web.Application
                 {
                     application.Context.Response.StatusCode = Convert.ToInt16(((HttpWebResponse)we.Response).StatusCode);
                 }
-                application.Context.Response.End();
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
         }
 

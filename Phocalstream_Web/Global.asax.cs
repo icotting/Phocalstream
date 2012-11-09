@@ -22,7 +22,6 @@ namespace Phocalstream_Web
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            RouteTable.Routes.MapHttpRoute(name: "DZC Controller", routeTemplate: "api/dzc/{resource}", defaults: new { controller = "DzcController" });
 
             AuthConfig.RegisterAuth();
             WebSecurity.InitializeDatabaseConnection("DbConnection", "Users", "ID", "GoogleID", true);

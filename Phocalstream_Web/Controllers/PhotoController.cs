@@ -39,6 +39,18 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
+        public PartialViewResult PhotoDetails(long photoID)
+        {
+            PhotoViewModel model = new PhotoViewModel();
+            using (EntityContext ctx = new EntityContext())
+            {
+                model.Photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
+                model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
+                model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
+            }
+            return PartialView("_PhotoInfo", model);
+        }
+
         [AllowAnonymous]
         public ActionResult CameraCollection(long siteID)
         {
@@ -46,7 +58,7 @@ namespace Phocalstream_Web.Controllers
             {
                 CollectionViewModel model = new CollectionViewModel();
                 model.Collection = (from c in ctx.Collections where c.Site.ID == siteID select c).First();
-                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/{3}", Request.Url.Scheme,
+                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/photocollection/forsite?id=3", Request.Url.Scheme,
                     Request.Url.Host,
                     Request.Url.Port,
                     model.Collection.Site.ID);

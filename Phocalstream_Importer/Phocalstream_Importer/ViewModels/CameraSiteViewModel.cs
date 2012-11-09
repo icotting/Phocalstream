@@ -537,11 +537,19 @@ namespace Phocalstream_Importer.ViewModels
                 if (NewFileName.IndexOf("/") == 0)
                     NewFileName = NewFileName.Remove(0, 1);
 
-                //Upload Blob
-                BlobRequestOptions options = new BlobRequestOptions() { Timeout = TimeSpan.FromMinutes(20), AccessCondition = AccessCondition.IfNotModifiedSince(file.LastWriteTimeUtc) };
-                CloudBlob destBlob = TargetContainer.GetBlobReference(NewFileName);
-                destBlob.UploadFile(file.FullName, options);
-                file.Delete();
+                try
+                {
+                    //Upload Blob
+                    BlobRequestOptions options = new BlobRequestOptions() { Timeout = TimeSpan.FromMinutes(20) };
+                    CloudBlob destBlob = TargetContainer.GetBlobReference(NewFileName);
+                    destBlob.UploadFile(file.FullName, options);
+                    file.Delete();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(String.Format("Error uploading file {0}", NewFileName);
+                    Console.WriteLine(e.ToString());
+                }
             });
         }
     }
