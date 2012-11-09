@@ -65,6 +65,7 @@
       <DependentUpon>201211081715106_PhotoHeight.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ExternalDataModels.cs" />
     <Compile Include="Models\PhotoEntities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
