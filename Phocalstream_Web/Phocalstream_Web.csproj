@@ -45,6 +45,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="C5">
+      <HintPath>..\packages\Quartz.2.0.1\lib\net40\C5.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging">
+      <HintPath>..\packages\Common.Logging.2.0.0\lib\2.0\Common.Logging.dll</HintPath>
+    </Reference>
     <Reference Include="DotNetOpenAuth.AspNet">
       <HintPath>..\packages\DotNetOpenAuth.AspNet.4.0.4.12182\lib\net40-full\DotNetOpenAuth.AspNet.dll</HintPath>
     </Reference>
@@ -83,6 +89,9 @@
     </Reference>
     <Reference Include="Org.Mentalis.Security.Cryptography">
       <HintPath>..\packages\DotNetOpenAuth.OpenId.Core.4.0.4.12182\lib\net40-full\Org.Mentalis.Security.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="Quartz">
+      <HintPath>..\packages\Quartz.2.0.1\lib\net40\Quartz.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -161,10 +170,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\Data\DroughtMonitorImporter.cs" />
+    <Compile Include="Application\Data\Scheduler.cs" />
     <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\Api\SiteCollectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
@@ -225,6 +234,7 @@
   <ItemGroup>
     <Folder Include="Application\IO\" />
     <Folder Include="App_Data\" />
+    <Folder Include="Controllers\Api\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
   <ItemGroup>
