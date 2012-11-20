@@ -54,7 +54,7 @@ namespace Phocalstream_Web.Controllers
                                 details.Last = reader.GetDateTime(1);
                                 details.PhotoCount = reader.GetInt32(2);
 
-                                details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}-dz/{4}.dzi", Request.Url.Scheme,
+                                details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", Request.Url.Scheme,
                                     Request.Url.Host,
                                     Request.Url.Port,
                                     site.ContainerID,

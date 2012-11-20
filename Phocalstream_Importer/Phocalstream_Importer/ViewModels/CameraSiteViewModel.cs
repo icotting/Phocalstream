@@ -547,7 +547,7 @@ namespace Phocalstream_Importer.ViewModels
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(String.Format("Error uploading file {0}", NewFileName);
+                    Console.WriteLine(String.Format("Error uploading file {0}", NewFileName));
                     Console.WriteLine(e.ToString());
                 }
             });

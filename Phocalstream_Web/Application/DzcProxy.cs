@@ -20,10 +20,11 @@ namespace Phocalstream_Web.Application
             HttpApplication application = (HttpApplication)source;
             HttpContext context = application.Context;
             string resource = application.Request.RawUrl;
-
+            System.Diagnostics.Debug.WriteLine(resource);
             if (resource.Contains("/dzc/"))
             {
-                string blobRequest = string.Format("http://phocalstream.blob.core.windows.net/{0}",
+                Console.WriteLine(resource);
+                string blobRequest = string.Format(@"C:/Photos/{0}",
                         resource.Substring(resource.IndexOf("/dzc/") + 5));
 
                 string extension = (resource.IndexOf(".") > -1) ? resource.Substring(resource.LastIndexOf(".")) : "";
@@ -40,15 +41,20 @@ namespace Phocalstream_Web.Application
 
                 try
                 {
-                    WebClient client = new WebClient();
-                    byte[] responseContent = client.DownloadData(blobRequest);
-
+                    using (FileStream stream = File.OpenRead(blobRequest))
+                    {
+                        int len = 0;
+                        byte[] buf = new byte[1024];
+                        while ((len = stream.Read(buf, 0, 1024)) > 0)
+                        {
+                            application.Context.Response.OutputStream.Write(buf, 0, len);
+                        }
+                    }
                     application.Context.Response.StatusCode = 200;
-                    application.Context.Response.OutputStream.Write(responseContent, 0, responseContent.Length);
                 }
-                catch (WebException we)
+                catch (DirectoryNotFoundException we)
                 {
-                    application.Context.Response.StatusCode = Convert.ToInt16(((HttpWebResponse)we.Response).StatusCode);
+                    application.Context.Response.StatusCode = 404;
                 }
                 HttpContext.Current.ApplicationInstance.CompleteRequest();
             }

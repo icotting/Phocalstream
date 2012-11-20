@@ -4,6 +4,8 @@ using Phocalstream_Web.Application;
 using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,26 +16,56 @@ using System.Xml;
 
 namespace Phocalstream_Web.Controllers.Api
 {
-    public class PhotoCollectionController : ApiController
+    public class SiteCollectionController : ApiController
     {
-
-        public HttpResponseMessage GetForPhotos(string photoList)
+        [HttpGet]
+        public HttpResponseMessage DeepZoomCollectionForSite(long siteID)
         {
-            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where CameraSites.ID = @id", conn))
+                {
+                    command.Prepare();
+                    command.Parameters.AddWithValue("@id", siteID);
+                    HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+                    XmlDocument doc = CreateDeepZoomDocument(command);
+                    MemoryStream stream = new MemoryStream();
+                    doc.Save(stream);
+                    stream.Position = 0;
+                    message.Content = new StreamContent(stream);
 
-            return message;
+                    message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
+
+                    return message;
+                }
+            }
         }
 
-        public HttpResponseMessage GetDeepZoomCollection(string photoList)
+        [HttpGet]
+        public HttpResponseMessage DeepZoomCollection(string photoList)
         {
-            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in (" + photoList + ")", conn))
+                {
+                    HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+                    XmlDocument doc = CreateDeepZoomDocument(command);
+                    MemoryStream stream = new MemoryStream();
+                    doc.Save(stream);
+                    stream.Position = 0;
+                    message.Content = new StreamContent(stream);
 
-            return message;
+                    message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
+
+                    return message;
+                }
+            }
         }
-
-        // GET api/collection/5
-        [AllowAnonymous]
-        public HttpResponseMessage GetForSite(int id)
+  
+        [HttpGet]
+        public HttpResponseMessage CollectionForSite(int id)
         {
             using (EntityContext ctx = new EntityContext())
             {
@@ -47,6 +79,7 @@ namespace Phocalstream_Web.Controllers.Api
 
                 XmlDocument doc = new XmlDocument();
                 XmlElement root = doc.CreateElement("Collection");
+
                 root.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
                 root.SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
                 root.SetAttribute("xmlns:p", "http://schemas.microsoft.com/livelabs/pivot/collection/2009");
@@ -76,29 +109,19 @@ namespace Phocalstream_Web.Controllers.Api
                     facets.AppendChild(facet);
                     root.AppendChild(facets);
 
-                    string dzCollection = string.Format("{0}://{1}:{2}/dzc/{3}-dz/da.dzc", Request.RequestUri.Scheme, 
-                        Request.RequestUri.Host, 
-                        Request.RequestUri.Port, 
-                        site.ContainerID);
+                string dzCollection = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/collection.dzc", Request.RequestUri.Scheme,
+                    Request.RequestUri.Host,
+                    Request.RequestUri.Port,
+                    site.ContainerID);
 
                 XmlElement items = doc.CreateElement("Items");
-                items.SetAttribute("ImgBase", string.Format("/dzc/{0}-dz/da.dzc", site.ContainerID));
+                items.SetAttribute("ImgBase", dzCollection);
 
-                    XmlElement item = null;
-                    // to get the photo meta data for the DeepZoom referenced image, the photo will need to be looked up by BlobID (not ideal)
-                    using (XmlReader collectionReader = XmlReader.Create(dzCollection))
-                    {
-                        int i = 0;
-                        while (collectionReader.Read())
-                        {
-                            if (collectionReader.NodeType == XmlNodeType.Element && collectionReader.Name == "I")
-                            {
-                                items.AppendChild(GetItemFor(doc, ctx, 
-                                    collectionReader.GetAttribute("Source").Substring(0, collectionReader.GetAttribute("Source").IndexOf(".")), 
-                                    collectionReader.GetAttribute("Id")));
-                            }
-                        }
-                    }
+                ICollection<Photo> photos = ctx.Photos.Where(p => p.Site.ID == id).ToList<Photo>();
+                foreach (Photo photo in photos)
+                {
+                    items.AppendChild(ItemFor(doc, photo));
+                }
 
                 root.AppendChild(items);
 
@@ -112,12 +135,11 @@ namespace Phocalstream_Web.Controllers.Api
             }
         }
 
-        private XmlElement GetItemFor(XmlDocument doc, EntityContext context, string BlobID, string Id)
+        [NonAction]
+        private XmlElement ItemFor(XmlDocument doc, Photo photo)
         {
-            Photo photo = (from p in context.Photos where p.BlobID == BlobID select p).First<Photo>();
-
             XmlElement item = doc.CreateElement("Item");
-            item.SetAttribute("Img", String.Format("#{0}", Id));
+            item.SetAttribute("Img", String.Format("#{0}", photo.ID));
             item.SetAttribute("Id", Convert.ToString(photo.ID));
             item.SetAttribute("Name", string.Format("{0} {1}", photo.Site.Name, photo.Captured.ToString("MMM dd, yyyy hh:mm tt")));
             
@@ -125,7 +147,7 @@ namespace Phocalstream_Web.Controllers.Api
             XmlElement facet = doc.CreateElement("Facet");
             facet.SetAttribute("Name", "Date"); 
             XmlElement facetValue = doc.CreateElement("DateTime");
-            facetValue.SetAttribute("Value", photo.Captured.ToString("yyyy-MM-ddThh:mm:ss"));
+            facetValue.SetAttribute("Value", photo.Captured.ToString("yyyy-MM-ddTHH:mm:ss"));
             facet.AppendChild(facetValue);
             facets.AppendChild(facet);
 
@@ -183,6 +205,52 @@ namespace Phocalstream_Web.Controllers.Api
 
             item.AppendChild(facets);
             return item;
+        }
+
+        [NonAction]
+        private XmlDocument CreateDeepZoomDocument(SqlCommand command)
+        {
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement("Collection");
+            root.SetAttribute("MaxLevel", "7");
+            root.SetAttribute("TileSize", "256");
+            root.SetAttribute("Format", "jpg");
+            root.SetAttribute("xmlns", "http://schemas.microsoft.com/deepzoom/2009");
+
+            doc.AppendChild(root);
+
+            XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
+            doc.InsertBefore(xmldecl, root);
+
+            XmlElement items = doc.CreateElement("Items");
+
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+                int count = 0;
+                while (reader.Read())
+                {
+                    string imageSource = string.Format("{0}://{1}:{2}/dzc/{3}-dz/{4}.dzi", Request.RequestUri.Scheme,
+                        Request.RequestUri.Host,
+                        Request.RequestUri.Port,
+                        reader.GetString(4),
+                        reader.GetString(1));
+
+                    XmlElement item = doc.CreateElement("I");
+                    item.SetAttribute("Source", imageSource);
+                    item.SetAttribute("N", Convert.ToString(count++));
+                    item.SetAttribute("Id", Convert.ToString(reader.GetInt64(0)));
+
+                    XmlElement size = doc.CreateElement("Size");
+                    size.SetAttribute("Width", Convert.ToString(reader.GetInt32(2)));
+                    size.SetAttribute("Height", Convert.ToString(reader.GetInt32(3)));
+                    item.AppendChild(size);
+
+                    items.AppendChild(item);
+                }
+                root.SetAttribute("NextItemId", Convert.ToString(count));
+            }
+            root.AppendChild(items);
+            return doc;
         }
     }
 }

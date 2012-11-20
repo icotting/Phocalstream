@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,11 @@ namespace Phocalstream_Shared.Models
 {
     public enum DMDataType
     {
+        [Description("County")]
         COUNTY,
+        [Description("State")]
         STATE,
+        [Description("US")]
         US
     }
 
