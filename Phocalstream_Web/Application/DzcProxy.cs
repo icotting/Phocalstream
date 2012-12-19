@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,6 +18,8 @@ namespace Phocalstream_Web.Application
 
         private void Application_BeginRequest(Object source, EventArgs e)
         {
+            string basePath = ConfigurationManager.AppSettings["photoPath"];
+
             HttpApplication application = (HttpApplication)source;
             HttpContext context = application.Context;
             string resource = application.Request.RawUrl;
@@ -24,7 +27,7 @@ namespace Phocalstream_Web.Application
             if (resource.Contains("/dzc/"))
             {
                 Console.WriteLine(resource);
-                string blobRequest = string.Format(@"C:/Photos/{0}",
+                string blobRequest = string.Format(@"{0}/{1}", basePath,
                         resource.Substring(resource.IndexOf("/dzc/") + 5));
 
                 string extension = (resource.IndexOf(".") > -1) ? resource.Substring(resource.LastIndexOf(".")) : "";

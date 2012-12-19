@@ -15,7 +15,7 @@
         var pin = new Microsoft.Maps.Pushpin(loc);
         pin.siteId = site.Site.ID;
         Microsoft.Maps.Events.addHandler(pin, 'click', function (e) {
-            $("#siteInfo").load('/Home/SiteDetails/' + e.target.siteId);
+            $("#siteList").load('/Home/SiteDetails/' + e.target.siteId);
         });
 
         map.entities.push(pin);
