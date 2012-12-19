@@ -63,4 +63,23 @@ namespace Phocalstream_Shared.Models
         } //End ConvertDateToTuesday
 
     }
+
+    public class WaterParameterCode
+    {
+        public long ParameterID { get; set; }
+        public string ParameterCode { get; set; }
+        public string ParameterDesc { get; set; }
+        public string StatisticCode { get; set; }
+        public string StatisticDesc { get; set; }
+        public string UnitOfMeasureDesc { get; set; }
+    }
+
+    public class AvailableWaterDataByStation
+    {
+        public long DataID { get; set; }
+        public long StationID { get; set; }
+        public string ParameterCode { get; set; }
+        public string StatisticCode { get; set; }
+        public DateTime CurrentLastDate { get; set; }
+    }
 }
