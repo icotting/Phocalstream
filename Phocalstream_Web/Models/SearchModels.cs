@@ -19,4 +19,9 @@ namespace Phocalstream_Web.Models
         public string ImageUrl { get; set; }
         public Photo Photo { get; set; }
     }
+
+    public class SearchCache
+    {
+
+    }
 }

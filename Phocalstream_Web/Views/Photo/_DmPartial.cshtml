@@ -25,26 +25,7 @@
         // Apply the theme
         var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
     </script>
-
-<h2>Drought Monitor Data</h2>
-@if (Model.DMValues.Type.ToString().Equals("COUNTY"))
-{
-    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
-    <text> | </text>   
-    @Ajax.ActionLink("US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
-}
-else if (Model.DMValues.Type.ToString().Equals("STATE"))
-{
-    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
-    <text> | </text> 
-    @Ajax.ActionLink("US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
-}
-else
-{
-    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
-    <text> | </text> 
-    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
-}
+<!--
 <div id="DMInfo">
     <ul>
         <li>Type: <span class="value">@Html.DisplayFor(model => model.DMValues.Type)</span></li>
@@ -57,6 +38,7 @@ else
         <li>D4: <span class="value">@Html.DisplayFor(model => model.DMValues.D4)</span></li>
     </ul>
 </div>
+    -->
 <div style="clear: both;"></div>
 
 @if (Model.DMValues.NonDrought != 100)
@@ -79,7 +61,7 @@ else
 	                legend: false,
 	                xAxis: {
 	                    categories: [
-                            '@Html.DisplayFor(model => model.DisplayDate)',
+                            'Current Week',
                             'Previous Week',
                             'Previous Month'
                         ]
@@ -194,3 +176,24 @@ else
     <text> No drought recorded for @Html.DisplayFor(model => model.DMValues.Type). </text>
 }
 
+@if (Model.DMValues.Type.ToString().Equals("COUNTY"))
+{
+    <text>Change view to:</text>
+    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <text> or </text>   
+    @Ajax.ActionLink("Enitre US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}
+else if (Model.DMValues.Type.ToString().Equals("STATE"))
+{
+    <text>Change view to:</text>
+    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
+    <text> or </text> 
+    @Ajax.ActionLink("Entire US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}
+else
+{
+    <text>Change view to:</text>    
+    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
+    <text> or </text> 
+    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}

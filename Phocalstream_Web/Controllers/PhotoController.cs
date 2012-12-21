@@ -30,7 +30,7 @@ namespace Phocalstream_Web.Controllers
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
             }
 
-            model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}-dz/{4}.dzi", Request.Url.Scheme,
+            model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", Request.Url.Scheme,
                     Request.Url.Host,
                     Request.Url.Port,
                     model.Photo.Site.ContainerID,
@@ -64,7 +64,8 @@ namespace Phocalstream_Web.Controllers
             {
                 CollectionViewModel model = new CollectionViewModel();
                 model.Collection = (from c in ctx.Collections where c.Site.ID == siteID select c).First();
-                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/photocollection/forsite?id=3", Request.Url.Scheme,
+
+                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/collectionforsite?id={3}", Request.Url.Scheme,
                     Request.Url.Host,
                     Request.Url.Port,
                     model.Collection.Site.ID);

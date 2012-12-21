@@ -69,8 +69,7 @@
         <script src="@Url.Content("~/Content/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
         <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
         <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-        <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+    	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
         <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
 
         <script type="text/javascript">
@@ -96,7 +95,11 @@
 
             viewer.openDzi("@Html.DisplayFor(model => model.ImageUrl)");
         </script>
+        <div style="margin-bottom: 20px; margin-top: 20px;">
+            @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { DataWeek = Model.DroughtMonitorData.DataWeek }); }
+        </div>
     </div>
+
     <div id="siteInfo">
         <h1>@Html.DisplayFor(model => model.PhotoTime)</h1>
         <h3>@Html.DisplayFor(model => model.PhotoDate)</h3>
@@ -112,20 +115,10 @@
             <li>Max Aperture: <span class="value">@Html.DisplayFor(model => model.Photo.MaxAperture)</span></li>
             <li>Shutter Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ShutterSpeed)</span></li>
         </ul>
-        <div style="margin-top: 20px;">
-
-        </div>
-
-        <div style="float: right; width: 300px;" id="dmPartial">
+        <div style="margin-top: 20px;" id="dmPartial">
             @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
         </div>
-
     </div>
-
-    <div style="float: left; margin-right: 300px; width: 100%; min-width: 300px;" id="dmMapPartial">
-        @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { DataWeek = Model.DroughtMonitorData.DataWeek }); }
-    </div>
-
-    <div style="clear: both;"></div>
 </div>
+
 
