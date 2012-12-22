@@ -86,4 +86,5 @@ namespace Phocalstream_Shared.Models
         public string StatisticCode { get; set; }
         public DateTime CurrentLastDate { get; set; }
     }
+
 }

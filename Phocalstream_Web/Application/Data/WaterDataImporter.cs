@@ -146,7 +146,7 @@ namespace Phocalstream_Web.Application.Data
             DateTime resultDate = dataType.CurrentLastDate;
             //Get data from current last date (plus 1) to current date
             //Get information
-            string url = String.Format(@"http://waterservices.usgs.gov/nwis/dv/?format=rdb&sites={0}&parameterCd={1}&statCd={2}&startDT={3}&endDT={4}", 
+            string url = String.Format(@"http://waterservices.usgs.gov/nwis/dv/?format=rdb&sites={0}&parameterCd={1}&statCd={2}&startDT={3}&endDT={4}",
                 this.GetStationCode(conn, dataType.StationID), dataType.ParameterCode, dataType.StatisticCode, dataType.CurrentLastDate.AddDays(1).ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
             WebClient client = new WebClient();
             string response = client.DownloadString(url);
@@ -277,7 +277,7 @@ namespace Phocalstream_Web.Application.Data
         private string ParametersToStringForRead()
         {
             string result = "";
-            char[] charsToTrim = {','};
+            char[] charsToTrim = { ',' };
             foreach (WaterParameterCode record in this._parameterCodes)
             {
                 result += record.ParameterCode + ",";
@@ -290,7 +290,7 @@ namespace Phocalstream_Web.Application.Data
             // Get the ConnectionString by using the configuration ConnectionStrings property to read the connectionString. 
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["WaterDBConnection"].ConnectionString))
             {
-                DateTime tempDate = new DateTime(2011, 12, 31); 
+                DateTime tempDate = new DateTime(2011, 12, 31);
                 conn.Open();
                 foreach (string line in rows)
                 {
@@ -306,7 +306,7 @@ namespace Phocalstream_Web.Application.Data
                     {
                         //Write Water Station
                         long stationID = AddWaterStation(conn, cols[1], cols[2], float.Parse(cols[4]), float.Parse(cols[5]), stateID);
-                        
+
                         //Write Water Data Types
                         long waterDataTypeID = AddWaterDataType(conn, stationID, this.GetParameterID(cols[12], cols[13]), DateTime.Parse(cols[20]), DateTime.Parse(cols[21]));
 
@@ -493,7 +493,7 @@ namespace Phocalstream_Web.Application.Data
             command.ExecuteNonQuery();
 
         } //End UpdateAvailableDataTypes
-        
+
         private long GetStationID(SqlConnection conn, string station)
         {
             long stationID = -1;
@@ -599,4 +599,3 @@ namespace Phocalstream_Web.Application.Data
 
     }
 }
-
