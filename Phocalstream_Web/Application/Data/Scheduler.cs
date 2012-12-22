@@ -72,4 +72,26 @@ namespace Phocalstream_Web.Application.Data
         }
     }
 
+    public class WaterImporterJob : PhocalstreamJob
+    {
+        private string _sched;
+
+        public WaterImporterJob()
+        {
+            //Currently hardcoded to run every Friday @ 12:00 PM
+            this._sched = "0 0 12 ? * FRI";
+        }
+
+        public string GetSchedule()
+        {
+            return this._sched;
+        }
+
+        public void Execute(IJobExecutionContext context)
+        {
+            WaterDataImporter.getInstance().UpdateWaterData();
+        }
+    }
+
+
 }
