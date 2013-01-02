@@ -28,6 +28,7 @@ namespace Phocalstream_Web
             WebSecurity.InitializeDatabaseConnection("DbConnection", "Users", "ID", "GoogleID", true);
 
             Scheduler.getInstance().AddJobToSchedule(new DmImporterJob());
+            Scheduler.getInstance().AddJobToSchedule(new WaterImporterJob());
         }
     }
 }
