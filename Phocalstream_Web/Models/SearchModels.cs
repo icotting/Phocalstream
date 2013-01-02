@@ -12,6 +12,7 @@ namespace Phocalstream_Web.Models
     {
         public string Query { get; set; }
         public List<SearchResult> Results { get; set; }
+        public string CollectionUrl { get; set; }
     }
 
     public class SearchResult

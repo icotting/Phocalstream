@@ -33,6 +33,7 @@ namespace Phocalstream_Shared.Models
         public virtual CameraSite Site { get; set; }
         public User Owner { get; set; }
         public ICollection<Photo> Photos { get; set; }
+        public string ContainerID { get; set; }
 
         // if the type is SITE then the Photos collection will be empty
         public CollectionType Type { get; set; }
@@ -42,7 +43,8 @@ namespace Phocalstream_Shared.Models
     public enum CollectionType
     {
         SITE,
-        USER
+        USER, 
+        SEARCH
     }
 
     public enum CollectionStatus

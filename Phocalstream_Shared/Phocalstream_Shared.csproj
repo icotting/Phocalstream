@@ -64,6 +64,10 @@
     <Compile Include="Migrations\201211081715106_PhotoHeight.Designer.cs">
       <DependentUpon>201211081715106_PhotoHeight.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201301012046094_CollectionContainerID.cs" />
+    <Compile Include="Migrations\201301012046094_CollectionContainerID.Designer.cs">
+      <DependentUpon>201301012046094_CollectionContainerID.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ExternalDataModels.cs" />
     <Compile Include="Models\PhotoEntities.cs" />
@@ -82,6 +86,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201211081715106_PhotoHeight.resx">
       <DependentUpon>201211081715106_PhotoHeight.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201301012046094_CollectionContainerID.resx">
+      <DependentUpon>201301012046094_CollectionContainerID.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

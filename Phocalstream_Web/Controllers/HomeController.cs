@@ -25,7 +25,7 @@ namespace Phocalstream_Web.Controllers
 
             using (EntityContext ctx = new EntityContext())
             {
-                model.Collections = ctx.Collections.Include("Site").Where(c => c.Status == CollectionStatus.COMPLETE).ToList<Collection>();
+                model.Collections = ctx.Collections.Include("Site").Where(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE).ToList<Collection>();
                 return View(model);
             }
         }

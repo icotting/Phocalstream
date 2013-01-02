@@ -65,12 +65,12 @@ namespace Phocalstream_Web.Controllers.Api
         }
   
         [HttpGet]
-        public HttpResponseMessage CollectionForSite(int id)
+        public HttpResponseMessage PivotCollectionFor(int id)
         {
             using (EntityContext ctx = new EntityContext())
             {
-                CameraSite site = ctx.Sites.Find(id);
-                if (site == null)
+                Collection collection = ctx.Collections.Include("Photos").SingleOrDefault<Collection>(c => c.ID == id);
+                if (collection == null)
                 {
                     return new HttpResponseMessage(HttpStatusCode.NotFound);
                 }
@@ -84,7 +84,14 @@ namespace Phocalstream_Web.Controllers.Api
                 root.SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
                 root.SetAttribute("xmlns:p", "http://schemas.microsoft.com/livelabs/pivot/collection/2009");
                 root.SetAttribute("SchemaVersion", "1.0");
-                root.SetAttribute("Name", string.Format("{0} Photo Collection", site.Name));
+                if (collection.Site != null)
+                {
+                    root.SetAttribute("Name", string.Format("{0} Photo Collection", collection.Site.Name));
+                }
+                else
+                {
+                    root.SetAttribute("Name", string.Format("{0} Photo Collection", collection.Name));
+                }
                 root.SetAttribute("xmlns", "http://schemas.microsoft.com/collection/metadata/2009");
                 doc.AppendChild(root);
 
@@ -109,18 +116,26 @@ namespace Phocalstream_Web.Controllers.Api
                     facets.AppendChild(facet);
                     root.AppendChild(facets);
 
+                    if (collection.Type != CollectionType.SITE)
+                    {
+                        facet = doc.CreateElement("FacetCategory");
+                        facet.SetAttribute("Name", "Site");
+                        facet.SetAttribute("Type", "String");
+                        facets.AppendChild(facet);
+                        root.AppendChild(facets);
+                    }
+
                 string dzCollection = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/collection.dzc", Request.RequestUri.Scheme,
                     Request.RequestUri.Host,
                     Request.RequestUri.Port,
-                    site.ContainerID);
+                    collection.ContainerID);
 
                 XmlElement items = doc.CreateElement("Items");
                 items.SetAttribute("ImgBase", dzCollection);
 
-                ICollection<Photo> photos = ctx.Photos.Where(p => p.Site.ID == id).ToList<Photo>();
-                foreach (Photo photo in photos)
+                foreach (Photo photo in collection.Photos)
                 {
-                    items.AppendChild(ItemFor(doc, photo));
+                    items.AppendChild(ItemFor(doc, photo, (collection.Type != CollectionType.SITE)));
                 }
 
                 root.AppendChild(items);
@@ -136,13 +151,14 @@ namespace Phocalstream_Web.Controllers.Api
         }
 
         [NonAction]
-        private XmlElement ItemFor(XmlDocument doc, Photo photo)
+        private XmlElement ItemFor(XmlDocument doc, Photo photo, bool includeSite)
         {
             XmlElement item = doc.CreateElement("Item");
             item.SetAttribute("Img", String.Format("#{0}", photo.ID));
             item.SetAttribute("Id", Convert.ToString(photo.ID));
             item.SetAttribute("Name", string.Format("{0} {1}", photo.Site.Name, photo.Captured.ToString("MMM dd, yyyy hh:mm tt")));
-            
+            item.SetAttribute("Href", "http://www.google.com");
+
             XmlElement facets = doc.CreateElement("Facets");
             XmlElement facet = doc.CreateElement("Facet");
             facet.SetAttribute("Name", "Date"); 
@@ -202,6 +218,16 @@ namespace Phocalstream_Web.Controllers.Api
             facetValue.SetAttribute("Value", timeOfYear);
             facet.AppendChild(facetValue);
             facets.AppendChild(facet);
+
+            if (includeSite)
+            {
+                facet = doc.CreateElement("Facet");
+                facet.SetAttribute("Name", "Site");
+                facetValue = doc.CreateElement("String");
+                facetValue.SetAttribute("Value", photo.Site.Name);
+                facet.AppendChild(facetValue);
+                facets.AppendChild(facet);
+            }
 
             item.AppendChild(facets);
             return item;

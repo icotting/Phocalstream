@@ -65,10 +65,10 @@ namespace Phocalstream_Web.Controllers
                 CollectionViewModel model = new CollectionViewModel();
                 model.Collection = (from c in ctx.Collections where c.Site.ID == siteID select c).First();
 
-                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/collectionforsite?id={3}", Request.Url.Scheme,
+                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                     Request.Url.Host,
                     Request.Url.Port,
-                    model.Collection.Site.ID);
+                    model.Collection.ID);
                 model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
 
                 List<Photo> photos = ctx.Photos.Where(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
