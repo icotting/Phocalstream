@@ -4,7 +4,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Web;
 
-namespace Phocalstream_Web.Application.Data
+namespace Phocalstream_Web.Application.Admin
 {
     public interface PhocalstreamJob : IJob
     {

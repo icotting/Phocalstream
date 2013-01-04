@@ -1,6 +1,7 @@
 ﻿using Phocalstream_Shared;
-using Phocalstream_Shared.Models;
+using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application;
+using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
 using Phocalstream_Web.Models;
 using Phocalstream_Web.Models.ViewModels;
@@ -23,7 +24,7 @@ namespace Phocalstream_Web.Controllers
         {
             HomeViewModel model = new HomeViewModel();
 
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 model.Collections = ctx.Collections.Include("Site").Where(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE).ToList<Collection>();
                 return View(model);
@@ -34,7 +35,7 @@ namespace Phocalstream_Web.Controllers
         {
             CameraSite site;
             SiteDetails details = new SiteDetails();
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                site = ctx.Sites.FirstOrDefault<CameraSite>(s => s.ID == id);
                 details.SiteName = site.Name;

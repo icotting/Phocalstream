@@ -8,9 +8,9 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
-using Phocalstream_Shared.Models;
+using Phocalstream_Shared.Data.Model.External;
 
-namespace Phocalstream_Web.Application.Data
+namespace Phocalstream_Web.Application.Admin
 {
                 
     public class DroughtMonitorImporter

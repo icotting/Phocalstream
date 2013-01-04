@@ -1,6 +1,8 @@
 ﻿using Phocalstream_Shared;
-using Phocalstream_Shared.Models;
+using Phocalstream_Shared.Data.Model.External;
+using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application;
+using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
 using Phocalstream_Web.Models.ViewModels;
 using System;
@@ -20,7 +22,7 @@ namespace Phocalstream_Web.Controllers
         public ActionResult Index(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 model.Photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
             }
@@ -48,7 +50,7 @@ namespace Phocalstream_Web.Controllers
         public PartialViewResult PhotoDetails(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 model.Photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
                 model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
@@ -60,7 +62,7 @@ namespace Phocalstream_Web.Controllers
         [AllowAnonymous]
         public ActionResult CameraCollection(long siteID)
         {
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 CollectionViewModel model = new CollectionViewModel();
                 model.Collection = (from c in ctx.Collections where c.Site.ID == siteID select c).First();
@@ -95,7 +97,7 @@ namespace Phocalstream_Web.Controllers
             }
 
             Photo photo = null;
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
             }

@@ -1,32 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Phocalstream_Shared.Models
+namespace Phocalstream_Shared.Data.Model.External
 {
-    public enum DMDataType
-    {
-        [Description("County")]
-        COUNTY,
-        [Description("State")]
-        STATE,
-        [Description("US")]
-        US
-    }
-
     public class DroughtMonitorWeek
     {
         public DateTime Week { get; set; }
         public DMDataType Type { get; set; }
         public float NonDrought { get; set; }
+        public USCounty County { get; set; }
+        public USState State { get; set; }
         public float D0 { get; set; }
         public float D1 { get; set; }
         public float D2 { get; set; }
         public float D3 { get; set; }
         public float D4 { get; set; }
+
+        public float this[int key] 
+        {
+            get 
+            {
+                switch (key)
+                {
+                    case 0:
+                        return D0;
+                    case 1:
+                        return D1;
+                    case 2: 
+                        return D2;
+                    case 3:
+                        return D3;
+                    case 4:
+                        return D4;
+                    default:
+                        return -1;
+                }
+            }
+
+            set 
+            { 
+                switch (key) 
+                {
+                    case 0:
+                        D0 = value;
+                        break;
+                    case 1:
+                        D1 = value;
+                        break;
+                    case 2:
+                        D2 = value;
+                        break;
+                    case 3:
+                        D3 = value;
+                        break;
+                    case 4:
+                        D4 = value;
+                        break;
+                }
+            }
+        }
 
         public static DateTime ConvertDateToTuesday(DateTime date)
         {
@@ -65,26 +100,19 @@ namespace Phocalstream_Shared.Models
                     return date;
             } //End Switch on Day of Week
         } //End ConvertDateToTuesday
-
     }
 
-    public class WaterParameterCode
+    public class USCounty
     {
-        public long ParameterID { get; set; }
-        public string ParameterCode { get; set; }
-        public string ParameterDesc { get; set; }
-        public string StatisticCode { get; set; }
-        public string StatisticDesc { get; set; }
-        public string UnitOfMeasureDesc { get; set; }
+        public long ID { get; set; }
+        public int Fips { get; set; }
+        public string Name { get; set; }
+        public USState State { get; set; }
     }
 
-    public class AvailableWaterDataByStation
+    public class USState 
     {
-        public long DataID { get; set; }
-        public long StationID { get; set; }
-        public string ParameterCode { get; set; }
-        public string StatisticCode { get; set; }
-        public DateTime CurrentLastDate { get; set; }
+        public long ID { get; set; }
+        public string Name { get; set; }
     }
-
 }

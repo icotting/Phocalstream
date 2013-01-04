@@ -15,7 +15,6 @@ using System.IO;
 using System.Threading;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
-using Phocalstream_Shared.Models;
 using Phocalstream_Shared;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -24,6 +23,8 @@ using System.Data;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data.SqlClient;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Web.Application.Data;
 
 namespace Phocalstream_Importer
 {
@@ -69,7 +70,7 @@ namespace Phocalstream_Importer
 
             try
             {
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
                     _viewModel.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.ToList<CameraSite>());
 

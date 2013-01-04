@@ -1,5 +1,6 @@
 ﻿using Phocalstream_Shared;
-using Phocalstream_Shared.Models;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Web.Application.Admin;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models.ViewModels;
 using System;
@@ -23,7 +24,7 @@ namespace Phocalstream_Web.Controllers
             model.DmProcess = getDMModel();
 
             List<User> users;
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 users = ctx.Users.ToList<User>();
             }
@@ -42,7 +43,7 @@ namespace Phocalstream_Web.Controllers
         [HttpGet]
         public ActionResult Delete(long id)
         {
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 User user = ctx.Users.Find(id);
                 if (user != null)
@@ -57,7 +58,7 @@ namespace Phocalstream_Web.Controllers
         [HttpGet]
         public ActionResult AddAdmin(long id)
         {
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 User user = ctx.Users.Find(id);
                 if (user != null)
@@ -72,7 +73,7 @@ namespace Phocalstream_Web.Controllers
         [HttpGet]
         public ActionResult RemoveAdmin(long id)
         {
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 User user = ctx.Users.Find(id);
                 if (user != null)

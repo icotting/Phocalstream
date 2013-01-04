@@ -1,4 +1,4 @@
-﻿using Phocalstream_Shared.Models;
+﻿using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;

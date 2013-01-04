@@ -3,7 +3,6 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
 using Phocalstream_Importer.Commands;
 using Phocalstream_Web.Application;
-using Phocalstream_Shared.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,6 +20,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Phocalstream_Shared;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Web.Application.Data;
 
 namespace Phocalstream_Importer.ViewModels
 {
@@ -120,7 +121,7 @@ namespace Phocalstream_Importer.ViewModels
 
         protected void DoImport()
         {
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 // create a new container if one has not been provided
                 if (this.ContainerName == null || this.ContainerName.Trim() == "")
@@ -199,7 +200,7 @@ namespace Phocalstream_Importer.ViewModels
 
                 this.ProgressColor = "Gray";
                 this.Site = new CameraSite();
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
                     // update the ViewModel site list
                     this.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.Include("Photos").ToList<CameraSite>());
@@ -214,7 +215,7 @@ namespace Phocalstream_Importer.ViewModels
             using (var fileStream = System.IO.File.OpenRead(fileName))
             {
                 // get an entity context for adding the photo entity for this image
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
                     // find the camera site for this photo (bound to this entity context)
                     CameraSite site = (from s in ctx.Sites where s.ID == this.Site.ID select s).First<CameraSite>();
@@ -321,7 +322,7 @@ namespace Phocalstream_Importer.ViewModels
             CameraSite selected = this.SiteList.ElementAt<CameraSite>(this.SelectedSiteIndex);
             if (selected != null)
             {
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
                     ctx.Sites.Remove(ctx.Sites.Attach(selected));
                     ctx.Entry<CameraSite>(selected).State = EntityState.Deleted;

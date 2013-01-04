@@ -51,7 +51,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EntityContext.cs" />
+    <Compile Include="Data\IDroughtMonitorRepository.cs" />
+    <Compile Include="Data\IEntityRepository.cs" />
+    <Compile Include="Data\IEntityRepositoryFactory.cs" />
+    <Compile Include="Data\Model\External\AvailableWaterDataByStation.cs" />
+    <Compile Include="Data\Model\External\DMDataType.cs" />
+    <Compile Include="Data\Model\External\DroughtMonitorWeek.cs" />
+    <Compile Include="Data\Model\External\WaterParameterCode.cs" />
+    <Compile Include="Data\Model\Photo\CameraSite.cs" />
+    <Compile Include="Data\Model\Photo\Collection.cs" />
+    <Compile Include="Data\Model\Photo\CollectionStatus.cs" />
+    <Compile Include="Data\Model\Photo\CollectionType.cs" />
+    <Compile Include="Data\Model\Photo\MetaDatum.cs" />
+    <Compile Include="Data\Model\Photo\Photo.cs" />
+    <Compile Include="Data\Model\Photo\PhotoAnnotation.cs" />
+    <Compile Include="Data\Model\Photo\User.cs" />
+    <Compile Include="Data\Model\Photo\UserRole.cs" />
     <Compile Include="Migrations\201211052038402_CameraSiteCountyFips.cs" />
     <Compile Include="Migrations\201211052038402_CameraSiteCountyFips.Designer.cs">
       <DependentUpon>201211052038402_CameraSiteCountyFips.cs</DependentUpon>
@@ -68,9 +83,6 @@
     <Compile Include="Migrations\201301012046094_CollectionContainerID.Designer.cs">
       <DependentUpon>201301012046094_CollectionContainerID.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\ExternalDataModels.cs" />
-    <Compile Include="Models\PhotoEntities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

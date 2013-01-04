@@ -1,4 +1,4 @@
-﻿using Phocalstream_Shared.Models;
+﻿using Phocalstream_Shared.Data.Model.External;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Phocalstream_Web.Application.Data
+namespace Phocalstream_Web.Application.Admin
 {
     public class WaterDataImporter
     {

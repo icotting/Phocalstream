@@ -1,6 +1,7 @@
 ﻿using Phocalstream_Shared;
-using Phocalstream_Shared.Models;
+using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application;
+using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;
@@ -67,7 +68,7 @@ namespace Phocalstream_Web.Controllers.Api
         [HttpGet]
         public HttpResponseMessage PivotCollectionFor(int id)
         {
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 Collection collection = ctx.Collections.Include("Photos").SingleOrDefault<Collection>(c => c.ID == id);
                 if (collection == null)

@@ -1,4 +1,5 @@
-﻿using Phocalstream_Shared.Models;
+﻿using Phocalstream_Shared.Data.Model.External;
+using Phocalstream_Shared.Data.Model.Photo;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,15 +1,45 @@
-﻿using Phocalstream_Shared.Models;
+﻿using Phocalstream_Shared.Data;
+using Phocalstream_Shared.Data.Model.Photo;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
 
-namespace Phocalstream_Shared
+namespace Phocalstream_Web.Application.Data
 {
-    public class EntityContext : DbContext
+    public class EntityRepositoryFactory : IEntityRepositoryFactory
     {
-        public EntityContext() : base("DbConnection") { }
+        private ApplicationContext _dbContext;
+
+        public EntityRepositoryFactory()
+        {
+            _dbContext = new ApplicationContext();
+        }
+
+        public void SaveChanges()
+        {
+            _dbContext.SaveChanges();
+        }
+
+        public IEntityRepository<T> GetRepository<T>() where T : class
+        {
+            return null;
+        }
+
+        public void Dispose()
+        {
+            _dbContext.Dispose();
+        }
+    }
+
+    public class ApplicationContext : DbContext
+    {
+        public ApplicationContext()
+            : base("DbConnection") 
+        { 
+            
+        }
 
         public DbSet<CameraSite> Sites { get; set; }
         public DbSet<Photo> Photos { get; set; }
@@ -30,11 +60,11 @@ namespace Phocalstream_Shared
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<Collection>().HasMany<Photo>(c => c.Photos).WithMany(p => p.FoundIn).Map(m =>
-                {
-                    m.MapLeftKey("CollectionId");
-                    m.MapRightKey("PhotoId");
-                    m.ToTable("CollectionPhotos");
-                });
+            {
+                m.MapLeftKey("CollectionId");
+                m.MapRightKey("PhotoId");
+                m.ToTable("CollectionPhotos");
+            });
         }
     }
 }

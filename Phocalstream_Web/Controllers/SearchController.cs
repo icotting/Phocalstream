@@ -1,6 +1,7 @@
 ﻿using Microsoft.DeepZoomTools;
 using Phocalstream_Shared;
-using Phocalstream_Shared.Models;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Phocalstream_Web.Controllers
             results.Query = query;
 
             List<Photo> matches = null;
-            using ( EntityContext ctx = new EntityContext()) 
+            using (ApplicationContext ctx = new ApplicationContext()) 
             {
                 int qid = query.GetHashCode();
                 string basePath = ConfigurationManager.AppSettings["photoPath"];

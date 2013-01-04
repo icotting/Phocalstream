@@ -2,7 +2,6 @@
 using Microsoft.Web.WebPages.OAuth;
 using Phocalstream_Shared;
 using Phocalstream_Web.Application;
-using Phocalstream_Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
@@ -11,8 +10,10 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using WebMatrix.WebData;
-using Phocalstream_Web.Models;
 using System.Web.Security;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Web.Application.Data;
+using Phocalstream_Web.Models;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -22,7 +23,7 @@ namespace Phocalstream_Web.Controllers
         public ActionResult UserProfile()
         {
             User user;
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 user = ctx.Users.Where(u => u.GoogleID == this.User.Identity.Name).FirstOrDefault<User>();
             }
@@ -52,7 +53,7 @@ namespace Phocalstream_Web.Controllers
             {
                 try
                 {
-                    using (EntityContext ctx = new EntityContext())
+                    using (ApplicationContext ctx = new ApplicationContext())
                     {
                         ctx.Entry<User>(model.User).State = System.Data.EntityState.Modified;
                         ctx.SaveChanges();
@@ -108,7 +109,7 @@ namespace Phocalstream_Web.Controllers
                 // User is new, ask for their desired membership name
                 string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
                 ViewBag.ReturnUrl = returnUrl;
-                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = new Phocalstream_Shared.Models.User()});
+                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = new Phocalstream_Shared.Data.Model.Photo.User()});
             }
         }
 
@@ -128,9 +129,9 @@ namespace Phocalstream_Web.Controllers
             if (ModelState.IsValid)
             {
                 // Insert a new user into the database
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
-                    Phocalstream_Shared.Models.User user = ctx.Users.FirstOrDefault(u => u.GoogleID == model.ProviderUserName);
+                    User user = ctx.Users.FirstOrDefault(u => u.GoogleID == model.ProviderUserName);
 
                     // Check if user already exists
                     if (user == null)
