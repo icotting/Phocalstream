@@ -115,7 +115,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Util\RelayCommand.cs" />
-    <Compile Include="ViewModels\ApplicationContext.cs" />
     <Compile Include="ViewModels\BindableObject.cs" />
     <Compile Include="ViewModels\CameraSiteViewModel.cs" />
     <Page Include="MainWindow.xaml">

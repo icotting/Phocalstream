@@ -2,6 +2,7 @@
 using Phocalstream_Shared.Data.Model.External;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Linq;
 using System.Data.SqlClient;
 using System.Linq;
@@ -41,6 +42,55 @@ namespace Phocalstream_Web.Application.Data
 
         public void Add(DroughtMonitorWeek week)
         {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand(null, conn))
+                {
+                    switch (week.Type)
+                    {
+                        case DMDataType.COUNTY:
+                            command.CommandText = "insert into CountyDMValues (PublishedDate, County_ID, DroughtCategory, DroughtValue) values (@pdate, @county, @category, @dval)";
+                            command.Parameters.AddWithValue("@county", week.County.ID);
+                            break;
+                        case DMDataType.STATE:
+                            command.CommandText = "insert into StateDMValues (PublishedDate, State_ID, DroughtCategory, DroughtValue) values (@pdate, @state, @category, @dval)";
+                            command.Parameters.AddWithValue("@state", week.State.ID);
+                            break;
+                        case DMDataType.US:
+                            command.CommandText = "insert into USDMValues (PublishedDate, DroughtCategory, DroughtValue) values (@pdate, @category, @dval)";
+                            break;
+                    }
+                    command.Parameters.AddWithValue("@pdate", week.Week);
+                    command.Parameters.Add("@category", SqlDbType.Int);
+                    command.Parameters.Add("@dval", SqlDbType.Float);
+
+                    command.Parameters["@category"].Value = 0;
+                    command.Parameters["@dval"].Value = week.NonDrought;
+                    command.ExecuteNonQuery();
+
+                    command.Parameters["@category"].Value = 1;
+                    command.Parameters["@dval"].Value = week.D0;
+                    command.ExecuteNonQuery();
+
+                    command.Parameters["@category"].Value = 2;
+                    command.Parameters["@dval"].Value = week.D1;
+                    command.ExecuteNonQuery();
+
+                    command.Parameters["@category"].Value = 3;
+                    command.Parameters["@dval"].Value = week.D2;
+                    command.ExecuteNonQuery();
+
+                    command.Parameters["@category"].Value = 4;
+                    command.Parameters["@dval"].Value = week.D3;
+                    command.ExecuteNonQuery();
+                    
+                    command.Parameters["@category"].Value = 5;
+                    command.Parameters["@dval"].Value = week.D4;
+                    command.ExecuteNonQuery();
+                }
+            }
+
             throw new NotImplementedException();
         }
 
