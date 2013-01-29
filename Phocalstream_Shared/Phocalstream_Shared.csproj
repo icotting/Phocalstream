@@ -54,9 +54,11 @@
     <Compile Include="Data\IDroughtMonitorRepository.cs" />
     <Compile Include="Data\IEntityRepository.cs" />
     <Compile Include="Data\IEntityRepositoryFactory.cs" />
+    <Compile Include="Data\IWaterDataRepository.cs" />
     <Compile Include="Data\Model\External\AvailableWaterDataByStation.cs" />
     <Compile Include="Data\Model\External\DMDataType.cs" />
     <Compile Include="Data\Model\External\DroughtMonitorWeek.cs" />
+    <Compile Include="Data\Model\External\WaterDataValue.cs" />
     <Compile Include="Data\Model\External\WaterParameterCode.cs" />
     <Compile Include="Data\Model\Photo\CameraSite.cs" />
     <Compile Include="Data\Model\Photo\Collection.cs" />
