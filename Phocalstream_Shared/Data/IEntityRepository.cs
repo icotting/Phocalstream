@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace Phocalstream_Shared.Data
 {
+    // http://efpatterns.codeplex.com/SourceControl/changeset/view/7f1a9beddf25#Main/EntityFramework.Patterns/IRepository.cs
     public interface IEntityRepository<T> where T : class
     {
-        IQueryable<T> Fetch();
-        IEnumerable<T> GetAll();
-        IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
-        T Single(Expression<Func<T, bool>> predicate);
-        T First(Expression<Func<T, bool>> predicate);
-        T FindById(object id);
-        void Add(T entity);
-        void Update(T entity);
+        IQueryable<T> AsQueryable();
+        IEnumerable<T> GetAll(params Expression<Func<T, object>>[] includeProperties);
+        IEnumerable<T> Find(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties);
+        T Single(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties);
+        T First(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties);
         void Delete(T entity);
+        void Insert(T entity);
+        void Update(T entity);
     }
 }

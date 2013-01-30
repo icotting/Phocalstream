@@ -2,43 +2,21 @@
 using Phocalstream_Shared.Data.Model.Photo;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Data.Objects;
 using System.Linq;
 using System.Web;
 
 namespace Phocalstream_Web.Application.Data
 {
-    public class EntityRepositoryFactory : IEntityRepositoryFactory
-    {
-        private ApplicationContext _dbContext;
-
-        public EntityRepositoryFactory()
-        {
-            _dbContext = new ApplicationContext();
-        }
-
-        public void SaveChanges()
-        {
-            _dbContext.SaveChanges();
-        }
-
-        public IEntityRepository<T> GetRepository<T>() where T : class
-        {
-            return null;
-        }
-
-        public void Dispose()
-        {
-            _dbContext.Dispose();
-        }
-    }
-
     public class ApplicationContext : DbContext
     {
         public ApplicationContext()
-            : base("DbConnection") 
-        { 
-            
+            : base("DbConnection")
+        {
+
         }
 
         public DbSet<CameraSite> Sites { get; set; }
@@ -66,5 +44,43 @@ namespace Phocalstream_Web.Application.Data
                 m.ToTable("CollectionPhotos");
             });
         }
+    }
+
+    public class ApplicationContextAdapter : IDbSetFactory, IDbContext
+    {
+        private readonly DbContext _context;
+
+        public ApplicationContextAdapter(DbContext context)
+        {
+            _context = context;
+        }
+
+        #region IObjectContext Members
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+
+        #endregion
+
+        #region IObjectSetFactory Members
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+
+        public DbSet<T> CreateDbSet<T>() where T : class
+        {
+            return _context.Set<T>();
+        }
+
+        public void ChangeObjectState(object entity, EntityState state)
+        {
+            _context.Entry(entity).State = state;
+        }
+
+        #endregion
     }
 }

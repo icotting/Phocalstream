@@ -1,8 +1,9 @@
-﻿using Phocalstream_Shared;
+﻿using Microsoft.Practices.Unity;
+using Phocalstream_Shared;
+using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
-using Phocalstream_Web.Models;
 using Phocalstream_Web.Models;
 using Phocalstream_Web.Models.ViewModels;
 using System;
@@ -17,58 +18,39 @@ namespace Phocalstream_Web.Controllers
 {
     public class HomeController : Controller
     {
+        [Dependency]
+        public IEntityRepository<Collection> CollectionRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<CameraSite> CameraSiteRepository { get; set; }
+
+        [Dependency]
+        public IPhotoRepository PhotoRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<Photo> PhotoEntityRepository { get; set; }
+
         //
         // GET: /Home/
-
         public ActionResult Index()
         {
             HomeViewModel model = new HomeViewModel();
-
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                model.Collections = ctx.Collections.Include("Site").Where(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE).ToList<Collection>();
-                return View(model);
-            }
+            model.Collections = CollectionRepository.AsQueryable().Where(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE).ToList<Collection>();
+            return View(model);
         }
 
         public ActionResult SiteDetails(long id)
         {
-            CameraSite site;
-            SiteDetails details = new SiteDetails();
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-               site = ctx.Sites.FirstOrDefault<CameraSite>(s => s.ID == id);
-                details.SiteName = site.Name;
-                details.SiteID = site.ID;
+            CameraSite site = CameraSiteRepository.First(s => s.ID == id);
+            Phocalstream_Shared.Data.Model.View.SiteDetails details = PhotoRepository.GetSiteDetails(site);
 
-                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
-                {
-                    conn.Open();
-                    using (SqlCommand command = new SqlCommand("select min(Captured), max(Captured), count(*), max(ID) from Photos where Site_ID = @siteID", conn))
-                    {
-                        command.Parameters.AddWithValue("@siteID", site.ID);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                details.First = reader.GetDateTime(0);
-                                details.Last = reader.GetDateTime(1);
-                                details.PhotoCount = reader.GetInt32(2);
-
-                                details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", Request.Url.Scheme,
-                                    Request.Url.Host,
-                                    Request.Url.Port,
-                                    site.ContainerID,
-                                    ctx.Photos.Find(reader.GetInt64(3)).BlobID);
-                            }
-                        }
-                    }
-                }
-            }
-
+            details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", Request.Url.Scheme,
+                Request.Url.Host,
+                Request.Url.Port,
+                site.ContainerID,
+                PhotoEntityRepository.First(p => p.ID == details.LastPhotoID).BlobID);
 
             return PartialView("_SiteDetails", details);
         }
-
     }
 }

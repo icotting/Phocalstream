@@ -1,6 +1,7 @@
 ﻿using Phocalstream_Shared;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Shared.Data.Model.View;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;

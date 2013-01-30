@@ -1,79 +1,83 @@
-﻿using Phocalstream_Shared.Data;
+﻿using Microsoft.Practices.Unity;
+using Phocalstream_Shared.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Objects;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Web;
 
 namespace Phocalstream_Web.Application.Data
 {
     public class EntityRepository<T> : IEntityRepository<T> where T : class
     {
-        private DbContext _dbContext;
-        private DbSet<T> _dbSet;
+        private readonly DbSet<T> _dbSet;
+        private readonly IDbSetFactory _dbSetFactory;
 
-        public EntityRepository(DbContext dbContext) 
+        public EntityRepository(IDbSetFactory dbSetFactory)
         {
-            if (dbContext == null)
-            {
-                throw new ArgumentNullException("The db context cannot be null for an EntityRepository");
-            }
-            _dbContext = dbContext;
-            _dbSet = _dbContext.Set<T>();
-            if (_dbSet == null)
-            {
-                throw new ArgumentException(string.Format("The type {0} does not exist in the provided context", typeof(T).FullName));
-            }
+            _dbSet = dbSetFactory.CreateDbSet<T>();
+            _dbSetFactory = dbSetFactory;
         }
 
-        public IQueryable<T> Fetch()
+        #region IRepository<T> Members
+
+        public IQueryable<T> AsQueryable()
         {
-            return _dbSet.AsQueryable<T>();
+            return _dbSet;
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(params Expression<Func<T, object>>[] includeProperties)
         {
-            return _dbSet.ToList<T>();
+            IQueryable<T> query = AsQueryable();
+            return PerformInclusions(includeProperties, query);
         }
 
-        public IEnumerable<T> Find(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public IEnumerable<T> Find(Expression<Func<T, bool>> where,
+                                   params Expression<Func<T, object>>[] includeProperties)
         {
-            return _dbSet.Where<T>(predicate);
+            IQueryable<T> query = AsQueryable();
+            query = PerformInclusions(includeProperties, query);
+            return query.Where(where);
         }
 
-        public T Single(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public T Single(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties)
         {
-            return _dbSet.SingleOrDefault<T>(predicate);
+            IQueryable<T> query = AsQueryable();
+            query = PerformInclusions(includeProperties, query);
+            return query.Single(where);
         }
 
-        public T First(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public T First(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties)
         {
-            return _dbSet.FirstOrDefault<T>(predicate);
+            IQueryable<T> query = AsQueryable();
+            query = PerformInclusions(includeProperties, query);
+            return query.First(where);
         }
 
-        public T FindById(object id)
+        public void Delete(T entity)
         {
-            return _dbSet.Find(id);
+            _dbSetFactory.ChangeObjectState(entity, EntityState.Deleted);
         }
 
-        public void Add(T entity)
+        public void Insert(T entity)
         {
             _dbSet.Add(entity);
         }
 
         public void Update(T entity)
         {
-            _dbContext.Entry<T>(entity).State = EntityState.Modified;
+            _dbSetFactory.ChangeObjectState(entity, EntityState.Modified);
         }
 
-        public void Delete(T entity)
+        #endregion
+
+        private static IQueryable<T> PerformInclusions(IEnumerable<Expression<Func<T, object>>> includeProperties,
+                                                       IQueryable<T> query)
         {
-            if (_dbContext.Entry<T>(entity).State == EntityState.Deleted)
-            {
-                _dbSet.Attach(entity);
-            }
-            _dbSet.Remove(entity);
+            return includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
         }
     }
 }

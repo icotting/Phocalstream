@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
 using Phocalstream_Shared.Data.Model.External;
+using Phocalstream_Shared.Data;
 
 namespace Phocalstream_Web.Application.Admin
 {
@@ -16,6 +17,9 @@ namespace Phocalstream_Web.Application.Admin
     public class DroughtMonitorImporter
     {
         private static DroughtMonitorImporter _instance;
+
+        [Microsoft.Practices.Unity.Dependency]
+        public IDroughtMonitorRepository DmRepository { get; set; }
 
         private bool _importRunning;
         private String _firstDate;

@@ -14,20 +14,19 @@ using System.Web.Security;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
+using Microsoft.Practices.Unity;
 
 namespace Phocalstream_Web.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        [Dependency]
+        public EntityRepository<User> UserRepository { get; set; }
+
         public ActionResult UserProfile()
         {
-            User user;
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                user = ctx.Users.Where(u => u.GoogleID == this.User.Identity.Name).FirstOrDefault<User>();
-            }
-            
+            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);            
             return View(new UserManageModel() { User = user });
         }
 

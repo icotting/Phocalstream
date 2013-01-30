@@ -30,6 +30,8 @@ namespace Phocalstream_Web
 
             Scheduler.getInstance().AddJobToSchedule(new DmImporterJob());
             Scheduler.getInstance().AddJobToSchedule(new WaterImporterJob());
+
+            Bootstrapper.Initialise();
         }
     }
 }

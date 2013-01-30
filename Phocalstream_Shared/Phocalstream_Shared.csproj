@@ -53,7 +53,9 @@
   <ItemGroup>
     <Compile Include="Data\IDroughtMonitorRepository.cs" />
     <Compile Include="Data\IEntityRepository.cs" />
-    <Compile Include="Data\IEntityRepositoryFactory.cs" />
+    <Compile Include="Data\IDbContext.cs" />
+    <Compile Include="Data\IDbSetFactory.cs" />
+    <Compile Include="Data\IPhotoRepository.cs" />
     <Compile Include="Data\Model\External\AvailableWaterDataByStation.cs" />
     <Compile Include="Data\Model\External\DMDataType.cs" />
     <Compile Include="Data\Model\External\DroughtMonitorWeek.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Data\Model\Photo\PhotoAnnotation.cs" />
     <Compile Include="Data\Model\Photo\User.cs" />
     <Compile Include="Data\Model\Photo\UserRole.cs" />
+    <Compile Include="Data\Model\View\SiteDetails.cs" />
     <Compile Include="Migrations\201211052038402_CameraSiteCountyFips.cs" />
     <Compile Include="Migrations\201211052038402_CameraSiteCountyFips.Designer.cs">
       <DependentUpon>201211052038402_CameraSiteCountyFips.cs</DependentUpon>
