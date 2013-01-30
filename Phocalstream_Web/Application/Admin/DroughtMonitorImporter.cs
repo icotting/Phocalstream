@@ -16,11 +16,10 @@ namespace Phocalstream_Web.Application.Admin
                 
     public class DroughtMonitorImporter
     {
-        private static DroughtMonitorImporter _instance;
-
         [Microsoft.Practices.Unity.Dependency]
         public IDroughtMonitorRepository DmRepository { get; set; }
 
+        private static DroughtMonitorImporter _instance;
         private bool _importRunning;
         private String _firstDate;
         private String _lastDate;

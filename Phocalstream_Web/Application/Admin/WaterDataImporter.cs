@@ -1,4 +1,5 @@
-﻿using Phocalstream_Shared.Data.Model.External;
+﻿using Phocalstream_Shared.Data;
+using Phocalstream_Shared.Data.Model.External;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,6 +15,9 @@ namespace Phocalstream_Web.Application.Admin
 {
     public class WaterDataImporter
     {
+        [Microsoft.Practices.Unity.Dependency]
+        public IWaterDataRepository WaterRepository { get; set; }
+
         private static WaterDataImporter _instance;
 
         private bool _importRunning;

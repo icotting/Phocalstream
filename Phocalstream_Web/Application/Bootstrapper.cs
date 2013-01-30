@@ -24,7 +24,8 @@ namespace Phocalstream_Web.Application
         private static IUnityContainer BuildUnityContainer()
         {
             var container = new UnityContainer();
-            container.RegisterType<IDroughtMonitorRepository, DroughtMonitorRepository>();
+            container.RegisterType(typeof(IDroughtMonitorRepository), typeof(DroughtMonitorRepository));
+            container.RegisterType(typeof(IWaterDataRepository), typeof(WaterDataRepository));
             container.RegisterType(typeof(IPhotoRepository), typeof(PhotoRepository));
 
             container.RegisterType(typeof(IEntityRepository<>), typeof(EntityRepository<>));
