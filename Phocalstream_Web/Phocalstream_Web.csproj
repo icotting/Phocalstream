@@ -234,7 +234,9 @@
     <Content Include="Content\Images\Settings.png" />
     <Content Include="Content\Images\User.png" />
     <Content Include="App_Config\connectionStrings.config" />
-    <Content Include="App_Config\connectionStringsRelease.config" />
+    <Content Include="App_Config\connectionStringsRelease.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="App_Config\appSettings.config" />
     <Content Include="App_Config\appSettingsRelease.config" />
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
