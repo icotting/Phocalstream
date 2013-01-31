@@ -10,14 +10,15 @@ using System.Threading.Tasks;
 using System.Web;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data;
+using Microsoft.Practices.Unity;
 
 namespace Phocalstream_Web.Application.Admin
 {
                 
     public class DroughtMonitorImporter
     {
-        [Microsoft.Practices.Unity.Dependency]
-        public IDroughtMonitorRepository DmRepository { get; set; }
+
+        private readonly IDroughtMonitorRepository _repo; 
 
         private static DroughtMonitorImporter _instance;
         private bool _importRunning;
@@ -37,7 +38,7 @@ namespace Phocalstream_Web.Application.Admin
             get { return _lastDate; }
         }
 
-        private DroughtMonitorImporter()
+        private DroughtMonitorImporter(IDroughtMonitorRepository repository)
         {
             this._firstDate = "None";
             this._lastDate = "None";
@@ -46,11 +47,23 @@ namespace Phocalstream_Web.Application.Admin
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
+        public static void InitWithContainer(IUnityContainer container)
+        {
+            if (_instance != null)
+            {
+                throw new Exception("Cannot reinitialize the singleton");
+            }
+            else
+            {
+                _instance = new DroughtMonitorImporter(container.Resolve<IDroughtMonitorRepository>());
+            }
+        }
+
         public static DroughtMonitorImporter getInstance()
         {
             if (_instance == null)
             {
-                _instance = new DroughtMonitorImporter();
+                throw new Exception("The importer must first be initialized");
             }
             return _instance;
         } //End getInstance
@@ -137,7 +150,7 @@ namespace Phocalstream_Web.Application.Admin
 
         private bool AlreadyImported(DateTime week)
         {
-            List<DroughtMonitorWeek> importedList =  DmRepository.FindUS(week, 0).ToList<DroughtMonitorWeek>();
+            List<DroughtMonitorWeek> importedList =  _repo.FindUS(week, 0).ToList<DroughtMonitorWeek>();
 
             return (importedList.Count > 0);
             
@@ -213,7 +226,7 @@ namespace Phocalstream_Web.Application.Admin
                     dmWeek[i] = float.Parse(cols[i + offset]);
                 }
 
-                DmRepository.Add(dmWeek);
+                _repo.Add(dmWeek);
             } //End foreach line in rows
 
         } //End WriteData

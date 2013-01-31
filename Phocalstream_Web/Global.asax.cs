@@ -28,10 +28,10 @@ namespace Phocalstream_Web
             AuthConfig.RegisterAuth();
             WebSecurity.InitializeDatabaseConnection("DbConnection", "Users", "ID", "GoogleID", true);
 
+            Bootstrapper.Initialise();
+
             Scheduler.getInstance().AddJobToSchedule(new DmImporterJob());
             Scheduler.getInstance().AddJobToSchedule(new WaterImporterJob());
-
-            Bootstrapper.Initialise();
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Data.Entity;
 using System.Configuration;
+using Phocalstream_Web.Application.Admin;
 
 namespace Phocalstream_Web.Application
 {
@@ -18,6 +19,11 @@ namespace Phocalstream_Web.Application
         public static void Initialise()
         {
             var container = BuildUnityContainer();
+
+            /* initialize the external data importers with the appropriately injected repositories */
+            DroughtMonitorImporter.InitWithContainer(container);
+            WaterDataImporter.InitWithContainer(container);
+
             DependencyResolver.SetResolver(new Unity.Mvc3.UnityDependencyResolver(container));
             GlobalConfiguration.Configuration.DependencyResolver = new Unity.WebApi.UnityDependencyResolver(container);
         }

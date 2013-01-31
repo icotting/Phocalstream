@@ -1,4 +1,5 @@
-﻿using Phocalstream_Shared.Data;
+﻿using Microsoft.Practices.Unity;
+using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,7 @@ namespace Phocalstream_Web.Application.Admin
 {
     public class WaterDataImporter
     {
-        [Microsoft.Practices.Unity.Dependency]
-        public IWaterDataRepository WaterRepository { get; set; }
+        private readonly IWaterDataRepository _repo;
 
         private static WaterDataImporter _instance;
 
@@ -34,19 +34,34 @@ namespace Phocalstream_Web.Application.Admin
             get { return _lastDate.ToString("MM/dd/yyyy"); }
         }
 
-        private WaterDataImporter()
+        private WaterDataImporter(IWaterDataRepository repo)
         {
+            _repo = repo;
+
             this._importRunning = false;
-            this._parameterCodes = WaterRepository.FetchParameterCodes().ToList<WaterParameterCode>();
-            this._lastDate = WaterRepository.GetLastDate();
+            this._parameterCodes = _repo.FetchParameterCodes().ToList<WaterParameterCode>();
+            this._lastDate = _repo.GetLastDate();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
+        public static void InitWithContainer(IUnityContainer container)
+        {
+            if (_instance != null)
+            {
+                throw new Exception("Cannot reinitialize the singleton");
+            }
+            else
+            {
+                _instance = new WaterDataImporter(container.Resolve<IWaterDataRepository>());
+            }
+        }
+
+
         public static WaterDataImporter getInstance()
         {
             if (_instance == null)
             {
-                _instance = new WaterDataImporter();
+                throw new Exception("The importer must be initialized before being used");
             }
             return _instance;
         } //End getInstance
@@ -98,7 +113,7 @@ namespace Phocalstream_Web.Application.Admin
             // Get the ConnectionString by using the configuration ConnectionStrings property to read the connectionString. 
             //using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["WaterDBConnection"].ConnectionString))
 
-            List<AvailableWaterDataByStation> stationDataTypes = WaterRepository.FetchCurrentDataTypes().ToList<AvailableWaterDataByStation>();
+            List<AvailableWaterDataByStation> stationDataTypes = _repo.FetchCurrentDataTypes().ToList<AvailableWaterDataByStation>();
             //Loop through Available Water Data Types using station, parameter, and statistic info
             foreach (AvailableWaterDataByStation dataType in stationDataTypes)
             {
@@ -110,11 +125,11 @@ namespace Phocalstream_Web.Application.Admin
                 {
                     //Update date in DB
                     dataType.CurrentLastDate = newLastDate;
-                    WaterRepository.UpdateAvailableDataTypes(dataType);
+                    _repo.UpdateAvailableDataTypes(dataType);
                 }
             }
             //Reset the instance's last date value
-            this._lastDate = WaterRepository.GetLastDate();
+            this._lastDate = _repo.GetLastDate();
         } //End UpdateWaterDataToCurrent
 
         private DateTime UpdateWaterValues(AvailableWaterDataByStation dataType, DateTime endDate)
@@ -123,7 +138,7 @@ namespace Phocalstream_Web.Application.Admin
             //Get data from current last date (plus 1) to current date
             //Get information
             string url = String.Format(@"http://waterservices.usgs.gov/nwis/dv/?format=rdb&sites={0}&parameterCd={1}&statCd={2}&startDT={3}&endDT={4}",
-                WaterRepository.GetStationCode(dataType.StationID), dataType.ParameterCode, dataType.StatisticCode, dataType.CurrentLastDate.AddDays(1).ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+                _repo.GetStationCode(dataType.StationID), dataType.ParameterCode, dataType.StatisticCode, dataType.CurrentLastDate.AddDays(1).ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
             WebClient client = new WebClient();
             string response = client.DownloadString(url);
 
@@ -151,31 +166,31 @@ namespace Phocalstream_Web.Application.Admin
         private void ResetWaterData()
         {
             this.RemoveCurrentWaterData();
-            List<string> currentStates = WaterRepository.FetchCurrentImportedStates().ToList<string>();
+            List<string> currentStates = _repo.FetchCurrentImportedStates().ToList<string>();
             //Update the instance's Parameter Codes just in case they are resetting the data because they added a new parameter
-            this._parameterCodes = WaterRepository.FetchParameterCodes().ToList<WaterParameterCode>();
+            this._parameterCodes = _repo.FetchParameterCodes().ToList<WaterParameterCode>();
             foreach (string state in currentStates)
             {
                 //Call the importer by state in reset mode
                 this.ImportWaterDataByState(state, new DateTime(2009, 1, 1), true);
             }
             //Reset the instance's last date value
-            this._lastDate = WaterRepository.GetLastDate();
+            this._lastDate = _repo.GetLastDate();
         } //End ReseWaterData
 
         private void RemoveCurrentWaterData()
         {
             //Delete Water Values
-            WaterRepository.DeleteTableData("WaterValues");
+            _repo.DeleteTableData("WaterValues");
             //Delete Water Data Types
-            WaterRepository.DeleteTableData("AvailableWaterDataTypes");
+            _repo.DeleteTableData("AvailableWaterDataTypes");
             //Delete Water Stations
-            WaterRepository.DeleteTableData("WaterStations");
+            _repo.DeleteTableData("WaterStations");
         } //End RemoveCurrentWaterData
 
         private void ImportWaterDataByState(string state, DateTime startDate, bool reset)
         {
-            WaterStateInfo stateInfo = WaterRepository.GetStateInfo(state);
+            WaterStateInfo stateInfo = _repo.GetStateInfo(state);
             if (!stateInfo.IsImported || reset)
             {
                 //Get information
@@ -193,7 +208,7 @@ namespace Phocalstream_Web.Application.Admin
                 rows.RemoveAt(0); // remove the definition row
                 this.WriteData(rows, stateInfo.ID, startDate);
                 //Reset the instance's last date value
-                this._lastDate = WaterRepository.GetLastDate();
+                this._lastDate = _repo.GetLastDate();
 
             }
         } //End ImportWaterDataByState
@@ -226,10 +241,10 @@ namespace Phocalstream_Web.Application.Admin
                 if (ValidRow(cols[12], cols[13], cols[15], cols[21], startDate))
                 {
                     //Write Water Station
-                    long stationID = WaterRepository.AddWaterStation(cols[1], cols[2], float.Parse(cols[4]), float.Parse(cols[5]), stateID);
+                    long stationID = _repo.AddWaterStation(cols[1], cols[2], float.Parse(cols[4]), float.Parse(cols[5]), stateID);
 
                     //Write Water Data Types
-                    long waterDataTypeID = WaterRepository.AddWaterDataType(stationID, this.GetParameterID(cols[12], cols[13]), DateTime.Parse(cols[20]), DateTime.Parse(cols[21]));
+                    long waterDataTypeID = _repo.AddWaterDataType(stationID, this.GetParameterID(cols[12], cols[13]), DateTime.Parse(cols[20]), DateTime.Parse(cols[21]));
 
                     //Import and write data values for the station and data type
                     this.ImportAndWriteDataValues(cols[1], cols[12], cols[13], stationID, waterDataTypeID, startDate);
@@ -237,7 +252,7 @@ namespace Phocalstream_Web.Application.Admin
 
             } //End foreach line in rows
             //Update State as having been imported
-            WaterRepository.UpdateStateAsImported(stateID);
+            _repo.UpdateStateAsImported(stateID);
         } //End WriteData
 
         private bool ValidRow(string paraCode, string statCode, string additionalMeasure, string dataEndDate, DateTime startDate)
@@ -299,7 +314,7 @@ namespace Phocalstream_Web.Application.Admin
                 {
                     waterValue.Value = -999999;
                 }
-                WaterRepository.Add(waterValue);
+                _repo.Add(waterValue);
             } //End foreach line in rows
 
             return resultDate;
