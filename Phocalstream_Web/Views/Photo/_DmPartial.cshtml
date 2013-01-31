@@ -1,0 +1,199 @@
+﻿@model Phocalstream_Web.Models.ViewModels.DmData
+
+    @section Styles
+    {
+        <style type="text/css">
+
+            #DMInfo {
+                width: 300px;
+                position: absolute;
+                top: 0px;
+                right: 0px;
+            }
+
+        </style>
+    }
+
+	<script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+        Highcharts.theme = {
+            colors: ["#DCDCDC", "#F5E938", "#FECC6E", "#FD9827", "#FC3638", "#650205", "#ff0066", "#eeaaee",
+               "#55BF3B", "#DF5353", "#aaeeee"]
+        };
+
+        // Apply the theme
+        var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+    </script>
+<!--
+<div id="DMInfo">
+    <ul>
+        <li>Type: <span class="value">@Html.DisplayFor(model => model.DMValues.Type)</span></li>
+        <li>Week: <span class="value">@Html.DisplayFor(model => model.DisplayDate)</span></li>
+        <li>Nothing: <span class="value">@Html.DisplayFor(model => model.DMValues.NonDrought)</span></li>
+        <li>D0: <span class="value">@Html.DisplayFor(model => model.DMValues.D0)</span></li>
+        <li>D1: <span class="value">@Html.DisplayFor(model => model.DMValues.D1)</span></li>
+        <li>D2: <span class="value">@Html.DisplayFor(model => model.DMValues.D2)</span></li>
+        <li>D3: <span class="value">@Html.DisplayFor(model => model.DMValues.D3)</span></li>
+        <li>D4: <span class="value">@Html.DisplayFor(model => model.DMValues.D4)</span></li>
+    </ul>
+</div>
+    -->
+<div style="clear: both;"></div>
+
+@if (Model.DMValues.NonDrought != 100)
+{
+	<script type="text/javascript">
+	    $(function ShowColumn() {
+	        var chart;
+	        $(document).ready(function () {
+	            chart = new Highcharts.Chart({
+	                chart: {
+	                    renderTo: 'open_container',
+	                    type: 'column'
+	                },
+	                title: {
+	                    text: '@Html.DisplayFor(model => model.DMValues.Type) Drought Monitor Data'
+	                },
+	                subtitle: {
+	                    text: 'Source: droughtmonitor.unl.edu'
+	                },
+	                legend: false,
+	                xAxis: {
+	                    categories: [
+                            'Current Week',
+                            'Previous Week',
+                            'Previous Month'
+                        ]
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 100,
+                        title: false
+                    },
+                    tooltip: {
+                        formatter: function() {
+                            return ''+ this.series.name +
+                                ': '+ this.y +'%';
+                        }
+                    },
+                    plotOptions: {
+                        column: {
+                            pointPadding: 0.2,
+                            borderWidth: 0
+                        }
+                    },
+                    series: [{
+                        name: 'None',
+                        data: [ @Html.DisplayFor(model => model.DMValues.NonDrought) ,
+                            @Html.DisplayFor(model => model.PreviousWeekValues.NonDrought) ,
+                            @Html.DisplayFor(model => model.PreviousMonthValues.NonDrought)]
+                    }, {
+                        name: 'D0',
+                        data: [ @Html.DisplayFor(model => model.DMValues.D0) ,
+                            @Html.DisplayFor(model => model.PreviousWeekValues.D0) ,
+                            @Html.DisplayFor(model => model.PreviousMonthValues.D0)]
+                    }, {
+                        name: 'D1',
+                        data: [ @Html.DisplayFor(model => model.DMValues.D1) ,
+                            @Html.DisplayFor(model => model.PreviousWeekValues.D1) ,
+                            @Html.DisplayFor(model => model.PreviousMonthValues.D1)]
+                    }, {
+                        name: 'D2',
+                        data: [ @Html.DisplayFor(model => model.DMValues.D2) ,
+                            @Html.DisplayFor(model => model.PreviousWeekValues.D2) ,
+                            @Html.DisplayFor(model => model.PreviousMonthValues.D2)]
+                    }, {
+                        name: 'D3',
+                        data: [ @Html.DisplayFor(model => model.DMValues.D3) ,
+                            @Html.DisplayFor(model => model.PreviousWeekValues.D3) ,
+                            @Html.DisplayFor(model => model.PreviousMonthValues.D3)]
+                    }, {
+                        name: 'D4',
+                        data: [ @Html.DisplayFor(model => model.DMValues.D4) ,
+                            @Html.DisplayFor(model => model.PreviousWeekValues.D4) ,
+                            @Html.DisplayFor(model => model.PreviousMonthValues.D4)]
+                    }]
+                });
+	        });
+	    });
+    </script>
+
+    <div id="open_container" style="min-width: 320px; height: 300px; margin: 0 auto"></div>
+    
+   	<script type="text/javascript">
+	    $(function ShowPie() {
+	        var chart;
+	        $(document).ready(function () {
+    	
+	            // Build the chart
+	            chart = new Highcharts.Chart({
+	                chart: {
+	                    renderTo: 'pie_container',
+	                    plotBackgroundColor: null,
+	                    plotBorderWidth: null,
+	                    plotShadow: false
+	                },
+	                title: false,
+	                subtitle: false,
+	                tooltip: {
+	                    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+	                    percentageDecimals: 1
+	                },
+	                plotOptions: {
+	                    pie: {
+	                        allowPointSelect: true,
+	                        cursor: 'pointer',
+	                        dataLabels: {
+	                            enabled: false
+	                        },
+	                        showInLegend: true
+	                    }
+	                },
+	                series: [{
+	                    type: 'pie',
+	                    name: '@Html.DisplayFor(model => model.DMValues.Type)',
+	                    data: [
+                            ['None', @Html.DisplayFor(model => model.DMValues.NonDrought)],
+                            ['D0', @Html.DisplayFor(model => model.DMValues.D0)],
+                            ['D1', @Html.DisplayFor(model => model.DMValues.D1)],
+                            ['D2', @Html.DisplayFor(model => model.DMValues.D2)],
+                            ['D3', @Html.DisplayFor(model => model.DMValues.D3)],
+                            ['D4', @Html.DisplayFor(model => model.DMValues.D4)]
+	                    ]
+	                }]
+	            });
+	        });
+    
+	    });    
+
+	</script>
+
+    <div id="pie_container" style="min-width: 320px; height: 300px; margin: 0 auto"></div>
+}
+else
+{
+    <text> No drought recorded for @Html.DisplayFor(model => model.DMValues.Type). </text>
+}
+
+@if (Model.DMValues.Type.ToString().Equals("COUNTY"))
+{
+    <text>Change view to:</text>
+    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <text> or </text>   
+    @Ajax.ActionLink("Enitre US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}
+else if (Model.DMValues.Type.ToString().Equals("STATE"))
+{
+    <text>Change view to:</text>
+    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
+    <text> or </text> 
+    @Ajax.ActionLink("Entire US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}
+else
+{
+    <text>Change view to:</text>    
+    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
+    <text> or </text> 
+    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}

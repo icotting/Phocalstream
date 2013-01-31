@@ -1,24 +1,78 @@
-﻿@{
-    Layout = null;
+﻿@model Phocalstream_Web.Models.ViewModels.HomeViewModel
+
+@{
+    ViewBag.Title = "Home";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Phocalstream</title>
+@section styles 
+{
     <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: Arial;
+        #mapcontainer {
+            width: 100%;
+            min-width: 300px;
+            height: 400px;
+            position: relative;
+            margin-right: 300px;
         }
+
+        .detailsSub {
+            font-size: 14pt;
+            font-weight: 200;
+            margin-top: 15px;
+        }
+        
+        #siteList {
+            width: 300px;
+            position: absolute;
+            top: -15px;
+            right: 0px;
+        }
+
+        #siteList h1 {
+            font-weight: 100;            
+            font-size: 30pt;
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            line-height: 30px;
+        }
+
+        #sitesContainer { padding-right: 330px; left: 0px; right: 0px; position: relative;}
     </style>
-</head>
-<body>
-    <div>
-        <h1>Phocalstream</h1>
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        var siteList = @Html.Raw(Json.Encode(Model.Collections));
+    </script>
+    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+    <script type="text/javascript" src="~/Content/Scripts/SiteSelection.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
+    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
+}
+
+<p>Welcome to the Phocalstream web site.  This site represents the first release of a project being 
+    developed in partnership between the Robert B. Daugherty Water for Food Institute at the University of Nebraska and the
+    Jeffrey S. Raikes School of Computer Science and Management.  The site will see regular updates
+    over the next several months that will bring planned functionality.  In the mean time, the photo
+    collections that we are building from the Platte River Time-Lapse Photography Project can be browsed below. 
+</p>
+<p>
+    This project is being developed as an open source project.  Code can be found in our <a href="https://github.com/icotting/Phocalstream">Github repository</a>.
+</p>
+<div id="sitesContainer">
+    <div id="mapcontainer">
+        <div id="map">
+
+        </div>
     </div>
-</body>
-</html>
+    <div id="siteList">
+        <h1>Photo Collections</h1>
+        <p>
+            Using the map to the left, select from the available camera sites to view
+            time-lapse photos and information about the site.
+        </p>
+    </div>
+    <div style="clear: both;"></div>
+</div>

@@ -1,14 +1,16 @@
-﻿using Microsoft.WindowsAzure;
+﻿using Microsoft.DeepZoomTools;
+using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
 using Phocalstream_Importer.Commands;
 using Phocalstream_Web.Application;
-using Phocalstream_Web.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -17,6 +19,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Phocalstream_Shared;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Web.Application.Data;
 
 namespace Phocalstream_Importer.ViewModels
 {
@@ -39,9 +44,14 @@ namespace Phocalstream_Importer.ViewModels
         public string StorageAccountKey { get; set; }
         public string ImagePath { get; set; }
 
-        public string CurrentStatus { get; set; }
+        private string _currentStatus;
+        public string CurrentStatus 
+        {
+            get { return _currentStatus; }
+            set { _currentStatus = value; this.RaisePropertyChanged("CurrentStatus"); }        
+        }
 
-        public int ProgressValue 
+        public int ProgressValue
         {
             get { return _progressValue; }
             set { _progressValue = value; this.RaisePropertyChanged("ProgressValue"); }
@@ -95,6 +105,11 @@ namespace Phocalstream_Importer.ViewModels
             get { return new RelayCommand(DeleteSelected); }
         }
 
+        public ICommand RunDeepZoomProcess 
+        {
+            get { return new RelayCommand(doProcess); }
+        }
+
         public ObservableCollection<CameraSite> SiteList { get; set; }
 
         private Object lockObj = new Object();
@@ -104,9 +119,9 @@ namespace Phocalstream_Importer.ViewModels
             new Task(() => DoImport()).Start();
         }
 
-        private void DoImport()
+        protected void DoImport()
         {
-            using (EntityContext ctx = new EntityContext())
+            using (ApplicationContext ctx = new ApplicationContext())
             {
                 // create a new container if one has not been provided
                 if (this.ContainerName == null || this.ContainerName.Trim() == "")
@@ -161,7 +176,7 @@ namespace Phocalstream_Importer.ViewModels
             BlockingCollection<Task> queue = new BlockingCollection<Task>(waitLine, 25);
             Task.Factory.StartNew(() =>
             {
-                foreach ( string file in files)
+                foreach (string file in files)
                 {
                     // for each raw image, create a processing task
                     Task task = new Task(() => ProcessFile(file, container, opts));
@@ -177,7 +192,7 @@ namespace Phocalstream_Importer.ViewModels
                 {
                     Task check;
                     waitLine.TryPeek(out check); // peek at the task at the head of the queue
-                    if ( check != null && check.IsCompleted )
+                    if (check != null && check.IsCompleted)
                     {
                         queue.Take(); // if the task is finished, remove it from the waiting queue
                     }
@@ -185,7 +200,7 @@ namespace Phocalstream_Importer.ViewModels
 
                 this.ProgressColor = "Gray";
                 this.Site = new CameraSite();
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
                     // update the ViewModel site list
                     this.SiteList = new ObservableCollection<CameraSite>(ctx.Sites.Include("Photos").ToList<CameraSite>());
@@ -200,7 +215,7 @@ namespace Phocalstream_Importer.ViewModels
             using (var fileStream = System.IO.File.OpenRead(fileName))
             {
                 // get an entity context for adding the photo entity for this image
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
                     // find the camera site for this photo (bound to this entity context)
                     CameraSite site = (from s in ctx.Sites where s.ID == this.Site.ID select s).First<CameraSite>();
@@ -294,6 +309,7 @@ namespace Phocalstream_Importer.ViewModels
                     }
                 }
             }
+            File.Delete(fileName);
 
             lock (lockObj)
             {
@@ -306,7 +322,7 @@ namespace Phocalstream_Importer.ViewModels
             CameraSite selected = this.SiteList.ElementAt<CameraSite>(this.SelectedSiteIndex);
             if (selected != null)
             {
-                using (EntityContext ctx = new EntityContext())
+                using (ApplicationContext ctx = new ApplicationContext())
                 {
                     ctx.Sites.Remove(ctx.Sites.Attach(selected));
                     ctx.Entry<CameraSite>(selected).State = EntityState.Deleted;
@@ -323,6 +339,219 @@ namespace Phocalstream_Importer.ViewModels
 
                 this.SiteList.Remove(selected);
             }
+        }
+        private void doProcess() 
+        {
+            new Task(() => {
+                try
+                {
+                    // get a connection to the blob storage account
+                    CloudStorageAccount account = CloudStorageAccount.Parse(
+                        String.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", this.StorageAccountName, this.StorageAccountKey));
+                    CloudBlobClient client = account.CreateCloudBlobClient();
+
+                    // create a DeepZoom image creater to generate the tile set for each raw image
+                    ImageCreator creator = new ImageCreator();
+                    creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
+                    creator.TileOverlap = 1;
+                    creator.TileSize = 256;
+
+                    CollectionCreator ccreator = new CollectionCreator();
+                    ccreator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
+                    ccreator.TileOverlap = 1;
+                    ccreator.TileSize = 256;
+
+                    this.CurrentStatus += "Generating DeepZoom Tiles ...\n";
+                    string rootPath = "";
+                    string containerID = null;
+                    string siteName = null;
+                    long siteId = -1;
+
+                    List<string> files = null;
+                    List<Tuple<string, string, long, string>> siteInfo = new List<Tuple<string, string, long, string>>();
+
+                    using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                    {
+                        conn.Open();
+                        using (SqlCommand command = new SqlCommand("select BlobID,ContainerID,Site_ID,s.Name from Photos p inner join CameraSites s on p.Site_ID = s.ID where s.ID not in (select Site_ID from Collections where Status = 1) order by Site_ID", conn))
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                siteInfo.Add(new Tuple<string, string, long, string>(reader.GetString(0), reader.GetString(1), reader.GetInt64(2), reader.GetString(3)));
+                            }
+                        }
+                        conn.Close();
+                    }
+
+                    foreach (Tuple<string, string, long, string> site in siteInfo)
+                    {
+                        if (containerID == null || containerID != site.Item2)
+                        {
+                            if (files != null)
+                            {
+                                CompleteContainer(files, client, containerID, siteName, siteId, rootPath, ccreator);
+                            }
+
+                            // create a directory in which to store the DeepZoom tiles for the image
+                            rootPath = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.GetTempPath(), @"dzgen"), site.Item2);
+                            Directory.CreateDirectory(rootPath);
+
+                            // reset files to begin processing a new site
+                            files = new List<string>();
+                            containerID = site.Item2;
+                            siteId = site.Item3;
+                            siteName = site.Item4;
+
+                            this.CurrentStatus += String.Format("Starting process in {0}\n", rootPath);
+                        }
+
+                        string fileName = System.IO.Path.Combine(rootPath, site.Item1 + ".jpg");
+                        string dziFile = System.IO.Path.Combine(rootPath, site.Item1 + ".dzi");
+
+                        if (File.Exists(dziFile) == false) // if the file is already there, don't recreate it
+                        {
+                            CloudBlob imageBlob = client.GetBlobReference(site.Item2 + "/" + site.Item1 + "/Image.jpg");
+                            try
+                            {
+                                imageBlob.DownloadToFile(fileName);
+                                creator.Create(fileName, dziFile); // create the DeepZoom tileset
+                                File.Delete(fileName);
+                                files.Add(dziFile);
+                            }
+                            catch (Exception e)
+                            {
+                                this.CurrentStatus += String.Format("Could not process file {0} due to {1}\n", fileName, e.Message);
+                            }
+                        }
+                    }
+                    CompleteContainer(files, client, containerID, siteName, siteId, rootPath, ccreator);
+                }
+                catch (Exception e)
+                {
+                    this.CurrentStatus += String.Format("Error: {0}\n", e.Message);
+                    this.CurrentStatus += String.Format("Error: {0}\n", e.ToString());
+                }
+
+                this.CurrentStatus += "Deep Zoom Process complete\n";            
+            }).Start();
+        }
+
+        private void CompleteContainer(List<string> files, CloudBlobClient client, string containerID, string siteName, long siteId, string rootPath, CollectionCreator ccreator)
+        {
+                // create a reference to the container for this image site
+                CloudBlobContainer container = client.GetContainerReference(String.Format("{0}-dz", containerID));
+                container.CreateIfNotExist(); // create it on the cloud if it isn't already there
+
+                BlobRequestOptions options = new BlobRequestOptions();
+                options.UseFlatBlobListing = true;
+
+                // set permissions to be public so anyone can access the image sets
+                BlobContainerPermissions blobContainerPermissions = new BlobContainerPermissions();
+                blobContainerPermissions.PublicAccess = BlobContainerPublicAccessType.Container;
+                container.SetPermissions(blobContainerPermissions);
+
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                {
+                    conn.Open();
+                    Boolean create = false;
+                    using (SqlCommand command = new SqlCommand("select ID from Collections where Site_ID = @Site", conn))
+                    {
+                        command.Parameters.AddWithValue("@Site", siteId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows == false) // there is no collection for this site
+                            {
+                                create = true;
+                            }
+                        }
+                    }
+
+                    if (create)
+                    {
+                        this.CurrentStatus += String.Format("Building DeepZoom Collection for {0}...", containerID);
+                        // generate the collection
+                        ccreator.Create(files, System.IO.Path.Combine(rootPath, "da.dzc"));
+
+                        using (SqlCommand insert = new SqlCommand("insert into Collections (Name,Type,Site_ID,Status) values (@Name,@Type,@Site_ID,@Status)", conn))
+                        {
+                            insert.Parameters.AddWithValue("@Name", siteName);
+                            insert.Parameters.AddWithValue("@Type", 0);
+                            insert.Parameters.AddWithValue("@Site_ID", siteId);
+                            insert.Parameters.AddWithValue("@Status", 0);
+                            insert.ExecuteNonQuery();
+                        }
+                    }
+                    conn.Close();
+                }
+                DirectoryInfo rootInfo = new DirectoryInfo(rootPath);
+
+                this.CurrentStatus += "Uploading data to Azure ...\n";
+                IterateFolders(rootInfo, container, rootPath, rootPath); // upload all of the generated image tiles
+                this.CurrentStatus += String.Format("Cleaning up for {0} ...\n", containerID);
+
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand command = new SqlCommand("update Collections set Status = 1 where Site_ID = @Site", conn))
+                    {
+                        command.Parameters.AddWithValue("@Site", siteId);
+                        command.ExecuteNonQuery();
+                    }
+                    conn.Close();
+                }
+                Directory.Delete(rootPath, true); // delete the local DeepZoom tiles
+        }
+
+        // this method was taken from http://blogs.msdn.com/b/jbarnes/archive/2011/12/07/hosting-wp7-deep-zoom-content-in-azure-blob-storage.aspx 
+        private static void IterateFolders(DirectoryInfo CurrentDir, CloudBlobContainer TargetContainer, string RootFolderName, string globalRoot)
+        {
+            DirectoryInfo[] ChildDirectories = CurrentDir.GetDirectories();
+
+            //recurively iterate through all descendants of the source folder
+            foreach (DirectoryInfo ChildDir in ChildDirectories)
+            {
+                IterateFolders(ChildDir, TargetContainer, RootFolderName, globalRoot);
+            }
+
+            //get the path name including only the rootfoldername and its decendants; it will be used as part of the filename
+            string PreAppendPath = CurrentDir.FullName.Remove(0, CurrentDir.FullName.IndexOf(RootFolderName));
+
+            //get file list
+            FileInfo[] FileList = CurrentDir.GetFiles();
+
+            //Iterate through all files in a Folder in PARALLEL
+            Parallel.ForEach(FileList, file =>
+            {
+                //filename + path and use as name in container; path + filename should be unique
+                string NewFileName = PreAppendPath + "\\" + file.Name;
+
+                //Change Slash to opposite directon
+                string FldrPath = globalRoot;
+                FldrPath = FldrPath.Replace(@"\", "/").ToLower();
+
+                //Strip relative leading path
+                NewFileName = NewFileName.Replace(@"\", "/").ToLower();
+                NewFileName = NewFileName.Replace(FldrPath, "");
+
+                //Strip leading slash for root documents
+                if (NewFileName.IndexOf("/") == 0)
+                    NewFileName = NewFileName.Remove(0, 1);
+
+                try
+                {
+                    //Upload Blob
+                    BlobRequestOptions options = new BlobRequestOptions() { Timeout = TimeSpan.FromMinutes(20) };
+                    CloudBlob destBlob = TargetContainer.GetBlobReference(NewFileName);
+                    destBlob.UploadFile(file.FullName, options);
+                    file.Delete();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(String.Format("Error uploading file {0}", NewFileName));
+                    Console.WriteLine(e.ToString());
+                }
+            });
         }
     }
 }

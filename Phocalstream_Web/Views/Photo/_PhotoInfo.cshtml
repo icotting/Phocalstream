@@ -1,0 +1,19 @@
+﻿@model Phocalstream_Web.Models.ViewModels.PhotoViewModel
+
+<h1>@Html.DisplayFor(model => model.PhotoTime)</h1>
+<h3>@Html.DisplayFor(model => model.PhotoDate)</h3>
+<ul>
+    <li style="padding-bottom: 20px;">Camera Site: <span class="value">@Html.DisplayFor(model => model.Photo.Site.Name)</span></li>
+    <li>Exposure Time: <span class="value">@Html.DisplayFor(model => model.Photo.ExposureTime)</span></li>
+    <li>
+        @(Model.Photo.Flash ? "Flash" : "No Flash")
+
+    </li>
+    <li>Focal Length: <span class="value">@Html.DisplayFor(model => model.Photo.FocalLength)</span></li>
+    <li>ISO Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ISO)</span></li>
+    <li>Max Aperture: <span class="value">@Html.DisplayFor(model => model.Photo.MaxAperture)</span></li>
+    <li>Shutter Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ShutterSpeed)</span></li>
+</ul>
+<div style="margin-top: 20px;">
+
+</div>

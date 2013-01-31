@@ -1,0 +1,36 @@
+﻿<table>
+    <tr>
+        <td style="width: 225px;">
+            @using (Html.BeginForm("Index", "Search"))
+            {
+                <input style="position: relative; top: -8px;" type="text" name="query" />
+                <input type="image" style="width: 30px; position: relative; top: 3px;" src="~/Content/Images/Search.png" />
+            }
+        </td>
+        <td>
+                <img style="width: 30px;" src="~/Content/Images/About.png" alt="About" />
+        </td>
+        @if (Request.IsAuthenticated)
+        {
+        <td>
+            <img style="width: 30px;" src="~/Content/Images/Collections.png" alt="My Collections" />
+        </td>
+        }
+        @if (Request.IsAuthenticated)
+        {
+        <td>
+            <a href="/account/userprofile"><img style="width: 30px;" src="~/Content/Images/User.png" alt="About" /></a>
+        </td>
+        }
+        else
+        {
+        <td>
+            @using (@Html.BeginForm("Login", "Account"))
+            {
+                @Html.AntiForgeryToken()
+                <input style="width: 30px;" type="image" src="~/Content/Images/Login.png" alt="Login" />
+            }
+        </td>
+        }
+    </tr>
+</table>

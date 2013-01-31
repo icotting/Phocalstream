@@ -1,0 +1,20 @@
+﻿@model Phocalstream_Web.Models.ViewModels.DmImportProc
+
+<h2>Drought Monitor Data</h2>
+<p>Currently, the Drought Monitor Data ranges from @Html.DisplayFor(model => model.StartDate) through @Html.DisplayFor(model => model.EndDate)</p>
+
+<h3>Drought Monitor Import</h3>
+
+@if (Model.Running)
+{
+    <span>Import is running!</span>
+    <script type="text/javascript">
+        setTimeout(function () { reloadDMPartial(); }, 10000);
+    </script>
+} 
+else 
+{
+    @Ajax.ActionLink("Run Current Week", "StartDmImport", new { type = "current"}, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <text> | </text> 
+    @Ajax.ActionLink("Run Full", "StartDmImport", new { type = "full"}, new AjaxOptions { UpdateTargetId = "dmPartial" })
+}

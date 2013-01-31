@@ -1,0 +1,77 @@
+﻿@model Phocalstream_Web.Models.RegisterUserModel
+@{
+    ViewBag.Title = "Register with Phocalstream";
+}
+
+@section Styles
+{
+    <style>
+        .profile {
+            width: 40%;
+            margin-bottom: 20px;
+            margin-left: 15px;
+        }
+    </style>
+}
+
+<h1>User Registration</h1>
+
+@using (@Html.BeginForm("RegisterAccount", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+        <p>
+            You've successfully authenticated with your Google ID.  You will need to complete 
+            form below to create a new Phocalstream profile and click the Register button to finish
+            logging in.
+        </p>
+        <table class="profile">
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.User.FirstName)
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.User.FirstName)
+                </td>
+                <td>
+                    @Html.ValidationMessageFor(m => m.User.FirstName)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.User.LastName)
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.User.LastName)
+                </td>
+                <td>
+                    @Html.ValidationMessageFor(m => m.User.LastName)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.User.EmailAddress)
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.User.EmailAddress)
+                </td>
+                <td>
+                    @Html.ValidationMessageFor(m => m.User.EmailAddress)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.User.Organization)
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.User.Organization)
+                </td>
+                <td>
+                    @Html.ValidationMessageFor(m => m.User.Organization)
+                </td>
+            </tr>
+        </table>
+        @Html.HiddenFor(m => m.ProviderUserName)
+        @Html.HiddenFor(m => m.ProviderData)
+        <input type="submit" value="Register" />
+}
