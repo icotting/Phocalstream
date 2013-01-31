@@ -43,18 +43,23 @@ namespace Phocalstream_Web.Application.Data
             return query.Where(where);
         }
 
+        public T Find(object id)
+        {
+            return _dbSet.Find(id);
+        }
+
         public T Single(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties)
         {
             IQueryable<T> query = AsQueryable();
             query = PerformInclusions(includeProperties, query);
-            return query.Single(where);
+            return query.SingleOrDefault(where);
         }
 
         public T First(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties)
         {
             IQueryable<T> query = AsQueryable();
             query = PerformInclusions(includeProperties, query);
-            return query.First(where);
+            return query.FirstOrDefault(where);
         }
 
         public void Delete(T entity)

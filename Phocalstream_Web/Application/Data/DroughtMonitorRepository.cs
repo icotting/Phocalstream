@@ -50,18 +50,10 @@ namespace Phocalstream_Web.Application.Data
                     switch (week.Type)
                     {
                         case DMDataType.COUNTY:
-                            if (week.County.ID == 0)
-                            {
-                                week.County.ID = this.GetCountyID(conn, week.County.Name, week.County.Fips, week.State.Name);
-                            }
                             command.CommandText = "insert into CountyDMValues (PublishedDate, County_ID, DroughtCategory, DroughtValue) values (@pdate, @county, @category, @dval)";
                             command.Parameters.AddWithValue("@county", week.County.ID);
                             break;
                         case DMDataType.STATE:
-                            if (week.State.ID == 0)
-                            {
-                                week.State.ID = this.GetStateID(conn, week.State.Name);
-                            }
                             command.CommandText = "insert into StateDMValues (PublishedDate, State_ID, DroughtCategory, DroughtValue) values (@pdate, @state, @category, @dval)";
                             command.Parameters.AddWithValue("@state", week.State.ID);
                             break;
@@ -73,13 +65,29 @@ namespace Phocalstream_Web.Application.Data
                     command.Parameters.Add("@category", SqlDbType.Int);
                     command.Parameters.Add("@dval", SqlDbType.Float);
 
-                    for (int i = 0; i < 6; i++)
-                    {
-                        command.Parameters["@category"].Value = i;
-                        command.Parameters["@dval"].Value = week[i];
-                        command.ExecuteNonQuery();
-                    }
+                    command.Parameters["@category"].Value = 0;
+                    command.Parameters["@dval"].Value = week.NonDrought;
+                    command.ExecuteNonQuery();
 
+                    command.Parameters["@category"].Value = 1;
+                    command.Parameters["@dval"].Value = week.D0;
+                    command.ExecuteNonQuery();
+
+                    command.Parameters["@category"].Value = 2;
+                    command.Parameters["@dval"].Value = week.D1;
+                    command.ExecuteNonQuery();
+
+                    command.Parameters["@category"].Value = 3;
+                    command.Parameters["@dval"].Value = week.D2;
+                    command.ExecuteNonQuery();
+
+                    command.Parameters["@category"].Value = 4;
+                    command.Parameters["@dval"].Value = week.D3;
+                    command.ExecuteNonQuery();
+                    
+                    command.Parameters["@category"].Value = 5;
+                    command.Parameters["@dval"].Value = week.D4;
+                    command.ExecuteNonQuery();
                 }
             }
 
@@ -87,8 +95,9 @@ namespace Phocalstream_Web.Application.Data
         }
 
 
-        public ICollection<DroughtMonitorWeek> FindBy(USCounty county, DateTime? week = null, int weeksPrevious = 0)
+        public ICollection<DroughtMonitorWeek> FindBy(USCounty county, DateTime? week = null, int weeksPrevious = 1)
         {
+            if (weeksPrevious == 0) { weeksPrevious = 1; }
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -118,8 +127,9 @@ namespace Phocalstream_Web.Application.Data
             }
         }
 
-        public ICollection<DroughtMonitorWeek> FindBy(USState state, DateTime? week = null, int weeksPrevious = 0)
+        public ICollection<DroughtMonitorWeek> FindBy(USState state, DateTime? week = null, int weeksPrevious = 1)
         {
+            if (weeksPrevious == 0) { weeksPrevious = 1; }
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -149,8 +159,9 @@ namespace Phocalstream_Web.Application.Data
             }
         }
 
-        public ICollection<DroughtMonitorWeek> FindUS(DateTime? week = null, int weeksPrevious = 0)
+        public ICollection<DroughtMonitorWeek> FindUS(DateTime? week = null, int weeksPrevious = 1)
         {
+            if (weeksPrevious == 0) { weeksPrevious = 1; }
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -158,7 +169,7 @@ namespace Phocalstream_Web.Application.Data
                 {
                     if (week == null && weeksPrevious == 0)
                     {
-                        command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues order by PublishedDate");
+                        command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues where order by PublishedDate");
                     }
                     else if (week == null && weeksPrevious != null)
                     {
@@ -172,14 +183,9 @@ namespace Phocalstream_Web.Application.Data
                         command.Parameters.AddWithValue("@rangeend", week);
                     }
 
-                    return ProcessQuery(command, DMDataType.US);
+                    return ProcessQuery(command, DMDataType.STATE);
                 }
             }
-        }
-
-        public ICollection<DroughtMonitorWeek> Find(DateTime? week = null, int weeksPrevious = 0)
-        {
-            throw new NotImplementedException();
         }
 
         private List<DroughtMonitorWeek> GetValuesFor(DMDataType type)
@@ -250,84 +256,80 @@ namespace Phocalstream_Web.Application.Data
                         }
                     }
 
-                    currentWeek[reader.GetInt32(0)] = reader.GetFloat(1);
+                    currentWeek[reader.GetInt32(0)] = reader.GetDouble(1);
                 }
                 reader.Close();
             }
+
             return weeks;
         }
 
-        private long GetCountyID(SqlConnection conn, string county, int FIPS, string state)
+
+        public USState GetStateForName(string name)
         {
-            long countyID = -1;
-            using (SqlCommand countyLookup = new SqlCommand(string.Format("select ID from Counties where FIPS={0}", FIPS), conn))
-            using (SqlDataReader reader = countyLookup.ExecuteReader())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                if (reader.Read())
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select * from States where Name = @StateName", conn))
                 {
-                    countyID = reader.GetInt64(0);
-                }
-                reader.Close();
-                if (countyID == -1)
-                {
-                    // if county does not exist, add it
-                    countyID = this.AddCounty(conn, county, FIPS, state);
+                    command.Parameters.AddWithValue("@StateName", name);
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        USState state = new USState();
+                        state.ID = reader.GetInt64(0);
+                        state.Name = reader.GetString(1);
+                        return state;
+                    }
                 }
             }
-            return countyID;
-        } //End GetCountyID
+            throw new ArgumentException(string.Format("State name {0} is not recognized", name));
+        }
 
-        private long AddCounty(SqlConnection conn, string county, int FIPS, string state)
+        public USState GetState(long id)
         {
-            SqlCommand command = new SqlCommand(null, conn);
-            // Create and prepare an SQL statement.
-            command.CommandText = "insert into Counties (FIPS, Name, State_ID) values (@FIPS, @name, @state)";
-            command.Parameters.AddWithValue("@FIPS", FIPS);
-            command.Parameters.AddWithValue("@name", county);
-            command.Parameters.AddWithValue("@state", this.GetStateID(conn, state));
-            command.ExecuteNonQuery();
-
-            // Read the new ID back to return
-            command.Parameters.Clear();
-            command.CommandText = "SELECT @@IDENTITY";
-            return Convert.ToInt64(command.ExecuteScalar());
-        } //End AddCounty
-
-        private long GetStateID(SqlConnection conn, string state)
-        {
-            long stateID = -1;
-            // Get State ID
-            using (SqlCommand stateLookup = new SqlCommand(string.Format("select ID from States where Name='{0}'", state), conn))
-            using (SqlDataReader stateReader = stateLookup.ExecuteReader())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                if (stateReader.Read())
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select * from States where ID = @StateID", conn))
                 {
-                    stateID = stateReader.GetInt64(0);
-                }
-                stateReader.Close();
-                if (stateID == -1)
-                {
-                    // if state does not exist for county, add it
-                    stateID = this.AddState(conn, state);
+                    command.Parameters.AddWithValue("@StateID", id);
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        USState state = new USState();
+                        state.ID = reader.GetInt64(0);
+                        state.Name = reader.GetString(1);
+                        return state;
+                    }
                 }
             }
-            return stateID;
-        } //End GetStateID
+            throw new ArgumentException(string.Format("State id {0} is not recognized", id));
+        }
 
-        private long AddState(SqlConnection conn, string state)
+        public USCounty GetCountyForFips(int fips)
         {
-            SqlCommand command = new SqlCommand(null, conn);
-            // Create and prepare an SQL statement.
-            command.CommandText = "insert into States (Name) values (@name)";
-            command.Parameters.AddWithValue("@name", state);
-            command.ExecuteNonQuery();
 
-            // Read the new ID back to return
-            command.Parameters.Clear();
-            command.CommandText = "SELECT @@IDENTITY";
-            return Convert.ToInt64(command.ExecuteScalar());
-        } //End AddState
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select * from Counties where FIPS = @Fips", conn))
+                {
+                    command.Parameters.AddWithValue("@Fips", fips);
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        USCounty county = new USCounty();
+                        county.ID = reader.GetInt64(0);
+                        county.Fips = reader.GetInt32(1);
+                        county.Name = reader.GetString(2);
+                        county.State = GetState(reader.GetInt64(3));
 
-
+                        return county;
+                    }
+                }
+            }
+            throw new ArgumentException(string.Format("Fips code {0} is not recognized", fips));
+        }
     }
 }

@@ -53,11 +53,12 @@
   <ItemGroup>
     <Compile Include="Data\IDroughtMonitorRepository.cs" />
     <Compile Include="Data\IEntityRepository.cs" />
-	<Compile Include="Data\IDbContext.cs" />
+    <Compile Include="Data\IDbContext.cs" />
     <Compile Include="Data\IDbSetFactory.cs" />
     <Compile Include="Data\IPhotoRepository.cs" />
+    <Compile Include="Data\IUnitOfWork.cs" />
     <Compile Include="Data\IWaterDataRepository.cs" />
- 	<Compile Include="Data\Model\External\AvailableWaterDataByStation.cs" />
+    <Compile Include="Data\Model\External\AvailableWaterDataByStation.cs" />
     <Compile Include="Data\Model\External\DMDataType.cs" />
     <Compile Include="Data\Model\External\DroughtMonitorWeek.cs" />
     <Compile Include="Data\Model\External\WaterDataValue.cs" />

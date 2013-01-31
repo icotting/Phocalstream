@@ -197,6 +197,7 @@
     <Compile Include="Application\Data\EntityRepository.cs" />
     <Compile Include="Application\Data\DroughtMonitorRepository.cs" />
     <Compile Include="Application\Data\PhotoRepository.cs" />
+    <Compile Include="Application\Data\UnitOfWork.cs" />
     <Compile Include="Application\Data\WaterDataRepository.cs" />
     <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
@@ -232,6 +233,12 @@
     <Content Include="Content\Images\Search.png" />
     <Content Include="Content\Images\Settings.png" />
     <Content Include="Content\Images\User.png" />
+    <Content Include="App_Config\connectionStrings.config" />
+    <Content Include="App_Config\connectionStringsRelease.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="App_Config\appSettings.config" />
+    <Content Include="App_Config\appSettingsRelease.config" />
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />

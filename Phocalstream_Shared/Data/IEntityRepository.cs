@@ -13,6 +13,7 @@ namespace Phocalstream_Shared.Data
         IQueryable<T> AsQueryable();
         IEnumerable<T> GetAll(params Expression<Func<T, object>>[] includeProperties);
         IEnumerable<T> Find(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties);
+        T Find(object id);
         T Single(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties);
         T First(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includeProperties);
         void Delete(T entity);

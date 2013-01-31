@@ -13,13 +13,13 @@ namespace Phocalstream_Shared.Data.Model.External
         public float NonDrought { get; set; }
         public USCounty County { get; set; }
         public USState State { get; set; }
-        public float D0 { get; set; }
-        public float D1 { get; set; }
-        public float D2 { get; set; }
-        public float D3 { get; set; }
-        public float D4 { get; set; }
+        public double D0 { get; set; }
+        public double D1 { get; set; }
+        public double D2 { get; set; }
+        public double D3 { get; set; }
+        public double D4 { get; set; }
 
-        public float this[int key] 
+        public double this[int key] 
         {
             get 
             {

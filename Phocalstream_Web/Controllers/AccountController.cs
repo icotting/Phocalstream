@@ -15,6 +15,8 @@ using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
 using Microsoft.Practices.Unity;
+using System.Data.Entity;
+using Phocalstream_Shared.Data;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -22,7 +24,10 @@ namespace Phocalstream_Web.Controllers
     public class AccountController : Controller
     {
         [Dependency]
-        public EntityRepository<User> UserRepository { get; set; }
+        public IEntityRepository<User> UserRepository { get; set; }
+
+        [Dependency]
+        public IUnitOfWork Unit { get; set; }
 
         public ActionResult UserProfile()
         {
@@ -40,7 +45,6 @@ namespace Phocalstream_Web.Controllers
         public ActionResult LogOff()
         {
             WebSecurity.Logout();
-
             return RedirectToAction("Index", "Home");
         }
 
@@ -52,11 +56,8 @@ namespace Phocalstream_Web.Controllers
             {
                 try
                 {
-                    using (ApplicationContext ctx = new ApplicationContext())
-                    {
-                        ctx.Entry<User>(model.User).State = System.Data.EntityState.Modified;
-                        ctx.SaveChanges();
-                    }
+                    UserRepository.Update(model.User);
+                    Unit.Commit();
                     model.Status = "Profile updated";
                 }
                 catch (Exception e)
@@ -128,34 +129,31 @@ namespace Phocalstream_Web.Controllers
             if (ModelState.IsValid)
             {
                 // Insert a new user into the database
-                using (ApplicationContext ctx = new ApplicationContext())
+                User user = UserRepository.First(u => u.GoogleID == model.ProviderUserName);
+
+                // Check if user already exists
+                if (user == null)
                 {
-                    User user = ctx.Users.FirstOrDefault(u => u.GoogleID == model.ProviderUserName);
+                    // Insert name into the profile table
+                    model.User.GoogleID = model.ProviderUserName;
+                    model.User.Role = UserRole.STANDARD;
+                    UserRepository.Insert(model.User);
+                    Unit.Commit();
 
-                    // Check if user already exists
-                    if (user == null)
+                    OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.ProviderUserName);
+                    OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
+
+                    if (UserRepository.AsQueryable().Count() == 1)
                     {
-                        // Insert name into the profile table
-                        model.User.GoogleID = model.ProviderUserName;
-                        model.User.Role = UserRole.STANDARD;
-                        ctx.Users.Add(model.User);
-                        ctx.SaveChanges();
-
-                        OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.ProviderUserName);
-                        OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
-
-                        if (ctx.Users.Count() == 1)
-                        {
-                            Roles.CreateRole("Admin");
-                            Roles.AddUserToRole(model.ProviderUserName, "Admin");
-                        }
-
-                        return RedirectToLocal(returnUrl);
+                        Roles.CreateRole("Admin");
+                        Roles.AddUserToRole(model.ProviderUserName, "Admin");
                     }
-                    else
-                    {
-                        ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
-                    }
+
+                    return RedirectToLocal(returnUrl);
+                }
+                else
+                {
+                    ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
                 }
             }
             ViewBag.ReturnUrl = returnUrl;

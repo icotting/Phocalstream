@@ -1,4 +1,6 @@
-﻿using Phocalstream_Shared;
+﻿using Microsoft.Practices.Unity;
+using Phocalstream_Shared;
+using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application.Admin;
 using Phocalstream_Web.Application.Data;
@@ -15,6 +17,12 @@ namespace Phocalstream_Web.Controllers
     [Authorize(Roles=@"Admin")] 
     public class SettingsController : Controller
     {
+        [Dependency]
+        public IEntityRepository<User> UserRepository { get; set; }
+
+        [Dependency]
+        public IUnitOfWork Unit { get; set; }
+
         //
         // GET: /Settings/
 
@@ -23,11 +31,7 @@ namespace Phocalstream_Web.Controllers
             SettingsViewModel model = new SettingsViewModel();
             model.DmProcess = getDMModel();
 
-            List<User> users;
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                users = ctx.Users.ToList<User>();
-            }
+            List<User> users = UserRepository.AsQueryable().ToList<User>();
             model.UserList = new List<ManagedUser>();
             
             foreach (var user in users)
@@ -43,43 +47,35 @@ namespace Phocalstream_Web.Controllers
         [HttpGet]
         public ActionResult Delete(long id)
         {
-            using (ApplicationContext ctx = new ApplicationContext())
+            User user = UserRepository.Find(id);
+            if (user != null)
             {
-                User user = ctx.Users.Find(id);
-                if (user != null)
-                {
-                    ctx.Entry<User>(user).State = System.Data.EntityState.Deleted;
-                    ctx.SaveChanges();
-                }
+                UserRepository.Delete(user);
+                Unit.Commit();
             }
+
             return RedirectToAction("Index");
         }
 
         [HttpGet]
         public ActionResult AddAdmin(long id)
         {
-            using (ApplicationContext ctx = new ApplicationContext())
+            User user = UserRepository.Find(id);
+            if (user != null)
             {
-                User user = ctx.Users.Find(id);
-                if (user != null)
-                {
-                    Roles.AddUserToRole(user.GoogleID, "Admin");
-                }
+                Roles.AddUserToRole(user.GoogleID, "Admin");
             }
-
+           
             return RedirectToAction("Index");
         }
 
         [HttpGet]
         public ActionResult RemoveAdmin(long id)
         {
-            using (ApplicationContext ctx = new ApplicationContext())
+            User user = UserRepository.Find(id);
+            if (user != null)
             {
-                User user = ctx.Users.Find(id);
-                if (user != null)
-                {
-                    Roles.RemoveUserFromRole(user.GoogleID, "Admin");
-                }
+                Roles.RemoveUserFromRole(user.GoogleID, "Admin");
             }
 
             return RedirectToAction("Index");

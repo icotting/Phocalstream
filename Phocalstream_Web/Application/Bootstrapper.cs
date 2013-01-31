@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Data.Entity;
+using System.Configuration;
 
 namespace Phocalstream_Web.Application
 {
@@ -24,14 +25,20 @@ namespace Phocalstream_Web.Application
         private static IUnityContainer BuildUnityContainer()
         {
             var container = new UnityContainer();
-            container.RegisterType(typeof(IDroughtMonitorRepository), typeof(DroughtMonitorRepository));
-            container.RegisterType(typeof(IWaterDataRepository), typeof(WaterDataRepository));
-            container.RegisterType(typeof(IPhotoRepository), typeof(PhotoRepository));
+            container.RegisterType(typeof(IDroughtMonitorRepository), typeof(DroughtMonitorRepository),
+                new InjectionConstructor(ConfigurationManager.ConnectionStrings["DMConnection"].ConnectionString));
 
+            container.RegisterType(typeof(IWaterDataRepository), typeof(WaterDataRepository),
+                new InjectionConstructor(ConfigurationManager.ConnectionStrings["WaterDBConnection"].ConnectionString));
+
+            container.RegisterType(typeof(IPhotoRepository), typeof(PhotoRepository), 
+                new InjectionConstructor(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString));
+
+            container.RegisterType(typeof(IUnitOfWork), typeof(UnitOfWork));
             container.RegisterType(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             container.RegisterType(typeof(DbContext), typeof(ApplicationContext));
 
-            container.RegisterInstance(new ApplicationContextAdapter(container.Resolve<DbContext>()), new ContainerControlledLifetimeManager());
+            container.RegisterInstance(new ApplicationContextAdapter(container.Resolve<DbContext>()), new PerThreadLifetimeManager());
             container.RegisterType<IDbSetFactory>(new InjectionFactory(con => con.Resolve<ApplicationContextAdapter>()));
             container.RegisterType<IDbContext>(new InjectionFactory(con => con.Resolve<ApplicationContextAdapter>()));
 
