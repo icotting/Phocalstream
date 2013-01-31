@@ -1,4 +1,6 @@
-﻿using Phocalstream_Shared;
+﻿using Microsoft.Practices.Unity;
+using Phocalstream_Shared;
+using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
@@ -19,15 +21,20 @@ namespace Phocalstream_Web.Controllers
 {
     public class PhotoController : Controller
     {
-        [AllowAnonymous]
+        [Dependency]
+        public IEntityRepository<Photo> PhotoRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<Collection> CollectionRepository { get; set; }
+
+        [Dependency]
+        public IDroughtMonitorRepository DmRepository { get; set; }
+
         public ActionResult Index(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                model.Photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
-            }
-
+            model.Photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
+            
             if (model.Photo == null)
             {
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
@@ -38,6 +45,7 @@ namespace Phocalstream_Web.Controllers
                     Request.Url.Port,
                     model.Photo.Site.ContainerID,
                     model.Photo.BlobID);
+
             model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
             model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
             model.SiteCoords = string.Format("{0}, {1}", model.Photo.Site.Latitude, model.Photo.Site.Longitude);
@@ -51,33 +59,28 @@ namespace Phocalstream_Web.Controllers
         public PartialViewResult PhotoDetails(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                model.Photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
-                model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
-                model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
-            }
+            model.Photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
+            model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
+            model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
+
             return PartialView("_PhotoInfo", model);
         }
 
-        [AllowAnonymous]
         public ActionResult CameraCollection(long siteID)
         {
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                CollectionViewModel model = new CollectionViewModel();
-                model.Collection = (from c in ctx.Collections where c.Site.ID == siteID select c).First();
+            CollectionViewModel model = new CollectionViewModel();
+            model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
 
-                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
-                    Request.Url.Host,
-                    Request.Url.Port,
-                    model.Collection.ID);
-                model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
+            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
+                Request.Url.Host,
+                Request.Url.Port,
+                model.Collection.ID);
+            model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
 
-                List<Photo> photos = ctx.Photos.Where(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
-                model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
-                return View(model);
-            }
+            List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
+            model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
+            
+            return View(model);
         }
 
         [HttpGet]
@@ -97,12 +100,7 @@ namespace Phocalstream_Web.Controllers
                     break;
             }
 
-            Photo photo = null;
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                photo = ctx.Photos.Include("Site").SingleOrDefault(p => p.ID == photoID);
-            }
-
+            Photo photo = PhotoRepository.Single(p => p.ID == photoID);
             if (photo == null)
             {
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
@@ -131,99 +129,45 @@ namespace Phocalstream_Web.Controllers
 
         private DroughtMonitorWeek LoadDMDataValues (DMDataType type, DateTime date, int CountyFIPS)
         {
-            DroughtMonitorWeek DMValues = new DroughtMonitorWeek();
-
-            //data.DMValues.Type = type.ToString().ToLower();
-            DMValues.Type = type;
-            DMValues.Week = DroughtMonitorWeek.ConvertDateToTuesday(date);
-
-            // Get the ConnectionString by using the configuration ConnectionStrings property to read the connectionString. 
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DMConnection"].ConnectionString))
+            DroughtMonitorWeek week = null;
+            switch (type)
             {
-                conn.Open();
-                using (SqlCommand command = new SqlCommand(null, conn))
-                {
-                    switch (type)
-                    {
-                        case DMDataType.COUNTY:
-                            command.CommandText = string.Format("select DroughtCategory, DroughtValue from CountyDMValues where PublishedDate='{0}' and County_ID={1}", DMValues.Week.ToString("yyyyMMdd"), GetCountyID(conn, CountyFIPS));
-                            break;
-                        case DMDataType.STATE:
-                            command.CommandText = string.Format("select DroughtCategory, DroughtValue from StateDMValues where PublishedDate='{0}' and State_ID={1}", DMValues.Week.ToString("yyyyMMdd"), GetStateID(conn, CountyFIPS));
-                            break;
-                        case DMDataType.US:
-                            command.CommandText = string.Format("select DroughtCategory, DroughtValue from USDMValues where PublishedDate='{0}'", DMValues.Week.ToString("yyyyMMdd"));
-                            break;
-                    }
-
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            switch (reader.GetInt32(0))
-                            {
-                                case 0:
-                                    DMValues.NonDrought = (float)reader.GetDouble(1);
-                                    break;
-                                case 1:
-                                    DMValues.D0 = (float)reader.GetDouble(1);
-                                    break;
-                                case 2:
-                                    DMValues.D1 = (float)reader.GetDouble(1);
-                                    break;
-                                case 3:
-                                    DMValues.D2 = (float)reader.GetDouble(1);
-                                    break;
-                                case 4:
-                                    DMValues.D3 = (float)reader.GetDouble(1);
-                                    break;
-                                case 5:
-                                    DMValues.D4 = (float)reader.GetDouble(1);
-                                    break;
-                            }
-                        }
-                        reader.Close();
-                    }
-                }
+                case DMDataType.COUNTY:
+                    week = DmRepository.FindBy(DmRepository.GetCountyForFips(CountyFIPS), date).FirstOrDefault();
+                    break;
+                case DMDataType.STATE:
+                    week = DmRepository.FindBy(DmRepository.GetCountyForFips(CountyFIPS).State, date).FirstOrDefault();
+                    break;
+                case DMDataType.ALL:
+                    week = DmRepository.FindUS(date).FirstOrDefault();
+                    break;
             }
 
-            // Normalize data to be out of 100%
-            DMValues.D0 = (float) Math.Round((DMValues.D0 - DMValues.D1), 2);
-            DMValues.D1 = (float) Math.Round((DMValues.D1 - DMValues.D2), 2);
-            DMValues.D2 = (float) Math.Round((DMValues.D2 - DMValues.D3), 2);
-            DMValues.D3 = (float) Math.Round((DMValues.D3 - DMValues.D4), 2);
+            if (week == null)
+            {
+                USCounty county = DmRepository.GetCountyForFips(CountyFIPS);
+                week = new DroughtMonitorWeek() { 
+                    D0 = 0, 
+                    D1 = 0, 
+                    D2 = 0, 
+                    D3 = 0, 
+                    D4 = 0, 
+                    NonDrought = 0, 
+                    Week = date, 
+                    Type = type, 
+                    County = county, 
+                    State = county.State };
+            }
+            else
+            {
+                // Normalize data to be out of 100%
+                week.D0 = (float)Math.Round((week.D0 - week.D1), 2);
+                week.D1 = (float)Math.Round((week.D1 - week.D2), 2);
+                week.D2 = (float)Math.Round((week.D2 - week.D3), 2);
+                week.D3 = (float)Math.Round((week.D3 - week.D4), 2);
+            }
 
-            return DMValues;
+            return week;
         } //End LoadDMDataValues
-
-        private long GetCountyID(SqlConnection conn, int countyFIPS)
-        {
-            long countyID = -1;
-            using (SqlCommand countyLookup = new SqlCommand(string.Format("select ID from Counties where FIPS='{0}'", countyFIPS), conn))
-            using (SqlDataReader reader = countyLookup.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    countyID = reader.GetInt64(0);
-                }
-                reader.Close();
-            }
-            return countyID;
-        } //End GetCountyID
-
-        private long GetStateID(SqlConnection conn, int countyFIPS)
-        {
-            long stateID = -1;
-            using (SqlCommand countyLookup = new SqlCommand(string.Format("select State_ID from Counties where FIPS='{0}'", countyFIPS), conn))
-            using (SqlDataReader reader = countyLookup.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    stateID = reader.GetInt64(0);
-                }
-                reader.Close();
-            }
-            return stateID;
-        } //End GetStateID
     }
 }

@@ -1,4 +1,6 @@
-﻿using Phocalstream_Shared;
+﻿using Microsoft.Practices.Unity;
+using Phocalstream_Shared;
+using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
@@ -19,127 +21,20 @@ namespace Phocalstream_Web.Controllers.Api
 {
     public class SiteCollectionController : ApiController
     {
+        [Dependency]
+        public IPhotoRepository PhotoRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<Photo> PhotoEntityRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<Collection> CollectionRepository { get; set; }
+
         [HttpGet]
         public HttpResponseMessage DeepZoomCollectionForSite(long siteID)
         {
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
-            {
-                conn.Open();
-                using (SqlCommand command = new SqlCommand("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where CameraSites.ID = @id", conn))
-                {
-                    command.Prepare();
-                    command.Parameters.AddWithValue("@id", siteID);
-                    HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
-                    XmlDocument doc = CreateDeepZoomDocument(command);
-                    MemoryStream stream = new MemoryStream();
-                    doc.Save(stream);
-                    stream.Position = 0;
-                    message.Content = new StreamContent(stream);
-
-                    message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
-
-                    return message;
-                }
-            }
-        }
-
-        [HttpGet]
-        public HttpResponseMessage DeepZoomCollection(string photoList)
-        {
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
-            {
-                conn.Open();
-                using (SqlCommand command = new SqlCommand("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in (" + photoList + ")", conn))
-                {
-                    HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
-                    XmlDocument doc = CreateDeepZoomDocument(command);
-                    MemoryStream stream = new MemoryStream();
-                    doc.Save(stream);
-                    stream.Position = 0;
-                    message.Content = new StreamContent(stream);
-
-                    message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
-
-                    return message;
-                }
-            }
-        }
-  
-        [HttpGet]
-        public HttpResponseMessage PivotCollectionFor(int id)
-        {
-            using (ApplicationContext ctx = new ApplicationContext())
-            {
-                Collection collection = ctx.Collections.Include("Photos").SingleOrDefault<Collection>(c => c.ID == id);
-                if (collection == null)
-                {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound);
-                }
-
                 HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
-
-                XmlDocument doc = new XmlDocument();
-                XmlElement root = doc.CreateElement("Collection");
-
-                root.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-                root.SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
-                root.SetAttribute("xmlns:p", "http://schemas.microsoft.com/livelabs/pivot/collection/2009");
-                root.SetAttribute("SchemaVersion", "1.0");
-                if (collection.Site != null)
-                {
-                    root.SetAttribute("Name", string.Format("{0} Photo Collection", collection.Site.Name));
-                }
-                else
-                {
-                    root.SetAttribute("Name", string.Format("{0} Photo Collection", collection.Name));
-                }
-                root.SetAttribute("xmlns", "http://schemas.microsoft.com/collection/metadata/2009");
-                doc.AppendChild(root);
-
-                XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
-                doc.InsertBefore(xmldecl, root);
-
-                XmlElement facets = doc.CreateElement("FacetCategories");
-                    XmlElement facet = doc.CreateElement("FacetCategory");
-                    facet.SetAttribute("Name", "Date");
-                    facet.SetAttribute("Type", "DateTime");
-                    facet.SetAttribute("IsFilterVisible", "false");
-                    facets.AppendChild(facet);
-
-                    facet = doc.CreateElement("FacetCategory");
-                    facet.SetAttribute("Name", "Time of Day");
-                    facet.SetAttribute("Type", "String");
-                    facets.AppendChild(facet);
-
-                    facet = doc.CreateElement("FacetCategory");
-                    facet.SetAttribute("Name", "Time of Year");
-                    facet.SetAttribute("Type", "String");
-                    facets.AppendChild(facet);
-                    root.AppendChild(facets);
-
-                    if (collection.Type != CollectionType.SITE)
-                    {
-                        facet = doc.CreateElement("FacetCategory");
-                        facet.SetAttribute("Name", "Site");
-                        facet.SetAttribute("Type", "String");
-                        facets.AppendChild(facet);
-                        root.AppendChild(facets);
-                    }
-
-                string dzCollection = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/collection.dzc", Request.RequestUri.Scheme,
-                    Request.RequestUri.Host,
-                    Request.RequestUri.Port,
-                    collection.ContainerID);
-
-                XmlElement items = doc.CreateElement("Items");
-                items.SetAttribute("ImgBase", dzCollection);
-
-                foreach (Photo photo in collection.Photos)
-                {
-                    items.AppendChild(ItemFor(doc, photo, (collection.Type != CollectionType.SITE)));
-                }
-
-                root.AppendChild(items);
+                XmlDocument doc = PhotoRepository.CreateDeepZoomForSite(siteID);
 
                 MemoryStream stream = new MemoryStream();
                 doc.Save(stream);
@@ -147,8 +42,106 @@ namespace Phocalstream_Web.Controllers.Api
                 message.Content = new StreamContent(stream);
 
                 message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
+
                 return message;
+        }
+
+        [HttpGet]
+        public HttpResponseMessage DeepZoomCollection(string photoList)
+        {
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+            XmlDocument doc = PhotoRepository.CreateDeepZomForList(photoList);
+            MemoryStream stream = new MemoryStream();
+            doc.Save(stream);
+            stream.Position = 0;
+            message.Content = new StreamContent(stream);
+
+            message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
+
+            return message;
+        }
+  
+        [HttpGet]
+        public HttpResponseMessage PivotCollectionFor(int id)
+        {
+            Collection collection = CollectionRepository.Single(c => c.ID == id, c => c.Photos); 
+            if (collection == null)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
+
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement("Collection");
+
+            root.SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            root.SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+            root.SetAttribute("xmlns:p", "http://schemas.microsoft.com/livelabs/pivot/collection/2009");
+            root.SetAttribute("SchemaVersion", "1.0");
+            if (collection.Site != null)
+            {
+                root.SetAttribute("Name", string.Format("{0} Photo Collection", collection.Site.Name));
+            }
+            else
+            {
+                root.SetAttribute("Name", string.Format("{0} Photo Collection", collection.Name));
+            }
+            root.SetAttribute("xmlns", "http://schemas.microsoft.com/collection/metadata/2009");
+            doc.AppendChild(root);
+
+            XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
+            doc.InsertBefore(xmldecl, root);
+
+            XmlElement facets = doc.CreateElement("FacetCategories");
+                XmlElement facet = doc.CreateElement("FacetCategory");
+                facet.SetAttribute("Name", "Date");
+                facet.SetAttribute("Type", "DateTime");
+                facet.SetAttribute("IsFilterVisible", "false");
+                facets.AppendChild(facet);
+
+                facet = doc.CreateElement("FacetCategory");
+                facet.SetAttribute("Name", "Time of Day");
+                facet.SetAttribute("Type", "String");
+                facets.AppendChild(facet);
+
+                facet = doc.CreateElement("FacetCategory");
+                facet.SetAttribute("Name", "Time of Year");
+                facet.SetAttribute("Type", "String");
+                facets.AppendChild(facet);
+                root.AppendChild(facets);
+
+                if (collection.Type != CollectionType.SITE)
+                {
+                    facet = doc.CreateElement("FacetCategory");
+                    facet.SetAttribute("Name", "Site");
+                    facet.SetAttribute("Type", "String");
+                    facets.AppendChild(facet);
+                    root.AppendChild(facets);
+                }
+
+            string dzCollection = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/collection.dzc", Request.RequestUri.Scheme,
+                Request.RequestUri.Host,
+                Request.RequestUri.Port,
+                collection.ContainerID);
+
+            XmlElement items = doc.CreateElement("Items");
+            items.SetAttribute("ImgBase", dzCollection);
+
+            foreach (Photo photo in collection.Photos)
+            {
+                items.AppendChild(ItemFor(doc, photo, (collection.Type != CollectionType.SITE)));
+            }
+
+            root.AppendChild(items);
+
+            MemoryStream stream = new MemoryStream();
+            doc.Save(stream);
+            stream.Position = 0;
+            message.Content = new StreamContent(stream);
+
+            message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
+            return message;
         }
 
         [NonAction]
@@ -232,52 +225,6 @@ namespace Phocalstream_Web.Controllers.Api
 
             item.AppendChild(facets);
             return item;
-        }
-
-        [NonAction]
-        private XmlDocument CreateDeepZoomDocument(SqlCommand command)
-        {
-            XmlDocument doc = new XmlDocument();
-            XmlElement root = doc.CreateElement("Collection");
-            root.SetAttribute("MaxLevel", "7");
-            root.SetAttribute("TileSize", "256");
-            root.SetAttribute("Format", "jpg");
-            root.SetAttribute("xmlns", "http://schemas.microsoft.com/deepzoom/2009");
-
-            doc.AppendChild(root);
-
-            XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
-            doc.InsertBefore(xmldecl, root);
-
-            XmlElement items = doc.CreateElement("Items");
-
-            using (SqlDataReader reader = command.ExecuteReader())
-            {
-                int count = 0;
-                while (reader.Read())
-                {
-                    string imageSource = string.Format("{0}://{1}:{2}/dzc/{3}-dz/{4}.dzi", Request.RequestUri.Scheme,
-                        Request.RequestUri.Host,
-                        Request.RequestUri.Port,
-                        reader.GetString(4),
-                        reader.GetString(1));
-
-                    XmlElement item = doc.CreateElement("I");
-                    item.SetAttribute("Source", imageSource);
-                    item.SetAttribute("N", Convert.ToString(count++));
-                    item.SetAttribute("Id", Convert.ToString(reader.GetInt64(0)));
-
-                    XmlElement size = doc.CreateElement("Size");
-                    size.SetAttribute("Width", Convert.ToString(reader.GetInt32(2)));
-                    size.SetAttribute("Height", Convert.ToString(reader.GetInt32(3)));
-                    item.AppendChild(size);
-
-                    items.AppendChild(item);
-                }
-                root.SetAttribute("NextItemId", Convert.ToString(count));
-            }
-            root.AppendChild(items);
-            return doc;
         }
     }
 }

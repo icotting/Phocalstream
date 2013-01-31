@@ -1,11 +1,26 @@
 Distributed under the Apache License v. 2.0.  See License.txt for details.
 
 Basic Setup:
-The Phocalstream_Web project is missing the Web.Release.config file.  
-This file will is required to build a release version of the project 
-for deploymentand should contain the connection string for the remote
-SQL Server instance.  See http://blogs.msdn.com/b/webdev/archive/2010/10/26/asp-net-web-projects-web-debug-config-amp-web-release-config.aspx
-for more details. 
+Connection strings and app settings files will need to be provided in App_Config. 
+
+Sample connectionStrings.config
+
+<connectionStrings>
+  <add name="DbConnection" connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=phocalstream;Integrated Security=True;" providerName="System.Data.SqlClient" />
+  <add name="DMConnection" connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=droughtmonitor;Integrated Security=True;" providerName="System.Data.SqlClient" />
+  <add name="WaterDBConnection" connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=WaterData;Integrated Security=True;" providerName="System.Data.SqlClient" />
+</connectionStrings>
+
+Sample appSettings.config
+
+<appSettings>
+  <add key="webpages:Version" value="2.0.0.0" />
+  <add key="webpages:Enabled" value="false" />
+  <add key="PreserveLoginUrl" value="true" />
+  <add key="ClientValidationEnabled" value="true" />
+  <add key="UnobtrusiveJavaScriptEnabled" value="true" />
+  <add key="photoPath" value="X:/" />
+</appSettings>
 
 Lastly, for developers who will run Phocalstream_Importer, an app.config file will need to be provided with a valid connection string 
 to a SQL Server instance.  An example file looks like: 

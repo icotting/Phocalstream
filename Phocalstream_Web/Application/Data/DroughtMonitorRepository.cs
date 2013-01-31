@@ -95,8 +95,9 @@ namespace Phocalstream_Web.Application.Data
         }
 
 
-        public ICollection<DroughtMonitorWeek> FindBy(USCounty county, DateTime? week = null, int weeksPrevious = 0)
+        public ICollection<DroughtMonitorWeek> FindBy(USCounty county, DateTime? week = null, int weeksPrevious = 1)
         {
+            if (weeksPrevious == 0) { weeksPrevious = 1; }
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -126,8 +127,9 @@ namespace Phocalstream_Web.Application.Data
             }
         }
 
-        public ICollection<DroughtMonitorWeek> FindBy(USState state, DateTime? week = null, int weeksPrevious = 0)
+        public ICollection<DroughtMonitorWeek> FindBy(USState state, DateTime? week = null, int weeksPrevious = 1)
         {
+            if (weeksPrevious == 0) { weeksPrevious = 1; }
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -157,14 +159,33 @@ namespace Phocalstream_Web.Application.Data
             }
         }
 
-        public ICollection<DroughtMonitorWeek> FindUS(DateTime? week = null, int weeksPrevious = 0)
+        public ICollection<DroughtMonitorWeek> FindUS(DateTime? week = null, int weeksPrevious = 1)
         {
-            throw new NotImplementedException();
-        }
+            if (weeksPrevious == 0) { weeksPrevious = 1; }
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand(null, conn))
+                {
+                    if (week == null && weeksPrevious == 0)
+                    {
+                        command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues where order by PublishedDate");
+                    }
+                    else if (week == null && weeksPrevious != null)
+                    {
+                        command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues where PublishedDate >= @rangestart order by PublishedDate");
+                        command.Parameters.AddWithValue("@rangestart", DateTime.Now.AddDays(7 * (0 - weeksPrevious)));
+                    }
+                    else if (week != null)
+                    {
+                        command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues where PublishedDate >= @rangestart and PublishedDate <= @rangeend order by PublishedDate");
+                        command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)));
+                        command.Parameters.AddWithValue("@rangeend", week);
+                    }
 
-        public ICollection<DroughtMonitorWeek> Find(DateTime? week = null, int weeksPrevious = 0)
-        {
-            throw new NotImplementedException();
+                    return ProcessQuery(command, DMDataType.STATE);
+                }
+            }
         }
 
         private List<DroughtMonitorWeek> GetValuesFor(DMDataType type)
@@ -235,11 +256,80 @@ namespace Phocalstream_Web.Application.Data
                         }
                     }
 
-                    currentWeek[reader.GetInt32(0)] = reader.GetFloat(1);
+                    currentWeek[reader.GetInt32(0)] = reader.GetDouble(1);
                 }
                 reader.Close();
             }
+
             return weeks;
+        }
+
+
+        public USState GetStateForName(string name)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select * from States where Name = @StateName", conn))
+                {
+                    command.Parameters.AddWithValue("@StateName", name);
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        USState state = new USState();
+                        state.ID = reader.GetInt64(0);
+                        state.Name = reader.GetString(1);
+                        return state;
+                    }
+                }
+            }
+            throw new ArgumentException(string.Format("State name {0} is not recognized", name));
+        }
+
+        public USState GetState(long id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select * from States where ID = @StateID", conn))
+                {
+                    command.Parameters.AddWithValue("@StateID", id);
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        USState state = new USState();
+                        state.ID = reader.GetInt64(0);
+                        state.Name = reader.GetString(1);
+                        return state;
+                    }
+                }
+            }
+            throw new ArgumentException(string.Format("State id {0} is not recognized", id));
+        }
+
+        public USCounty GetCountyForFips(int fips)
+        {
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select * from Counties where FIPS = @Fips", conn))
+                {
+                    command.Parameters.AddWithValue("@Fips", fips);
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        USCounty county = new USCounty();
+                        county.ID = reader.GetInt64(0);
+                        county.Fips = reader.GetInt32(1);
+                        county.Name = reader.GetString(2);
+                        county.State = GetState(reader.GetInt64(3));
+
+                        return county;
+                    }
+                }
+            }
+            throw new ArgumentException(string.Format("Fips code {0} is not recognized", fips));
         }
     }
 }
