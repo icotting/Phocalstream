@@ -8,7 +8,20 @@ namespace Phocalstream_Shared.Data.Model.External
 {
     public class DroughtMonitorWeek
     {
-        public DateTime Week { get; set; }
+        private DateTime _week;
+        
+        public DateTime Week 
+        {
+            get
+            {
+                return _week;
+            }
+            set
+            {
+                _week = ConvertDateToTuesday(value);
+            }
+        }
+
         public DMDataType Type { get; set; }
         public float NonDrought { get; set; }
         public USCounty County { get; set; }

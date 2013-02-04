@@ -29,6 +29,8 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult Index(string query)
         {
+            return RedirectToAction("Index", "Home");
+
             SearchResults results = new SearchResults();
             results.Results = new List<SearchResult>();
             results.Query = query;

@@ -17,6 +17,8 @@ namespace Phocalstream_Shared.Data
 
         USState GetStateForName(string name);
         USState GetState(long id);
+
+        USCounty GetCounty(long id);
         USCounty GetCountyForFips(int fips);
 
         void Add(DroughtMonitorWeek week);

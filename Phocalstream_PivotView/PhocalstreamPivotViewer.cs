@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Net;
 using System.Windows;
 using System.Windows.Browser;
@@ -18,6 +19,16 @@ namespace Phocalstream_PivotView
         public PhocalstreamPivotViewer()
         {
             ItemDoubleClicked += new EventHandler<ItemEventArgs>(HandleItemDoubleClick);
+            PropertyChanged += HandlePropertyChangeEvent;
+        }
+
+
+        protected void HandlePropertyChangeEvent(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("InScopeItemIds"))
+            {
+                HtmlPage.Window.Invoke("registerNewSelection", String.Join(",", InScopeItemIds));
+            }
         }
 
         protected void HandleItemDoubleClick(object sender, ItemEventArgs e)
