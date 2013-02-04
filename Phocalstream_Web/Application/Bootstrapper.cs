@@ -44,7 +44,7 @@ namespace Phocalstream_Web.Application
             container.RegisterType(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             container.RegisterType(typeof(DbContext), typeof(ApplicationContext));
 
-            container.RegisterInstance(new ApplicationContextAdapter(container.Resolve<DbContext>()), new PerThreadLifetimeManager());
+            container.RegisterInstance(new ApplicationContextAdapter(container.Resolve<DbContext>()), new HierarchicalLifetimeManager());
             container.RegisterType<IDbSetFactory>(new InjectionFactory(con => con.Resolve<ApplicationContextAdapter>()));
             container.RegisterType<IDbContext>(new InjectionFactory(con => con.Resolve<ApplicationContextAdapter>()));
 

@@ -22,7 +22,6 @@ namespace Phocalstream_PivotView
 
         protected void MainPage_Loaded(object sender, RoutedEventArgs e) 
         {
-
             if (App.Current.Host.InitParams.ContainsKey("collection"))
             {
                 string collection = App.Current.Host.InitParams["collection"].ToString();

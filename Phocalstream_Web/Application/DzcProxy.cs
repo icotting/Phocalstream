@@ -23,10 +23,8 @@ namespace Phocalstream_Web.Application
             HttpApplication application = (HttpApplication)source;
             HttpContext context = application.Context;
             string resource = application.Request.RawUrl;
-            System.Diagnostics.Debug.WriteLine(resource);
             if (resource.Contains("/dzc/"))
             {
-                Console.WriteLine(resource);
                 string blobRequest = string.Format(@"{0}/{1}", basePath,
                         resource.Substring(resource.IndexOf("/dzc/") + 5));
 
