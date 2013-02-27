@@ -23,9 +23,9 @@ namespace Phocalstream_Shared.Data.Model.External
         }
 
         public DMDataType Type { get; set; }
-        public float NonDrought { get; set; }
         public USCounty County { get; set; }
         public USState State { get; set; }
+        public double NonDrought { get; set; }
         public double D0 { get; set; }
         public double D1 { get; set; }
         public double D2 { get; set; }
@@ -39,14 +39,16 @@ namespace Phocalstream_Shared.Data.Model.External
                 switch (key)
                 {
                     case 0:
-                        return D0;
+                        return NonDrought;
                     case 1:
+                        return D0;
+                    case 2:
                         return D1;
-                    case 2: 
+                    case 3: 
                         return D2;
-                    case 3:
-                        return D3;
                     case 4:
+                        return D3;
+                    case 5:
                         return D4;
                     default:
                         return -1;
@@ -58,18 +60,21 @@ namespace Phocalstream_Shared.Data.Model.External
                 switch (key) 
                 {
                     case 0:
-                        D0 = value;
+                        NonDrought = value;
                         break;
                     case 1:
-                        D1 = value;
+                        D0 = value;
                         break;
                     case 2:
-                        D2 = value;
+                        D1 = value;
                         break;
                     case 3:
-                        D3 = value;
+                        D2 = value;
                         break;
                     case 4:
+                        D3 = value;
+                        break;
+                    case 5:
                         D4 = value;
                         break;
                 }

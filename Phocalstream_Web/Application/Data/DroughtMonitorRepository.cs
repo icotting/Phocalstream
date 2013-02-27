@@ -50,10 +50,18 @@ namespace Phocalstream_Web.Application.Data
                     switch (week.Type)
                     {
                         case DMDataType.COUNTY:
+                            if (week.County.ID == -1)
+                            {
+                                week.County.ID = this.GetCountyID(conn, week.County.Name, week.County.Fips, week.State.Name);
+                            }
                             command.CommandText = "insert into CountyDMValues (PublishedDate, County_ID, DroughtCategory, DroughtValue) values (@pdate, @county, @category, @dval)";
                             command.Parameters.AddWithValue("@county", week.County.ID);
                             break;
                         case DMDataType.STATE:
+                            if (week.State.ID == -1)
+                            {
+                                week.State.ID = this.GetStateID(conn, week.State.Name);
+                            }
                             command.CommandText = "insert into StateDMValues (PublishedDate, State_ID, DroughtCategory, DroughtValue) values (@pdate, @state, @category, @dval)";
                             command.Parameters.AddWithValue("@state", week.State.ID);
                             break;
@@ -65,38 +73,21 @@ namespace Phocalstream_Web.Application.Data
                     command.Parameters.Add("@category", SqlDbType.Int);
                     command.Parameters.Add("@dval", SqlDbType.Float);
 
-                    command.Parameters["@category"].Value = 0;
-                    command.Parameters["@dval"].Value = week.NonDrought;
-                    command.ExecuteNonQuery();
-
-                    command.Parameters["@category"].Value = 1;
-                    command.Parameters["@dval"].Value = week.D0;
-                    command.ExecuteNonQuery();
-
-                    command.Parameters["@category"].Value = 2;
-                    command.Parameters["@dval"].Value = week.D1;
-                    command.ExecuteNonQuery();
-
-                    command.Parameters["@category"].Value = 3;
-                    command.Parameters["@dval"].Value = week.D2;
-                    command.ExecuteNonQuery();
-
-                    command.Parameters["@category"].Value = 4;
-                    command.Parameters["@dval"].Value = week.D3;
-                    command.ExecuteNonQuery();
-                    
-                    command.Parameters["@category"].Value = 5;
-                    command.Parameters["@dval"].Value = week.D4;
-                    command.ExecuteNonQuery();
+                    for (int i = 0; i < 6; i++)
+                    {
+                        command.Parameters["@category"].Value = i;
+                        command.Parameters["@dval"].Value = week[i];
+                        command.ExecuteNonQuery();
+                    }
                 }
             }
-
-            throw new NotImplementedException();
         }
 
 
         public ICollection<DroughtMonitorWeek> FindBy(USCounty county, DateTime? week = null, int weeksPrevious = 0)
         {
+            week = DroughtMonitorWeek.ConvertDateToTuesday(week.Value);
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -107,18 +98,18 @@ namespace Phocalstream_Web.Application.Data
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate, County_ID from CountyDMValues where County_ID = @county order by PublishedDate, County_ID");
                         command.Parameters.AddWithValue("@county", county.ID);
                     }
-                    else if (week == null && weeksPrevious != null)
+                    else if (week == null && weeksPrevious != 0)
                     {
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate, County_ID from CountyDMValues where County_ID = @county and PublishedDate >= @rangestart order by PublishedDate, County_ID");
                         command.Parameters.AddWithValue("@county", county.ID);
-                        command.Parameters.AddWithValue("@rangestart", DateTime.Now.AddDays(7 * (0 - weeksPrevious)));
+                        command.Parameters.AddWithValue("@rangestart", DateTime.Now.AddDays(7 * (0 - weeksPrevious)).ToString("yyyy/MM/dd"));
                     }
                     else if (week != null)
                     {
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate, County_ID from CountyDMValues where County_ID = @county and PublishedDate >= @rangestart and PublishedDate <= @rangeend order by PublishedDate, County_ID");
                         command.Parameters.AddWithValue("@county", county.ID);
-                        command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)));
-                        command.Parameters.AddWithValue("@rangeend", week);
+                        command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)).ToString("yyyy/MM/dd"));
+                        command.Parameters.AddWithValue("@rangeend", week.Value.ToString("yyyy/MM/dd"));
                     }
 
                     return ProcessQuery(command, DMDataType.COUNTY);
@@ -128,6 +119,8 @@ namespace Phocalstream_Web.Application.Data
 
         public ICollection<DroughtMonitorWeek> FindBy(USState state, DateTime? week = null, int weeksPrevious = 0)
         {
+            week = DroughtMonitorWeek.ConvertDateToTuesday(week.Value);
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -138,18 +131,18 @@ namespace Phocalstream_Web.Application.Data
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate, State_ID from StateDMValues where State_ID = @state order by PublishedDate, State_ID");
                         command.Parameters.AddWithValue("@state", state.ID);
                     }
-                    else if (week == null && weeksPrevious != null)
+                    else if (week == null && weeksPrevious != 0)
                     {
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate, State_ID from StateDMValues where State_ID = @state and PublishedDate >= @rangestart order by PublishedDate, State_ID");
                         command.Parameters.AddWithValue("@state", state.ID);
-                        command.Parameters.AddWithValue("@rangestart", DateTime.Now.AddDays(7 * (0 - weeksPrevious)));
+                        command.Parameters.AddWithValue("@rangestart", DateTime.Now.AddDays(7 * (0 - weeksPrevious)).ToString("yyyy/MM/dd"));
                     }
                     else if (week != null)
                     {
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate, State_ID from StateDMValues where State_ID = @state and PublishedDate >= @rangestart and PublishedDate <= @rangeend order by PublishedDate, State_ID");
                         command.Parameters.AddWithValue("@state", state.ID);
-                        command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)));
-                        command.Parameters.AddWithValue("@rangeend", week);
+                        command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)).ToString("yyyy/MM/dd"));
+                        command.Parameters.AddWithValue("@rangeend", week.Value.ToString("yyyy/MM/dd"));
                     }
 
                     return ProcessQuery(command, DMDataType.STATE);
@@ -159,6 +152,8 @@ namespace Phocalstream_Web.Application.Data
 
         public ICollection<DroughtMonitorWeek> FindUS(DateTime? week = null, int weeksPrevious = 0)
         {
+            week = DroughtMonitorWeek.ConvertDateToTuesday(week.Value);
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
@@ -168,19 +163,19 @@ namespace Phocalstream_Web.Application.Data
                     {
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues where order by PublishedDate");
                     }
-                    else if (week == null && weeksPrevious != null)
+                    else if (week == null && weeksPrevious != 0)
                     {
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues where PublishedDate >= @rangestart order by PublishedDate");
-                        command.Parameters.AddWithValue("@rangestart", DateTime.Now.AddDays(7 * (0 - weeksPrevious)));
+                        command.Parameters.AddWithValue("@rangestart", DateTime.Now.AddDays(7 * (0 - weeksPrevious)).ToString("yyyy/MM/dd"));
                     }
                     else if (week != null)
                     {
                         command.CommandText = string.Format("select DroughtCategory, DroughtValue, PublishedDate from USDMValues where PublishedDate >= @rangestart and PublishedDate <= @rangeend order by PublishedDate");
-                        command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)));
-                        command.Parameters.AddWithValue("@rangeend", week);
+                        command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)).ToString("yyyy/MM/dd"));
+                        command.Parameters.AddWithValue("@rangeend", week.Value.ToString("yyyy/MM/dd"));
                     }
 
-                    return ProcessQuery(command, DMDataType.STATE);
+                    return ProcessQuery(command, DMDataType.US);
                 }
             }
         }
@@ -262,6 +257,10 @@ namespace Phocalstream_Web.Application.Data
                     }
 
                     currentWeek[reader.GetInt32(0)] = reader.GetDouble(1);
+                }
+                if (currentWeek != null)
+                {
+                    weeks.Add(currentWeek);
                 }
                 reader.Close();
             }
@@ -361,5 +360,105 @@ namespace Phocalstream_Web.Application.Data
             }
             throw new ArgumentException(string.Format("id {0} is not recognized", id));
         }
+
+
+        private long GetCountyID(SqlConnection conn, string county, int FIPS, string state)
+        {
+            long countyID = -1;
+            using (SqlCommand countyLookup = new SqlCommand(string.Format("select ID from Counties where FIPS={0}", FIPS), conn))
+            using (SqlDataReader reader = countyLookup.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    countyID = reader.GetInt64(0);
+                }
+                reader.Close();
+                if (countyID == -1)
+                {
+                    // if county does not exist, add it
+                    countyID = this.AddCounty(conn, county, FIPS, state);
+                }
+            }
+            return countyID;
+        } //End GetCountyID
+
+        private long AddCounty(SqlConnection conn, string county, int FIPS, string state)
+        {
+            SqlCommand command = new SqlCommand(null, conn);
+            // Create and prepare an SQL statement.
+            command.CommandText = "insert into Counties (FIPS, Name, State_ID) values (@FIPS, @name, @state)";
+            command.Parameters.AddWithValue("@FIPS", FIPS);
+            command.Parameters.AddWithValue("@name", county);
+            command.Parameters.AddWithValue("@state", this.GetStateID(conn, state));
+            command.ExecuteNonQuery();
+
+            // Read the new ID back to return
+            command.Parameters.Clear();
+            command.CommandText = "SELECT @@IDENTITY";
+            return Convert.ToInt64(command.ExecuteScalar());
+        } //End AddCounty
+
+        private long GetStateID(SqlConnection conn, string state)
+        {
+            long stateID = -1;
+            // Get State ID
+            using (SqlCommand stateLookup = new SqlCommand(string.Format("select ID from States where Name='{0}'", state), conn))
+            using (SqlDataReader stateReader = stateLookup.ExecuteReader())
+            {
+                if (stateReader.Read())
+                {
+                    stateID = stateReader.GetInt64(0);
+                }
+                stateReader.Close();
+                if (stateID == -1)
+                {
+                    // if state does not exist for county, add it
+                    stateID = this.AddState(conn, state);
+                }
+            }
+            return stateID;
+        } //End GetStateID
+
+        private long AddState(SqlConnection conn, string state)
+        {
+            SqlCommand command = new SqlCommand(null, conn);
+            // Create and prepare an SQL statement.
+            command.CommandText = "insert into States (Name) values (@name)";
+            command.Parameters.AddWithValue("@name", state);
+            command.ExecuteNonQuery();
+
+            // Read the new ID back to return
+            command.Parameters.Clear();
+            command.CommandText = "SELECT @@IDENTITY";
+            return Convert.ToInt64(command.ExecuteScalar());
+        } //End AddState
+
+        public DateTime GetDmDate(int type)
+        {
+            // Setup the order by:
+            // - if type = 0 then accending (i.e. get first date): default
+            // - if type = 1 then decending (i.e. get last date)
+            string orderBy = "order by PublishedDate";
+            if (type == 1)
+            {
+                orderBy = "order by PublishedDate desc";
+            }
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand dateLookup = new SqlCommand(string.Format("select top 1 PublishedDate from USDMValues {0}", orderBy), conn))
+                using (SqlDataReader reader = dateLookup.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return reader.GetDateTime(0);
+                    }
+                    reader.Close();
+                }
+            }
+            throw new ArgumentException("No Drought Monitor data found.");
+        }
+
     }
 }

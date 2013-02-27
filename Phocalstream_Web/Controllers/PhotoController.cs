@@ -138,7 +138,7 @@ namespace Phocalstream_Web.Controllers
                 case DMDataType.STATE:
                     week = DmRepository.FindBy(DmRepository.GetCountyForFips(CountyFIPS).State, date).FirstOrDefault();
                     break;
-                case DMDataType.ALL:
+                case DMDataType.US:
                     week = DmRepository.FindUS(date).FirstOrDefault();
                     break;
             }
@@ -160,6 +160,7 @@ namespace Phocalstream_Web.Controllers
             }
             else
             {
+                week.Type = type;
                 // Normalize data to be out of 100%
                 week.D0 = (float)Math.Round((week.D0 - week.D1), 2);
                 week.D1 = (float)Math.Round((week.D1 - week.D2), 2);
