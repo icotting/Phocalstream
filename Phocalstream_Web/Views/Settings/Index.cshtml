@@ -13,6 +13,10 @@
         function reloadDMPartial() {
             $("#dmPartial").load("/Settings/CheckDMImport");
         }
+
+        function reloadWaterPartial() {
+            $("#waterPartial").load("/Settings/CheckWaterImport");
+        }
     </script>
 }
 
@@ -61,6 +65,21 @@
 }
 </table>
 </div>
-<div style="float: right; width: 280px;" id="dmPartial">
-    @{ Html.RenderPartial("_DmImportPartial", Model.DmProcess); }
+<div style="width: 300px; float: right;">
+<table>
+    <tr>
+        <td>
+        <div style="float: right; width: 280px;" id="dmPartial">
+            @{ Html.RenderPartial("_DmImportPartial", Model.DmProcess); }
+        </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+        <div style="float: right; width: 280px;" id="waterPartial">
+            @{ Html.RenderPartial("_WaterImportPartial", Model.WaterProcess); }
+        </div>
+        </td>
+    </tr>
+</table>
 </div>

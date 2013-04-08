@@ -1,0 +1,20 @@
+﻿@model Phocalstream_Web.Models.ViewModels.WaterImportProc
+
+<h2>Water and Stream Flow Data</h2>
+<p>Currently, the Water and Stream Flow Data includes values through @Html.DisplayFor(model => model.EndDate)</p>
+
+<h3>Water and Stream Flow Import</h3>
+
+@if (Model.Running)
+{
+    <span>Import is running!</span>
+    <script type="text/javascript">
+        setTimeout(function () { reloadWaterPartial(); }, 10000);
+    </script>
+} 
+else 
+{
+    @Ajax.ActionLink("Update Water Data to Current", "StartWaterImport", new { type = "current"}, new AjaxOptions { UpdateTargetId = "waterPartial" })
+    <text> | </text> 
+    @Ajax.ActionLink("Reset All Water Data", "StartWaterImport", new { type = "full"}, new AjaxOptions { UpdateTargetId = "waterPartial" })
+}

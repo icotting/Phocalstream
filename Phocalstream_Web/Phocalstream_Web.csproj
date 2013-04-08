@@ -274,6 +274,7 @@
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Video\Index.cshtml" />
+    <Content Include="Views\Settings\_WaterImportPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
