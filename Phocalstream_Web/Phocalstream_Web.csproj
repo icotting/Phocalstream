@@ -23,7 +23,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
-    <SilverlightApplicationList>{845BAD36-AE55-4513-8811-C3E1A58198AE}|..\Phocalstream_PivotView\Phocalstream_PivotView.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{845BAD36-AE55-4513-8811-C3E1A58198AE}|..\Phocalstream_PivotView\Phocalstream_PivotView.csproj|ClientBin|False,{1A755100-1294-437C-837D-516C9D1BCB2B}|..\Phocalstream_TimeLapse\Phocalstream_TimeLapse.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -72,8 +72,13 @@
     <Reference Include="DotNetOpenAuth.OpenId.RelyingParty">
       <HintPath>..\packages\DotNetOpenAuth.OpenId.RelyingParty.4.0.4.12182\lib\net40-full\DotNetOpenAuth.OpenId.RelyingParty.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.0.1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.0.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Gif.Components">
       <HintPath>.\Gif.Components.dll</HintPath>
@@ -92,14 +97,6 @@
     <Reference Include="Microsoft.Web.WebPages.OAuth, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.OAuth.2.0.20710.0\lib\net40\Microsoft.Web.WebPages.OAuth.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=1.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.1.7.0.0\lib\net35-full\Microsoft.WindowsAzure.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=1.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
-    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAzure.Storage.1.7.0.0\lib\net35-full\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Math">
       <HintPath>..\packages\DotNetOpenAuth.OpenId.Core.4.0.4.12182\lib\net40-full\Mono.Math.dll</HintPath>
     </Reference>
@@ -112,7 +109,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Drawing" />
@@ -196,12 +192,6 @@
     <Compile Include="Application\Admin\Scheduler.cs" />
     <Compile Include="Application\Admin\WaterDataImporter.cs" />
     <Compile Include="Application\Bootstrapper.cs" />
-    <Compile Include="Application\Data\ApplicationContext.cs" />
-    <Compile Include="Application\Data\EntityRepository.cs" />
-    <Compile Include="Application\Data\DroughtMonitorRepository.cs" />
-    <Compile Include="Application\Data\PhotoRepository.cs" />
-    <Compile Include="Application\Data\UnitOfWork.cs" />
-    <Compile Include="Application\Data\WaterDataRepository.cs" />
     <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -211,7 +201,6 @@
     <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
-    <Compile Include="Controllers\VideoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -221,6 +210,7 @@
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
     <Compile Include="Models\ViewModels\SettingsViewModel.cs" />
+    <Compile Include="Models\ViewModels\TimelapseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -228,6 +218,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="ClientBin\Phocalstream_PivotView.xap" />
+    <Content Include="ClientBin\Phocalstream_TimeLapse.xap" />
     <Content Include="Content\Images\About.png" />
     <Content Include="Content\Images\Collections.png" />
     <Content Include="Content\Images\Like.png" />
@@ -237,12 +228,18 @@
     <Content Include="Content\Images\Search.png" />
     <Content Include="Content\Images\Settings.png" />
     <Content Include="Content\Images\User.png" />
-    <Content Include="App_Config\connectionStrings.config" />
+    <Content Include="App_Config\connectionStrings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="App_Config\connectionStringsRelease.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="App_Config\appSettings.config" />
-    <Content Include="App_Config\appSettingsRelease.config" />
+    <Content Include="App_Config\appSettings.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="App_Config\appSettingsRelease.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
@@ -273,8 +270,8 @@
     <Content Include="Views\Photo\_DmMapPartial.cshtml" />
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <Content Include="Views\Search\Index.cshtml" />
-    <Content Include="Views\Video\Index.cshtml" />
     <Content Include="Views\Settings\_WaterImportPartial.cshtml" />
+    <Content Include="Views\Photo\TimeLapse.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -297,6 +294,10 @@
     <Content Include="Views\Settings\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Phocalstream_Core\Phocalstream_Core.csproj">
+      <Project>{9202ec9c-e382-4b11-ae12-5f95cc680fc7}</Project>
+      <Name>Phocalstream_Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Phocalstream_Shared\Phocalstream_Shared.csproj">
       <Project>{9363b507-2fc1-4917-8bb0-87966003dd6a}</Project>
       <Name>Phocalstream_Shared</Name>

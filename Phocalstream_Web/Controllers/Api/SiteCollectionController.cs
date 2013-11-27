@@ -3,7 +3,7 @@ using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Web.Application;
-using Phocalstream_Web.Application.Data;
+using Phocalstream_Service.Data;
 using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;
@@ -61,13 +61,23 @@ namespace Phocalstream_Web.Controllers.Api
             return message;
         }
   
-        [HttpGet]
+        [HttpGet, ActionName("PivotCollectionFor")]
         public HttpResponseMessage PivotCollectionFor(int id)
         {
-            Collection collection = CollectionRepository.Single(c => c.ID == id, c => c.Photos); 
+            Collection collection = CollectionRepository.Single(c => c.ID == id, c => c.Photos, c => c.Site, c=>c.Site.Photos); 
             if (collection == null)
             {
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+
+            ICollection<Photo> photos = null;
+            if (collection.Type == CollectionType.SITE)
+            {
+                photos = collection.Site.Photos;
+            }
+            else
+            {
+                photos = collection.Photos;
             }
 
             HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
@@ -120,17 +130,18 @@ namespace Phocalstream_Web.Controllers.Api
                     root.AppendChild(facets);
                 }
 
-            string dzCollection = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/collection.dzc", Request.RequestUri.Scheme,
+            string dzCollection = string.Format("{0}://{1}:{2}/dzc/{3}/collection.dzc", Request.RequestUri.Scheme,
                 Request.RequestUri.Host,
                 Request.RequestUri.Port,
-                collection.ContainerID);
+                collection.Name);
 
             XmlElement items = doc.CreateElement("Items");
             items.SetAttribute("ImgBase", dzCollection);
 
-            foreach (Photo photo in collection.Photos)
+            int position = 0;
+            foreach (Photo photo in photos)
             {
-                items.AppendChild(ItemFor(doc, photo, (collection.Type != CollectionType.SITE)));
+                items.AppendChild(ItemFor(doc, photo, (collection.Type != CollectionType.SITE), position++));
             }
 
             root.AppendChild(items);
@@ -145,10 +156,10 @@ namespace Phocalstream_Web.Controllers.Api
         }
 
         [NonAction]
-        private XmlElement ItemFor(XmlDocument doc, Photo photo, bool includeSite)
+        private XmlElement ItemFor(XmlDocument doc, Photo photo, bool includeSite, int position)
         {
             XmlElement item = doc.CreateElement("Item");
-            item.SetAttribute("Img", String.Format("#{0}", photo.ID));
+            item.SetAttribute("Img", String.Format("#{0}", position));
             item.SetAttribute("Id", Convert.ToString(photo.ID));
             item.SetAttribute("Name", string.Format("{0} {1}", photo.Site.Name, photo.Captured.ToString("MMM dd, yyyy hh:mm tt")));
             item.SetAttribute("Href", "http://www.google.com");

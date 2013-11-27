@@ -44,10 +44,10 @@ namespace Phocalstream_Web.Controllers
             CameraSite site = CameraSiteRepository.First(s => s.ID == id);
             Phocalstream_Shared.Data.Model.View.SiteDetails details = PhotoRepository.GetSiteDetails(site);
 
-            details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", Request.Url.Scheme,
+            details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,
-                site.ContainerID,
+                site.Name,
                 PhotoEntityRepository.First(p => p.ID == details.LastPhotoID).BlobID);
 
             return PartialView("_SiteDetails", details);

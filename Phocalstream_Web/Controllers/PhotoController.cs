@@ -12,9 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Xml.Serialization;
 //using System.Xml;
 
 namespace Phocalstream_Web.Controllers
@@ -30,6 +32,9 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IDroughtMonitorRepository DmRepository { get; set; }
 
+        [Dependency]
+        public IPhotoRepository DZPhotoRepository { get; set; }
+
         public ActionResult Index(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
@@ -40,10 +45,10 @@ namespace Phocalstream_Web.Controllers
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
             }
 
-            model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", Request.Url.Scheme,
+            model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
                     Request.Url.Host,
                     Request.Url.Port,
-                    model.Photo.Site.ContainerID,
+                    model.Photo.Site.Name,
                     model.Photo.BlobID);
 
             model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
@@ -170,5 +175,24 @@ namespace Phocalstream_Web.Controllers
 
             return week;
         } //End LoadDMDataValues
+
+        [HttpPost]
+        public ActionResult TimeLapse(string photoIds)
+        {
+            TimelapseModel model = new TimelapseModel();
+
+            List<TimelapseFrame> frames = DZPhotoRepository.CreateFrameSet(photoIds, Request.Url.Scheme, Request.Url.Host, Request.Url.Port).ToList<TimelapseFrame>();
+            frames.OrderBy(f => f.Time);
+            model.Ids = frames.Select(f => f.PhotoId).ToList<long>();
+            model.Video = new TimelapseVideo() { Frames = frames };
+
+            XmlSerializer serializer = new XmlSerializer(typeof(TimelapseVideo));
+            MemoryStream stream = new MemoryStream();
+            serializer.Serialize(stream, model.Video);
+            stream.Seek(0, SeekOrigin.Begin);
+            model.EncodedFrames = Convert.ToBase64String(stream.ToArray());
+
+            return View(model);
+        }
     }
 }

@@ -14,5 +14,6 @@ namespace Phocalstream_Shared.Data
         SiteDetails GetSiteDetails(CameraSite site);
         XmlDocument CreateDeepZoomForSite(long siteID);
         XmlDocument CreateDeepZomForList(string photoList);
+        ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort);
     }
 }

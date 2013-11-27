@@ -19,6 +19,8 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public int CountyFips { get; set; }
         public string ContainerID { get; set; }
 
+        public string DirectoryName { get; set; }
+
         [NotMapped]
         public int PhotoCount { get; set; }
 

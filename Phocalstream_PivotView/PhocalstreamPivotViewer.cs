@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Net;
 using System.Windows;
 using System.Windows.Browser;
 using System.Windows.Controls;
+using System.Windows.Controls.Pivot;
 using System.Windows.Documents;
 using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Pivot;
 using System.Windows.Shapes;
 
 namespace Phocalstream_PivotView
@@ -18,24 +20,21 @@ namespace Phocalstream_PivotView
     {
         public PhocalstreamPivotViewer()
         {
-            ItemDoubleClicked += new EventHandler<ItemEventArgs>(HandleItemDoubleClick);
-            PropertyChanged += HandlePropertyChangeEvent;
+            ItemDoubleClick += new EventHandler<PivotViewerItemDoubleClickEventArgs>(HandleItemDoubleClick);
+            (InScopeItems as INotifyCollectionChanged).CollectionChanged += new NotifyCollectionChangedEventHandler(HandleCollectionChangeEvent);
         }
 
-
-        protected void HandlePropertyChangeEvent(object sender, PropertyChangedEventArgs e)
+        protected void HandleCollectionChangeEvent(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.PropertyName.Equals("InScopeItemIds"))
-            {
-                HtmlPage.Window.Invoke("registerNewSelection", String.Join(",", InScopeItemIds));
-            }
+            string new_collection = String.Join(",", (from i in InScopeItems select ((PivotViewerItem)i).Id));
+            HtmlPage.Window.Invoke("registerNewSelection", new_collection);
         }
 
-        protected void HandleItemDoubleClick(object sender, ItemEventArgs e)
+        protected void HandleItemDoubleClick(object sender, PivotViewerItemDoubleClickEventArgs e)
         {
             string source = Application.Current.Host.Source.AbsoluteUri;
             string root = source.Substring(0, source.ToLower().IndexOf("clientbin"));
-            HtmlPage.Window.Navigate(new Uri(string.Format("{0}/photo?photoID={1}", root, e.ItemId)), "_blank");
+            HtmlPage.Window.Navigate(new Uri(string.Format("{0}/photo?photoID={1}", root, ((PivotViewerItem)e.Item).Id)), "_blank");
         }
     }
 }

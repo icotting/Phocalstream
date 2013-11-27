@@ -13,7 +13,6 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public long ID { get; set; }
         public string BlobID { get; set; }
         public DateTime Captured { get; set; }
-
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public double Altitude { get; set; }
@@ -26,7 +25,7 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public int ISO { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
-
+        public string FileName { get; set; }
         public ICollection<MetaDatum> AdditionalExifProperties { get; set; }
         public ICollection<PhotoAnnotation> Annotations { get; set; }
         public ICollection<Collection> FoundIn { get; set; }

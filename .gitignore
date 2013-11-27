@@ -116,3 +116,4 @@ Phocalstream_Web/App_Config/appSettings.config
 Phocalstream_Web/App_Config/appSettingsRelease.config
 Phocalstream_Web/App_Config/connectionStrings.config
 Phocalstream_Web/App_Config/connectionStringsRelease.config
+*.DS_Store
