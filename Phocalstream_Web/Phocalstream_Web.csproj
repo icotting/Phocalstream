@@ -218,7 +218,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="ClientBin\Phocalstream_PivotView.xap" />
-    <Content Include="ClientBin\Phocalstream_TimeLapse.xap" />
     <Content Include="Content\Images\About.png" />
     <Content Include="Content\Images\Collections.png" />
     <Content Include="Content\Images\Like.png" />
@@ -272,6 +271,8 @@
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Settings\_WaterImportPartial.cshtml" />
     <Content Include="Views\Photo\TimeLapse.cshtml" />
+    <Content Include="Views\Photo\_WaterDataPartial.cshtml" />
+    <Content Include="Views\Photo\_WaterChartPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

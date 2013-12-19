@@ -33,6 +33,9 @@ namespace Phocalstream_Web.Controllers
         public IDroughtMonitorRepository DmRepository { get; set; }
 
         [Dependency]
+        public IWaterDataRepository WaterRepository { get; set; }
+
+        [Dependency]
         public IPhotoRepository DZPhotoRepository { get; set; }
 
         public ActionResult Index(long photoID)
@@ -57,6 +60,9 @@ namespace Phocalstream_Web.Controllers
 
             model.DroughtMonitorData = LoadDMData(DMDataType.COUNTY, model.Photo.Captured, model.Photo.Site.CountyFips);
             model.DroughtMonitorData.PhotoID = photoID;
+
+            model.WaterData = LoadWaterData(model.Photo.Site.Latitude, model.Photo.Site.Longitude, model.Photo.Captured);
+            model.WaterData.PhotoID = photoID;
 
             return View(model);
         }
@@ -131,6 +137,31 @@ namespace Phocalstream_Web.Controllers
             return data;
         } //End Load DM Data
 
+        private WaterFlowData LoadWaterData(double siteLat, double siteLong, DateTime date)
+        {
+            WaterFlowData data = new WaterFlowData();
+            data.DataTypes = WaterRepository.FetchBestDataTypesForStationDate(WaterRepository.GetClosestStations(siteLat, siteLong, 1), date).ElementAt(0);
+            data.WaterDataValues = WaterRepository.FetchByDateRange(data.DataTypes.StationID, data.DataTypes.DataID, date.AddDays(-42), date);
+            data.ParameterInfo = WaterRepository.GetParameterCodeInfoFromDataType(data.DataTypes.DataID);
+            data.ClosestStation = WaterRepository.GetStationInfo(data.DataTypes.StationID);
+            
+            data.chartDataValues = "";
+            foreach (WaterDataValue value in data.WaterDataValues)
+            {
+                if (value.Value == -999999)
+                {
+                    data.chartDataValues += "null, ";
+                }
+                else
+                {
+                    data.chartDataValues += value.Value + ", ";
+                }
+
+            }
+            data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+
+            return data;
+        } //End Load DM Data
 
         private DroughtMonitorWeek LoadDMDataValues (DMDataType type, DateTime date, int CountyFIPS)
         {

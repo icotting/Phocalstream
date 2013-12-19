@@ -117,6 +117,9 @@
         <div style="margin-bottom: 20px; margin-top: 20px;">
             @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { DataWeek = Model.DroughtMonitorData.DataWeek }); }
         </div>
+        <div style="margin-bottom: 20px; margin-top: 20px;">
+            @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }
+        </div>
     </div>
 
     <div id="siteInfo">
@@ -136,6 +139,9 @@
         </ul>
         <div style="margin-top: 20px;" id="dmPartial">
             @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
+        </div>
+        <div style="margin-top: 20px;" id="wdPartial">
+            @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
         </div>
     </div>
 </div>

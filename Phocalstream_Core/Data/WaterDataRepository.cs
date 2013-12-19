@@ -45,7 +45,7 @@ namespace Phocalstream_Web.Application.Data
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                using (SqlCommand parameterLookup = new SqlCommand(string.Format("select * from WaterValues where Station_ID={0} and DataType_ID={1} and DateTime>={2} and DateTime<={3}", stationID, typeID, startDate, endDate), conn))
+                using (SqlCommand parameterLookup = new SqlCommand(string.Format("select * from WaterValues where Station_ID={0} and DataType_ID={1} and DateTime>='{2}' and DateTime<='{3}'", stationID, typeID, startDate.ToString("yyyy/MM/dd"), endDate.ToString("yyyy/MM/dd")), conn))
                 using (SqlDataReader reader = parameterLookup.ExecuteReader())
                 {
                     while (reader.Read())
@@ -54,8 +54,8 @@ namespace Phocalstream_Web.Application.Data
                         record.ID = reader.GetInt64(0);
                         record.StationID = reader.GetInt64(1);
                         record.DataTypeID = reader.GetInt64(2);
-                        record.Date = reader.GetDateTime(3);
-                        record.Value = reader.GetFloat(4);
+                        record.DateOf = reader.GetDateTime(3);
+                        record.Value = reader.GetDouble(4);
                         values.Add(record);
                     }
                     reader.Close();
@@ -92,6 +92,42 @@ namespace Phocalstream_Web.Application.Data
             return codes;
         }
 
+        public WaterParameterCode GetParameterCodeInfoFromDataType(long dataTypeID)
+        {
+            WaterParameterCode record = new WaterParameterCode();
+            long codeID = 1;
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand dataTypeLookup = new SqlCommand(string.Format("select * from AvailableWaterDataTypes where ID={0}", dataTypeID), conn))
+                using (SqlDataReader reader1 = dataTypeLookup.ExecuteReader())
+                {
+                    if (reader1.Read())
+                    {
+                        codeID = reader1.GetInt64(2);
+                    }
+                    reader1.Close();
+                } 
+                
+                using (SqlCommand parameterLookup = new SqlCommand(string.Format("select * from WaterDataParameters where ID={0}", codeID), conn))
+                using (SqlDataReader reader2 = parameterLookup.ExecuteReader())
+                {
+                    if (reader2.Read())
+                    {
+                        record.ParameterID = reader2.GetInt64(0);
+                        record.ParameterCode = reader2.GetString(1).TrimEnd();
+                        record.ParameterDesc = reader2.GetString(2);
+                        record.StatisticCode = reader2.GetString(3).TrimEnd();
+                        record.StatisticDesc = reader2.GetString(4);
+                        record.UnitOfMeasureDesc = reader2.GetString(5);
+                    }
+                    reader2.Close();
+                } //End Using SQL Command
+            } //End Using SQL Conection
+            return record;
+        }
+
         public ICollection<AvailableWaterDataByStation> FetchCurrentDataTypes()
         {
             List<AvailableWaterDataByStation> stationDataTypes = new List<AvailableWaterDataByStation>();
@@ -114,6 +150,41 @@ namespace Phocalstream_Web.Application.Data
                     }
                     reader.Close();
                 }
+            }
+            return stationDataTypes;
+        }
+
+        public ICollection<AvailableWaterDataByStation> FetchBestDataTypesForStationDate(ICollection<WaterStation> stationIDs, DateTime imageDate)
+        {
+            List<AvailableWaterDataByStation> stationDataTypes = new List<AvailableWaterDataByStation>();
+            Boolean found = false;
+            int stationIndex = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                while (!found && stationIDs.Count > stationIndex) {
+                    using (SqlCommand dataTypeLookup = new SqlCommand(string.Format("select * from AvailableWaterDataTypes where Station_ID = {0}", stationIDs.ElementAt(stationIndex).ID), conn))
+                    using (SqlDataReader reader = dataTypeLookup.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (imageDate.CompareTo(reader.GetDateTime(4)) <= 0)
+                            {
+                                AvailableWaterDataByStation record = new AvailableWaterDataByStation();
+                                record.DataID = reader.GetInt64(0);
+                                record.StationID = reader.GetInt64(1);
+                                long typeID = reader.GetInt64(2);
+                                record.ParameterCode = this.GetCode(typeID, WaterCodeType.PARAMETER);
+                                record.StatisticCode = this.GetCode(typeID, WaterCodeType.STATISTIC);
+                                record.CurrentLastDate = reader.GetDateTime(4);
+                                stationDataTypes.Add(record);
+                                found = true;
+                            }
+                        }
+                        reader.Close();
+                    }
+                    stationIndex++;
+                } // End while not found
             }
             return stationDataTypes;
         }
@@ -199,7 +270,7 @@ namespace Phocalstream_Web.Application.Data
                 command.Parameters["@type"].Value = waterDataValue.DataTypeID;
                 command.Parameters.Add("@date", SqlDbType.DateTime);
                 command.Parameters.Add("@value", SqlDbType.Float);
-                command.Parameters["@date"].Value = waterDataValue.Date;
+                command.Parameters["@date"].Value = waterDataValue.DateOf;
                 command.Parameters["@value"].Value = waterDataValue.Value;
                 command.Prepare();  // Calling Prepare after having set the Commandtext and parameters.
                 command.ExecuteNonQuery();
@@ -302,6 +373,61 @@ namespace Phocalstream_Web.Application.Data
                 }
             }
             return stationCode;
+        }
+
+        public ICollection<WaterStation> GetClosestStations(double siteLatitude, double siteLongitude, int range)
+        {
+            List<WaterStation> result = new List<WaterStation>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand stationLookup = new SqlCommand(string.Format("SELECT TOP 10 *, ((ACOS(SIN({0} * PI() / 180) * SIN(Latitude * PI() / 180) "
+                    + "+ COS({0} * PI() / 180) * COS(Latitude * PI() / 180) * COS(({1} - Longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) " 
+                    + "AS distance FROM WaterStations WHERE ( Latitude BETWEEN ({0} - {2}) AND ({0} + {2}) AND Longitude BETWEEN ({1} - {2}) AND ({1} + {2}) ) "
+                    + "ORDER BY distance ASC", siteLatitude, siteLongitude, range), conn)) 
+                using (SqlDataReader reader = stationLookup.ExecuteReader())
+                {
+                    WaterStation station = null; 
+                    while (reader.Read())
+                    {
+                        station = new WaterStation();
+                        station.ID = reader.GetInt64(0);
+                        station.StationNumber = reader.GetString(1);
+                        station.StationName = reader.GetString(2);
+                        station.Latitude = reader.GetDouble(3);
+                        station.Longitude = reader.GetDouble(4);
+
+                        result.Add(station);
+                    }
+                    reader.Close();
+                }
+            }
+            return result;
+        }
+
+        public WaterStation GetStationInfo(long stationID)
+        {
+            WaterStation station = new WaterStation();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand stationLookup = new SqlCommand(string.Format("SELECT * FROM WaterStations WHERE ID={0}", stationID), conn))
+                using (SqlDataReader reader = stationLookup.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        station.ID = reader.GetInt64(0);
+                        station.StationNumber = reader.GetString(1);
+                        station.StationName = reader.GetString(2);
+                        station.Latitude = reader.GetDouble(3);
+                        station.Longitude = reader.GetDouble(4);
+
+                    }
+                    reader.Close();
+                }
+            }
+            return station;
+
         }
 
         public DateTime GetLastDate()

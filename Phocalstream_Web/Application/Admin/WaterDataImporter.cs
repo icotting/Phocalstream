@@ -303,7 +303,7 @@ namespace Phocalstream_Web.Application.Admin
                 // split out each column
                 string[] cols = line.Split('\t');
 
-                waterValue.Date = DateTime.Parse(cols[2]);
+                waterValue.DateOf = DateTime.Parse(cols[2]);
                 resultDate = DateTime.Parse(cols[2]);
 
                 if (float.TryParse(cols[3], out value))
