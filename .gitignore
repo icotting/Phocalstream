@@ -19,6 +19,9 @@ TestResults
 *.user
 *.sln.docstates
 
+#Data
+App_Data/
+
 # Build results
 [Dd]ebug/
 [Rr]elease/

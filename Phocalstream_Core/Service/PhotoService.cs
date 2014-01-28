@@ -30,6 +30,9 @@ namespace Phocalstream_Service.Service
         [Dependency]
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
+        [Dependency]
+        public IPhotoRepository PhotoRepo { get; set; }
+
         public Collection GetCollectionForProcessing(XmlNode siteData)
         {
             string siteName = siteData["Folder"].InnerText;
@@ -281,6 +284,14 @@ namespace Phocalstream_Service.Service
                     result.Save(destination);
                 }
             }
+        }
+
+        public void GeneratePivotManifest(CameraSite site)
+        {
+            string rootDeepZoomPath = Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], site.DirectoryName);
+            XmlDocument doc = PhotoRepo.CreatePivotCollectionForSite(site.ID);
+
+            doc.Save(Path.Combine(rootDeepZoomPath, "site.cxml"));
         }
     }
 }

@@ -13,5 +13,6 @@ namespace Phocalstream_Shared.Service
         Collection GetCollectionForProcessing(XmlNode siteData);
         Photo ProcessPhoto(string fileName, CameraSite site);
         void ProcessCollection(Collection collection);
+        void GeneratePivotManifest(CameraSite site);
     }
 }

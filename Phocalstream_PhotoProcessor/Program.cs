@@ -98,6 +98,9 @@ namespace Phocalstream_PhotoProcessor
                     Console.WriteLine(string.Format("Building deep zoom site collection for site {0}", site.Name));
                     _service.ProcessCollection(collection);
                     _unit.Commit();
+
+                    Console.WriteLine(string.Format("Building pivot viewer manifest for site {0}", site.Name));
+                    _service.GeneratePivotManifest(site);
                 }
             }
             Console.WriteLine("Import process complete");
@@ -109,6 +112,10 @@ namespace Phocalstream_PhotoProcessor
             container.RegisterType(typeof(IUnitOfWork), typeof(UnitOfWork));
             container.RegisterType(typeof(IPhotoService), typeof(PhotoService));
             container.RegisterType(typeof(IEntityRepository<>), typeof(EntityRepository<>));
+
+            container.RegisterType(typeof(IPhotoRepository), typeof(PhotoRepository),
+                new InjectionConstructor(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString));
+
             container.RegisterType(typeof(DbContext), typeof(ApplicationContext));
 
             container.RegisterInstance(new ApplicationContextAdapter(container.Resolve<DbContext>()), new HierarchicalLifetimeManager());
