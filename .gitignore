@@ -22,6 +22,8 @@ TestResults
 #Data
 App_Data/
 
+Phocalstream_PhotoProcessor/App.config
+
 # Build results
 [Dd]ebug/
 [Rr]elease/
