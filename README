@@ -6,9 +6,9 @@ Connection strings and app settings files will need to be provided in App_Config
 Sample connectionStrings.config
 
 <connectionStrings>
-  <add name="DbConnection" connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=phocalstream;Integrated Security=True;" providerName="System.Data.SqlClient" />
-  <add name="DMConnection" connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=droughtmonitor;Integrated Security=True;" providerName="System.Data.SqlClient" />
-  <add name="WaterDBConnection" connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=WaterData;Integrated Security=True;" providerName="System.Data.SqlClient" />
+  <add name="DbConnection" providerName="System.Data.SqlClient" connectionString="Data Source=(LocalDB)\v11.0;AttachDbFileName=|DataDirectory|\Phocalstream.mdf;Integrated Security=True;MultipleActiveResultSets=True"/>
+  <add name="DMConnection" connectionString="Data Source=(LocalDB)\v11.0;AttachDbFileName=|DataDirectory|\DroughtMonitorData.mdf;Integrated Security=True;MultipleActiveResultSets=True" providerName="System.Data.SqlClient" />
+  <add name="WaterDBConnection" connectionString="Data Source=(LocalDB)\v11.0;AttachDbFileName=|DataDirectory|\WaterData.mdf;Integrated Security=True;MultipleActiveResultSets=True" providerName="System.Data.SqlClient" />
 </connectionStrings>
 
 Sample appSettings.config
@@ -19,30 +19,12 @@ Sample appSettings.config
   <add key="PreserveLoginUrl" value="true" />
   <add key="ClientValidationEnabled" value="true" />
   <add key="UnobtrusiveJavaScriptEnabled" value="true" />
-  <add key="photoPath" value="X:/" />
+  
+  <add key="photoPath" value="[PATH TO PHOCALSTREAM PHOTO SET]" />
+  <add key="rawPath" value="[PATH TO BASE PHOTO SET]" />
 </appSettings>
 
-Lastly, for developers who will run Phocalstream_Importer, an app.config file will need to be provided with a valid connection string 
-to a SQL Server instance.  An example file looks like: 
-
-<?xml version="1.0"?>
-<configuration>
-  <configSections>
-    <!-- For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 -->
-    <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false"/>
-  </configSections>
-  <connectionStrings>
-    <add name="DbConnection" connectionString="[CONNECTION_STRING]" providerName="System.Data.SqlClient"/>
-  </connectionStrings>
-  <entityFramework>
-    <defaultConnectionFactory type="System.Data.Entity.Infrastructure.LocalDbConnectionFactory, EntityFramework">
-      <parameters>
-        <parameter value="v11.0"/>
-      </parameters>
-    </defaultConnectionFactory>
-  </entityFramework>
-<startup><supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5"/></startup></configuration>
-
+Phocalstream_PhotoProcessor is configured to use a 
 
 
 
