@@ -215,8 +215,16 @@ namespace Phocalstream_Web.Application.Admin
 
         private void SetDates()
         {
-            this._firstDate = _repo.GetDmDate(0).ToString("MM/dd/yyyy");
-            this._lastDate = _repo.GetDmDate(1).ToString("MM/dd/yyyy");
+            try
+            {
+                this._firstDate = _repo.GetDmDate(0).ToString("MM/dd/yyyy");
+                this._lastDate = _repo.GetDmDate(1).ToString("MM/dd/yyyy");
+            }
+            catch (ArgumentException e)
+            {
+                this._firstDate = "None";
+                this._lastDate = "None";
+            }
         } //End SetDates
     }
 }
