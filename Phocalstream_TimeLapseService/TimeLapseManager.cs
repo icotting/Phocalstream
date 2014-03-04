@@ -56,7 +56,7 @@ namespace Phocalstream_TimeLapseService
 				NextId += 1;
 				if(NextId > MaximumSittingJobs)
 				{
-					Directory.Delete(ConfigurationManager.AppSettings["outputPath"] + "/Job" + (NextId - MaximumJobs), true);
+					Directory.Delete(ConfigurationManager.AppSettings["outputPath"] + "/Job" + (NextId - MaximumSittingJobs), true);
 					MinimumId += 1;
 				}
 			}
@@ -69,7 +69,7 @@ namespace Phocalstream_TimeLapseService
 					NextId += 1;
 					if (NextId > MaximumSittingJobs)
 					{
-						Directory.Delete(ConfigurationManager.AppSettings["outputPath"] + "/Job" + (NextId - MaximumJobs), true);
+						Directory.Delete(ConfigurationManager.AppSettings["outputPath"] + "/Job" + (NextId - MaximumSittingJobs), true);
 						MinimumId += 1;
 					}
 				}
