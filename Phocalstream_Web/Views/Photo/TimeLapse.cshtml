@@ -22,6 +22,10 @@
 	    </object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe></div>
     </form>
 
+<video autobuffer="autobuffer" autoplay="autoplay" loop="loop" controls="controls">
+    <source src='@ViewBag.destination' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+</video>
+
 @*
 <div style="position: relative; top: 0px; left: 0px;">
 @foreach (Phocalstream_Web.Models.TimelapseFrame frame in Model.Frames)

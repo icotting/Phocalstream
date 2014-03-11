@@ -4,6 +4,7 @@ using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_TimeLapseService;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
@@ -14,6 +15,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml.Serialization;
@@ -212,7 +214,22 @@ namespace Phocalstream_Web.Controllers
         {
             TimelapseModel model = new TimelapseModel();
 
-            List<TimelapseFrame> frames = DZPhotoRepository.CreateFrameSet(photoIds, Request.Url.Scheme, Request.Url.Host, Request.Url.Port).ToList<TimelapseFrame>();
+			model.Ids = photoIds.Split(',').Select(s => long.Parse(s)).ToList();
+
+			ITimeLapseManager manager = (ITimeLapseManager)Activator.GetObject(typeof(ITimeLapseManager), "tcp://localhost:8084/TimeLapseManager");
+
+			long job = manager.StartJob(model.Ids.ToList(), 20);
+			while (true)
+			{
+				float completion = manager.CheckJob(job);
+				if (completion >= 0.99f)
+				{
+					break;
+				}
+				Thread.Sleep(100);
+			}
+			ViewBag.destination = "file://" + manager.GetJobDestination(job);
+            /*List<TimelapseFrame> frames = DZPhotoRepository.CreateFrameSet(photoIds, Request.Url.Scheme, Request.Url.Host, Request.Url.Port).ToList<TimelapseFrame>();
             frames.OrderBy(f => f.Time);
             model.Ids = frames.Select(f => f.PhotoId).ToList<long>();
             model.Video = new TimelapseVideo() { Frames = frames };
@@ -221,7 +238,7 @@ namespace Phocalstream_Web.Controllers
             MemoryStream stream = new MemoryStream();
             serializer.Serialize(stream, model.Video);
             stream.Seek(0, SeekOrigin.Begin);
-            model.EncodedFrames = Convert.ToBase64String(stream.ToArray());
+            model.EncodedFrames = Convert.ToBase64String(stream.ToArray());*/
 
             return View(model);
         }

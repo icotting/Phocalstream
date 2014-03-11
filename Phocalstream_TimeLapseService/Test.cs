@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
@@ -15,6 +16,7 @@ namespace Phocalstream_TimeLapseService
 	{
 		/*static void Main(string[] args)
 		{
+			Debugger.Launch();
 			ITimeLapseManager manager = (ITimeLapseManager)Activator.GetObject(typeof(ITimeLapseManager), "tcp://localhost:8084/TimeLapseManager");
 			List<long> ids = new List<long>();
 			for(int i = 45; i <= 77; ++i)

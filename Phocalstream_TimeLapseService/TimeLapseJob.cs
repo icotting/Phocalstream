@@ -127,15 +127,24 @@ namespace Phocalstream_TimeLapseService
 		{
 			List<string> photoFiles = new List<string>();
 
-			using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+			if(PhotoIds.Count > 0)
 			{
-				conn.Open();
-				foreach (var photoId in PhotoIds)
+				using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
 				{
-					// Must be optimized
-					using (SqlCommand command = new SqlCommand("select FileName from Photos where ID = @id", conn))
+					conn.Open();
+					StringBuilder builder = new StringBuilder();
+
+					builder.Append("select FileName from Photos where ID in (");
+					foreach (var photoId in PhotoIds.Take(PhotoIds.Count-1))
 					{
-						command.Parameters.AddWithValue("@id", photoId);
+						builder.Append(photoId);
+						builder.Append(',');
+					}
+					builder.Append(PhotoIds.LastOrDefault());
+					builder.Append(")");
+
+					using (SqlCommand command = new SqlCommand(builder.ToString(), conn))
+					{
 						using (SqlDataReader reader = command.ExecuteReader())
 						{
 							while (reader.Read())
