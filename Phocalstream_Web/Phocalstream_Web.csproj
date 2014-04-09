@@ -226,6 +226,7 @@
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\bootstrap\js\bootstrap.js" />
     <Content Include="Content\bootstrap\js\bootstrap.min.js" />
+    <Content Include="Content\carousel.css" />
     <Content Include="Content\Images\About.png" />
     <Content Include="Content\Images\Collections.png" />
     <Content Include="Content\Images\Like.png" />

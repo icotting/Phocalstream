@@ -175,31 +175,35 @@ namespace Phocalstream_Service.Service
                         }
                     }
 
-                    // this is a dirty hack, figure out why the image isn't opening with the correct width and height
-                    if (portrait)
+                    // only generate the phocalstream image if it has not already been generated
+                    if (File.Exists(Path.Combine(basePath, @"High.jpg")) == false)
                     {
-                        photo.Width = img.Height;
-                        photo.Height = img.Width;
-                    }
+                        // this is a dirty hack, figure out why the image isn't opening with the correct width and height
+                        if (portrait)
+                        {
+                            photo.Width = img.Height;
+                            photo.Height = img.Width;
+                        }
 
-                    ResizeImageTo(fileName, 1200, 800, Path.Combine(basePath, @"High.jpg"), portrait);
-                    ResizeImageTo(fileName, 800, 533, Path.Combine(basePath, @"Medium.jpg"), portrait);
-                    ResizeImageTo(fileName, 400, 266, Path.Combine(basePath, @"Low.jpg"), portrait);
+                        ResizeImageTo(fileName, 1200, 800, Path.Combine(basePath, @"High.jpg"), portrait);
+                        ResizeImageTo(fileName, 800, 533, Path.Combine(basePath, @"Medium.jpg"), portrait);
+                        ResizeImageTo(fileName, 400, 266, Path.Combine(basePath, @"Low.jpg"), portrait);
 
-                    // create a DeepZoom image creater to generate the tile set for each raw image
-                    ImageCreator creator = new ImageCreator();
-                    creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-                    creator.TileOverlap = 1;
-                    creator.TileSize = 256;
+                        // create a DeepZoom image creater to generate the tile set for each raw image
+                        ImageCreator creator = new ImageCreator();
+                        creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
+                        creator.TileOverlap = 1;
+                        creator.TileSize = 256;
 
-                    string dziPath = Path.Combine(basePath, "Tiles.dzi");
-                    try
-                    {
-                        creator.Create(fileName, dziPath); // create the DeepZoom tileset
-                    }
-                    catch (Exception e)
-                    {
-                        throw new Exception(String.Format("Error creating deep zoom tiles for file {0}: {1}", fileName, e.Message));
+                        string dziPath = Path.Combine(basePath, "Tiles.dzi");
+                        try
+                        {
+                            creator.Create(fileName, dziPath); // create the DeepZoom tileset
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception(String.Format("Error creating deep zoom tiles for file {0}: {1}", fileName, e.Message));
+                        }
                     }
                     
                     return photo;

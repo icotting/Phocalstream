@@ -32,14 +32,14 @@ namespace Phocalstream_PhotoProcessor
         private static IPhotoService _service;
         private static IUnitOfWork _unit;
 
-        static void Main(string[] args)
+        static void Main()
         {
             IUnityContainer container = BuildUnityContainer();
 
             _service = container.Resolve<IPhotoService>();
             _unit = container.Resolve<IUnitOfWork>();
 
-            _path = args[0];
+            _path = ConfigurationManager.AppSettings["rawPath"];
 
             Thread t = new Thread(new ThreadStart(BeginProcess));
             t.Start();
@@ -85,14 +85,23 @@ namespace Phocalstream_PhotoProcessor
                     CameraSite site = collection.Site;
                     _unit.Commit();
 
-                    Console.WriteLine(string.Format("Processing {0} photos for site {1}", toProcess.Count(), site.Name));
+                    int len = toProcess.Count();
+                    Console.WriteLine(string.Format("Processing {0} photos for site {1}", len, site.Name));
 
+                    int index = 0;
                     foreach (string file in toProcess)
                     {
+                        Console.Write("\rFile {0} of {1}", index++, len);
                         _service.ProcessPhoto(file, site);
+                        if (index % 500 == 0)
+                        {
+                            _unit.Commit();
+                        }
+
                         if ( _break)
                             break;
                     }
+                    Console.WriteLine("");
                     _unit.Commit();
 
                     Console.WriteLine(string.Format("Building deep zoom site collection for site {0}", site.Name));
@@ -101,7 +110,12 @@ namespace Phocalstream_PhotoProcessor
 
                     Console.WriteLine(string.Format("Building pivot viewer manifest for site {0}", site.Name));
                     _service.GeneratePivotManifest(site);
-                }
+
+                    if (_break)
+                    {
+                        break;
+                    }
+               }
             }
             Console.WriteLine("Import process complete");
         }

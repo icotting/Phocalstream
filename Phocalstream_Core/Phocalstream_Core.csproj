@@ -67,9 +67,9 @@
     <Compile Include="Data\PhotoRepository.cs" />
     <Compile Include="Data\UnitOfWork.cs" />
     <Compile Include="Data\WaterDataRepository.cs" />
-    <Compile Include="Migrations\201311190412202_PhotoPath.cs" />
-    <Compile Include="Migrations\201311190412202_PhotoPath.Designer.cs">
-      <DependentUpon>201311190412202_PhotoPath.cs</DependentUpon>
+    <Compile Include="Migrations\201403160221092_CoverPhoto.cs" />
+    <Compile Include="Migrations\201403160221092_CoverPhoto.Designer.cs">
+      <DependentUpon>201403160221092_CoverPhoto.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,8 +86,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201311190412202_PhotoPath.resx">
-      <DependentUpon>201311190412202_PhotoPath.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201403160221092_CoverPhoto.resx">
+      <DependentUpon>201403160221092_CoverPhoto.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
