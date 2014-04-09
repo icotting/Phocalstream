@@ -72,6 +72,7 @@
     <Compile Include="Data\Model\Photo\MetaDatum.cs" />
     <Compile Include="Data\Model\Photo\Photo.cs" />
     <Compile Include="Data\Model\Photo\PhotoAnnotation.cs" />
+    <Compile Include="Data\Model\Photo\Tag.cs" />
     <Compile Include="Data\Model\Photo\User.cs" />
     <Compile Include="Data\Model\Photo\UserRole.cs" />
     <Compile Include="Data\Model\Photo\TimelapseFrame.cs" />

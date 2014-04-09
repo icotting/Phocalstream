@@ -71,6 +71,10 @@
     <Compile Include="Migrations\201403160221092_CoverPhoto.Designer.cs">
       <DependentUpon>201403160221092_CoverPhoto.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201404091527576_PhotoTags.cs" />
+    <Compile Include="Migrations\201404091527576_PhotoTags.Designer.cs">
+      <DependentUpon>201404091527576_PhotoTags.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\PhotoService.cs" />
@@ -88,6 +92,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201403160221092_CoverPhoto.resx">
       <DependentUpon>201403160221092_CoverPhoto.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201404091527576_PhotoTags.resx">
+      <DependentUpon>201404091527576_PhotoTags.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

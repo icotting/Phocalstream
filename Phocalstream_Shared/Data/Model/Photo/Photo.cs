@@ -26,6 +26,9 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public int Width { get; set; }
         public int Height { get; set; }
         public string FileName { get; set; }
+
+        public ICollection<Tag> Tags { get; set; }
+
         public ICollection<MetaDatum> AdditionalExifProperties { get; set; }
         public ICollection<PhotoAnnotation> Annotations { get; set; }
         public ICollection<Collection> FoundIn { get; set; }

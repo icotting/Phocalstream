@@ -32,6 +32,8 @@ namespace Phocalstream_Service.Data
                 .WithMany(s => s.Photos)
                 .WillCascadeOnDelete(true);
 
+            modelBuilder.Entity<Photo>().HasMany<Tag>(p => p.Tags).WithMany(t => t.Photos);
+
             modelBuilder.Entity<MetaDatum>()
                 .HasOptional<Photo>(m => m.Photo)
                 .WithMany(p => p.AdditionalExifProperties)

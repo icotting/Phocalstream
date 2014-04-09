@@ -9,7 +9,7 @@ namespace Phocalstream_Service.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
         protected override void Seed(Phocalstream_Service.Data.ApplicationContext context)
