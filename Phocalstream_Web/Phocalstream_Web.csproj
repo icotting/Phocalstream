@@ -285,6 +285,8 @@
     <Content Include="Views\Photo\TimeLapse.cshtml" />
     <Content Include="Views\Photo\_WaterDataPartial.cshtml" />
     <Content Include="Views\Photo\_WaterChartPartial.cshtml" />
+    <Content Include="Views\Home\SiteList.cshtml" />
+    <Content Include="Views\Photo\CameraCollection.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -297,8 +299,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Photo\Index.cshtml" />
-    <Content Include="Views\Photo\CameraCollection.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Account\RegisterAccount.cshtml" />
     <Content Include="Views\Shared\_MenuBarPartial.cshtml" />

@@ -140,26 +140,36 @@ namespace Phocalstream_Web.Application.Admin
             string url = String.Format(@"http://waterservices.usgs.gov/nwis/dv/?format=rdb&sites={0}&parameterCd={1}&statCd={2}&startDT={3}&endDT={4}",
                 _repo.GetStationCode(dataType.StationID), dataType.ParameterCode, dataType.StatisticCode, dataType.CurrentLastDate.AddDays(1).ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
             WebClient client = new WebClient();
-            string response = client.DownloadString(url);
 
-            // split the response into rows based on the new line character
-            List<string> rows = response.Split('\n').ToList<string>();
-            while (rows[0].StartsWith("#"))
+            try
             {
-                rows.RemoveAt(0); // remove the header comment rows
-            }
-            rows.RemoveAt(0); // remove the header row
-            rows.RemoveAt(0); // remove the definition row
-            //Write values and keep track of new greatest date
-            if (rows.Count != 0)
-            {
-                resultDate = this.WriteDataValues(rows, dataType.StationID, dataType.DataID);
-                if (resultDate.CompareTo(new DateTime(2009, 1, 1)) <= 0)
+                string response = client.DownloadString(url);
+
+                // split the response into rows based on the new line character
+                List<string> rows = response.Split('\n').ToList<string>();
+                while (rows[0].StartsWith("#"))
                 {
-                    resultDate = dataType.CurrentLastDate;
+                    rows.RemoveAt(0); // remove the header comment rows
                 }
+                rows.RemoveAt(0); // remove the header row
+                rows.RemoveAt(0); // remove the definition row
+                //Write values and keep track of new greatest date
+                if (rows.Count != 0)
+                {
+                    resultDate = this.WriteDataValues(rows, dataType.StationID, dataType.DataID);
+                    if (resultDate.CompareTo(new DateTime(2009, 1, 1)) <= 0)
+                    {
+                        resultDate = dataType.CurrentLastDate;
+                    }
+                }
+            } 
+            catch (WebException we)
+            {
+                if (((HttpWebResponse)we.Response).StatusCode != HttpStatusCode.NotFound)
+                {
+                    throw we;
+                } // else do nothing as this means the site doesn't have data for the requested interval which is OK
             }
-
             return resultDate;
         } //End UpdateWaterValues
 

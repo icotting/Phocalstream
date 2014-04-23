@@ -26,8 +26,27 @@ namespace Phocalstream_Web.Controllers.Api
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [HttpGet]
-        [ActionName("raw")]
-        public HttpResponseMessage GetPhoto(long id)
+        [ActionName("high")]
+        public HttpResponseMessage GetHighResPhoto(long id)
+        {
+            return loadPhoto(id, "High");
+        }
+
+        [HttpGet]
+        [ActionName("medium")]
+        public HttpResponseMessage GetMidResPhoto(long id)
+        {
+            return loadPhoto(id, "Medium");
+        }
+
+        [HttpGet]
+        [ActionName("low")]
+        public HttpResponseMessage GetLowResPhoto(long id)
+        {
+            return loadPhoto(id, "Low");
+        }
+
+        private HttpResponseMessage loadPhoto(long id, string res)
         {
             Photo photo = PhotoRepository.Single(p => p.ID == id, p => p.Site);
             if (photo == null)
@@ -37,7 +56,7 @@ namespace Phocalstream_Web.Controllers.Api
             else
             {
                 string basePath = ConfigurationManager.AppSettings["photoPath"];
-                string photoPath = string.Format("{0}/{1}/RAW/{2}.jpg", basePath, photo.Site.ContainerID, photo.BlobID);
+                string photoPath = string.Format("{0}/{1}/{2}.phocalstream/{3}.jpg", basePath, photo.Site.DirectoryName, photo.BlobID, res);
 
                 MemoryStream imageData = new MemoryStream();
                 using (FileStream stream = File.OpenRead(photoPath))

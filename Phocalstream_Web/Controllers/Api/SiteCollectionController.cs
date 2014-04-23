@@ -30,6 +30,20 @@ namespace Phocalstream_Web.Controllers.Api
         [Dependency]
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
+        [Dependency]
+        public IUnitOfWork UnitOfWork { get; set; }
+
+        [HttpGet]
+        [ActionName("updatecover")]
+        public void SetCoverPhoto(long photoId, long collectionId)
+        {
+            Collection col = CollectionRepository.Single(c => c.ID == collectionId);
+            Photo photo = PhotoEntityRepository.Single(p => p.ID == photoId);
+            col.CoverPhoto = photo;
+            CollectionRepository.Update(col);
+            UnitOfWork.Commit();
+        }
+
         [HttpGet]
         public HttpResponseMessage DeepZoomCollectionForSite(long siteID)
         {

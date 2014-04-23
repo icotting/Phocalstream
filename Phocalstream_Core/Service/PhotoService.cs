@@ -97,7 +97,7 @@ namespace Phocalstream_Service.Service
                     photo.Site = site;
                     photo.Width = img.Width;
                     photo.Height = img.Height;
-                    photo.FileName = fileName;
+                    photo.FileName = Path.GetFileName(fileName);
                     photo.AdditionalExifProperties = new List<MetaDatum>();
 
                     PhotoRepository.Insert(photo);
