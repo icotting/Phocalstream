@@ -229,9 +229,12 @@
     <Content Include="Content\carousel.css" />
     <Content Include="Content\Images\About.png" />
     <Content Include="Content\Images\Collections.png" />
+    <Content Include="Content\Images\ds.jpg" />
     <Content Include="Content\Images\Like.png" />
     <Content Include="Content\Images\Login.png" />
+    <Content Include="Content\Images\map.jpg" />
     <Content Include="Content\Images\Marker.png" />
+    <Content Include="Content\Images\Octocat.jpg" />
     <Content Include="Content\Images\Phocalstream.png" />
     <Content Include="Content\Images\Search.png" />
     <Content Include="Content\Images\Settings.png" />
@@ -252,6 +255,7 @@
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.woff" />
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
+    <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
     <Content Include="Content\Scripts\jquery-ui-1.8.20.min.js" />
