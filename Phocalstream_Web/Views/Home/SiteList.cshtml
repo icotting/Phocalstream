@@ -1,0 +1,86 @@
+﻿@model Phocalstream_Web.Models.ViewModels.HomeViewModel
+
+@{
+    ViewBag.Title = "SiteList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles
+{
+    <link rel="stylesheet" type="text/css" href="~/Content/carousel.css" />
+    <style>
+        #mapcontainer {
+            width: 100%;
+            min-width: 300px;
+            height: 400px;
+            position: relative;
+            margin-right: 300px;
+        }
+
+        .detailsSub {
+            font-size: 14pt;
+            font-weight: 200;
+            margin-top: 15px;
+        }
+
+
+        #sitesContainer {
+            padding-right: 330px;
+            left: 0px;
+            right: 0px;
+            position: relative;
+        }
+    </style>
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        var siteList = @Html.Raw(Json.Encode(Model.Collections));
+    </script>
+    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+    <script type="text/javascript" src="/Content/Scripts/SiteSelection.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
+    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
+}
+<div class="container" style="margin-top: 100px;">
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#maptab" data-toggle="tab">Site Map</a></li>
+        <li><a href="#sites" data-toggle="tab">Camera Sites</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane" id="sites">
+            @foreach (var site in Model.Sites)
+            {
+                <div class="row">
+                    <img src="/api/photo/low/@site.CoverPhotoID" alt="@site.SiteName" style="float: left; width: 200px; margin-right: 20px; margin-bottom: 20px; margin-top: 20px;">
+                    <h1>@site.SiteName</h1>
+                    <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
+                    <a href="/photo/cameracollection?siteId=@site.SiteID">View Collection</a>
+                </div>
+            }
+        </div>
+        <div class="tab-pane active" id="maptab">
+            <div class="row">
+                <div class="col-md-5">
+                    <div id="siteList">
+                        <h1>Photo Collections</h1>
+                        <p>
+                            Using the map to the left, select from the available camera sites to view
+                            time-lapse photos and information about the site.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div id="mapcontainer">
+                        <div id="map">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

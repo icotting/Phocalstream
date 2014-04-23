@@ -15,6 +15,7 @@ namespace Phocalstream_Web.Models.ViewModels
         public string PhotoTime { get; set; }
         public string SiteCoords { get; set; }
         public DmData DroughtMonitorData { get; set; }
+        public WaterFlowData WaterData { get; set; }
     }
 
     public class DmData
@@ -30,5 +31,15 @@ namespace Phocalstream_Web.Models.ViewModels
     public class DmMapData
     {
         public string DataWeek { get; set; }
+    }
+
+    public class WaterFlowData
+    {
+        public long PhotoID { get; set; }
+        public WaterStation ClosestStation { get; set; }
+        public AvailableWaterDataByStation DataTypes { get; set; }
+        public ICollection<WaterDataValue> WaterDataValues { get; set; }
+        public WaterParameterCode ParameterInfo { get; set; }
+        public String chartDataValues { get; set; }
     }
 }

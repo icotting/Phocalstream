@@ -19,6 +19,11 @@ TestResults
 *.user
 *.sln.docstates
 
+#Data
+App_Data/
+
+Phocalstream_PhotoProcessor/App.config
+
 # Build results
 [Dd]ebug/
 [Rr]elease/
@@ -116,3 +121,4 @@ Phocalstream_Web/App_Config/appSettings.config
 Phocalstream_Web/App_Config/appSettingsRelease.config
 Phocalstream_Web/App_Config/connectionStrings.config
 Phocalstream_Web/App_Config/connectionStringsRelease.config
+*.DS_Store

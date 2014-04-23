@@ -16,6 +16,7 @@ namespace Phocalstream_Shared.Data
         
         //Water Parameter Codes
         ICollection<WaterParameterCode> FetchParameterCodes();
+        WaterParameterCode GetParameterCodeInfoFromDataType(long dataTypeID);
 
         //General Water Data
         void DeleteTableData(string tableName);
@@ -28,9 +29,12 @@ namespace Phocalstream_Shared.Data
         //Water Stations
         long AddWaterStation(string number, string name, float latitude, float longitude, long stateID);
         string GetStationCode(long stationID);
+        ICollection<WaterStation> GetClosestStations(double siteLatitude, double siteLongitude, int range);
+        WaterStation GetStationInfo(long stationID);
 
         //Water Data Types
         ICollection<AvailableWaterDataByStation> FetchCurrentDataTypes();
+        ICollection<AvailableWaterDataByStation> FetchBestDataTypesForStationDate(ICollection<WaterStation> stationIDs, DateTime imageDate);
         long AddWaterDataType(long stationID, long parameterID, DateTime fromDate, DateTime toDate);
         void UpdateAvailableDataTypes(AvailableWaterDataByStation dataType);
         DateTime GetLastDate();

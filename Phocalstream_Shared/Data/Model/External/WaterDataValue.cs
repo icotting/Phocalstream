@@ -11,7 +11,7 @@ namespace Phocalstream_Shared.Data.Model.External
         public long ID { get; set; }
         public long StationID { get; set; }
         public long DataTypeID { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime DateOf { get; set; }
         public double Value { get; set; }
     }
 

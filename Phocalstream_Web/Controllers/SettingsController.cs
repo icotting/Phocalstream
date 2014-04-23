@@ -30,6 +30,7 @@ namespace Phocalstream_Web.Controllers
         {
             SettingsViewModel model = new SettingsViewModel();
             model.DmProcess = getDMModel();
+            model.WaterProcess = getWaterModel();
 
             List<User> users = UserRepository.AsQueryable().ToList<User>();
             model.UserList = new List<ManagedUser>();
@@ -110,6 +111,39 @@ namespace Phocalstream_Web.Controllers
             return model;
         }
 
+        [HttpGet]
+        public ActionResult StartWaterImport(string type)
+        {
+            WaterImportProc model = getWaterModel();
+            model.Running = true;
 
+            if (type.Equals("full"))
+            {
+                WaterDataImporter.getInstance().ResetAllWaterData();
+            }
+            else
+            {
+                WaterDataImporter.getInstance().UpdateWaterData();
+            }
+
+            return PartialView("_WaterImportPartial", model);
+        }
+
+        [HttpGet]
+        public ActionResult CheckWaterImport()
+        {
+            return PartialView("_WaterImportPartial", getWaterModel());
+        }
+
+        private WaterImportProc getWaterModel()
+        {
+            WaterImportProc model = new WaterImportProc();
+            WaterDataImporter importer = WaterDataImporter.getInstance();
+
+            model.Running = importer.ImportRunning;
+            model.EndDate = importer.LastDate;
+
+            return model;
+        }
     }
 }

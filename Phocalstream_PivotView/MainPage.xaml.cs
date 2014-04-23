@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Pivot;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -14,6 +15,9 @@ namespace Phocalstream_PivotView
 {
     public partial class MainPage : UserControl
     {
+
+        private CxmlCollectionSource _source;
+
         public MainPage()
         {
             InitializeComponent();
@@ -28,7 +32,8 @@ namespace Phocalstream_PivotView
                 Pivot.Visibility = System.Windows.Visibility.Visible;
                 try
                 {
-                    Pivot.LoadCollection(collection, string.Empty);
+                    _source = new CxmlCollectionSource(new Uri(collection));
+                    _source.StateChanged += _source_StateChanged;
                 }
                 catch (Exception ex)
                 {
@@ -49,6 +54,16 @@ namespace Phocalstream_PivotView
                     MessageBox.Show(ex.Message);
                     Console.WriteLine(ex.ToString());
                 }
+            }
+        }
+
+        void _source_StateChanged(object sender, CxmlCollectionStateChangedEventArgs e)
+        {
+            if (e.NewState == CxmlCollectionState.Loaded)
+            {
+                Pivot.PivotProperties =_source.ItemProperties.ToList();
+                Pivot.ItemTemplates = _source.ItemTemplates;
+                Pivot.ItemsSource = _source.Items;
             }
         }
     }

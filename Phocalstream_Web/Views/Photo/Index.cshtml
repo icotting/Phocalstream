@@ -1,6 +1,7 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.PhotoViewModel
 @{
     ViewBag.Title = Model.Photo.Site.Name + " Photo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
     @section Styles
@@ -59,18 +60,37 @@
                 border: 1px solid #a7a7a7;
             }
 
-            #table { padding-right: 330px; left: 0px; right: 0px; position: relative;}
+            #table { padding-right: 330px; left: 0px; right: 0px; top: 80px; position: relative;}
+            
+            #DMInfo {
+                width: 300px;
+                position: absolute;
+                top: 0px;
+                right: 0px;
+            }
 
     </style>
     }
 
     @section Scripts 
     {
+        <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
+
+	    <script type="text/javascript">
+	        Highcharts.theme = {
+	            colors: ["#DCDCDC", "#F5E938", "#FECC6E", "#FD9827", "#FC3638", "#650205", "#ff0066", "#eeaaee",
+                   "#55BF3B", "#DF5353", "#aaeeee"]
+	        };
+
+	        // Apply the theme
+	        var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+        </script>
+
         <script src="@Url.Content("~/Content/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
         <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
         <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
     	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-        <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
 
         <script type="text/javascript">
             function fullScreen() {
@@ -80,6 +100,7 @@
 
     }
 
+<div class="container">
 <div id="table">
     <div id="imageCell">
         <div id="imageContainer">
@@ -97,6 +118,9 @@
         </script>
         <div style="margin-bottom: 20px; margin-top: 20px;">
             @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { DataWeek = Model.DroughtMonitorData.DataWeek }); }
+        </div>
+        <div style="margin-bottom: 20px; margin-top: 20px;">
+            @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }
         </div>
     </div>
 
@@ -118,7 +142,9 @@
         <div style="margin-top: 20px;" id="dmPartial">
             @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
         </div>
+        <div style="margin-top: 20px;" id="wdPartial">
+            @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
+        </div>
     </div>
 </div>
-
-
+</div>

@@ -21,7 +21,8 @@ namespace Phocalstream_Shared.Data
         USCounty GetCounty(long id);
         USCounty GetCountyForFips(int fips);
 
-        void Add(DroughtMonitorWeek week);
+        DateTime GetDmDate(int type);
 
+        void Add(DroughtMonitorWeek week);
     }
 }

@@ -13,6 +13,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Phocalstream_Shared.Data.Model.View;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -35,22 +36,41 @@ namespace Phocalstream_Web.Controllers
         public ActionResult Index()
         {
             HomeViewModel model = new HomeViewModel();
-            model.Collections = CollectionRepository.AsQueryable().Where(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE).ToList<Collection>();
+            ICollection<Collection> collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
+            model.Sites = collections.Select(c => GetDetailsForCollection(c));
+
+            return View(model);
+        }
+
+        public ActionResult SiteList()
+        {
+            HomeViewModel model = new HomeViewModel();
+            model.Collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
+            model.Sites = model.Collections.Select(c => GetDetailsForCollection(c));
             return View(model);
         }
 
         public ActionResult SiteDetails(long id)
         {
-            CameraSite site = CameraSiteRepository.First(s => s.ID == id);
-            Phocalstream_Shared.Data.Model.View.SiteDetails details = PhotoRepository.GetSiteDetails(site);
+            Collection collection = CollectionRepository.First(c => c.Site.ID == id, c => c.Site, c => c.CoverPhoto);
 
-            details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", Request.Url.Scheme,
+            Phocalstream_Shared.Data.Model.View.SiteDetails details = PhotoRepository.GetSiteDetails(collection.Site);
+
+            details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,
-                site.ContainerID,
-                PhotoEntityRepository.First(p => p.ID == details.LastPhotoID).BlobID);
+                collection.Site.Name,
+                collection.CoverPhoto == null ? PhotoEntityRepository.First(p => p.ID == details.LastPhotoID).BlobID : collection.CoverPhoto.BlobID);
 
             return PartialView("_SiteDetails", details);
+        }
+
+        private SiteDetails GetDetailsForCollection(Collection collection)
+        {
+            SiteDetails details = PhotoRepository.GetSiteDetails(collection.Site);
+            details.CoverPhotoID = collection.CoverPhoto == null ? details.LastPhotoID : collection.CoverPhoto.ID;
+
+            return details;
         }
     }
 }

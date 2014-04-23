@@ -40,6 +40,8 @@ namespace Phocalstream_Web.Application.Admin
 
         private DroughtMonitorImporter(IDroughtMonitorRepository repository)
         {
+            _repo = repository;
+
             this._firstDate = "None";
             this._lastDate = "None";
             this._importRunning = false;
@@ -132,16 +134,19 @@ namespace Phocalstream_Web.Application.Admin
                 {
                     foreach (DMDataType type in Enum.GetValues(typeof(DMDataType)))
                     {
-                        //Get information
-                        string url = String.Format(@"http://torka.unl.edu/DroughtMonitor/Export/?mode=table&aoi={0}&date={1}", type.ToString().ToLower(), week.ToString("yyyyMMdd"));
-                        WebClient client = new WebClient();
-                        string response = client.DownloadString(url);
+                        if (type != DMDataType.ALL)
+                        {
+                            //Get information
+                            string url = String.Format(@"http://torka.unl.edu/DroughtMonitor/Export/?mode=table&aoi={0}&date={1}", type.ToString().ToLower(), week.ToString("yyyyMMdd"));
+                            WebClient client = new WebClient();
+                            string response = client.DownloadString(url);
 
-                        // split the response into rows based on the new line character
-                        List<string> rows = response.Split('\n').ToList<string>();
-                        rows.RemoveAt(0); // remove the header row
+                            // split the response into rows based on the new line character
+                            List<string> rows = response.Split('\n').ToList<string>();
+                            rows.RemoveAt(0); // remove the header row
 
-                        this.WriteData(type, rows, week);
+                            this.WriteData(type, rows, week);
+                        }
                     }
                 }
             } //End foreach week in importDates
@@ -153,28 +158,6 @@ namespace Phocalstream_Web.Application.Admin
             List<DroughtMonitorWeek> importedList =  _repo.FindUS(week, 0).ToList<DroughtMonitorWeek>();
 
             return (importedList.Count > 0);
-            
-            /*
-            // Get the ConnectionString by using the configuration ConnectionStrings property to read the connectionString. 
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DMConnection"].ConnectionString))
-            {
-                conn.Open();
-                long dataID = -1;
-                using (SqlCommand weekLookup = new SqlCommand(string.Format("select ID from USDMValues where PublishedDate='{0}'", week.ToString("yyyy-MM-dd")), conn))
-                using (SqlDataReader reader = weekLookup.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        dataID = reader.GetInt64(0);
-                    }
-                    reader.Close();
-                    if (dataID == -1)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            } */
         } //End AlreadyImported
 
         private void WriteData(DMDataType type, List<string> rows, DateTime date)
@@ -182,6 +165,9 @@ namespace Phocalstream_Web.Application.Admin
             DroughtMonitorWeek dmWeek = new DroughtMonitorWeek();
             dmWeek.Type = type;
             dmWeek.Week = date;
+            dmWeek.County = new USCounty();
+            dmWeek.County.State = new USState();
+            dmWeek.State = new USState();
 
             bool wroteUS = false;
             foreach (string line in rows)
@@ -198,20 +184,16 @@ namespace Phocalstream_Web.Application.Admin
                 switch (type)
                 {
                     case DMDataType.COUNTY:
-                        //get county ID from col[1]
-                        dmWeek.County.ID = 0;
+                        dmWeek.County.ID = -1;
                         dmWeek.County.Name = cols[2];
                         dmWeek.County.Fips = int.Parse(cols[1]);
                         dmWeek.County.State.Name = cols[3];
                         dmWeek.State.Name = cols[3];
-                        //command.Parameters["@placeID"].Value = this.GetCountyID(conn, cols[2], int.Parse(cols[1]), cols[3]);
                         offset = 4;
                         break;
                     case DMDataType.STATE:
-                        //get state ID from col[1]
-                        dmWeek.State.ID = 0;
+                        dmWeek.State.ID = -1;
                         dmWeek.State.Name = cols[1];
-                        //command.Parameters["@placeID"].Value = this.GetStateID(conn, cols[1]);
                         break;
                     case DMDataType.US:
                         //only write first line of data for US data
@@ -233,28 +215,15 @@ namespace Phocalstream_Web.Application.Admin
 
         private void SetDates()
         {
-            // Get the ConnectionString by using the configuration ConnectionStrings property to read the connectionString. 
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DMConnection"].ConnectionString))
+            try
             {
-                conn.Open();
-                using (SqlCommand dateLookup = new SqlCommand(string.Format("select top 1 PublishedDate from USDMValues order by PublishedDate"), conn))
-                using (SqlDataReader reader = dateLookup.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        this._firstDate = reader.GetDateTime(0).ToString("MM/dd/yyyy");
-                    }
-                    reader.Close();
-                }
-                using (SqlCommand dateLookup = new SqlCommand(string.Format("select top 1 PublishedDate from USDMValues order by PublishedDate desc"), conn))
-                using (SqlDataReader reader = dateLookup.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        this._lastDate = reader.GetDateTime(0).ToString("MM/dd/yyyy");
-                    }
-                    reader.Close();
-                }
+                this._firstDate = _repo.GetDmDate(0).ToString("MM/dd/yyyy");
+                this._lastDate = _repo.GetDmDate(1).ToString("MM/dd/yyyy");
+            }
+            catch (ArgumentException e)
+            {
+                this._firstDate = "None";
+                this._lastDate = "None";
             }
         } //End SetDates
     }

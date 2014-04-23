@@ -26,31 +26,27 @@ namespace Phocalstream_Web.Controllers.Api
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [HttpGet]
-        [ActionName("animate")]
-        public HttpResponseMessage GenerateAnimation(string photoIds)
+        [ActionName("high")]
+        public HttpResponseMessage GetHighResPhoto(long id)
         {
-            IEnumerable<long> photos = photoIds.Split(',').Select(s => Convert.ToInt64(s));
-            
-            string basePath = ConfigurationManager.AppSettings["photoPath"];
-
-            AnimatedGifEncoder encoder = new AnimatedGifEncoder();
-            encoder.Start(string.Format("{0}/videos/{1}.gif", basePath, Guid.NewGuid().ToString()));
-            encoder.SetDelay(500);
-            encoder.SetRepeat(0);
-
-            foreach (long id in photos)
-            {
-                Photo photo = PhotoRepository.Single(p => p.ID == id, p => p.Site);
-                encoder.AddFrame(Image.FromFile(string.Format("{0}/{1}/RAW/{2}.jpg", basePath, photo.Site.ContainerID, photo.BlobID)));
-            }
-            encoder.Finish();
-
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            return loadPhoto(id, "High");
         }
 
         [HttpGet]
-        [ActionName("raw")]
-        public HttpResponseMessage GetPhoto(long id)
+        [ActionName("medium")]
+        public HttpResponseMessage GetMidResPhoto(long id)
+        {
+            return loadPhoto(id, "Medium");
+        }
+
+        [HttpGet]
+        [ActionName("low")]
+        public HttpResponseMessage GetLowResPhoto(long id)
+        {
+            return loadPhoto(id, "Low");
+        }
+
+        private HttpResponseMessage loadPhoto(long id, string res)
         {
             Photo photo = PhotoRepository.Single(p => p.ID == id, p => p.Site);
             if (photo == null)
@@ -60,7 +56,7 @@ namespace Phocalstream_Web.Controllers.Api
             else
             {
                 string basePath = ConfigurationManager.AppSettings["photoPath"];
-                string photoPath = string.Format("{0}/{1}/RAW/{2}.jpg", basePath, photo.Site.ContainerID, photo.BlobID);
+                string photoPath = string.Format("{0}/{1}/{2}.phocalstream/{3}.jpg", basePath, photo.Site.DirectoryName, photo.BlobID, res);
 
                 MemoryStream imageData = new MemoryStream();
                 using (FileStream stream = File.OpenRead(photoPath))
