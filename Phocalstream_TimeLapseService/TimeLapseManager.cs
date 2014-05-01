@@ -17,8 +17,6 @@ namespace Phocalstream_TimeLapseService
 		private long NextId { get; set; }
 		private Stack<long> UnusedIds { get; set; }
 
-		private const long MaximumSittingJobs = 500;
-
 		public TimeLapseManager()
 		{
 			Jobs = new Dictionary<long, TimeLapseJob>();
@@ -32,21 +30,6 @@ namespace Phocalstream_TimeLapseService
 			Jobs.Clear();
 		}
 
-		private long ExtractOldestId()
-		{
-			Stack<long> temporary = new Stack<long>();
-			while (UnusedIds.Count > 0)
-			{
-				temporary.Push(UnusedIds.Pop());
-			}
-			long bottom = temporary.Pop();
-			while (temporary.Count > 0)
-			{
-				UnusedIds.Push(temporary.Pop());
-			}
-			return bottom;
-		}
-
 		public long StartJob(List<long> photoIds, int framerate)
 		{
 			TimeLapseJob job;
@@ -54,29 +37,11 @@ namespace Phocalstream_TimeLapseService
 			{
 				job = new TimeLapseJob(NextId, photoIds, framerate);
 				NextId += 1;
-				if(NextId > MaximumSittingJobs)
-				{
-					Directory.Delete(ConfigurationManager.AppSettings["outputPath"] + "/Job" + (NextId - MaximumSittingJobs), true);
-					MinimumId += 1;
-				}
 			}
 			else
 			{
 				long id = UnusedIds.Pop();
-				if(id < MinimumId)
-				{
-					job = new TimeLapseJob(NextId, photoIds, framerate);
-					NextId += 1;
-					if (NextId > MaximumSittingJobs)
-					{
-						Directory.Delete(ConfigurationManager.AppSettings["outputPath"] + "/Job" + (NextId - MaximumSittingJobs), true);
-						MinimumId += 1;
-					}
-				}
-				else
-				{
-					job = new TimeLapseJob(id, photoIds, framerate);
-				}
+				job = new TimeLapseJob(id, photoIds, framerate);
 			}
 
 			job.BeginProcessing();

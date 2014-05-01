@@ -22,6 +22,7 @@ namespace Phocalstream_TimeLapseService
 		protected override void OnStart(string[] args)
 		{
 			AppDomain.CurrentDomain.SetData("DataDirectory", "C:\\PhocalStream\\Phocalstream\\Phocalstream_Web\\App_Data");
+			System.IO.Directory.SetCurrentDirectory(ConfigurationManager.AppSettings["outputPath"]);
 			TcpChannel channel = new TcpChannel(8084);
 			ChannelServices.RegisterChannel(channel, false);
 			RemotingConfiguration.RegisterWellKnownServiceType(typeof(TimeLapseManager), "TimeLapseManager", WellKnownObjectMode.Singleton);

@@ -16,7 +16,6 @@ namespace Phocalstream_TimeLapseService
 	{
 		/*static void Main(string[] args)
 		{
-			Debugger.Launch();
 			ITimeLapseManager manager = (ITimeLapseManager)Activator.GetObject(typeof(ITimeLapseManager), "tcp://localhost:8084/TimeLapseManager");
 			List<long> ids = new List<long>();
 			for(int i = 45; i <= 77; ++i)
@@ -24,16 +23,6 @@ namespace Phocalstream_TimeLapseService
 				ids.Add(i);
 			}
 			long job = manager.StartJob(ids, 20);
-			while(true)
-			{
-				float completion = manager.CheckJob(job);
-				Console.WriteLine(completion);
-				if(completion >= 0.99f)
-				{
-					break;
-				}
-				Thread.Sleep(10);
-			}
 			Console.WriteLine(manager.GetJobDestination(job));
 			Console.ReadKey();
 		}*/

@@ -34,7 +34,11 @@ namespace Phocalstream_TimeLapseService
 
 		public bool Complete { get { return progress >= 0.99f; } }
 		public string Destination { get { return ConfigurationManager.AppSettings["outputPath"] + "/Job" + Id + "/output.mpg"; } }
+		private string Directory { get { return ConfigurationManager.AppSettings["outputPath"] + "/Job" + Id + "/"; } }
 		private string TemporaryDirectory { get { return ConfigurationManager.AppSettings["outputPath"] + "/Job" + Id + "/temp/"; } }
+
+		private readonly bool Verbose = true;
+		private readonly bool ProduceLog = true;
 
 		public float Progress
 		{
@@ -55,31 +59,45 @@ namespace Phocalstream_TimeLapseService
 
 		public void BeginProcessing()
 		{
-			Composer = Task.Run(() => Process());
+			Log("Beginning processing for " + Id);
+			Composer = Task.Run(() => ProcessPhotos());
 		}
 
-		private void Process()
+		private void Log(string message, string title = "")
+		{
+			if (!ProduceLog) return;
+			using(StreamWriter logfile = File.AppendText(ConfigurationManager.AppSettings["outputPath"] + "/phlog.txt"))
+			{
+				logfile.Write("[");
+				logfile.Write(DateTime.Now.ToShortTimeString());
+				logfile.Write("]: ");
+				logfile.WriteLine(title);
+				logfile.WriteLine(message);
+				logfile.WriteLine();
+			}
+		}
+
+		private void ProcessPhotos()
 		{
 			List<string> photoFilenames = PhotoFilenames();
-
 			new FileInfo(TemporaryDirectory).Directory.Create();
 
-			LinkedList<Task> blendingTasks = new LinkedList<Task>();
+			Log("Creating blend frames for " + Id);
 			// Skip one file so that all files can be blended with the previous.
 			for (int i = 1; i < photoFilenames.Count; ++i)
 			{
-				// If I let the closure take i, it will change. This makes another variable which will be redeclared at the beginning of the loop.
-				int otherI = i;
-				blendingTasks.AddFirst(Task.Run(() => CreateBlend(photoFilenames[otherI - 1], photoFilenames[otherI], TemporaryDirectory + "blended" + otherI.ToString("D09") + ".jpg")));
+				CreateBlend(photoFilenames[i - 1], photoFilenames[i], "blended" + i.ToString("D09") + ".jpg");
 			}
 
-			// Joins the threads linearly, but this doesn't matter much as there
-			// is little disparity between taks run times.
-			foreach (var task in blendingTasks)
+			// Wait until all the blends have been finished.
+			int finalFileCount = (photoFilenames.Count-1) * 3;
+			while(new FileInfo(TemporaryDirectory).Directory.GetFiles().Length < finalFileCount)
 			{
-				task.Wait();
+				Log("Waiting for blend files." + new FileInfo(TemporaryDirectory).Directory.GetFiles().Length + ",,," + finalFileCount);
+				Thread.Sleep(1000);
 			}
 
+			Log("Creating mpeg for " + Id);
 			CreateMpeg(TemporaryDirectory + "blended%09d.jpg", Framerate, Destination);
 			if(completionEvent != null)
 			{
@@ -87,32 +105,68 @@ namespace Phocalstream_TimeLapseService
 			}
 		}
 
-		private void CreateMpeg(string path, int framerate, string destination)
-		{
-			Process ffmpeg = new Process();
-			ffmpeg.StartInfo.FileName = ConfigurationManager.AppSettings["ffmpegPath"] + "\\ffmpeg";
-			ffmpeg.StartInfo.Arguments = "-f image2 -r " + framerate + " -i " + path + " -vf scale=2000:-1 -qscale 2 -r 20 \"" + destination +"\"";
-			ffmpeg.StartInfo.UseShellExecute = false;
-			ffmpeg.StartInfo.RedirectStandardInput = true;
-			ffmpeg.Start();
-			ffmpeg.StandardInput.WriteLine("y");
-			ffmpeg.WaitForExit();
-			// Approximates that encoding take 30% of the time to complete.
-			Progress += 0.3f;
-		}
-
 		private void CreateBlend(string imageA, string imageB, string destination)
 		{
-			Process magick = new Process();
-			magick.StartInfo.FileName = ConfigurationManager.AppSettings["magickPath"] + "\\composite";
-			magick.StartInfo.Arguments = "-blend 20 \"" + ExtractImagePath(imageA) + "\" -matte \"" + ExtractImagePath(imageB) + "\" " + destination;
-			magick.StartInfo.UseShellExecute = false;
-			magick.Start();
-			magick.WaitForExit();
-			// Approximates that blending takes 60% of the time to complete.
-			Progress += (1f / (float)(PhotoIds.Count - 1)) * 0.7f;
+			if(Verbose)
+			{
+				Log("Creating blend for [" + imageA + "] and [" + imageB + "] -> " + destination);
+			}
+			using (StreamWriter stream = new StreamWriter(File.OpenWrite(TemporaryDirectory + imageA.Split('\\', '/').Last() + imageB.Split('\\', '/').Last() + "condor.submit")))
+			{
+				stream.WriteLine("Universe = vanilla");
+				stream.WriteLine("Executable = " + TemporaryDirectory + imageA.Split('\\', '/').Last() + imageB.Split('\\', '/').Last() + "exec.bat");
+				stream.WriteLine("getenv = true");
+				stream.WriteLine("run_as_owner = true");
+				stream.WriteLine("Queue");
+			}
+			using (StreamWriter stream = new StreamWriter(File.OpenWrite(TemporaryDirectory + imageA.Split('\\', '/').Last() + imageB.Split('\\', '/').Last() + "exec.bat")))
+			{
+				stream.Write(ConfigurationManager.AppSettings["magickPath"] + "/composite.exe -blend 20 \"" + ExtractImagePath(imageA) + "\" -matte \"" + ExtractImagePath(imageB) + "\" \"" + TemporaryDirectory + destination + "\"");
+			}
+
+			Log("Submitting for job " + Id);
+			Process process = new Process();
+			process.StartInfo.FileName = "condor_submit";
+			process.StartInfo.Arguments = "\"" + TemporaryDirectory + imageA.Split('\\', '/').Last() + imageB.Split('\\', '/').Last() + "condor.submit" + "\"";
+			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.RedirectStandardError = true;
+			process.StartInfo.UseShellExecute = false;
+			process.Start();
+			Log(process.StandardOutput.ReadToEnd().Trim(), "Blend output");
+			Log(process.StandardError.ReadToEnd().Trim(), "Blend error");
 		}
-		
+
+		private void CreateMpeg(string path, int framerate, string destination)
+		{
+			string ffmpeg = ConfigurationManager.AppSettings["ffmpegPath"] + "\\ffmpeg";
+			string arguments = "-f image2 -r " + framerate + " -i " + path + " -vf scale=2000:-1 -qscale 2 -r 20 \"" + destination + "\"";
+
+			using (StreamWriter stream = new StreamWriter(File.OpenWrite(Directory + "condor.submit")))
+			{
+				stream.WriteLine("Universe = vanilla");
+				stream.WriteLine("Executable = " + ffmpeg);
+				stream.WriteLine("Arguments = " + arguments);
+				stream.WriteLine("Queue");
+			}
+
+			Log(ffmpeg + " " + arguments);
+			Process process = new Process();
+			process.StartInfo.FileName = "condor_submit";
+			process.StartInfo.Arguments = Directory + "condor.submit";
+			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.RedirectStandardError = true;
+			process.StartInfo.UseShellExecute = false;
+			process.Start();
+			while (!process.StandardError.EndOfStream)
+			{
+				Log(process.StandardError.ReadLine(), "Condor error");
+			}
+			while(!process.StandardOutput.EndOfStream)
+			{
+				Log(process.StandardOutput.ReadLine(), "Condor output");
+			}
+		}
+
 		private string ExtractImagePath(string path)
 		{
 			//Remove the first three directory things.
@@ -122,6 +176,7 @@ namespace Phocalstream_TimeLapseService
 			path = ConfigurationManager.AppSettings["rawPath"] + path;
 			return path;
 		}
+		
 
 		private List<string> PhotoFilenames()
 		{
