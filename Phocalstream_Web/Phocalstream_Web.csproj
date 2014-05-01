@@ -17,8 +17,8 @@
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
-    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -313,10 +313,6 @@
     <ProjectReference Include="..\Phocalstream_Shared\Phocalstream_Shared.csproj">
       <Project>{9363b507-2fc1-4917-8bb0-87966003dd6a}</Project>
       <Name>Phocalstream_Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Phocalstream_TimeLapseService\Phocalstream_TimeLapseService.csproj">
-      <Project>{9c893004-b702-4bbf-9907-aa426ba61886}</Project>
-      <Name>Phocalstream_TimeLapseService</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
