@@ -27,6 +27,9 @@ namespace Phocalstream_Web.Controllers
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [Dependency]
+        public IEntityRepository<Tag> TagRepository { get; set; }
+        
+        [Dependency]
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
@@ -38,10 +41,13 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IPhotoRepository DZPhotoRepository { get; set; }
 
+        [Dependency]
+        public IUnitOfWork Unit { get; set; }
+
         public ActionResult Index(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
-            model.Photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
+            model.Photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site, p => p.Tags);
             
             if (model.Photo == null)
             {
@@ -225,5 +231,39 @@ namespace Phocalstream_Web.Controllers
 
             return View(model);
         }
+
+        [HttpPost]
+        public ActionResult AddTag(FormCollection form)
+        {
+            long photoID = Convert.ToInt32(form["ID"]);
+
+            //all tags are stored in lowercase
+            String text = form["tag"].ToLower();;
+
+            //Need to check if the tag exists
+            Tag tag = TagRepository.Find(t => t.Name.Equals(text)).FirstOrDefault();
+            
+            //if tag is null, create one
+            if(tag == null)
+            {
+                tag = new Tag(text);
+            }
+
+            //Get the photo to be tagged
+            Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site, p=> p.Tags);
+            if (photo == null)
+            {
+                return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
+            }
+
+            //add the tag
+            photo.Tags.Add(tag);
+            
+            //commit changes
+            Unit.Commit();
+
+            return PartialView("_TagPartial", photo);
+        }
+
     }
 }
