@@ -233,22 +233,8 @@ namespace Phocalstream_Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddTag(FormCollection form)
-        {
-            long photoID = Convert.ToInt32(form["ID"]);
-
-            //all tags are stored in lowercase
-            String text = form["tag"].ToLower();;
-
-            //Need to check if the tag exists
-            Tag tag = TagRepository.Find(t => t.Name.Equals(text)).FirstOrDefault();
-            
-            //if tag is null, create one
-            if(tag == null)
-            {
-                tag = new Tag(text);
-            }
-
+        public ActionResult AddTag(long photoID, string tags)
+       {
             //Get the photo to be tagged
             Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site, p=> p.Tags);
             if (photo == null)
@@ -256,8 +242,26 @@ namespace Phocalstream_Web.Controllers
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
             }
 
-            //add the tag
-            photo.Tags.Add(tag);
+            //Create the array of tags
+            string[] tagArray = tags.Split(',');
+
+            foreach (string name in tagArray)
+            {
+                //all tags are stored in lowercase
+                String text = name.ToLower(); ;
+
+                //Need to check if the tag exists
+                Tag tag = TagRepository.Find(t => t.Name.Equals(text)).FirstOrDefault();
+
+                //if tag is null, create one
+                if (tag == null)
+                {
+                    tag = new Tag(name);
+                }
+
+                //add the tag
+                photo.Tags.Add(tag);
+            }
             
             //commit changes
             Unit.Commit();
