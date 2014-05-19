@@ -15,35 +15,23 @@
         <ul>
             @foreach (var tag in Model.Tags)
             {
-                <li class="tag label label-primary">@tag.Name</li> 
+                <li class="tag label label-primary">@tag.Name</li>
             }
         </ul>
     }
 
     <!-- Field for new tags -->
-    <div class="row" style="padding-left: 40px">
-        @using (Ajax.BeginForm("AddTag", new AjaxOptions { UpdateTargetId = "tagPartial" }))
-        {
-            <form role="form">
-                @Html.HiddenFor(model => model.ID)
+    <div style="padding-left: 40px">
+        <div class="row">
+            <form role="form" class="col-lg-8">
                 <div class="form-group">
-                    <input id="tag-field" type="text" />
+                    <input id="tag-field" class="col-lg-8" type="text" />
                 </div>
-                <button type="submit" class="btn btn-default">Submit</button>
             </form>
-        }
+            <button id="tag-submit" class="btn btn-success col-lg-4">Add Tag</button>
+        </div>
     </div>
 </div>
-
-<div>
-    <button id="tag-submit" class="btn btn-danger">Submit if you dare!</button>
-</div>
-
-<script>
-    $('#tag-field').tagsinput({
-    //    tagClass: 'big'
-    });
-</script>
 
 <script>
     $(document).ready(function () {
@@ -55,7 +43,7 @@
                 type: 'POST',
                 cache: false,
                 data: {
-                    photoID: 60,
+                    photoID: @Model.ID,
                     tags: tags
                 },
                 success: function (data) {
@@ -66,5 +54,9 @@
                 }
             });
         });
+    });
+
+    $('#tag-field').tagsinput({
+        //    tagClass: 'big'
     });
 </script>
