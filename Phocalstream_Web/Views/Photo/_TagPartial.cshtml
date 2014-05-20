@@ -37,6 +37,8 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
+        var availableTags = @Html.Raw(Json.Encode(Model.AvailableTags));
+        
         var substringMatcher = function(strs) {
             return function findMatches(q, cb) {
                 var matches, substringRegex;
@@ -70,7 +72,7 @@
         },
         {
             name: 'states',
-            source: substringMatcher(["Ian", "Zach", "Ashu", "Jeremy"])
+            source: substringMatcher(availableTags)
         });
 
         $('#tag-submit').click(function () {

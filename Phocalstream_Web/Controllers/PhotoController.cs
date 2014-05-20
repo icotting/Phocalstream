@@ -54,6 +54,8 @@ namespace Phocalstream_Web.Controllers
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
             }
 
+            model.Photo.AvailableTags = GetUnusedTagNames(photoID);
+
             model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
                     Request.Url.Host,
                     Request.Url.Port,
@@ -266,8 +268,18 @@ namespace Phocalstream_Web.Controllers
             //commit changes
             Unit.Commit();
 
+            photo.AvailableTags = GetUnusedTagNames(photoID);
+
             return PartialView("_TagPartial", photo);
         }
 
+        private List<string> GetUnusedTagNames(long photoID)
+        {
+            var photoTags = PhotoRepository.Single(p => p.ID == photoID, p => p.Tags).Tags.Select(t => t.Name);
+            
+            List<string> unusedTags = TagRepository.GetAll().Select(t => t.Name).Except(photoTags).ToList();
+
+            return unusedTags;
+        }
     }
 }

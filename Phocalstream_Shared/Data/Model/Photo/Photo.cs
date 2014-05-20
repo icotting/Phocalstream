@@ -33,5 +33,7 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public ICollection<PhotoAnnotation> Annotations { get; set; }
         public ICollection<Collection> FoundIn { get; set; }
         public virtual CameraSite Site { get; set; }
+
+        public ICollection<string> AvailableTags { get; set; }
     }
 }
