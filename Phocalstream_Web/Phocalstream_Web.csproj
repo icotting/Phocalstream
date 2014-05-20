@@ -255,14 +255,18 @@
     <Content Include="App_Config\appSettingsRelease.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Content\bootstrap-tags\js\bootstrap-tagsinput.min.js.map" />
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="Content\bootstrap-tags\js\bootstrap-tagsinput.min.js.map" />
+    <Content Include="Content\bootstrap\css\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap\css\bootstrap.css.map" />
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
+    <Content Include="Content\Scripts\jquery-2.1.1.js" />
+    <Content Include="Content\Scripts\jquery-2.1.1.min.js" />
     <Content Include="Content\Scripts\jquery-ui-1.8.20.min.js" />
     <Content Include="Content\Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Content\Scripts\jquery.validate.min.js" />
@@ -271,6 +275,7 @@
     <Content Include="Content\Scripts\modernizr-2.5.3.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Site.css" />
+    <Content Include="Content\typeahead\typeahead.bundle.js" />
     <Content Include="Global.asax" />
     <Content Include="Content\Scripts\Silverlight.js" />
     <Content Include="Web.config">

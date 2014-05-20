@@ -3,6 +3,7 @@
 <!-- Bootstrap Tags Input CSS and JS Files-->
 <link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
 <script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.min.js"></script>
+<script src="~/Content/typeahead/typeahead.bundle.js"></script>
 
 <div style="clear: both;"></div>
 
@@ -33,8 +34,43 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var substringMatcher = function(strs) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
+
+                // an array that will be populated with substring matches
+                matches = [];
+
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
+
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                    if (substrRegex.test(str)) {
+
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({ value: str });
+                    }
+                });
+
+                cb(matches);
+            };
+        };
+
+        $('#tag-field').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'states',
+            source: substringMatcher(["Ian", "Zach", "Ashu", "Jeremy"])
+        });
+
         $('#tag-submit').click(function () {
             var tags = $("#tag-field").val();
             
@@ -54,9 +90,5 @@
                 }
             });
         });
-    });
-
-    $('#tag-field').tagsinput({
-        //    tagClass: 'big'
     });
 </script>
