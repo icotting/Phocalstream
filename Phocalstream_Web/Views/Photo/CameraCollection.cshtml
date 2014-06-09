@@ -76,6 +76,22 @@
             form.appendTo('body').submit();
         }
 
+        function downloadImages() {
+            var form; 
+            form = $('<form />', {
+                action: '/photo/FullResolutionDownload',
+                method: 'POST',
+                style: 'display: none;'
+            });
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'photoIds',
+                value: visibleItems
+            }));
+            form.appendTo('body').submit();
+        }
+
         function setCover() {
             var form;
             form = $('<form />', {
@@ -168,6 +184,8 @@
     {
         <li><a href="javascript:setCover()">Set Cover</a></li>
     }
+    
+    <li><a href="javascript:downloadImages()">Download Images</a></li>
 }
 
 <div id="pageHeader">
