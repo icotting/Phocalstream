@@ -67,13 +67,9 @@
     <Compile Include="Data\PhotoRepository.cs" />
     <Compile Include="Data\UnitOfWork.cs" />
     <Compile Include="Data\WaterDataRepository.cs" />
-    <Compile Include="Migrations\201403160221092_CoverPhoto.cs" />
-    <Compile Include="Migrations\201403160221092_CoverPhoto.Designer.cs">
-      <DependentUpon>201403160221092_CoverPhoto.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201404091527576_PhotoTags.cs" />
-    <Compile Include="Migrations\201404091527576_PhotoTags.Designer.cs">
-      <DependentUpon>201404091527576_PhotoTags.cs</DependentUpon>
+    <Compile Include="Migrations\201406162013014_Initialise.cs" />
+    <Compile Include="Migrations\201406162013014_Initialise.Designer.cs">
+      <DependentUpon>201406162013014_Initialise.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,11 +86,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201403160221092_CoverPhoto.resx">
-      <DependentUpon>201403160221092_CoverPhoto.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201404091527576_PhotoTags.resx">
-      <DependentUpon>201404091527576_PhotoTags.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201406162013014_Initialise.resx">
+      <DependentUpon>201406162013014_Initialise.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
