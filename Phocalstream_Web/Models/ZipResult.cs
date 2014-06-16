@@ -1,6 +1,8 @@
 ﻿using Ionic.Zip;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -10,6 +12,7 @@ namespace Phocalstream_Web.Models
 {
     public class ZipResult : ActionResult
     {
+        private static string _path;
         private IEnumerable<string> _files;
         private string _fileName;
 
@@ -25,11 +28,13 @@ namespace Phocalstream_Web.Models
         public ZipResult(params string[] files)
         {
             this._files = files;
+            _path = ConfigurationManager.AppSettings["rawPath"];
         }
 
         public ZipResult(IEnumerable<string> files)
         {
             this._files = files;
+            _path = ConfigurationManager.AppSettings["rawPath"];
         }
 
         public override void ExecuteResult(ControllerContext context)
@@ -47,7 +52,7 @@ namespace Phocalstream_Web.Models
                     var getOpener = new Ionic.Zip.OpenDelegate(name =>
                     {
                         WebClient c = new WebClient();
-                        return c.OpenRead(file);
+                        return c.OpenRead(Path.Combine(_path, file));
                     });
 
                     zf.AddEntry(file, getOpener, closer);
@@ -59,8 +64,6 @@ namespace Phocalstream_Web.Models
                 zf.Save(context.HttpContext.Response.OutputStream);
             }
         }
-
-        
 
     }
 }

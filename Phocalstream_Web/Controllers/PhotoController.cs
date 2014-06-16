@@ -231,30 +231,18 @@ namespace Phocalstream_Web.Controllers
         {
             List<string> fileNames = new List<string>();
 
-            //Get files
             string[] ids = photoIds.Split(',');
-                
             foreach (var id in ids)
             {
                 long photoID = Convert.ToInt32(id);
-
                 Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
 
                 if (photo != null)
                 {
-                    string imageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
-                            Request.Url.Host,
-                            Request.Url.Port,
-                            photo.Site.Name,
-                            photo.BlobID);
-
-                    fileNames.Add(imageUrl);
+                    fileNames.Add(photo.FileName);
                 }
-
             }
-
             return new ZipResult(fileNames);
-
         }
     }
 }
