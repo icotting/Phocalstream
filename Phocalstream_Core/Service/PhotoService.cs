@@ -74,8 +74,11 @@ namespace Phocalstream_Service.Service
         }
 
         public Phocalstream_Shared.Data.Model.Photo.Photo ProcessPhoto(string fileName, CameraSite site)
-        {                   
+        {
+            string relativeName = fileName;
+            fileName = Path.Combine(ConfigurationManager.AppSettings["rawPath"], fileName);
             FileInfo info = new FileInfo(fileName);
+
             try
             {
                 // create the directory for the image and its components
@@ -97,7 +100,7 @@ namespace Phocalstream_Service.Service
                     photo.Site = site;
                     photo.Width = img.Width;
                     photo.Height = img.Height;
-                    photo.FileName = Path.GetFileName(fileName);
+                    photo.FileName = relativeName;
                     photo.AdditionalExifProperties = new List<MetaDatum>();
 
                     PhotoRepository.Insert(photo);

@@ -60,7 +60,8 @@ namespace Phocalstream_PhotoProcessor
             {
                 string dirName = siteNode["Folder"].InnerText;
                 string[] files = Directory.GetFiles(Path.Combine(_path, dirName), "*.JPG", SearchOption.AllDirectories);
-
+                files = files.Select(f => f.Replace(_path, "")).ToArray<string>();
+                  
                 List<string> siteFiles = new List<string>();
                 
                 using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
