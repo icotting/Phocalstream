@@ -20,7 +20,7 @@ namespace Phocalstream_Web.Models
         {
             get
             {
-                return _fileName ?? "file.zip";
+                return _fileName ?? (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
             }
             set { _fileName = value; }
         }
@@ -58,10 +58,10 @@ namespace Phocalstream_Web.Models
                     zf.AddEntry(file, getOpener, closer);
                 }
 
-                context.HttpContext.Response.ContentType = "application/zip";
-                context.HttpContext.Response.AppendHeader("content-disposition", "attachment; filename=" + FileName);
+                //context.HttpContext.Response.ContentType = "application/zip";
+                //context.HttpContext.Response.AppendHeader("content-disposition", "attachment; filename=" + FileName);
              
-                zf.Save(context.HttpContext.Response.OutputStream);
+                zf.Save(Path.Combine("C:/Users/Zach/Desktop", FileName));
             }
         }
 

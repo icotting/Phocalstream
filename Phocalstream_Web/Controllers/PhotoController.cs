@@ -1,4 +1,5 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Ionic.Zip;
+using Microsoft.Practices.Unity;
 using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
@@ -14,6 +15,8 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml.Serialization;
@@ -227,8 +230,9 @@ namespace Phocalstream_Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult FullResolutionDownload(string photoIds)
+        public void FullResolutionDownload(string photoIds)
         {
+            //need to access photos and names on main thread
             List<string> fileNames = new List<string>();
 
             string[] ids = photoIds.Split(',');
@@ -242,7 +246,37 @@ namespace Phocalstream_Web.Controllers
                     fileNames.Add(photo.FileName);
                 }
             }
-            return new ZipResult(fileNames);
+
+            Thread t = new Thread(new ThreadStart(() => DownloadImages(fileNames)));
+            t.Start();
+        }
+
+        private void DownloadImages(List<string> fileNames)
+        {
+            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
+            string path = ConfigurationManager.AppSettings["rawPath"];
+            
+            //closer for save process
+            var closer = new Ionic.Zip.CloseDelegate((name, stream) =>
+            {
+                stream.Dispose();
+            });
+
+            using (ZipFile zf = new ZipFile())
+            {
+                foreach (var file in fileNames)
+                {
+                    var getOpener = new Ionic.Zip.OpenDelegate(name =>
+                    {
+                        WebClient c = new WebClient();
+                        return c.OpenRead(Path.Combine(path, file));
+                    });
+
+                    zf.AddEntry(file, getOpener, closer);
+                }
+
+                zf.Save(Path.Combine("C:/Users/Zach/Desktop", FileName));
+            }
         }
     }
 }
