@@ -256,6 +256,12 @@ namespace Phocalstream_Web.Controllers
             string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
             string path = ConfigurationManager.AppSettings["rawPath"];
             
+            string save_path = ConfigurationManager.AppSettings["downloadPath"];
+            if (!Directory.Exists(save_path))
+            {
+                Directory.CreateDirectory(save_path);
+            }
+
             //closer for save process
             var closer = new Ionic.Zip.CloseDelegate((name, stream) =>
             {
@@ -275,7 +281,7 @@ namespace Phocalstream_Web.Controllers
                     zf.AddEntry(file, getOpener, closer);
                 }
 
-                zf.Save(Path.Combine("C:/Users/Zach/Desktop", FileName));
+                zf.Save(Path.Combine(save_path, FileName));
             }
         }
     }

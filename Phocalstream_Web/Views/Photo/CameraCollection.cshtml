@@ -77,19 +77,11 @@
         }
 
         function downloadImages() {
-            var form; 
-            form = $('<form />', {
-                action: '/photo/FullResolutionDownload',
-                method: 'POST',
-                style: 'display: none;'
-            });
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'photoIds',
-                value: visibleItems
-            }));
-            form.appendTo('body').submit();
+            $.ajax({
+                url : '/photo/FullResolutionDownload',
+                type: "POST",
+                data : {"photoIds":visibleItems},
+            })
         }
 
         function setCover() {
