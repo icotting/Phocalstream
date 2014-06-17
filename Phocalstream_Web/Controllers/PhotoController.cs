@@ -1,5 +1,6 @@
 ﻿using Ionic.Zip;
 using Microsoft.Practices.Unity;
+using Phocalstream_Service.Service;
 using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
@@ -40,6 +41,9 @@ namespace Phocalstream_Web.Controllers
 
         [Dependency]
         public IPhotoRepository DZPhotoRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<User> UserRepository { get; set; }
 
         public ActionResult Index(long photoID)
         {
@@ -83,6 +87,7 @@ namespace Phocalstream_Web.Controllers
         public ActionResult CameraCollection(long siteID)
         {
             CollectionViewModel model = new CollectionViewModel();
+
             model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
@@ -247,11 +252,13 @@ namespace Phocalstream_Web.Controllers
                 }
             }
 
-            Thread t = new Thread(new ThreadStart(() => DownloadImages(fileNames)));
+            string email = UserRepository.First(u => u.GoogleID == this.User.Identity.Name).EmailAddress;
+
+            Thread t = new Thread(new ThreadStart(() => DownloadImages(fileNames, email)));
             t.Start();
         }
 
-        private void DownloadImages(List<string> fileNames)
+        private void DownloadImages(List<string> fileNames, string email)
         {
             string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
             string path = ConfigurationManager.AppSettings["rawPath"];
@@ -283,6 +290,9 @@ namespace Phocalstream_Web.Controllers
 
                 zf.Save(Path.Combine(save_path, FileName));
             }
+
+            //after save, send email
+            EmailService.SendMail(email, "Phocalstream Download", "Please visit [URL] to download images.");
         }
     }
 }
