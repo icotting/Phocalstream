@@ -261,8 +261,7 @@ namespace Phocalstream_Web.Controllers
                                                 Request.Url.Authority,
                                                 Url.Action("Download", "Photo", new { fileName = FileName }));
             
-            Thread t = new Thread(new ThreadStart(() => DownloadImages(fileNames, FileName, email, downloadURL)));
-            t.Start();
+            DownloadImages(fileNames, FileName, email, downloadURL);
         }
 
         private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
@@ -307,6 +306,7 @@ namespace Phocalstream_Web.Controllers
             if (System.IO.File.Exists(downloadPath))
             {
                 Response.TransmitFile(downloadPath);
+                Response.Flush();
             }
         }
 
