@@ -254,15 +254,21 @@ namespace Phocalstream_Web.Controllers
 
             string email = UserRepository.First(u => u.GoogleID == this.User.Identity.Name).EmailAddress;
 
-            Thread t = new Thread(new ThreadStart(() => DownloadImages(fileNames, email)));
+            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
+                
+            string downloadURL = string.Format("{0}://{1}{2}",
+                                                Request.Url.Scheme,
+                                                Request.Url.Authority,
+                                                Url.Action("Download", "Photo", new { fileName = FileName }));
+            
+            Thread t = new Thread(new ThreadStart(() => DownloadImages(fileNames, FileName, email, downloadURL)));
             t.Start();
         }
 
-        private void DownloadImages(List<string> fileNames, string email)
+        private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
         {
-            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
             string path = ConfigurationManager.AppSettings["rawPath"];
-            
+
             string save_path = ConfigurationManager.AppSettings["downloadPath"];
             if (!Directory.Exists(save_path))
             {
@@ -292,7 +298,28 @@ namespace Phocalstream_Web.Controllers
             }
 
             //after save, send email
-            EmailService.SendMail(email, "Phocalstream Download", "Please visit [URL] to download images.");
+            EmailService.SendMail(email, "Phocalstream Download", "Please visit " + downloadURL + " to download the images.");
+        }
+
+        public void Download(string fileName)
+        {
+            string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+            if (System.IO.File.Exists(downloadPath))
+            {
+                Response.TransmitFile(downloadPath);
+            }
+        }
+
+        public ActionResult DeleteDownload(string fileName)
+        {
+            string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            return RedirectToAction("Downloads", "Home");
         }
     }
 }

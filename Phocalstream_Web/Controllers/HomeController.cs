@@ -14,6 +14,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Phocalstream_Shared.Data.Model.View;
+using System.IO;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -63,6 +64,28 @@ namespace Phocalstream_Web.Controllers
                 collection.CoverPhoto == null ? PhotoEntityRepository.First(p => p.ID == details.LastPhotoID).BlobID : collection.CoverPhoto.BlobID);
 
             return PartialView("_SiteDetails", details);
+        }
+
+        public ActionResult Downloads()
+        {
+            DownloadViewModel model = new DownloadViewModel();
+
+            model.DownloadPath = ConfigurationManager.AppSettings["downloadPath"];
+            
+            string[] fullFilePath = Directory.GetFiles(model.DownloadPath);
+
+            string[] fileNames = new string[fullFilePath.Length];
+            string[] split;
+
+            for (int i = 0; i < fullFilePath.Length; i++ )
+            {
+                split = fullFilePath[i].Split('/');
+                fileNames[i] = split[split.Length - 1];
+            }
+
+            model.Files = fileNames;
+
+            return View(model);
         }
 
         private SiteDetails GetDetailsForCollection(Collection collection)

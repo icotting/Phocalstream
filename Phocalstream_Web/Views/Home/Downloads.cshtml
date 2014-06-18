@@ -1,0 +1,35 @@
+﻿@model Phocalstream_Web.Models.ViewModels.DownloadViewModel
+
+@{
+    ViewBag.Title = "Downloads";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="padding-top: 50px;">
+<h2>Current Zip Files On Server</h2>
+
+
+<table class="table table-bordered table-condensed">
+    <thead>
+        <tr>
+            <th>
+                Filename
+            </th>
+            <th>
+                Delete?
+            </th>
+        </tr>
+    </thead>
+    @foreach(var file in Model.Files)
+    {   
+        <tr>
+            <td>
+                @Html.ActionLink(file, "Download", "Photo", new { fileName = file }, null)
+            </td>
+            <td>
+                <a class="icon-delete no-underline" href="@Url.Action("DeleteDownload", "Photo", new { fileName = file })">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
+</div>
