@@ -76,6 +76,10 @@
                         <ul class="nav navbar-nav">
                             <li><a href="/Home/SiteList">Sites</a></li>
                             <li><a href="#about">About</a></li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li><a href="/Home/Downloads">Downloads</a></li>
+                            }
                             @if (Request.IsAuthenticated)
                             {
                                 <li class="dropdown">
@@ -148,7 +152,7 @@
             <div class="col-md-4">
                 <img class="imghead" src="/Content/Images/map.jpg" alt="Your Places">
                 <h2>Your Places</h2>
-                <p>We are using the magic software to build a community of users sharing stories through photography. Phocalstream is all about unlocking creative potential on the Platte all the way down to local backyards.</p>
+                <p>We are using the magic of software to build a community of users sharing stories through photography. Phocalstream is all about unlocking creative potential on the Platte all the way down to local backyards.</p>
                 <p><a class="btn btn-default" href="#" role="button">Start Contributing &raquo;</a></p>
             </div><!-- /.col-lg-4 -->
             <div class="col-md-4">

@@ -76,29 +76,6 @@
             form.appendTo('body').submit();
         }
 
-        function setCover() {
-            var form;
-            form = $('<form />', {
-                action: '/api/sitecollection/updatecover',
-                method: 'GET',
-                style: 'display: none;'
-            });
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'photoId',
-                value: visibleItems.split(",")[0]
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'collectionId',
-                value: @Model.Collection.ID
-            }));
-
-            form.appendTo('body').submit();
-        }
-
         function onSilverlightError(sender, args) {
             var appSource = "";
             if (sender != null && sender != 0) {
@@ -133,7 +110,46 @@
 
             throw new Error(errMsg);
         }
+        
+        function downloadPrompt() {
+            var response = confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.");
+
+            if (response) {
+                downloadImages();
+            } 
+        }
+   
+        function downloadImages() {
+           $.ajax({
+               url : '/api/sitecollection/RawDownload?photoIds='+visibleItems,
+                type: "POST"
+            })
+        }
+    
+        function setCover() {
+            var form;
+            form = $('<form />', {
+                action: '/api/sitecollection/updatecover',
+                method: 'GET',
+                style: 'display: none;'
+            });
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'photoId',
+                value: visibleItems.split(",")[0]
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'collectionId',
+                value: @Model.Collection.ID
+            }));
+
+            form.appendTo('body').submit();
+        }
     </script>
+
     <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
 
     <script type="text/javascript">
@@ -167,6 +183,7 @@
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
         <li><a href="javascript:setCover()">Set Cover</a></li>
+        <li><a href="javascript:downloadPrompt()">Download Images</a></li>
     }
 }
 

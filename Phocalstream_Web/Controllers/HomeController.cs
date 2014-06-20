@@ -14,6 +14,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Phocalstream_Shared.Data.Model.View;
+using System.IO;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -65,12 +66,55 @@ namespace Phocalstream_Web.Controllers
             return PartialView("_SiteDetails", details);
         }
 
+        public ActionResult Downloads()
+        {
+            DownloadViewModel model = new DownloadViewModel();
+
+            model.DownloadPath = ConfigurationManager.AppSettings["downloadPath"];
+            FileInfo[] fileInfos = new DirectoryInfo(model.DownloadPath).GetFiles();
+
+            Tuple<string, string>[] Files = new Tuple<string, string>[fileInfos.Length];
+
+            for (int i = 0; i < Files.Length; i++ )
+            {
+                Files[i] = new Tuple<string, string>(fileInfos[i].Name, ToFileSize(fileInfos[i].Length));
+            }
+
+            model.Files = Files;
+
+            return View(model);
+        }
+
         private SiteDetails GetDetailsForCollection(Collection collection)
         {
             SiteDetails details = PhotoRepository.GetSiteDetails(collection.Site);
             details.CoverPhotoID = collection.CoverPhoto == null ? details.LastPhotoID : collection.CoverPhoto.ID;
 
             return details;
+        }
+
+        //Utility method to convert FileSize to correct string
+        private static string ToFileSize(long source)
+        {
+            const int byteConversion = 1024;
+            double bytes = Convert.ToDouble(source);
+
+            if (bytes >= Math.Pow(byteConversion, 3)) //GB Range
+            {
+                return string.Concat(Math.Round(bytes / Math.Pow(byteConversion, 3), 2), " GB");
+            }
+            else if (bytes >= Math.Pow(byteConversion, 2)) //MB Range
+            {
+                return string.Concat(Math.Round(bytes / Math.Pow(byteConversion, 2), 2), " MB");
+            }
+            else if (bytes >= byteConversion) //KB Range
+            {
+                return string.Concat(Math.Round(bytes / byteConversion, 2), " KB");
+            }
+            else //Bytes
+            {
+                return string.Concat(bytes, " Bytes");
+            }
         }
     }
 }

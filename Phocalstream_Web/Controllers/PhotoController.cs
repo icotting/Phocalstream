@@ -1,4 +1,6 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Ionic.Zip;
+using Microsoft.Practices.Unity;
+using Phocalstream_Service.Service;
 using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
@@ -14,6 +16,8 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml.Serialization;
@@ -37,6 +41,9 @@ namespace Phocalstream_Web.Controllers
 
         [Dependency]
         public IPhotoRepository DZPhotoRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<User> UserRepository { get; set; }
 
         public ActionResult Index(long photoID)
         {
@@ -80,6 +87,7 @@ namespace Phocalstream_Web.Controllers
         public ActionResult CameraCollection(long siteID)
         {
             CollectionViewModel model = new CollectionViewModel();
+
             model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
@@ -224,6 +232,101 @@ namespace Phocalstream_Web.Controllers
             model.EncodedFrames = Convert.ToBase64String(stream.ToArray());
 
             return View(model);
+        }
+
+        public ActionResult DeleteDownload(string fileName)
+        {
+            if (fileName.Equals("ALL"))
+            {
+                FileInfo[] files = new DirectoryInfo(ConfigurationManager.AppSettings["downloadPath"]).GetFiles();
+                foreach (var file in files)
+                {
+                    file.Delete();
+                }
+            }
+
+            else
+            {
+                string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return RedirectToAction("Downloads", "Home");
+        }
+
+        public void Download(string fileName)
+        {
+            System.IO.Stream iStream = null;
+
+            // Buffer to read 10K bytes in chunk:
+            byte[] buffer = new Byte[10000];
+
+            // Length of the file:
+            int length;
+
+            // Total bytes to read:
+            long dataToRead;
+
+            // Identify the file to download including its path.
+            string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+
+            try
+            {
+                // Open the file.
+                iStream = new System.IO.FileStream(downloadPath, System.IO.FileMode.Open,
+                            System.IO.FileAccess.Read, System.IO.FileShare.Read);
+
+
+                // Total bytes to read:
+                dataToRead = iStream.Length;
+
+                Response.Clear();
+                Response.ContentType = "application/octet-stream";
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.AddHeader("Content-Length", iStream.Length.ToString());
+
+                // Read the bytes.
+                while (dataToRead > 0)
+                {
+                    // Verify that the client is connected.
+                    if (Response.IsClientConnected)
+                    {
+                        // Read the data in buffer.
+                        length = iStream.Read(buffer, 0, 10000);
+
+                        // Write the data to the current output stream.
+                        Response.OutputStream.Write(buffer, 0, length);
+
+                        // Flush the data to the output.
+                        Response.Flush();
+
+                        buffer = new Byte[10000];
+                        dataToRead = dataToRead - length;
+                    }
+                    else
+                    {
+                        //prevent infinite loop if user disconnects
+                        dataToRead = -1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+            finally
+            {
+                if (iStream != null)
+                {
+                    //Close the file.
+                    iStream.Close();
+                }
+                Response.Close();
+            }
         }
     }
 }
