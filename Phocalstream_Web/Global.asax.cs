@@ -21,8 +21,11 @@ namespace Phocalstream_Web
         {
             AreaRegistration.RegisterAllAreas();
 
+            GlobalConfiguration.Configuration.Filters.Add(new ExceptionFilter());
+
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             AuthConfig.RegisterAuth();

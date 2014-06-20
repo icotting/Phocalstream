@@ -121,9 +121,8 @@
    
         function downloadImages() {
            $.ajax({
-                url : '/photo/FullResolutionDownload',
-                type: "POST",
-                data : {"photoIds":visibleItems}
+               url : '/api/sitecollection/RawDownload?photoIds='+visibleItems,
+                type: "POST"
             })
         }
     

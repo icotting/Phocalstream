@@ -234,80 +234,28 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public void FullResolutionDownload(string photoIds)
+        public ActionResult DeleteDownload(string fileName)
         {
-            //need to access photos and names on main thread
-            List<string> fileNames = new List<string>();
-
-            string[] ids = photoIds.Split(',');
-            foreach (var id in ids)
+            if (fileName.Equals("ALL"))
             {
-                long photoID = Convert.ToInt32(id);
-                Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
-
-                if (photo != null)
+                FileInfo[] files = new DirectoryInfo(ConfigurationManager.AppSettings["downloadPath"]).GetFiles();
+                foreach (var file in files)
                 {
-                    fileNames.Add(photo.FileName);
+                    file.Delete();
                 }
             }
 
-            string email = UserRepository.First(u => u.GoogleID == this.User.Identity.Name).EmailAddress;
-
-            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
-                
-            string downloadURL = string.Format("{0}://{1}{2}",
-                                                Request.Url.Scheme,
-                                                Request.Url.Authority,
-                                                Url.Action("Download", "Photo", new { fileName = FileName }));
-
-            try 
+            else
             {
-                DownloadImages(fileNames, FileName, email, downloadURL);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("Error");
-                Console.WriteLine(e.ToString());
-                Console.WriteLine(e.InnerException.ToString());
-            }
+                string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
 
-        }
-
-        private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
-        {
-            string path = ConfigurationManager.AppSettings["rawPath"];
-
-            string save_path = ConfigurationManager.AppSettings["downloadPath"];
-            if (!Directory.Exists(save_path))
-            {
-                Directory.CreateDirectory(save_path);
-            }
-
-            //closer for save process
-            var closer = new Ionic.Zip.CloseDelegate((name, stream) =>
-            {
-                stream.Dispose();
-            });
-
-            using (ZipFile zf = new ZipFile())
-            {
-                foreach (var file in fileNames)
+                if (System.IO.File.Exists(filePath))
                 {
-                    var getOpener = new Ionic.Zip.OpenDelegate(name =>
-                    {
-                        WebClient c = new WebClient();
-                        return c.OpenRead(Path.Combine(path, file));
-                    });
-
-                    zf.AddEntry(file, getOpener, closer);
+                    System.IO.File.Delete(filePath);
                 }
-
-                zf.Save(Path.Combine(save_path, FileName));
             }
 
-            //after save, send email
-            EmailService.SendMail(email, "Phocalstream Download", "Please visit " + downloadURL + " to download the images.");
+            return RedirectToAction("Downloads", "Home");
         }
 
         public void Download(string fileName)
@@ -325,7 +273,7 @@ namespace Phocalstream_Web.Controllers
 
             // Identify the file to download including its path.
             string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
-            
+
             try
             {
                 // Open the file.
@@ -379,30 +327,6 @@ namespace Phocalstream_Web.Controllers
                 }
                 Response.Close();
             }
-        }
-
-        public ActionResult DeleteDownload(string fileName)
-        {
-            if (fileName.Equals("ALL"))
-            {
-                FileInfo[] files = new DirectoryInfo(ConfigurationManager.AppSettings["downloadPath"]).GetFiles();
-                foreach(var file in files)
-                {
-                    file.Delete();
-                }
-            }
-            
-            else
-            {
-                string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
-
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-            }
-
-            return RedirectToAction("Downloads", "Home");
         }
     }
 }

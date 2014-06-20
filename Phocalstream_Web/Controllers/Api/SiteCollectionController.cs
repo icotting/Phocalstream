@@ -16,6 +16,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Xml;
+using Phocalstream_Service.Service;
+using Ionic.Zip;
+using System.Diagnostics;
 
 namespace Phocalstream_Web.Controllers.Api
 {
@@ -32,6 +35,9 @@ namespace Phocalstream_Web.Controllers.Api
 
         [Dependency]
         public IUnitOfWork UnitOfWork { get; set; }
+
+        [Dependency]
+        public IEntityRepository<User> UserRepository { get; set; }
 
         [HttpGet]
         [ActionName("updatecover")]
@@ -101,6 +107,94 @@ namespace Phocalstream_Web.Controllers.Api
 
             message.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
             return message;
+        }
+
+        [HttpPost, ActionName("RawDownload")]
+        public void FullResolutionDownload(string photoIds)
+        {
+            //need to access photos and names on main thread
+            List<string> fileNames = new List<string>();
+
+            string[] ids = photoIds.Split(',');
+
+            foreach (var id in ids)
+            {
+                long photoID = Convert.ToInt32(id);
+                Photo photo = PhotoEntityRepository.Single(p => p.ID == photoID, p => p.Site);
+
+                if (photo != null)
+                {
+                    fileNames.Add(photo.FileName);
+                }
+            }
+
+            string email = UserRepository.First(u => u.GoogleID == this.User.Identity.Name).EmailAddress;
+
+            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
+
+            string downloadURL = string.Format("{0}://{1}{2}",
+                                                Request.RequestUri.Scheme,
+                                                Request.RequestUri.Authority,
+                                                string.Format(@"/Photo/Download?fileName={0}", FileName));
+
+            DownloadImages(fileNames, FileName, email, downloadURL);
+        }
+
+        private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
+        {
+            string path = ConfigurationManager.AppSettings["rawPath"];
+
+            if (String.IsNullOrEmpty(path))
+            {
+                throw new Exception("The raw photo path is null or empty");
+            }
+
+            string save_path = ConfigurationManager.AppSettings["downloadPath"];
+            if (!Directory.Exists(save_path))
+            {
+                Directory.CreateDirectory(save_path);
+            }
+
+            //closer for save process
+            var closer = new Ionic.Zip.CloseDelegate((name, stream) =>
+            {
+                stream.Dispose();
+            });
+
+            using (ZipFile zf = new ZipFile())
+            {
+                foreach (var file in fileNames)
+                {
+                    string fullName = file;
+                    /* for some reason path combine does not work on the server this needs to be further investigated */
+                    if (!fullName.StartsWith(@"\"))
+                    {
+                       fullName = string.Format(@"{0}\{1}", path, file);
+                    }
+                    else
+                    {
+                        fullName = string.Format(@"{0}{1}", path, file);
+                    }
+
+                    if (!File.Exists(fullName))
+                    {
+                        throw new Exception(string.Format(@"The file {0} does not exist", fullName));
+                    }
+
+                    var getOpener = new Ionic.Zip.OpenDelegate(name =>
+                    {
+                        WebClient c = new WebClient();
+                        return c.OpenRead(fullName);
+                    });
+
+                    zf.AddEntry(Path.GetFileName(file), getOpener, closer);
+                }
+
+                zf.Save(Path.Combine(save_path, FileName));
+            }
+
+            //after save, send email
+            EmailService.SendMail(email, "Phocalstream Download", "Please visit " + downloadURL + " to download the images.");
         }
     }
 }
