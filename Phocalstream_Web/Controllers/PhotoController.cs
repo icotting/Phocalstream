@@ -312,19 +312,72 @@ namespace Phocalstream_Web.Controllers
 
         public void Download(string fileName)
         {
+            System.IO.Stream iStream = null;
+
+            // Buffer to read 10K bytes in chunk:
+            byte[] buffer = new Byte[10000];
+
+            // Length of the file:
+            int length;
+
+            // Total bytes to read:
+            long dataToRead;
+
+            // Identify the file to download including its path.
             string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
-            if (System.IO.File.Exists(downloadPath))
+            
+            try
             {
-                FileInfo info = new FileInfo(downloadPath);
+                // Open the file.
+                iStream = new System.IO.FileStream(downloadPath, System.IO.FileMode.Open,
+                            System.IO.FileAccess.Read, System.IO.FileShare.Read);
+
+
+                // Total bytes to read:
+                dataToRead = iStream.Length;
 
                 Response.Clear();
+                Response.ContentType = "application/octet-stream";
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.AddHeader("Content-Length", iStream.Length.ToString());
 
-                Response.ContentType = "application/zip";
-                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName + ";");
-                Response.AddHeader("Content-Length", info.Length.ToString());
-                
-                Response.TransmitFile(downloadPath);
-             //   Response.Flush();
+                // Read the bytes.
+                while (dataToRead > 0)
+                {
+                    // Verify that the client is connected.
+                    if (Response.IsClientConnected)
+                    {
+                        // Read the data in buffer.
+                        length = iStream.Read(buffer, 0, 10000);
+
+                        // Write the data to the current output stream.
+                        Response.OutputStream.Write(buffer, 0, length);
+
+                        // Flush the data to the output.
+                        Response.Flush();
+
+                        buffer = new Byte[10000];
+                        dataToRead = dataToRead - length;
+                    }
+                    else
+                    {
+                        //prevent infinite loop if user disconnects
+                        dataToRead = -1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+            finally
+            {
+                if (iStream != null)
+                {
+                    //Close the file.
+                    iStream.Close();
+                }
+                Response.Close();
             }
         }
 
