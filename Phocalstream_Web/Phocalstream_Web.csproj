@@ -83,6 +83,9 @@
     <Reference Include="Gif.Components">
       <HintPath>.\Gif.Components.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\DotNetZip.1.9.2\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
@@ -207,6 +210,7 @@
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\SearchModels.cs" />
     <Compile Include="Models\ViewModels\CollectionViewModel.cs" />
+    <Compile Include="Models\ViewModels\DownloadViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
     <Compile Include="Models\ViewModels\SettingsViewModel.cs" />
@@ -291,6 +295,8 @@
     <Content Include="Views\Photo\_WaterChartPartial.cshtml" />
     <Content Include="Views\Home\SiteList.cshtml" />
     <Content Include="Views\Photo\CameraCollection.cshtml" />
+    <Content Include="Views\Photo\FullResolutionDownload.cshtml" />
+    <Content Include="Views\Home\Downloads.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

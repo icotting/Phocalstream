@@ -41,6 +41,10 @@
                 <ul class="nav navbar-nav">
                     <li><a href="/Home/SiteList">Sites</a></li>
                     <li><a href="#about">About</a></li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li><a href="/Home/Downloads">Downloads</a></li>
+                    }
                     @RenderSection("MenuItems", required: false)
                     @if (Request.IsAuthenticated)
                     {

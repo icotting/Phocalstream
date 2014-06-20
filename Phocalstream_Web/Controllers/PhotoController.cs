@@ -1,4 +1,6 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Ionic.Zip;
+using Microsoft.Practices.Unity;
+using Phocalstream_Service.Service;
 using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
@@ -14,6 +16,8 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml.Serialization;
@@ -37,6 +41,9 @@ namespace Phocalstream_Web.Controllers
 
         [Dependency]
         public IPhotoRepository DZPhotoRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<User> UserRepository { get; set; }
 
         public ActionResult Index(long photoID)
         {
@@ -80,6 +87,7 @@ namespace Phocalstream_Web.Controllers
         public ActionResult CameraCollection(long siteID)
         {
             CollectionViewModel model = new CollectionViewModel();
+
             model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
@@ -224,6 +232,177 @@ namespace Phocalstream_Web.Controllers
             model.EncodedFrames = Convert.ToBase64String(stream.ToArray());
 
             return View(model);
+        }
+
+        [HttpPost]
+        public void FullResolutionDownload(string photoIds)
+        {
+            //need to access photos and names on main thread
+            List<string> fileNames = new List<string>();
+
+            string[] ids = photoIds.Split(',');
+            foreach (var id in ids)
+            {
+                long photoID = Convert.ToInt32(id);
+                Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
+
+                if (photo != null)
+                {
+                    fileNames.Add(photo.FileName);
+                }
+            }
+
+            string email = UserRepository.First(u => u.GoogleID == this.User.Identity.Name).EmailAddress;
+
+            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
+                
+            string downloadURL = string.Format("{0}://{1}{2}",
+                                                Request.Url.Scheme,
+                                                Request.Url.Authority,
+                                                Url.Action("Download", "Photo", new { fileName = FileName }));
+
+            try 
+            {
+                DownloadImages(fileNames, FileName, email, downloadURL);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(e.ToString());
+                Console.WriteLine(e.InnerException.ToString());
+            }
+
+        }
+
+        private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
+        {
+            string path = ConfigurationManager.AppSettings["rawPath"];
+
+            string save_path = ConfigurationManager.AppSettings["downloadPath"];
+            if (!Directory.Exists(save_path))
+            {
+                Directory.CreateDirectory(save_path);
+            }
+
+            //closer for save process
+            var closer = new Ionic.Zip.CloseDelegate((name, stream) =>
+            {
+                stream.Dispose();
+            });
+
+            using (ZipFile zf = new ZipFile())
+            {
+                foreach (var file in fileNames)
+                {
+                    var getOpener = new Ionic.Zip.OpenDelegate(name =>
+                    {
+                        WebClient c = new WebClient();
+                        return c.OpenRead(Path.Combine(path, file));
+                    });
+
+                    zf.AddEntry(file, getOpener, closer);
+                }
+
+                zf.Save(Path.Combine(save_path, FileName));
+            }
+
+            //after save, send email
+            EmailService.SendMail(email, "Phocalstream Download", "Please visit " + downloadURL + " to download the images.");
+        }
+
+        public void Download(string fileName)
+        {
+            System.IO.Stream iStream = null;
+
+            // Buffer to read 10K bytes in chunk:
+            byte[] buffer = new Byte[10000];
+
+            // Length of the file:
+            int length;
+
+            // Total bytes to read:
+            long dataToRead;
+
+            // Identify the file to download including its path.
+            string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+            
+            try
+            {
+                // Open the file.
+                iStream = new System.IO.FileStream(downloadPath, System.IO.FileMode.Open,
+                            System.IO.FileAccess.Read, System.IO.FileShare.Read);
+
+
+                // Total bytes to read:
+                dataToRead = iStream.Length;
+
+                Response.Clear();
+                Response.ContentType = "application/octet-stream";
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                Response.AddHeader("Content-Length", iStream.Length.ToString());
+
+                // Read the bytes.
+                while (dataToRead > 0)
+                {
+                    // Verify that the client is connected.
+                    if (Response.IsClientConnected)
+                    {
+                        // Read the data in buffer.
+                        length = iStream.Read(buffer, 0, 10000);
+
+                        // Write the data to the current output stream.
+                        Response.OutputStream.Write(buffer, 0, length);
+
+                        // Flush the data to the output.
+                        Response.Flush();
+
+                        buffer = new Byte[10000];
+                        dataToRead = dataToRead - length;
+                    }
+                    else
+                    {
+                        //prevent infinite loop if user disconnects
+                        dataToRead = -1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+            finally
+            {
+                if (iStream != null)
+                {
+                    //Close the file.
+                    iStream.Close();
+                }
+                Response.Close();
+            }
+        }
+
+        public ActionResult DeleteDownload(string fileName)
+        {
+            if (fileName.Equals("ALL"))
+            {
+                FileInfo[] files = new DirectoryInfo(ConfigurationManager.AppSettings["downloadPath"]).GetFiles();
+                foreach(var file in files)
+                {
+                    file.Delete();
+                }
+            }
+            
+            else
+            {
+                string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return RedirectToAction("Downloads", "Home");
         }
     }
 }

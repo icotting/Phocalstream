@@ -76,6 +76,10 @@
                         <ul class="nav navbar-nav">
                             <li><a href="/Home/SiteList">Sites</a></li>
                             <li><a href="#about">About</a></li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li><a href="/Home/Downloads">Downloads</a></li>
+                            }
                             @if (Request.IsAuthenticated)
                             {
                                 <li class="dropdown">
