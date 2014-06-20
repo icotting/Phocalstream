@@ -5,31 +5,56 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div style="padding-top: 50px;">
-<h2>Current Zip Files On Server</h2>
+<div class="row" style="padding-top: 50px;">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="row">
+            <h2 class="col-md-8">Current  Files On Server</h2>
+            <div class="col-md-4" style="padding-top: 15px;">
+                @Html.ActionLink("Delete All", "DeleteDownload", "Photo", new { fileName = "ALL" }, new { @class = "btn btn-danger col-md-12" })
+            </div>
+        </div>
 
-
-<table class="table table-bordered table-condensed">
-    <thead>
-        <tr>
-            <th>
-                Filename
-            </th>
-            <th>
-                Delete?
-            </th>
-        </tr>
-    </thead>
-    @foreach(var file in Model.Files)
-    {   
-        <tr>
-            <td>
-                @Html.ActionLink(file, "Download", "Photo", new { fileName = file }, null)
-            </td>
-            <td>
-                <a class="icon-delete no-underline" href="@Url.Action("DeleteDownload", "Photo", new { fileName = file })">Delete</a>
-            </td>
-        </tr>
-    }
-</table>
+        @if(Model.Files.Length == 0)
+        {
+            <div class="col-md-12 well text-center">
+                No image files found.
+            </div> 
+        }
+        else
+        { 
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-bordered table-condensed">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    Filename
+                                </th>
+                                <th class="text-center">
+                                    Size
+                                </th>
+                                <th class="text-center">
+                                    Delete?
+                                </th>
+                            </tr>
+                        </thead>
+                        @foreach (var file in Model.Files)
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    @Html.ActionLink(file.Item1, "Download", "Photo", new { fileName = file.Item1 }, null)
+                                </td>
+                                <td class="text-right">
+                                    @file.Item2
+                                </td>
+                                <td class="text-center">
+                                    <a class="icon-delete no-underline" href="@Url.Action("DeleteDownload", "Photo", new { fileName = file.Item1 })">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
 </div>

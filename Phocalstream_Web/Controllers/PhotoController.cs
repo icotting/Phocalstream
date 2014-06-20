@@ -260,8 +260,18 @@ namespace Phocalstream_Web.Controllers
                                                 Request.Url.Scheme,
                                                 Request.Url.Authority,
                                                 Url.Action("Download", "Photo", new { fileName = FileName }));
-            
-            DownloadImages(fileNames, FileName, email, downloadURL);
+
+            try 
+            {
+                DownloadImages(fileNames, FileName, email, downloadURL);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(e.ToString());
+                Console.WriteLine(e.InnerException.ToString());
+            }
+
         }
 
         private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
@@ -305,18 +315,38 @@ namespace Phocalstream_Web.Controllers
             string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
             if (System.IO.File.Exists(downloadPath))
             {
+                FileInfo info = new FileInfo(downloadPath);
+
+                Response.Clear();
+
+                Response.ContentType = "application/zip";
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName + ";");
+                Response.AddHeader("Content-Length", info.Length.ToString());
+                
                 Response.TransmitFile(downloadPath);
-                Response.Flush();
+             //   Response.Flush();
             }
         }
 
         public ActionResult DeleteDownload(string fileName)
         {
-            string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
-
-            if (System.IO.File.Exists(filePath))
+            if (fileName.Equals("ALL"))
             {
-                System.IO.File.Delete(filePath);
+                FileInfo[] files = new DirectoryInfo(ConfigurationManager.AppSettings["downloadPath"]).GetFiles();
+                foreach(var file in files)
+                {
+                    file.Delete();
+                }
+            }
+            
+            else
+            {
+                string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
             }
 
             return RedirectToAction("Downloads", "Home");
