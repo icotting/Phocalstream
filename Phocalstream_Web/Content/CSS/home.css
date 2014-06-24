@@ -1,0 +1,32 @@
+﻿body {
+}
+
+
+#mapcontainer {
+    width: 100%;
+    min-width: 300px;
+    height: 400px;
+    position: relative;
+    margin-right: 300px;
+}
+
+.detailsSub {
+    font-size: 14pt;
+    font-weight: 200;
+    margin-top: 15px;
+}
+
+
+#sitesContainer {
+    padding-right: 330px;
+    left: 0px;
+    right: 0px;
+    position: relative;
+}
+
+.imghead {
+    display: block; 
+    margin-left: auto; 
+    margin-right: auto; 
+    width: 140px;
+}
