@@ -38,10 +38,6 @@
     top: -10px;
 }
 
-a {
-    color: white;
-}
-
 #map {
     z-index: 10; 
     position: relative;
@@ -140,3 +136,27 @@ ul {
     margin-bottom: 20px; 
     margin-top: 20px;
 }
+
+/* DmMapData Partial */
+#droughtMap {
+    top: 0px; 
+    left: 0px; 
+    height:500px; 
+    margin-bottom: 20px;
+}
+
+/* WaterChart Partial */
+#waterContainer {
+    min-width: 310px; 
+    height: 400px; 
+    margin: 0 auto;
+}
+
+/* Dm Partial */
+.dm_container {
+    min-width: 320px; 
+    height: 300px;
+    margin: 0 auto;
+}
+
+

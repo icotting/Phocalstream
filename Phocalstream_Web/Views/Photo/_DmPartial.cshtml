@@ -14,8 +14,6 @@
     </ul>
 </div>
     -->
-<div style="clear: both;"></div>
-
 @if (Model.DMValues.NonDrought != 100)
 {
 	<script type="text/javascript">
@@ -94,8 +92,8 @@
 	    });
     </script>
 
-    <div id="open_container" style="min-width: 320px; height: 300px; margin: 0 auto"></div>
-    
+    <div id="open_container" class="dm_container"></div>
+
    	<script type="text/javascript">
 	    $(function ShowPie() {
 	        var chart;
@@ -144,7 +142,7 @@
 
 	</script>
 
-    <div id="pie_container" style="min-width: 320px; height: 300px; margin: 0 auto"></div>
+    <div id="pie_container" class="dm_container"></div>
 }
 else
 {

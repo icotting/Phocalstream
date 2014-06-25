@@ -1,14 +1,14 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.DmMapData
 
-<div id="map" style="top: 0px; left: 0px; height:500px; margin-bottom: 20px;"></div>
+<div id="droughtMap"></div>
 <script type="text/javascript">
     var mapOptions = {
         zoom: 4,
         center: new google.maps.LatLng(38, -95),
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    map = new google.maps.Map(document.getElementById('droughtMap'), mapOptions);
     var kmzAddress = 'http://torka.unl.edu:8080/dm/data/kml/usdm' + '@Html.DisplayFor(model => model.DataWeek)' + '.kmz';
 	var dmLayer = new google.maps.KmlLayer(kmzAddress, { preserveViewport: true });
-    dmLayer.setMap(map);
+	dmLayer.setMap(map);
 </script>
