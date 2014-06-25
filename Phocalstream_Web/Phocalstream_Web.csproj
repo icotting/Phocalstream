@@ -256,7 +256,8 @@
     <Content Include="Content\bootstrap\js\bootstrap.js" />
     <Content Include="Content\bootstrap\js\bootstrap.min.js" />
     <Content Include="Content\carousel.css" />
-    <Content Include="Content\CSS\home.css" />
+    <Content Include="Content\CSS\Home.css" />
+    <Content Include="Content\CSS\Photo.css" />
     <Content Include="Content\Images\About.png" />
     <Content Include="Content\Images\Collections.png" />
     <Content Include="Content\Images\ds.jpg" />
@@ -327,7 +328,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\CSS\Home\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
