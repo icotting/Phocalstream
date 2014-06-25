@@ -92,3 +92,11 @@ h2 {
     background-color: #f6f6f6;
     border: 1px solid #a7a7a7;
 }
+
+.button-override {
+    color: white !important;
+}
+
+.content {
+    margin-top: 100px;
+}
