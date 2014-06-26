@@ -1,11 +1,11 @@
 ﻿@model Phocalstream_Shared.Data.Model.View.SiteDetails
 
-<h1 style="line-height: 25pt;">@Html.DisplayFor(model => model.SiteName)</h1>
+<h1>@Html.DisplayFor(model => model.SiteName)</h1>
 
 <div class="detailsSub">
     @Html.DisplayFor(model => model.PhotoCount) photos from @Html.DisplayFor(model => model.First) to @Html.DisplayFor(model => model.Last)
 </div>
-<div id="imageContainer" style="margin-top: 10px; margin-bottom: 10px; width: 300px; height: 225px;">
+<div id="imageContainer">
 
 </div>
 <script type="text/javascript">

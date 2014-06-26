@@ -3,25 +3,19 @@
     ViewBag.Title = "Register with Phocalstream";
 }
 
-@section Styles
-{
-    <style>
-        .profile {
-            width: 40%;
-            margin-bottom: 20px;
-            margin-left: 15px;
-        }
-    </style>
-}
+@Styles.Render(
+        "~/Content/CSS/Account.css"
+    );
 
-<h1>User Registration</h1>
+<div class="container content">
+    <h1>User Registration</h1>
 
-@using (@Html.BeginForm("RegisterAccount", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
-{
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true)
+    @using (@Html.BeginForm("RegisterAccount", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
         <p>
-            You've successfully authenticated with your Google ID.  You will need to complete 
+            You've successfully authenticated with your Google ID.  You will need to complete
             form below to create a new Phocalstream profile and click the Register button to finish
             logging in.
         </p>
@@ -74,4 +68,5 @@
         @Html.HiddenFor(m => m.ProviderUserName)
         @Html.HiddenFor(m => m.ProviderData)
         <input type="submit" value="Register" />
-}
+    }
+</div>
