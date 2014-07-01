@@ -4,74 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-    @section Styles
-    {
-        <style type="text/css">
-            #siteInfo h1 {
-                font-weight: 100;            
-                font-size: 30pt;
-                margin-bottom: 0px;
-                padding-bottom: 0px;
-                line-height: 0px;
-            }
-
-            #siteInfo h3 {
-                font-weight: 300;
-                font-size: 16pt;
-                margin-bottom: 0px;
-                padding-bottom: 0px;
-            }
-
-            .value {
-                font-size: 10pt;
-                padding-left: 5px;
-            }
-
-            li {
-                font-size: 12pt;
-            }
-
-            ul {
-                margin-top: 20pt;
-                list-style: none;
-                margin-left: 0px;
-                padding-left: 30px;
-            }
-
-            #imageCell {
-                width: 100%;
-                min-width: 300px;
-                height: 400px;
-                position: relative;
-                margin-right: 300px;
-            }
-
-            #siteInfo {
-                width: 300px;
-                position: absolute;
-                top: 0px;
-                right: 0px;
-            }
-
-            #imageContainer {
-                width: 100%;
-                height: 600px;
-                background-color: #f6f6f6;
-                border: 1px solid #a7a7a7;
-            }
-
-            #table { padding-right: 330px; left: 0px; right: 0px; top: 80px; position: relative;}
-            
-            #DMInfo {
-                width: 300px;
-                position: absolute;
-                top: 0px;
-                right: 0px;
-            }
-
-    </style>
-    }
-
+@Styles.Render(
+            "~/Content/CSS/Site.css",
+            "~/Content/CSS/Photo.css"
+    )
+   
     @section Scripts 
     {
         <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
@@ -105,7 +42,7 @@
         <div id="imageContainer">
 
         </div>
-        <span style="font-size: 8pt;">You can use your mouse to pan and zoom the image or view in <a href="javascript:fullScreen()">fullscreen</a>.</span>
+        <span ><small>You can use your mouse to pan and zoom the image or view in <a href="javascript:fullScreen()">fullscreen</a>.</small></span>
         <script type="text/javascript">
             viewer = new Seadragon.Viewer("imageContainer");
             viewer.clearControls();
@@ -115,10 +52,10 @@
 
             viewer.openDzi("@Html.DisplayFor(model => model.ImageUrl)");
         </script>
-        <div style="margin-bottom: 20px; margin-top: 20px;">
+        <div class="data-partial">
             @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { DataWeek = Model.DroughtMonitorData.DataWeek }); }
         </div>
-        <div style="margin-bottom: 20px; margin-top: 20px;">
+        <div class="data-partial">
             @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }
         </div>
     </div>
@@ -127,7 +64,7 @@
         <h1>@Html.DisplayFor(model => model.PhotoTime)</h1>
         <h3>@Html.DisplayFor(model => model.PhotoDate)</h3>
         <ul>
-            <li style="padding-bottom: 20px;">Camera Site: <span class="value">@Html.DisplayFor(model => model.Photo.Site.Name)</span></li>
+            <li>Camera Site: <span class="value">@Html.DisplayFor(model => model.Photo.Site.Name)</span></li>
             <li>Exposure Time: <span class="value">@Html.DisplayFor(model => model.Photo.ExposureTime)</span></li>
             <li>
                 @(Model.Photo.Flash ? "Flash" : "No Flash")
@@ -138,10 +75,10 @@
             <li>Max Aperture: <span class="value">@Html.DisplayFor(model => model.Photo.MaxAperture)</span></li>
             <li>Shutter Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ShutterSpeed)</span></li>
         </ul>
-        <div style="margin-top: 20px;" id="dmPartial">
+        <div class="data-partial" id="dmPartial">
             @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
         </div>
-        <div style="margin-top: 20px;" id="wdPartial">
+        <div class="data-partial" id="wdPartial">
             @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
         </div>
         <div style="margin-top: 20px;" id="tagPartial">

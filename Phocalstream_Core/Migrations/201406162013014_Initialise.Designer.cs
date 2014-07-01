@@ -7,13 +7,13 @@ namespace Phocalstream_Service.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.0.1-21010")]
-    public sealed partial class CoverPhoto : IMigrationMetadata
+    public sealed partial class Initialise : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(CoverPhoto));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Initialise));
         
         string IMigrationMetadata.Id
         {
-            get { return "201403160221092_CoverPhoto"; }
+            get { return "201406162013014_Initialise"; }
         }
         
         string IMigrationMetadata.Source

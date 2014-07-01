@@ -1,0 +1,62 @@
+﻿@model Phocalstream_Web.Models.ViewModels.DownloadViewModel
+
+@{
+    ViewBag.Title = "Downloads";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-10 h2 no-margin-bottom">Current Files On Server</div>
+                    <a class="btn btn-danger col-md-2 button-override" href="@Url.Action("DeleteDownload", "Photo")">Delete All</a>
+                </div>
+            </div>
+
+            @if(Model.Files.Length == 0)
+        {
+                <div class="col-md-12 well text-center">
+                    No image files found.
+                </div>
+        }
+        else
+        {
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        Filename
+                                    </th>
+                                    <th class="text-center">
+                                        Size
+                                    </th>
+                                    <th class="text-center">
+                                        Delete?
+                                    </th>
+                                </tr>
+                            </thead>
+                            @foreach (var file in Model.Files)
+                        {
+                                <tr>
+                                    <td class="text-center">
+                                        @Html.ActionLink(file.Item1, "Download", "Photo", new { fileName = file.Item1 }, null)
+                                    </td>
+                                    <td class="text-right">
+                                        @file.Item2
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="icon-delete no-underline" href="@Url.Action("DeleteDownload", "Photo", new { fileName = file.Item1 })">Delete</a>
+                                    </td>
+                                </tr>
+                        }
+                        </table>
+                    </div>
+                </div>
+        }
+        </div>
+    </div>
+</div>

@@ -5,50 +5,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section Styles
-    {
-    <style type="text/css">
-        #silverlightControlHost {
-            height: 100%;
-            text-align: center;
-        }
-
-        #pageHeader {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: rgba(0,0,0,0.5);
-            height: 180px;
-            width: 100%;
-            padding-top: 50px;
-            z-index: 20;
-        }
-
-            #pageHeader h1 {
-                padding-left: 50px;
-                color: white;
-                font-family: Arial;
-                font-size: 28pt;
-            }
-
-            #pageHeader div {
-                position: relative;
-                color: white;
-                padding-left: 50px;
-                font-size: 10pt;
-                font-family: Arial;
-            }
-
-        #subhead {
-            position: relative;
-            top: -10px;
-        }
-
-        a {
-            color: white;
-        }
-    </style>
-}
+@Styles.Render(
+            "~/Content/CSS/Photo.css"
+    )
 
 @section Scripts
     {
@@ -73,29 +32,6 @@
                 name: 'photoIds',
                 value: visibleItems
             }));
-            form.appendTo('body').submit();
-        }
-
-        function setCover() {
-            var form;
-            form = $('<form />', {
-                action: '/api/sitecollection/updatecover',
-                method: 'GET',
-                style: 'display: none;'
-            });
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'photoId',
-                value: visibleItems.split(",")[0]
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'collectionId',
-                value: @Model.Collection.ID
-            }));
-
             form.appendTo('body').submit();
         }
 
@@ -133,7 +69,46 @@
 
             throw new Error(errMsg);
         }
+        
+        function downloadPrompt() {
+            var response = confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.");
+
+            if (response) {
+                downloadImages();
+            } 
+        }
+   
+        function downloadImages() {
+           $.ajax({
+               url : '/api/sitecollection/RawDownload?photoIds='+visibleItems,
+                type: "POST"
+            })
+        }
+    
+        function setCover() {
+            var form;
+            form = $('<form />', {
+                action: '/api/sitecollection/updatecover',
+                method: 'GET',
+                style: 'display: none;'
+            });
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'photoId',
+                value: visibleItems.split(",")[0]
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'collectionId',
+                value: @Model.Collection.ID
+            }));
+
+            form.appendTo('body').submit();
+        }
     </script>
+
     <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
 
     <script type="text/javascript">
@@ -167,6 +142,7 @@
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
         <li><a href="javascript:setCover()">Set Cover</a></li>
+        <li><a href="javascript:downloadPrompt()">Download Images</a></li>
     }
 }
 
@@ -179,9 +155,9 @@
 
 <h2>@Model.CollectionUrl</h2>
 
-<div id="map" style="z-index: 10; position: relative; width: 100%; height: 225px; top: -20px; left: 0px;"></div>
-<form id="form1" runat="server" style="position: absolute; top: 180px; bottom: 5px; width: 100%; min-width: 900px; z-index: 300;">
-    <div style="height: 100%;" id="silverlightControlHost">
+<div id="map"></div>
+<form id="form1" runat="server">
+    <div id="silverlightControlHost">
         <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
             <param name="source" value="/ClientBin/Phocalstream_PivotView.xap" />
             <param name="onError" value="onSilverlightError" />
@@ -189,10 +165,10 @@
             <param name="minRuntimeVersion" value="4.0.60310.0" />
             <param name="autoUpgrade" value="true" />
             <param name="initParams" value="collection=@Html.DisplayFor(model => model.CollectionUrl)" />
-            <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" style="text-decoration:none">
-                <img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" style="border-style:none" />
+            <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" >
+                <img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" />
             </a>
-        </object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe>
+        </object><iframe id="_sl_historyFrame"></iframe>
     </div>
 </form>
 <script type="text/javascript">
