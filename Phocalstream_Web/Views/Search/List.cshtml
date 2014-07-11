@@ -1,0 +1,13 @@
+﻿@model Phocalstream_Web.Models.SearchList
+@{
+    ViewBag.Title = "List";
+}
+
+<h2>Search List</h2>
+
+<div class="row">
+    @foreach (var c in Model.Collections)
+    {
+        <div class="col-md-12">@c.Name</div>
+    }
+</div>
