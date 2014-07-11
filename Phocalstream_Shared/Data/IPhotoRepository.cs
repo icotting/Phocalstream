@@ -17,7 +17,7 @@ namespace Phocalstream_Shared.Data
         XmlDocument CreateDeepZoomForSite(long siteID);
         XmlDocument CreateDeepZomForList(string photoList);
         XmlDocument CreatePivotCollectionForSite(long siteID);
-        XmlDocument CreatePivotCollectionForList(string photoList);
+        XmlDocument CreatePivotCollectionForList(string collectionName, string photoList);
 
         ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort);
     }

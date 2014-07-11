@@ -300,5 +300,14 @@ namespace Phocalstream_Service.Service
 
             doc.Save(Path.Combine(rootDeepZoomPath, "site.cxml"));
         }
+
+        public void GeneratePivotManifest(string collectionName, string photoList)
+        {
+            string rootPath = Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], collectionName);
+            XmlDocument doc = PhotoRepo.CreatePivotCollectionForList(collectionName, photoList);
+
+            doc.Save(Path.Combine(rootPath, "site.cxml"));
+
+        }
     }
 }

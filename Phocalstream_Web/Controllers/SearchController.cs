@@ -1,8 +1,10 @@
 ﻿using Microsoft.DeepZoomTools;
 using Microsoft.Practices.Unity;
+using Phocalstream_Service.Service;
 using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Shared.Service;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
 using System;
@@ -27,10 +29,11 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IUnitOfWork Unit { get; set; }
 
+        [Dependency]
+        public IPhotoService PhotoService { get; set; }
+
         public ActionResult Index(string query)
         {
-            return RedirectToAction("Index", "Home");
-
             SearchResults results = new SearchResults();
             results.Results = new List<SearchResult>();
             results.Query = query;
@@ -64,7 +67,7 @@ namespace Phocalstream_Web.Controllers
                     matches = new List<Photo>();
                 }
 
-                string collectionPath = Path.Combine(Path.Combine(Path.Combine(basePath, containerID, "DZ"), "collection.dzc"));
+                string collectionPath = Path.Combine(basePath, containerID, "collection.dzc");
 
                 CollectionCreator creator = new CollectionCreator();
                 creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
@@ -89,10 +92,10 @@ namespace Phocalstream_Web.Controllers
 
                 foreach (Photo photo in matches)
                 {
-                    fileNames.Add(Path.Combine(Path.Combine(Path.Combine(ConfigurationManager.AppSettings["photoPath"], photo.Site.ContainerID),
-                        "DZ"), string.Format("{0}.dzi", photo.BlobID)));
+                    fileNames.Add(Path.Combine(ConfigurationManager.AppSettings["photoPath"], photo.Site.DirectoryName,
+                        string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
 
-                    string photoRelativePath = string.Format(@"../../{0}/DZ/{1}.dzi", photo.Site.ContainerID, photo.BlobID);
+                    string photoRelativePath = string.Format(@"../../{0}/{1}.phocalstream/Tiles.dzi", photo.Site.DirectoryName, photo.BlobID);
 
                     XmlElement item = doc.CreateElement("I");
                     item.SetAttribute("Source", photoRelativePath);
@@ -125,6 +128,8 @@ namespace Phocalstream_Web.Controllers
                 root.SetAttribute("NextItemId", Convert.ToString(count));
                 root.AppendChild(items);
                 doc.Save(collectionPath);
+
+                PhotoService.GeneratePivotManifest(containerID, "1,2,3");
             }
 
             results.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
@@ -135,5 +140,13 @@ namespace Phocalstream_Web.Controllers
             return View(results);
         }
 
+        public ActionResult List()
+        {
+            List<Collection> SearchCollections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH).ToList();
+
+
+
+            return View();
+        }
     }
 }

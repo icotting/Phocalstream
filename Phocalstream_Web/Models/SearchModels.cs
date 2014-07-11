@@ -25,4 +25,9 @@ namespace Phocalstream_Web.Models
     {
 
     }
+
+    public class SearchList
+    {
+        public List<Collection> Collections { get; set; }
+    }
 }

@@ -103,9 +103,17 @@ namespace Phocalstream_Web.Application.Data
             }
         }
 
-        public XmlDocument CreatePivotCollectionForList(string photoList)
+        public XmlDocument CreatePivotCollectionForList(string collectionName, string photoList)
         {
-            throw new NotImplementedException();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured from Photos where Photos.ID IN ({0})", photoList), conn))
+                {
+                    return CreatePivotDocument(collectionName, command, null, CollectionType.SEARCH);
+                }
+            }
         }
 
         public ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort)

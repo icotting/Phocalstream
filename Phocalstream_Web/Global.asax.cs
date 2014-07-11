@@ -23,15 +23,16 @@ namespace Phocalstream_Web
 
             GlobalConfiguration.Configuration.Filters.Add(new ExceptionFilter());
 
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+
+            UnityConfig.RegisterComponents();
 
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             AuthConfig.RegisterAuth();
             WebSecurity.InitializeDatabaseConnection("DbConnection", "Users", "ID", "GoogleID", true);
-
-            Bootstrapper.Initialise();
 
             Scheduler.getInstance().AddJobToSchedule(new DmImporterJob());
             Scheduler.getInstance().AddJobToSchedule(new WaterImporterJob());
