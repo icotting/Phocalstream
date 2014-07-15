@@ -226,6 +226,15 @@ namespace Phocalstream_Web.Application.Data
             facet.SetAttribute("Name", "Time of Year");
             facet.SetAttribute("Type", "String");
             facets.AppendChild(facet);
+
+            if (type == CollectionType.SEARCH)
+            {
+                facet = doc.CreateElement("FacetCategory");
+                facet.SetAttribute("Name", "Site");
+                facet.SetAttribute("Type", "String");
+                facets.AppendChild(facet);
+            }
+
             root.AppendChild(facets);
 
             string dzCollection = (uri == null) ? string.Format("/dzc/{0}/collection.dzc", collectionName) 

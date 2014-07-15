@@ -94,6 +94,12 @@ namespace Phocalstream_Web.Controllers.Api
                 doc = new XmlDocument();
                 doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
             }
+            else if (col.Type == CollectionType.SEARCH)
+            {
+                string rootDeepZoomPath = Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], col.ContainerID);
+                doc = new XmlDocument();
+                doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
+            }
             else
             {
                 doc = PhotoRepository.CreatePivotCollectionForSite(id);

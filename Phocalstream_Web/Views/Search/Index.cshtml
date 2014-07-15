@@ -3,32 +3,21 @@
     ViewBag.Title = "Search";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-@section Styles
-{
-        <style type="text/css">
-        #silverlightControlHost {
-	        height: 100%;
-            width: 100%;
-	        text-align:center;
-        }
-
-            #pivot {
-                position: absolute; 
-                top: 220px; 
-                bottom: 5px; 
-                width: 80%; 
-                min-width: 900px; 
-                z-index: 300;
-            }
-        </style>
-}
-
+@Styles.Render(
+            "~/Content/CSS/Photo.css"
+    )
 
 @section Scripts 
 {
         <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
         <script type="text/javascript">
+
+            var visibleItems;
+            function registerNewSelection(items) {
+                visibleItems = items;
+            }
+
+
             function onSilverlightError(sender, args) {
                 var appSource = "";
                 if (sender != null && sender != 0) {
@@ -68,8 +57,9 @@
 
 <h2>Search</h2>
 Results for query: '@Html.DisplayTextFor(m => m.Query)'
+Model URL: '@Model.CollectionUrl
 
-<form id="pivot" runat="server">
+<form id="form1" runat="server">
     <div id="silverlightControlHost">
     <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
 		<param name="source" value="/ClientBin/Phocalstream_PivotView.xap"/>
@@ -83,3 +73,4 @@ Results for query: '@Html.DisplayTextFor(m => m.Query)'
 		</a>
 	</object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe></div>
 </form>
+       

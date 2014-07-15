@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
@@ -41,7 +42,7 @@ namespace Phocalstream_Web.Controllers
             List<Photo> matches = null;
             int qid = query.GetHashCode();
             string basePath = ConfigurationManager.AppSettings["photoPath"];
-            string containerID = string.Format("search-{0}", qid);
+            string containerID = string.Format("search{0}", qid);
 
             Collection c = CollectionRepository.First(col => col.ContainerID == containerID);
             if (c == null)
@@ -89,18 +90,21 @@ namespace Phocalstream_Web.Controllers
                 XmlElement items = doc.CreateElement("Items");
                 int count = 0;
                 List<string> fileNames = new List<string>();
+                StringBuilder photoIds = new StringBuilder();
 
                 foreach (Photo photo in matches)
                 {
                     fileNames.Add(Path.Combine(ConfigurationManager.AppSettings["photoPath"], photo.Site.DirectoryName,
                         string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
 
-                    string photoRelativePath = string.Format(@"../../{0}/{1}.phocalstream/Tiles.dzi", photo.Site.DirectoryName, photo.BlobID);
+                    photoIds.Append(photo.ID.ToString() + ",");
+
+                    string photoRelativePath = string.Format(@"../{0}/{1}.phocalstream/Tiles.dzi", photo.Site.DirectoryName, photo.BlobID);
 
                     XmlElement item = doc.CreateElement("I");
                     item.SetAttribute("Source", photoRelativePath);
-                    item.SetAttribute("N", Convert.ToString(count++));
-                    item.SetAttribute("Id", Convert.ToString(photo.ID));
+                    item.SetAttribute("N", Convert.ToString(count));
+                    item.SetAttribute("Id", Convert.ToString(count++));
 
                     XmlElement size = doc.CreateElement("Size");
                     size.SetAttribute("Width", Convert.ToString(photo.Width));
@@ -120,6 +124,8 @@ namespace Phocalstream_Web.Controllers
                     results.Results.Add(result);
                 }
 
+                photoIds.Remove(photoIds.Length - 1, 1);
+
                 c.Photos = matches;
                 Unit.Commit();
 
@@ -129,7 +135,7 @@ namespace Phocalstream_Web.Controllers
                 root.AppendChild(items);
                 doc.Save(collectionPath);
 
-                PhotoService.GeneratePivotManifest(containerID, "1,2,3");
+                PhotoService.GeneratePivotManifest(containerID, photoIds.ToString());
             }
 
             results.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
