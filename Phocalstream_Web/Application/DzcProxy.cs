@@ -19,15 +19,29 @@ namespace Phocalstream_Web.Application
         private void Application_BeginRequest(Object source, EventArgs e)
         {
             string basePath = ConfigurationManager.AppSettings["photoPath"];
+            string searchPath = ConfigurationManager.AppSettings["searchPath"];
 
             HttpApplication application = (HttpApplication)source;
             HttpContext context = application.Context;
             string resource = application.Request.RawUrl;
             if (resource.Contains("/dzc/"))
             {
-                string blobRequest = string.Format(@"{0}/{1}", basePath,
-                        resource.Substring(resource.IndexOf("/dzc/") + 5));
-
+                string blobRequest;
+                if (resource.Contains("Search"))
+                {
+                    blobRequest = string.Format(@"{0}/{1}", searchPath, 
+                            resource.Substring(resource.IndexOf("/dzc/Search/") + 12));
+                }
+                else if (resource.Contains("Phocalstream"))
+                {
+                    blobRequest = string.Format(@"{0}/{1}", basePath,
+                            resource.Substring(resource.IndexOf("/dzc/Phocalstream/") + 18));
+                }
+                else
+                {
+                   blobRequest = string.Format(@"{0}/{1}", basePath,
+                            resource.Substring(resource.IndexOf("/dzc/") + 5));
+                }
                 string extension = (resource.IndexOf(".") > -1) ? resource.Substring(resource.LastIndexOf(".")) : "";
                 switch (extension)
                 {

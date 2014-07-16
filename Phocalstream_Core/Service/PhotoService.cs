@@ -303,8 +303,8 @@ namespace Phocalstream_Service.Service
 
         public void GeneratePivotManifest(string collectionID, string photoList)
         {
-            string rootPath = Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], collectionID);
-            XmlDocument doc = PhotoRepo.CreatePivotCollectionForList(collectionID, photoList);
+            string rootPath = Path.Combine(ConfigurationManager.AppSettings["searchPath"], collectionID);
+            XmlDocument doc = PhotoRepo.CreatePivotCollectionForList("Search/" + collectionID, photoList);
 
             doc.Save(Path.Combine(rootPath, "site.cxml"));
         }

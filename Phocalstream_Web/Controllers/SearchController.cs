@@ -39,10 +39,20 @@ namespace Phocalstream_Web.Controllers
             results.Results = new List<SearchResult>();
             results.Query = query;
 
-            List<Photo> matches = null;
+            //get query hash and name the container (becomes the file name)
             int qid = query.GetHashCode();
-            string basePath = ConfigurationManager.AppSettings["photoPath"];
             string containerID = string.Format("search{0}", qid);
+
+            //the root path where searchs are stored
+            string search_path = ConfigurationManager.AppSettings["searchPath"];
+            if (!Directory.Exists(search_path))
+            {
+                Directory.CreateDirectory(search_path);
+            }
+            //replace this
+            //string basePath = ConfigurationManager.AppSettings["photoPath"];
+            
+            List<Photo> matches = null;
 
             Collection c = CollectionRepository.First(col => col.ContainerID == containerID);
             if (c == null)
@@ -67,8 +77,6 @@ namespace Phocalstream_Web.Controllers
                 {
                     matches = new List<Photo>();
                 }
-
-                string collectionPath = Path.Combine(basePath, containerID, "collection.dzc");
 
                 CollectionCreator creator = new CollectionCreator();
                 creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
@@ -99,6 +107,7 @@ namespace Phocalstream_Web.Controllers
 
                     photoIds.Append(photo.ID.ToString() + ",");
 
+                    //navigate up two directores, then come into the photo directory
                     string photoRelativePath = string.Format(@"../{0}/{1}.phocalstream/Tiles.dzi", photo.Site.DirectoryName, photo.BlobID);
 
                     XmlElement item = doc.CreateElement("I");
@@ -129,11 +138,11 @@ namespace Phocalstream_Web.Controllers
                 c.Photos = matches;
                 Unit.Commit();
 
-                creator.Create(new List<string>(fileNames), collectionPath);
+                creator.Create(new List<string>(fileNames), Path.Combine(search_path, containerID, "collection.dzc"));
 
                 root.SetAttribute("NextItemId", Convert.ToString(count));
                 root.AppendChild(items);
-                doc.Save(collectionPath);
+                doc.Save(Path.Combine(search_path, containerID, "collection1.dzc"));
 
                 PhotoService.GeneratePivotManifest(containerID, photoIds.ToString());
             }
