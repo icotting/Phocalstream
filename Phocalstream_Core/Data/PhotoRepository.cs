@@ -1,10 +1,12 @@
-﻿using Phocalstream_Shared.Data;
+﻿using Phocalstream_Service.Service;
+using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml;
@@ -237,11 +239,24 @@ namespace Phocalstream_Web.Application.Data
 
             root.AppendChild(facets);
 
-            string dzCollection = (uri == null) ? string.Format("/dzc/{0}/collection.dzc", collectionName) 
-                : string.Format("{0}://{1}:{2}/dzc/{3}/collection.dzc", uri.Scheme,
-                uri.Host,
-                uri.Port,
-                collectionName);
+            string dzCollection;
+            if (type == CollectionType.SEARCH)
+            {
+                dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.SearchPath, collectionName)
+                    : string.Format("{0}://{1}:{2}/dzc/{3}{4}/collection.dzc", uri.Scheme,
+                    uri.Host,
+                    uri.Port,
+                    PathManager.SearchPath,
+                    collectionName);
+            }
+            else
+            {
+                dzCollection = (uri == null) ? string.Format("/dzc/{0}/collection.dzc", collectionName)
+                    : string.Format("{0}://{1}:{2}/dzc/{3}/collection.dzc", uri.Scheme,
+                    uri.Host,
+                    uri.Port,
+                    collectionName);
+            }
 
             XmlElement items = doc.CreateElement("Items");
             items.SetAttribute("ImgBase", dzCollection);

@@ -8,32 +8,45 @@ namespace Phocalstream_Service.Service
 {
     public static class PathManager
     {
+        //Raw photo path
+        public static string RawPath = ConfigurationManager.AppSettings["rawPath"];
 
-        public static String GetBasePath()
+        //Base path of Phocalstream directory
+        public static string BasePath = ConfigurationManager.AppSettings["basePath"];
+        
+        //BasePath/Photo, BasePath/Search, BasePath/Download
+        public static string PhotoPath = ConfigurationManager.AppSettings["photoPath"];
+        public static string SearchPath = ConfigurationManager.AppSettings["searchPath"];
+        public static string DownloadPath = ConfigurationManager.AppSettings["downloadPath"];
+
+
+        public static string GetRawPath()
         {
-            return ConfigurationManager.AppSettings["basePath"];
+            return RawPath;
         }
 
-        public static String GetPhotoPath()
+        
+        public static string GetBasePath()
         {
-            return ConfigurationManager.AppSettings["photoPath"];
+            return BasePath;
+        }
+
+        public static string GetPhotoPath()
+        {
+            return string.Format("{0}{1}", BasePath, PhotoPath);
         }
 
 
-        public static String GetSearchPath()
+        public static string GetSearchPath()
         {
-            return ConfigurationManager.AppSettings["searchPath"];
+            return string.Format("{0}{1}", BasePath, SearchPath);
         }
 
 
-        public static String GetRawPath()
-        {
-            return ConfigurationManager.AppSettings["rawPath"];
-        }
 
-        public static String GetDownloadPath()
+        public static string GetDownloadPath()
         {
-            return ConfigurationManager.AppSettings["downloadPath"];
+            return string.Format("{0}{1}", BasePath, DownloadPath);
         }
 
 
