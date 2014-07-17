@@ -294,7 +294,7 @@ namespace Phocalstream_Web.Controllers
         {
             if (fileName.Equals("ALL"))
             {
-                FileInfo[] files = new DirectoryInfo(ConfigurationManager.AppSettings["downloadPath"]).GetFiles();
+                FileInfo[] files = new DirectoryInfo(PathManager.GetDownloadPath()).GetFiles();
                 foreach (var file in files)
                 {
                     file.Delete();
@@ -303,7 +303,7 @@ namespace Phocalstream_Web.Controllers
 
             else
             {
-                string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+                string filePath = PathManager.GetDownloadPath() + fileName;
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -328,7 +328,7 @@ namespace Phocalstream_Web.Controllers
             long dataToRead;
 
             // Identify the file to download including its path.
-            string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+            string downloadPath = PathManager.GetDownloadPath() + fileName;
 
             try
             {

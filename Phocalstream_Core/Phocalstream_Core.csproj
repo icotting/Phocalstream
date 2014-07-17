@@ -79,6 +79,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\EmailService.cs" />
+    <Compile Include="Service\PathManager.cs" />
     <Compile Include="Service\PhotoService.cs" />
   </ItemGroup>
   <ItemGroup>

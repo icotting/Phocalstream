@@ -3,6 +3,7 @@ using Microsoft.Practices.Unity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Service;
+using Phocalstream_Web.Application;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -76,13 +77,13 @@ namespace Phocalstream_Service.Service
         public Phocalstream_Shared.Data.Model.Photo.Photo ProcessPhoto(string fileName, CameraSite site)
         {
             string relativeName = fileName;
-            fileName = Path.Combine(ConfigurationManager.AppSettings["rawPath"], fileName);
+            fileName = Path.Combine(PathManager.GetRawPath(), fileName);
             FileInfo info = new FileInfo(fileName);
-
+            
             try
             {
                 // create the directory for the image and its components
-                string basePath = Path.Combine(Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], site.DirectoryName), string.Format("{0}.phocalstream", info.Name));
+                string basePath = Path.Combine(Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName), string.Format("{0}.phocalstream", info.Name));
                 if (Directory.Exists(basePath) == false)
                 {
                     Directory.CreateDirectory(basePath);
@@ -227,7 +228,7 @@ namespace Phocalstream_Service.Service
             creator.TileOverlap = 1;
             creator.TileSize = 256;
 
-            string rootDeepZoomPath = Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], site.DirectoryName);
+            string rootDeepZoomPath = Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName);
 
             List<string> files = new List<string>();
             using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
@@ -295,7 +296,7 @@ namespace Phocalstream_Service.Service
 
         public void GeneratePivotManifest(CameraSite site)
         {
-            string rootDeepZoomPath = Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], site.DirectoryName);
+            string rootDeepZoomPath = Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName);
             XmlDocument doc = PhotoRepo.CreatePivotCollectionForSite(site.ID);
 
             doc.Save(Path.Combine(rootDeepZoomPath, "site.cxml"));
@@ -303,7 +304,7 @@ namespace Phocalstream_Service.Service
 
         public void GeneratePivotManifest(string collectionID, string photoList)
         {
-            string rootPath = Path.Combine(ConfigurationManager.AppSettings["searchPath"], collectionID);
+            string rootPath = Path.Combine(PathManager.GetSearchPath(), collectionID);
             XmlDocument doc = PhotoRepo.CreatePivotCollectionForList("Search/" + collectionID, photoList);
 
             doc.Save(Path.Combine(rootPath, "site.cxml"));

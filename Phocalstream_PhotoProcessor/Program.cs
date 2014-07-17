@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Threading;
+using Phocalstream_Web.Application;
 
 namespace Phocalstream_PhotoProcessor
 {
@@ -39,7 +40,7 @@ namespace Phocalstream_PhotoProcessor
             _service = container.Resolve<IPhotoService>();
             _unit = container.Resolve<IUnitOfWork>();
 
-            _path = ConfigurationManager.AppSettings["rawPath"];
+            _path = PathManager.GetRawPath();
 
             Thread t = new Thread(new ThreadStart(BeginProcess));
             t.Start();

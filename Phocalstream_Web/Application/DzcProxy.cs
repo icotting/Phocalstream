@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Phocalstream_Service.Service;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -18,8 +19,8 @@ namespace Phocalstream_Web.Application
 
         private void Application_BeginRequest(Object source, EventArgs e)
         {
-            string basePath = ConfigurationManager.AppSettings["photoPath"];
-            string searchPath = ConfigurationManager.AppSettings["searchPath"];
+            string basePath = PathManager.GetPhotoPath();
+            string searchPath = PathManager.GetSearchPath();
 
             HttpApplication application = (HttpApplication)source;
             HttpContext context = application.Context;

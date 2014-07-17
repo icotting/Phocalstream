@@ -15,6 +15,7 @@ using System.Web;
 using System.Web.Mvc;
 using Phocalstream_Shared.Data.Model.View;
 using System.IO;
+using Phocalstream_Service.Service;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -69,8 +70,8 @@ namespace Phocalstream_Web.Controllers
         public ActionResult Downloads()
         {
             DownloadViewModel model = new DownloadViewModel();
-
-            model.DownloadPath = ConfigurationManager.AppSettings["downloadPath"];
+            
+            model.DownloadPath = PathManager.GetDownloadPath();
             FileInfo[] fileInfos = new DirectoryInfo(model.DownloadPath).GetFiles();
 
             Tuple<string, string>[] Files = new Tuple<string, string>[fileInfos.Length];

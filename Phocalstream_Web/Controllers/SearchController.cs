@@ -5,6 +5,7 @@ using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Service;
+using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
 using System;
@@ -44,13 +45,11 @@ namespace Phocalstream_Web.Controllers
             string containerID = string.Format("search{0}", qid);
 
             //the root path where searchs are stored
-            string search_path = ConfigurationManager.AppSettings["searchPath"];
+            string search_path = PathManager.GetSearchPath();
             if (!Directory.Exists(search_path))
             {
                 Directory.CreateDirectory(search_path);
             }
-            //replace this
-            //string basePath = ConfigurationManager.AppSettings["photoPath"];
             
             List<Photo> matches = null;
 
@@ -102,7 +101,7 @@ namespace Phocalstream_Web.Controllers
 
                 foreach (Photo photo in matches)
                 {
-                    fileNames.Add(Path.Combine(ConfigurationManager.AppSettings["photoPath"], photo.Site.DirectoryName,
+                    fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
                         string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
 
                     photoIds.Append(photo.ID.ToString() + ",");
