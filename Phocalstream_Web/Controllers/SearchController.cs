@@ -17,6 +17,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
+using System.Data.Entity;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -34,15 +35,16 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IPhotoService PhotoService { get; set; }
 
-        public ActionResult Index(string query)
+        public ActionResult Index()
         {
-            SearchResults results = new SearchResults();
-            results.Results = new List<SearchResult>();
-            results.Query = query;
+            return View();
+        }
 
+        public ActionResult Search(string query)
+        {
             //get query hash and name the container (becomes the file name)
             int qid = query.GetHashCode();
-            string containerID = string.Format("search{0}", qid);
+            string containerID = string.Format("{0}", qid);
 
             //the root path where searchs are stored
             string search_path = PathManager.GetSearchPath();
@@ -82,20 +84,6 @@ namespace Phocalstream_Web.Controllers
                 creator.TileOverlap = 1;
                 creator.TileSize = 256;
 
-                XmlDocument doc = new XmlDocument();
-                XmlElement root = doc.CreateElement("Collection");
-                root.SetAttribute("MaxLevel", "7");
-                root.SetAttribute("TileSize", "256");
-                root.SetAttribute("Format", "jpg");
-                root.SetAttribute("xmlns", "http://schemas.microsoft.com/deepzoom/2009");
-
-                doc.AppendChild(root);
-
-                XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
-                doc.InsertBefore(xmldecl, root);
-
-                XmlElement items = doc.CreateElement("Items");
-                int count = 0;
                 List<string> fileNames = new List<string>();
                 StringBuilder photoIds = new StringBuilder();
 
@@ -105,31 +93,6 @@ namespace Phocalstream_Web.Controllers
                         string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
 
                     photoIds.Append(photo.ID.ToString() + ",");
-
-                    //navigate up two directores, then come into the photo directory
-                    string photoRelativePath = string.Format(@"../{0}/{1}.phocalstream/Tiles.dzi", photo.Site.DirectoryName, photo.BlobID);
-
-                    XmlElement item = doc.CreateElement("I");
-                    item.SetAttribute("Source", photoRelativePath);
-                    item.SetAttribute("N", Convert.ToString(count));
-                    item.SetAttribute("Id", Convert.ToString(count++));
-
-                    XmlElement size = doc.CreateElement("Size");
-                    size.SetAttribute("Width", Convert.ToString(photo.Width));
-                    size.SetAttribute("Height", Convert.ToString(photo.Height));
-                    item.AppendChild(size);
-
-                    items.AppendChild(item);
-
-                    SearchResult result = new SearchResult();
-                    result.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}-dz/{4}.dzi", Request.Url.Scheme,
-                    Request.Url.Host,
-                    Request.Url.Port,
-                    photo.Site.ContainerID,
-                    photo.BlobID);
-
-                    result.Photo = photo;
-                    results.Results.Add(result);
                 }
 
                 photoIds.Remove(photoIds.Length - 1, 1);
@@ -139,28 +102,67 @@ namespace Phocalstream_Web.Controllers
 
                 creator.Create(new List<string>(fileNames), Path.Combine(search_path, containerID, "collection.dzc"));
 
-                root.SetAttribute("NextItemId", Convert.ToString(count));
-                root.AppendChild(items);
-                doc.Save(Path.Combine(search_path, containerID, "collection1.dzc"));
-
                 PhotoService.GeneratePivotManifest(containerID, photoIds.ToString());
             }
+           
+            return RedirectToAction("SearchResult", new {collectionID = c.ID});
+        }
 
-            results.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
+        public ActionResult SearchResult(int collectionID)
+        {
+            SearchResults model = new SearchResults();
+            
+            Collection c = CollectionRepository.First(col => col.ID == collectionID);
+            model.Query = c.Name.Split()[0];
+
+            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,
                 c.ID);
 
-            return View(results);
+            return View(model);
         }
 
         public ActionResult List()
         {
-            List<Collection> SearchCollections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH).ToList();
+            SearchList model = new SearchList();
 
+            model.SearchPath = PathManager.GetSearchPath();
 
+            List<Collection> collections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH).ToList();
 
-            return View();
+            model.Collections = collections;
+
+            return View(model);
+        }
+
+        public ActionResult DeleteSearch(long collectionID)
+        {
+            List<Collection> collections;
+            if (collectionID == -1)
+            {
+                collections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH).ToList();
+            }
+            else
+            {
+                collections = CollectionRepository.Find(c => c.ID == collectionID && c.Type == CollectionType.SEARCH).ToList();
+
+            }
+
+            foreach(var col in collections)
+            {
+                string filePath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
+
+                if (System.IO.Directory.Exists(filePath))
+                {
+                    System.IO.Directory.Delete(filePath, true);
+                }
+
+                CollectionRepository.Delete(col);
+                Unit.Commit();
+            }
+            
+            return RedirectToAction("List", "Search");
         }
     }
 }

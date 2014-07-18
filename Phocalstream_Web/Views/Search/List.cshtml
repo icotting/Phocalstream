@@ -1,13 +1,55 @@
 ﻿@model Phocalstream_Web.Models.SearchList
 @{
     ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Search List</h2>
+<div class="content">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-10 h2 no-margin-bottom">Current Search Collections</div>
+                    <a class="btn btn-danger col-md-2 button-override" href="@Url.Action("DeleteSearch", "Search", new { collectionID = -1})">Delete All</a>
+                </div>
+            </div>
 
-<div class="row">
-    @foreach (var c in Model.Collections)
-    {
-        <div class="col-md-12">@c.Name</div>
-    }
+            @if (Model.Collections.Count == 0)
+            {
+                <div class="col-md-12 well text-center">
+                    No search collections found.
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        Search Collection Name
+                                    </th>
+                                    <th class="text-center">
+                                        Delete?
+                                    </th>
+                                </tr>
+                            </thead>
+                            @foreach (var c in Model.Collections)
+                            {
+                                <tr>
+                                    <td class="text-center">
+                                        @Html.ActionLink(@c.Name, "SearchResult", "Search", new { collectionID = c.ID }, null)
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="icon-delete no-underline" href="@Url.Action("DeleteSearch", "Search", new { collectionID = c.ID })">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 </div>
