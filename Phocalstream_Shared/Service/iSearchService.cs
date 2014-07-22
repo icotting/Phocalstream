@@ -10,6 +10,8 @@ namespace Phocalstream_Shared.Service
     public interface ISearchService
     {
         string ValidateAndGetSearchPath();
+        void DeleteSearch(long collectionID);
+        void DeleteAllSearches();
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
         List<Photo> GetPhotosByDate(string dateString);
         List<Photo> GetPhotosByTag(string tagString);

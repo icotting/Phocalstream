@@ -111,11 +111,33 @@ namespace Phocalstream_Web.Application.Data
             {
                 conn.Open();
 
-                using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured from Photos where Photos.ID IN ({0})", photoList), conn))
+                using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured, Site_ID from Photos where Photos.ID IN ({0})", photoList), conn))
                 {
                     return CreatePivotDocument(collectionName, command, null, CollectionType.SEARCH);
                 }
             }
+        }
+
+        public string GetCameraSiteName(long siteID)
+        {
+            string siteName = "";
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand command = new SqlCommand(string.Format("select ID, Name, DirectoryName from CameraSites where CameraSites.ID = {0}", siteID), conn))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            siteName = (string)reader["Name"];
+                        }
+                    }
+                }
+            }
+
+            return siteName;
         }
 
         public ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort)
@@ -278,17 +300,20 @@ namespace Phocalstream_Web.Application.Data
         {
             DateTime captured = (DateTime)photo["Captured"];
 
-            XmlElement item = doc.CreateElement("Item");
-            item.SetAttribute("Img", String.Format("#{0}", position));
-            item.SetAttribute("Id", Convert.ToString(photo["ID"]));
-            if (!includeSite)
+            string siteName;
+            if(includeSite)
             {
-                item.SetAttribute("Name", string.Format("{0} {1}", collectionName, captured.ToString("MMM dd, yyyy hh:mm tt")));
+                 siteName = GetCameraSiteName((long)photo["Site_ID"]);
             }
             else
             {
-                item.SetAttribute("Name", string.Format("{0} {1}", "Collection Name", captured.ToString("MMM dd, yyyy hh:mm tt")));
+                siteName = collectionName;
             }
+
+            XmlElement item = doc.CreateElement("Item");
+            item.SetAttribute("Img", String.Format("#{0}", position));
+            item.SetAttribute("Id", Convert.ToString(photo["ID"]));
+            item.SetAttribute("Name", string.Format("{0} {1}", siteName, captured.ToString("MMM dd, yyyy hh:mm tt")));
             item.SetAttribute("Href", "http://www.google.com");
 
             XmlElement facets = doc.CreateElement("Facets");
@@ -356,7 +381,7 @@ namespace Phocalstream_Web.Application.Data
                 facet = doc.CreateElement("Facet");
                 facet.SetAttribute("Name", "Site");
                 facetValue = doc.CreateElement("String");
-                facetValue.SetAttribute("Value", "Collection Name");
+                facetValue.SetAttribute("Value", siteName);
                 facet.AppendChild(facetValue);
                 facets.AppendChild(facet);
             }

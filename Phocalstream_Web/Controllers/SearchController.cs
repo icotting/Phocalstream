@@ -121,30 +121,13 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult DeleteSearch(long collectionID)
         {
-            List<Collection> collections;
-            if (collectionID == -1)
-            {
-                collections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH).ToList();
-            }
-            else
-            {
-                collections = CollectionRepository.Find(c => c.ID == collectionID && c.Type == CollectionType.SEARCH).ToList();
+            SearchService.DeleteSearch(collectionID);
+            return RedirectToAction("List", "Search");
+        }
 
-            }
-
-            foreach(var col in collections)
-            {
-                string filePath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
-
-                if (System.IO.Directory.Exists(filePath))
-                {
-                    System.IO.Directory.Delete(filePath, true);
-                }
-
-                CollectionRepository.Delete(col);
-                Unit.Commit();
-            }
-            
+        public ActionResult DeleteAllSearches()
+        {
+            SearchService.DeleteAllSearches();
             return RedirectToAction("List", "Search");
         }
     }

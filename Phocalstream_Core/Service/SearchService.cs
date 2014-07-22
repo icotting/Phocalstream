@@ -21,6 +21,12 @@ namespace Phocalstream_Service.Service
         [Dependency]
         public IEntityRepository<Tag> TagRepository { get; set; }
 
+        [Dependency]
+        public IEntityRepository<Collection> CollectionRepository { get; set; }
+
+        [Dependency]
+        public IUnitOfWork Unit { get; set; }
+
         
         public string ValidateAndGetSearchPath()
         {
@@ -33,6 +39,42 @@ namespace Phocalstream_Service.Service
             return search_path;
         }
 
+        public void DeleteSearch(long collectionID)
+        {
+            Collection col = CollectionRepository.First(c => c.ID == collectionID && c.Type == CollectionType.SEARCH);
+
+            if (col != null)
+            {
+                string filePath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
+
+                if (System.IO.Directory.Exists(filePath))
+                {
+                    System.IO.Directory.Delete(filePath, true);
+                }
+
+                CollectionRepository.Delete(col);
+                Unit.Commit();
+            }
+        }
+
+        public void DeleteAllSearches()
+        {
+            List<Collection> collections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH).ToList();
+
+            foreach (var col in collections)
+            {
+                string filePath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
+
+                if (System.IO.Directory.Exists(filePath))
+                {
+                    System.IO.Directory.Delete(filePath, true);
+                }
+
+                CollectionRepository.Delete(col);
+                Unit.Commit();
+            }
+        }
+
         public void GenerateCollectionManifest(List<string> fileNames, string savePath)
         {
             CollectionCreator creator = new CollectionCreator();
@@ -42,7 +84,6 @@ namespace Phocalstream_Service.Service
 
             creator.Create(fileNames, savePath);
         }
-
 
         public List<Photo> GetPhotosByDate(string dateString)
         { 
