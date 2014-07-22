@@ -1,19 +1,35 @@
-﻿@model Phocalstream_Web.Models.SearchResults
+﻿@model Phocalstream_Web.Models.SearchModel
 @{
     ViewBag.Title = "Search";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="content">
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            <p> Put a text field here. </p>
+
+    @using (@Html.BeginForm("AdvancedSearch", "Search"))
+    {
+        <div class="row">
+            <div class="col-md-3 col-md-offset-1">
+                @Html.LabelFor(m => m.Date)
+            </div>
+            <div class="col-md-7">
+                @Html.TextBoxFor(m => m.Date)
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 col-md-offset-6">
-            @Html.ActionLink("Search", "Search", "Search", new { query = "4/5/2012" }, new { @class="btn btn-success"})
+        <div class="row">
+            <div class="col-md-3 col-md-offset-1">
+                @Html.LabelFor(m => m.Tags)
+            </div>
+            <div class="col-md-7">
+                @Html.TextBoxFor(m => m.Tags)
+            </div>
         </div>
-    </div>
+
+        <div class="row">
+            <div class="col-md-3 col-md-offset-6">
+                <button class="btn btn-success" type="submit">Search</button>
+            </div>
+        </div>
+    }
 </div>
        

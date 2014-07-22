@@ -29,6 +29,7 @@ namespace Phocalstream_Web
                 new InjectionConstructor(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString));
 
             container.RegisterType(typeof(IPhotoService), typeof(PhotoService));
+            container.RegisterType(typeof(ISearchService), typeof(SearchService));
             container.RegisterType(typeof(IUnitOfWork), typeof(UnitOfWork));
             container.RegisterType(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             container.RegisterType(typeof(DbContext), typeof(ApplicationContext));

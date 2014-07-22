@@ -35,77 +35,60 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IPhotoService PhotoService { get; set; }
 
+        [Dependency]
+        public ISearchService SearchService { get; set; }
+
+
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult Search(string query)
+        public ActionResult AdvancedSearch(SearchModel model)
         {
-            //get query hash and name the container (becomes the file name)
-            int qid = query.GetHashCode();
-            string containerID = string.Format("{0}", qid);
-
-            //the root path where searchs are stored
-            string search_path = PathManager.GetSearchPath();
-            if (!Directory.Exists(search_path))
-            {
-                Directory.CreateDirectory(search_path);
-            }
+            Guid containerID = Guid.NewGuid();
             
-            List<Photo> matches = null;
+            string search_path = SearchService.ValidateAndGetSearchPath();
+            string collection_path = Path.Combine(search_path, containerID.ToString(), "collection.dzc");
 
-            Collection c = CollectionRepository.First(col => col.ContainerID == containerID);
-            if (c == null)
+
+            List<Photo> matches = new List<Photo>();
+
+            Collection c = new Collection();
+            c.Name = string.Format("Collection Created {0}", DateTime.Today.ToString("MM/dd/yyyy"));
+            c.ContainerID = containerID.ToString();
+            c.Type = CollectionType.SEARCH;
+
+            CollectionRepository.Insert(c);
+            Unit.Commit();
+
+
+            matches.AddRange(SearchService.GetPhotosByDate(model.Date));
+            matches.AddRange(SearchService.GetPhotosByTag(model.Tags));
+            matches = matches.Distinct().OrderBy(p => p.ID).ToList<Photo>();
+            
+            List<string> fileNames = new List<string>();
+            StringBuilder photoIds = new StringBuilder();
+            
+            foreach (Photo photo in matches)
             {
-                c = new Collection();
-                c.Name = string.Format("{0} results", query);
-                c.ContainerID = containerID;
-                c.Photos = matches;
-                c.Type = CollectionType.SEARCH;
+                fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
+                    string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
 
-                CollectionRepository.Insert(c);
-                Unit.Commit();
-
-                try
-                {
-                    DateTime dateQuery = DateTime.Parse(query);
-                    matches = PhotoRepository.Find(p => p.Captured.Month == dateQuery.Month &&
-                        p.Captured.Day == dateQuery.Day &&
-                        p.Captured.Year == dateQuery.Year).ToList<Photo>();
-                }
-                catch (Exception e)
-                {
-                    matches = new List<Photo>();
-                }
-
-                CollectionCreator creator = new CollectionCreator();
-                creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-                creator.TileOverlap = 1;
-                creator.TileSize = 256;
-
-                List<string> fileNames = new List<string>();
-                StringBuilder photoIds = new StringBuilder();
-
-                foreach (Photo photo in matches)
-                {
-                    fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
-                        string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
-
-                    photoIds.Append(photo.ID.ToString() + ",");
-                }
-
-                photoIds.Remove(photoIds.Length - 1, 1);
-
-                c.Photos = matches;
-                Unit.Commit();
-
-                creator.Create(new List<string>(fileNames), Path.Combine(search_path, containerID, "collection.dzc"));
-
-                PhotoService.GeneratePivotManifest(containerID, photoIds.ToString());
+                photoIds.Append(photo.ID.ToString() + ",");
             }
-           
-            return RedirectToAction("SearchResult", new {collectionID = c.ID});
+
+            photoIds.Remove(photoIds.Length - 1, 1);
+
+
+            c.Photos = matches;
+            Unit.Commit();
+
+            
+            SearchService.GenerateCollectionManifest(fileNames, collection_path);
+            PhotoService.GeneratePivotManifest(containerID.ToString(), photoIds.ToString());
+
+            return RedirectToAction("SearchResult", new { collectionID = c.ID });
         }
 
         public ActionResult SearchResult(int collectionID)

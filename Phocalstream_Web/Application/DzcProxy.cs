@@ -26,8 +26,15 @@ namespace Phocalstream_Web.Application
             string resource = application.Request.RawUrl;
             if (resource.Contains("/dzc/"))
             {
-                string blobRequest = Path.Combine(basePath, resource.Substring(resource.IndexOf("/dzc/") + 5));
-
+                string blobRequest;
+                if (resource.Contains(PathManager.SearchPath) || resource.Contains(PathManager.PhotoPath))
+                {
+                    blobRequest = Path.Combine(basePath, resource.Substring(resource.IndexOf("/dzc/") + 5));
+                }
+                else
+                {
+                    blobRequest = Path.Combine(PathManager.GetPhotoPath(), resource.Substring(resource.IndexOf("/dzc/") + 5));
+                }
                 string extension = (resource.IndexOf(".") > -1) ? resource.Substring(resource.LastIndexOf(".")) : "";
                 switch (extension)
                 {

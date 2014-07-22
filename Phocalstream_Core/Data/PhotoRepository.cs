@@ -281,7 +281,14 @@ namespace Phocalstream_Web.Application.Data
             XmlElement item = doc.CreateElement("Item");
             item.SetAttribute("Img", String.Format("#{0}", position));
             item.SetAttribute("Id", Convert.ToString(photo["ID"]));
-            item.SetAttribute("Name", string.Format("{0} {1}", collectionName, captured.ToString("MMM dd, yyyy hh:mm tt")));
+            if (!includeSite)
+            {
+                item.SetAttribute("Name", string.Format("{0} {1}", collectionName, captured.ToString("MMM dd, yyyy hh:mm tt")));
+            }
+            else
+            {
+                item.SetAttribute("Name", string.Format("{0} {1}", "Collection Name", captured.ToString("MMM dd, yyyy hh:mm tt")));
+            }
             item.SetAttribute("Href", "http://www.google.com");
 
             XmlElement facets = doc.CreateElement("Facets");
@@ -349,7 +356,7 @@ namespace Phocalstream_Web.Application.Data
                 facet = doc.CreateElement("Facet");
                 facet.SetAttribute("Name", "Site");
                 facetValue = doc.CreateElement("String");
-                facetValue.SetAttribute("Value", collectionName);
+                facetValue.SetAttribute("Value", "Collection Name");
                 facet.AppendChild(facetValue);
                 facets.AppendChild(facet);
             }

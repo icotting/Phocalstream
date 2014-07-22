@@ -8,6 +8,15 @@ using System.Web;
 
 namespace Phocalstream_Web.Models
 {
+    public class SearchModel
+    {
+        [Display(Name = "Date")]
+        public string Date { get; set; }
+
+        [Display(Name = "Tags")]
+        public string Tags { get; set; }
+    }
+
     public class SearchResults
     {
         public string Query { get; set; }

@@ -81,6 +81,7 @@
     <Compile Include="Service\EmailService.cs" />
     <Compile Include="Service\PathManager.cs" />
     <Compile Include="Service\PhotoService.cs" />
+    <Compile Include="Service\SearchService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Phocalstream_Shared\Phocalstream_Shared.csproj">
