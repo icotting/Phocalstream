@@ -16,5 +16,6 @@ namespace Phocalstream_Shared.Service
         List<Photo> GetPhotosByDate(string dateString);
         List<Photo> GetPhotosByTag(string tagString);
         List<Photo> GetPhotosByTimeOfDay(string timeString);
+        List<Photo> GetPhotosBySite(string siteString);
     }
 }

@@ -10,14 +10,17 @@ namespace Phocalstream_Web.Models
 {
     public class SearchModel
     {
-        [Display(Name = "Date")]
-        public string Date { get; set; }
+        [Display(Name = "Sites")]
+        public string Sites { get; set; }
+
+        [Display(Name = "Dates")]
+        public string Dates { get; set; }
 
         [Display(Name = "Tags")]
         public string Tags { get; set; }
 
-        [Display(Name = "Time of Day")]
-        public string TimeOfDay { get; set; }
+        [Display(Name = "Times of Day")]
+        public string TimesOfDay { get; set; }
     }
 
     public class SearchResults

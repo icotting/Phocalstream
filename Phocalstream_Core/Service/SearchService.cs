@@ -25,6 +25,9 @@ namespace Phocalstream_Service.Service
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
+        public IEntityRepository<CameraSite> SiteRepository { get; set; }
+
+        [Dependency]
         public IUnitOfWork Unit { get; set; }
 
         
@@ -136,6 +139,24 @@ namespace Phocalstream_Service.Service
                 {
                     int timeInt = Convert.ToInt16(time);
                     matches.AddRange(PhotoRepository.Find(p => p.Captured.Hour == timeInt));
+                }
+            }
+
+            return matches;
+        }
+
+        public List<Photo> GetPhotosBySite(string siteString)
+        {
+            List<Photo> matches = new List<Photo>();
+
+            if (siteString != null)
+            {
+                string[] sites = siteString.Split(',');
+
+                foreach (var site in sites)
+                {
+                    CameraSite cameraSite = SiteRepository.First(s => s.Name.Equals(site));
+                    matches.AddRange(PhotoRepository.Find(p => p.Site.ID == cameraSite.ID));
                 }
             }
 
