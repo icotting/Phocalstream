@@ -23,10 +23,26 @@
         </div>
         <div class="row">
             <div class="col-md-3 col-md-offset-1">
+                @Html.LabelFor(m => m.Seasons)
+            </div>
+            <div class="col-md-7">
+                @Html.TextBoxFor(m => m.Seasons, new { @placeholder = "Spring, Summer, Fall, Winter" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-md-offset-1">
+                @Html.LabelFor(m => m.Months)
+            </div>
+            <div class="col-md-7">
+                @Html.TextBoxFor(m => m.Months, new { @placeholder = "1, 11" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-md-offset-1">
                 @Html.LabelFor(m => m.Dates)
             </div>
             <div class="col-md-7">
-                @Html.TextBoxFor(m => m.Dates)
+                @Html.TextBoxFor(m => m.Dates, new { @placeholder = "8/4/2012" })
             </div>
         </div>
         <div class="row">
@@ -42,7 +58,15 @@
                 @Html.LabelFor(m => m.TimesOfDay)
             </div>
             <div class="col-md-7">
-                @Html.TextBoxFor(m => m.TimesOfDay)
+                @Html.TextBoxFor(m => m.TimesOfDay, new { @placeholder = "Morning, Afternoon, Evening, Night"})
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-md-offset-1">
+                @Html.LabelFor(m => m.HoursOfDay)
+            </div>
+            <div class="col-md-7">
+                @Html.TextBoxFor(m => m.HoursOfDay, new { @placeholder = "10,11,16,17" })
             </div>
         </div>
 

@@ -13,6 +13,12 @@ namespace Phocalstream_Web.Models
         [Display(Name = "Sites")]
         public string Sites { get; set; }
 
+        [Display(Name = "Season")]
+        public string Seasons { get; set; }
+
+        [Display(Name = "Months")]
+        public string Months { get; set; }
+        
         [Display(Name = "Dates")]
         public string Dates { get; set; }
 
@@ -21,6 +27,11 @@ namespace Phocalstream_Web.Models
 
         [Display(Name = "Times of Day")]
         public string TimesOfDay { get; set; }
+
+        [Display(Name = "Hours of Day")]
+        public string HoursOfDay { get; set; }
+
+        
 
         public ICollection<string> SiteNames { get; set; }
         public ICollection<string> AvailableTags { get; set; }

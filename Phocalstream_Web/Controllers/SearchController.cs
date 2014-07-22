@@ -68,9 +68,12 @@ namespace Phocalstream_Web.Controllers
             Unit.Commit();
 
             matches.AddRange(SearchService.GetPhotosBySite(model.Sites));
+            matches.AddRange(SearchService.GetPhotosBySeason(model.Seasons));
+            matches.AddRange(SearchService.GetPhotosByMonth(model.Months));
             matches.AddRange(SearchService.GetPhotosByDate(model.Dates));
             matches.AddRange(SearchService.GetPhotosByTag(model.Tags));
             matches.AddRange(SearchService.GetPhotosByTimeOfDay(model.TimesOfDay));
+            matches.AddRange(SearchService.GetPhotosByHourOfDay(model.HoursOfDay));
             matches = matches.Distinct().OrderBy(p => p.ID).ToList<Photo>();
             
             List<string> fileNames = new List<string>();

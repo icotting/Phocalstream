@@ -30,6 +30,15 @@ namespace Phocalstream_Service.Service
         [Dependency]
         public IUnitOfWork Unit { get; set; }
 
+        private const string MorningHours = "5,6,7,8,9,10,11";
+        private const string AfternoonHours = "12,13,14,15,16";
+        private const string EveningHours = "17,18,19,20";
+        private const string NightHours = "21,22,23,0,1,2,3,4";
+
+        private const string SpringMonths = "3,4,5";
+        private const string SummerMonths = "6,7,8";
+        private const string FallMonths = "9,10,11";
+        private const string WinterMonths = "12,1,2";
         
         public string ValidateAndGetSearchPath()
         {
@@ -93,8 +102,77 @@ namespace Phocalstream_Service.Service
             return SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
         }
 
+        public List<Photo> GetPhotosBySite(string siteString)
+        {
+            List<Photo> matches = new List<Photo>();
+
+            if (siteString != null)
+            {
+                string[] sites = siteString.Split(',');
+
+                foreach (var site in sites)
+                {
+                    CameraSite cameraSite = SiteRepository.First(s => s.Name.Equals(site));
+                    matches.AddRange(PhotoRepository.Find(p => p.Site.ID == cameraSite.ID));
+                }
+            }
+
+            return matches;
+        }
+
+        public List<Photo> GetPhotosBySeason(string seasonString)
+        {
+            List<Photo> matches = new List<Photo>();
+
+            if (seasonString != null)
+            {
+                string[] seasons = seasonString.Split(',');
+
+                foreach (var season in seasons)
+                {
+                    switch(season)
+                    {
+                        case "Spring":
+                            matches.AddRange(GetPhotosByMonth(SpringMonths));
+                            break;
+                        case "Summer":
+                            matches.AddRange(GetPhotosByMonth(SummerMonths));
+                            break;
+                        case "Fall":
+                            matches.AddRange(GetPhotosByMonth(FallMonths));
+                            break;
+                        case "Winter":
+                            matches.AddRange(GetPhotosByMonth(WinterMonths));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            return matches;
+        }
+
+        public List<Photo> GetPhotosByMonth(string monthString)
+        {
+            List<Photo> matches = new List<Photo>();
+
+            if (monthString != null)
+            {
+                string[] months = monthString.Split(',');
+
+                foreach (var m in months)
+                {
+                    int month = Convert.ToInt16(m);
+                    matches.AddRange(PhotoRepository.Find(p => p.Captured.Month == month));
+                }
+            }
+
+            return matches;
+        }
+
         public List<Photo> GetPhotosByDate(string dateString)
-        { 
+        {
             List<Photo> matches = new List<Photo>();
 
             if (dateString != null)
@@ -142,26 +220,41 @@ namespace Phocalstream_Service.Service
 
                 foreach (var time in times)
                 {
-                    int timeInt = Convert.ToInt16(time);
-                    matches.AddRange(PhotoRepository.Find(p => p.Captured.Hour == timeInt));
+                    switch (time)
+                    {
+                        case "Morning":
+                            matches.AddRange(GetPhotosByHourOfDay(MorningHours));
+                            break;
+                        case "Afternoon":
+                            matches.AddRange(GetPhotosByHourOfDay(AfternoonHours));
+                            break;
+                        case "Evening":
+                            matches.AddRange(GetPhotosByHourOfDay(EveningHours));
+                            break;
+                        case "Night":
+                            matches.AddRange(GetPhotosByHourOfDay(NightHours));
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
             return matches;
         }
 
-        public List<Photo> GetPhotosBySite(string siteString)
+        public List<Photo> GetPhotosByHourOfDay(string hourString)
         {
             List<Photo> matches = new List<Photo>();
 
-            if (siteString != null)
+            if (hourString != null)
             {
-                string[] sites = siteString.Split(',');
+                string[] times = hourString.Split(',');
 
-                foreach (var site in sites)
+                foreach (var t in times)
                 {
-                    CameraSite cameraSite = SiteRepository.First(s => s.Name.Equals(site));
-                    matches.AddRange(PhotoRepository.Find(p => p.Site.ID == cameraSite.ID));
+                    int time = Convert.ToInt16(t);
+                    matches.AddRange(PhotoRepository.Find(p => p.Captured.Hour == time));
                 }
             }
 
