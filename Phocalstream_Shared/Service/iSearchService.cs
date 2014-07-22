@@ -13,6 +13,7 @@ namespace Phocalstream_Shared.Service
         void DeleteSearch(long collectionID);
         void DeleteAllSearches();
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
+        List<string> GetSiteNames();        
         List<Photo> GetPhotosByDate(string dateString);
         List<Photo> GetPhotosByTag(string tagString);
         List<Photo> GetPhotosByTimeOfDay(string timeString);

@@ -21,6 +21,9 @@ namespace Phocalstream_Web.Models
 
         [Display(Name = "Times of Day")]
         public string TimesOfDay { get; set; }
+
+        public ICollection<string> SiteNames { get; set; }
+        public ICollection<string> AvailableTags { get; set; }
     }
 
     public class SearchResults

@@ -15,5 +15,8 @@ namespace Phocalstream_Shared.Service
         void ProcessCollection(Collection collection);
         void GeneratePivotManifest(CameraSite site);
         void GeneratePivotManifest(string collectionID, string photoList);
+        List<string> GetUnusedTagNames(long photoID);
+        List<string> GetTagNames();
+        Photo AddTag(long photoID, string tags);
     }
 }

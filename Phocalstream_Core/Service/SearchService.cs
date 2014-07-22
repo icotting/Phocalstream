@@ -88,6 +88,11 @@ namespace Phocalstream_Service.Service
             creator.Create(fileNames, savePath);
         }
 
+        public List<string> GetSiteNames()
+        {
+            return SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
+        }
+
         public List<Photo> GetPhotosByDate(string dateString)
         { 
             List<Photo> matches = new List<Photo>();

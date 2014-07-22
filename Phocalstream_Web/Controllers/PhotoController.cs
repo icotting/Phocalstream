@@ -6,6 +6,7 @@ using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_Shared.Service;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
@@ -45,10 +46,11 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IPhotoRepository DZPhotoRepository { get; set; }
 
+        [Dependency]
         public IEntityRepository<User> UserRepository { get; set; }
 
         [Dependency]
-        public IUnitOfWork Unit { get; set; }
+        public IPhotoService PhotoService { get; set; }
 
         
         public ActionResult Index(long photoID)
@@ -61,7 +63,7 @@ namespace Phocalstream_Web.Controllers
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
             }
 
-            model.Photo.AvailableTags = GetUnusedTagNames(photoID);
+            model.Photo.AvailableTags = PhotoService.GetUnusedTagNames(photoID);
 
             model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
                     Request.Url.Host,
@@ -245,49 +247,14 @@ namespace Phocalstream_Web.Controllers
         [HttpPost]
         public ActionResult AddTag(long photoID, string tags)
        {
-            //Get the photo to be tagged
-            Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site, p=> p.Tags);
-            if (photo == null)
+           Photo photo = PhotoService.AddTag(photoID, tags);
+
+            if(photo == null)
             {
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
             }
 
-            //Create the array of tags
-            string[] tagArray = tags.Split(',');
-
-            foreach (string name in tagArray)
-            {
-                //all tags are stored in lowercase
-                String text = name.ToLower(); ;
-
-                //Need to check if the tag exists
-                Tag tag = TagRepository.Find(t => t.Name.Equals(text)).FirstOrDefault();
-
-                //if tag is null, create one
-                if (tag == null)
-                {
-                    tag = new Tag(name);
-                }
-
-                //add the tag
-                photo.Tags.Add(tag);
-            }
-            
-            //commit changes
-            Unit.Commit();
-
-            photo.AvailableTags = GetUnusedTagNames(photoID);
-
             return PartialView("_TagPartial", photo);
-        }
-
-        private List<string> GetUnusedTagNames(long photoID)
-        {
-            var photoTags = PhotoRepository.Single(p => p.ID == photoID, p => p.Tags).Tags.Select(t => t.Name);
-
-            List<string> unusedTags = TagRepository.GetAll().Select(t => t.Name).Except(photoTags).ToList();
-
-            return unusedTags;
         }
 
         public ActionResult DeleteDownload(string fileName)

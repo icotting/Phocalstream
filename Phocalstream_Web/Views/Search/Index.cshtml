@@ -4,6 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Bootstrap Tags Input CSS and JS Files-->
+<link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
+<script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.min.js"></script>
+<script src="~/Content/typeahead/typeahead.bundle.js"></script>
+
 <div class="content">
 
     @using (@Html.BeginForm("AdvancedSearch", "Search"))
@@ -13,7 +18,7 @@
                 @Html.LabelFor(m => m.Sites)
             </div>
             <div class="col-md-7">
-                @Html.TextBoxFor(m => m.Sites)
+                @Html.TextBoxFor(m => m.Sites, new { @id = "site-field" })
             </div>
         </div>
         <div class="row">
@@ -29,7 +34,7 @@
                 @Html.LabelFor(m => m.Tags)
             </div>
             <div class="col-md-7">
-                @Html.TextBoxFor(m => m.Tags)
+                @Html.TextBoxFor(m => m.Tags, new { @id = "tag-field"})
             </div>
         </div>
         <div class="row">
@@ -49,3 +54,61 @@
     }
 </div>
        
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var availableTags = @Html.Raw(Json.Encode(Model.AvailableTags));
+        var sites = @Html.Raw(Json.Encode(Model.SiteNames));
+
+        var substringMatcher = function(strs) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
+
+                // an array that will be populated with substring matches
+                matches = [];
+
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
+
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                    if (substrRegex.test(str)) {
+
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({ value: str });
+                    }
+                });
+
+                cb(matches);
+            };
+        };
+
+        $('#tag-field').tagsinput();
+
+        $('#tag-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'available-tags',
+            source: substringMatcher(availableTags)
+        });
+
+        $('#site-field').tagsinput();
+
+        $('#site-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'sites',
+            source: substringMatcher(sites)
+        });
+
+
+
+        
+    });
+</script>

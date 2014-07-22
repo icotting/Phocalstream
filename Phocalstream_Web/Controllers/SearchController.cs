@@ -41,7 +41,12 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            SearchModel model = new SearchModel();
+
+            model.AvailableTags = PhotoService.GetTagNames();
+            model.SiteNames = SearchService.GetSiteNames();
+
+            return View(model);
         }
 
         public ActionResult AdvancedSearch(SearchModel model)
@@ -85,7 +90,7 @@ namespace Phocalstream_Web.Controllers
             c.Photos = matches;
             Unit.Commit();
 
-            
+
             SearchService.GenerateCollectionManifest(fileNames, collection_path);
             PhotoService.GeneratePivotManifest(containerID.ToString(), photoIds.ToString());
 

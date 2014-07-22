@@ -26,6 +26,9 @@ namespace Phocalstream_Service.Service
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [Dependency]
+        public IEntityRepository<Tag> TagRepository { get; set; }
+
+        [Dependency]
         public IEntityRepository<CameraSite> SiteRepository { get; set; }
 
         [Dependency]
@@ -33,6 +36,10 @@ namespace Phocalstream_Service.Service
 
         [Dependency]
         public IPhotoRepository PhotoRepo { get; set; }
+
+        [Dependency]
+        public IUnitOfWork Unit { get; set; }
+
 
         public Collection GetCollectionForProcessing(XmlNode siteData)
         {
@@ -308,6 +315,55 @@ namespace Phocalstream_Service.Service
             XmlDocument doc = PhotoRepo.CreatePivotCollectionForList(collectionID, photoList);
 
             doc.Save(Path.Combine(rootPath, "site.cxml"));
+        }
+
+        public List<string> GetUnusedTagNames(long photoID)
+        {
+            var photoTags = PhotoRepository.Single(p => p.ID == photoID, p => p.Tags).Tags.Select(t => t.Name);
+            return TagRepository.GetAll().Select(t => t.Name).Except(photoTags).ToList();
+        }
+
+        public List<string> GetTagNames()
+        {
+            return TagRepository.GetAll().Select(t => t.Name).ToList<string>();
+        }
+
+        public Photo AddTag(long photoID, string tags)
+        {
+            //Get the photo to be tagged
+            Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site, p => p.Tags);
+            if (photo == null)
+            {
+                return null;
+            }
+
+            //Create the array of tags
+            string[] tagArray = tags.Split(',');
+
+            foreach (string name in tagArray)
+            {
+                //all tags are stored in lowercase
+                String text = name.ToLower(); ;
+
+                //Need to check if the tag exists
+                Tag tag = TagRepository.Find(t => t.Name.Equals(text)).FirstOrDefault();
+
+                //if tag is null, create one
+                if (tag == null)
+                {
+                    tag = new Tag(name);
+                }
+
+                //add the tag
+                photo.Tags.Add(tag);
+            }
+
+            //commit changes
+            Unit.Commit();
+
+            photo.AvailableTags = GetUnusedTagNames(photoID);
+
+            return photo;
         }
     }
 }
