@@ -123,5 +123,23 @@ namespace Phocalstream_Service.Service
 
             return matches;
         }
+
+        public List<Photo> GetPhotosByTimeOfDay(string timeString)
+        {
+            List<Photo> matches = new List<Photo>();
+
+            if (timeString != null)
+            {
+                string[] times = timeString.Split(',');
+
+                foreach (var time in times)
+                {
+                    int timeInt = Convert.ToInt16(time);
+                    matches.AddRange(PhotoRepository.Find(p => p.Captured.Hour == timeInt));
+                }
+            }
+
+            return matches;
+        }
     }
 }

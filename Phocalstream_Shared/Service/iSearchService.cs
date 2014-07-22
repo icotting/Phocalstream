@@ -15,5 +15,6 @@ namespace Phocalstream_Shared.Service
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
         List<Photo> GetPhotosByDate(string dateString);
         List<Photo> GetPhotosByTag(string tagString);
+        List<Photo> GetPhotosByTimeOfDay(string timeString);
     }
 }

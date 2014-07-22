@@ -65,6 +65,7 @@ namespace Phocalstream_Web.Controllers
 
             matches.AddRange(SearchService.GetPhotosByDate(model.Date));
             matches.AddRange(SearchService.GetPhotosByTag(model.Tags));
+            matches.AddRange(SearchService.GetPhotosByTimeOfDay(model.TimeOfDay));
             matches = matches.Distinct().OrderBy(p => p.ID).ToList<Photo>();
             
             List<string> fileNames = new List<string>();

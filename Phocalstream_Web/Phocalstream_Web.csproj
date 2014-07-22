@@ -384,7 +384,6 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\SearchResult.cshtml" />
-    <Content Include="Views\Search\AdvancedSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

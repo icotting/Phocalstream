@@ -15,6 +15,9 @@ namespace Phocalstream_Web.Models
 
         [Display(Name = "Tags")]
         public string Tags { get; set; }
+
+        [Display(Name = "Time of Day")]
+        public string TimeOfDay { get; set; }
     }
 
     public class SearchResults
