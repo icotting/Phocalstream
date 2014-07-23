@@ -5,6 +5,7 @@ using Phocalstream_Shared.Data.Model.View;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -73,7 +74,7 @@ namespace Phocalstream_Web.Application.Data
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                using (SqlCommand command = new SqlCommand("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in (" + photoList + ")", conn))
+                using (SqlCommand command = new SqlCommand(string.Format("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID IN ({0})", photoList), conn))
                 {
                     return CreateDeepZoomDocument(command, null);
                 }
@@ -82,24 +83,16 @@ namespace Phocalstream_Web.Application.Data
 
         public XmlDocument CreatePivotCollectionForSite(long siteID)
         {
+            string siteName = GetCameraSiteName(siteID);
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string siteName = "";
-                using (SqlCommand command = new SqlCommand(string.Format("select Name from CameraSites where ID = {0}", siteID), conn))
+                using (SqlCommand command = new SqlCommand("select ID, Captured from Photos where Site_ID = @id", conn))
                 {
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            siteName = (string)reader["Name"];
-                        }
-                    }
-                }
-
-                using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured from Photos where Site_ID = {0}", siteID), conn))
-                {
+                    command.Prepare();
+                    command.Parameters.AddWithValue("@id", siteID);
                     return CreatePivotDocument(siteName, command, null, CollectionType.SITE);
                 }
             }
@@ -125,8 +118,11 @@ namespace Phocalstream_Web.Application.Data
             {
                 conn.Open();
 
-                using (SqlCommand command = new SqlCommand(string.Format("select ID, Name, DirectoryName from CameraSites where CameraSites.ID = {0}", siteID), conn))
+                using (SqlCommand command = new SqlCommand("select Name from CameraSites where ID = @id", conn))
                 {
+                    command.Prepare();
+                    command.Parameters.AddWithValue("@id", siteID);
+
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
@@ -146,10 +142,11 @@ namespace Phocalstream_Web.Application.Data
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "select BlobID, ContainerID, Captured, Photos.ID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in (" + photoList + ")";
                 conn.Open();
-                using (SqlCommand command = new SqlCommand(query, conn))
+
+                using (SqlCommand command = new SqlCommand(string.Format("select BlobID, ContainerID, Captured, Photos.ID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in ({0})", photoList), conn))
                 {
+
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -261,7 +258,7 @@ namespace Phocalstream_Web.Application.Data
 
             root.AppendChild(facets);
 
-            string dzCollection;
+            string dzCollection = "";
             if (type == CollectionType.SEARCH)
             {
                 dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.SearchPath, collectionName)

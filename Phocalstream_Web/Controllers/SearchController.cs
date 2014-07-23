@@ -18,6 +18,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Data.Entity;
+using Phocalstream_Shared.Data.Model.View;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -67,13 +68,7 @@ namespace Phocalstream_Web.Controllers
             CollectionRepository.Insert(c);
             Unit.Commit();
 
-            matches.AddRange(SearchService.GetPhotosBySite(model.Sites));
-            matches.AddRange(SearchService.GetPhotosBySeason(model.Seasons));
-            matches.AddRange(SearchService.GetPhotosByMonth(model.Months));
-            matches.AddRange(SearchService.GetPhotosByDate(model.Dates));
-            matches.AddRange(SearchService.GetPhotosByTag(model.Tags));
-            matches.AddRange(SearchService.GetPhotosByTimeOfDay(model.TimesOfDay));
-            matches.AddRange(SearchService.GetPhotosByHourOfDay(model.HoursOfDay));
+            matches = SearchService.Search(model);
             matches = matches.Distinct().OrderBy(p => p.ID).ToList<Photo>();
             
             List<string> fileNames = new List<string>();
