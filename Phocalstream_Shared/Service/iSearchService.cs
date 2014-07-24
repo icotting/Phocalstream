@@ -16,12 +16,5 @@ namespace Phocalstream_Shared.Service
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
         List<string> GetSiteNames();
         SearchMatches Search(SearchModel model);
-        List<Photo> GetPhotosBySite(string siteString);
-        List<Photo> GetPhotosBySeason(string seasonString);
-        List<Photo> GetPhotosByMonth(string monthString);
-        List<Photo> GetPhotosByDate(string dateString);
-        List<Photo> GetPhotosByTag(string tagString);
-        List<Photo> GetPhotosByTimeOfDay(string timeString);
-        List<Photo> GetPhotosByHourOfDay(string hourString);
     }
 }
