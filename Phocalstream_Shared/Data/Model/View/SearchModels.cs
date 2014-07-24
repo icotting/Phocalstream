@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace Phocalstream_Shared.Data.Model.View
@@ -121,6 +122,42 @@ namespace Phocalstream_Shared.Data.Model.View
 
             return hours;
         }
+    
+        public string CreateCollectionName()
+        {
+            StringBuilder name = new StringBuilder(); 
+            name.Append("Showing photos ");
+
+            if(!String.IsNullOrWhiteSpace(Sites))
+            {
+
+                name.Append("from " + String.Join(", ", Sites.Split(',')) + " ");
+            }
+
+            if (!String.IsNullOrWhiteSpace(Tags))
+            {
+                name.Append("tagged with " + String.Join(", ", Tags.Split(',')) + " ");
+            }
+
+            string months = CreateMonthString();
+            if (!String.IsNullOrWhiteSpace(months))
+            {
+                name.Append("taken during " + months + " ");
+            }
+
+            if (!String.IsNullOrWhiteSpace(Dates))
+            {
+                name.Append("taken on " + String.Join(", ", Dates.Split(',')) + " ");
+            }
+            
+            string hours = CreateHourString();
+            if (!String.IsNullOrWhiteSpace(hours))
+            {
+                name.Append("during the hours of " + String.Join(", ", hours.Split(',')) + ".");
+            }
+
+            return name.ToString();
+        }
     }
 
     public class SearchMatches
@@ -131,6 +168,8 @@ namespace Phocalstream_Shared.Data.Model.View
 
     public class SearchResults
     {
+        public string CollectionName { get; set; }
+        public int PhotoCount { get; set; }
         public string CollectionUrl { get; set; }
     }
 

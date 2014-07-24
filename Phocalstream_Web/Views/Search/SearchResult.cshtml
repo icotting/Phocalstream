@@ -9,55 +9,109 @@
 
 @section Scripts 
 {
-        <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
-        <script type="text/javascript">
+    <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+    <script type="text/javascript">
 
-            var visibleItems;
-            function registerNewSelection(items) {
-                visibleItems = items;
+        var visibleItems;
+        function registerNewSelection(items) {
+            visibleItems = items;
+        }
+
+        function onSilverlightError(sender, args) {
+            var appSource = "";
+            if (sender != null && sender != 0) {
+                appSource = sender.getHost().Source;
             }
 
+            var errorType = args.ErrorType;
+            var iErrorCode = args.ErrorCode;
 
-            function onSilverlightError(sender, args) {
-                var appSource = "";
-                if (sender != null && sender != 0) {
-                    appSource = sender.getHost().Source;
-                }
+            if (errorType == "ImageError" || errorType == "MediaError") {
+                return;
+            }
 
-                var errorType = args.ErrorType;
-                var iErrorCode = args.ErrorCode;
+            var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
 
-                if (errorType == "ImageError" || errorType == "MediaError") {
-                    return;
-                }
+            errMsg += "Code: " + iErrorCode + "    \n";
+            errMsg += "Category: " + errorType + "       \n";
+            errMsg += "Message: " + args.ErrorMessage + "     \n";
 
-                var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
-
-                errMsg += "Code: " + iErrorCode + "    \n";
-                errMsg += "Category: " + errorType + "       \n";
-                errMsg += "Message: " + args.ErrorMessage + "     \n";
-
-                if (errorType == "ParserError") {
-                    errMsg += "File: " + args.xamlFile + "     \n";
+            if (errorType == "ParserError") {
+                errMsg += "File: " + args.xamlFile + "     \n";
+                errMsg += "Line: " + args.lineNumber + "     \n";
+                errMsg += "Position: " + args.charPosition + "     \n";
+            }
+            else if (errorType == "RuntimeError") {
+                if (args.lineNumber != 0) {
                     errMsg += "Line: " + args.lineNumber + "     \n";
                     errMsg += "Position: " + args.charPosition + "     \n";
                 }
-                else if (errorType == "RuntimeError") {
-                    if (args.lineNumber != 0) {
-                        errMsg += "Line: " + args.lineNumber + "     \n";
-                        errMsg += "Position: " + args.charPosition + "     \n";
-                    }
-                    errMsg += "MethodName: " + args.methodName + "     \n";
-                }
-
-                throw new Error(errMsg);
+                errMsg += "MethodName: " + args.methodName + "     \n";
             }
-        </script>
+
+            throw new Error(errMsg);
+        }
+
+        function downloadPrompt() {
+            var response = confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.");
+
+            if (response) {
+                downloadImages();
+            }
+        }
+
+        function downloadImages() {
+            $.ajax({
+                url: '/api/sitecollection/RawDownload?photoIds=' + visibleItems,
+                type: "POST"
+            })
+        }
+    </script>
+
+    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+
+    <script type="text/javascript">
+        function loadMap() {
+            var mapOptions = {
+                credentials: "AvikYUpjcBjzTZDMq41HatI4Val4on1Qp45zwxkOVVEB_tQ-dP-fpTuV5axCkTkW",
+                mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+                labelOverlay: Microsoft.Maps.LabelOverlay.hidden,
+                showDashboard: false,
+                disableKeyboardInput: true,
+                disableMouseInput: true,
+                disablePanning: true,
+                disableTouchInput: true,
+                disableUserInput: true,
+                disableZooming: true
+            }
+
+            var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
+            // Define the pushpin location
+
+            // Add a pin to the map
+            var center = new Microsoft.Maps.Location(41.1289, -101.7194);
+            
+            map.setView({ center: center, zoom: 8 });
+        }
+    </script>
 }
 
-<h2>Search</h2>
-Model URL: '@Model.CollectionUrl
+@section MenuItems
+{
+    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li><a href="javascript:downloadPrompt()">Download Images</a></li>
+    }
+}
 
+<div id="pageHeader">
+    <h1>@Html.DisplayFor(model => model.CollectionName)</h1>
+    <div id="subhead">
+        @Html.DisplayFor(model => model.PhotoCount) photos
+    </div>
+</div>
+
+<div id="map"></div>
 <form id="form1" runat="server">
     <div id="silverlightControlHost">
     <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
@@ -72,4 +126,7 @@ Model URL: '@Model.CollectionUrl
 		</a>
 	</object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe></div>
 </form>
-       
+
+<script type="text/javascript">
+    loadMap();
+</script>

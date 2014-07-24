@@ -73,7 +73,7 @@ namespace Phocalstream_Web.Controllers
 
                 //save the collection
                 Collection c = new Collection();
-                c.Name = string.Format("Collection Created {0}", DateTime.Today.ToString("MM/dd/yyyy"));
+                c.Name = model.CreateCollectionName();
                 c.ContainerID = containerID.ToString();
                 c.Type = CollectionType.SEARCH;
                 c.Photos = result.Matches;
@@ -97,8 +97,11 @@ namespace Phocalstream_Web.Controllers
         {
             SearchResults model = new SearchResults();
             
-            Collection c = CollectionRepository.First(col => col.ID == collectionID);
-            
+            Collection c = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            model.CollectionName = c.Name;
+
+            model.PhotoCount = c.Photos.Count;
+
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,

@@ -54,7 +54,6 @@ namespace Phocalstream_Web.Application.Data
             return details;
         }
 
-
         public System.Xml.XmlDocument CreateDeepZoomForSite(long siteID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
