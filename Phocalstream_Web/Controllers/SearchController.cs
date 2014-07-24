@@ -31,6 +31,9 @@ namespace Phocalstream_Web.Controllers
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [Dependency]
+        public IPhotoRepository PhotoRepo { get; set; }
+
+        [Dependency]
         public IUnitOfWork Unit { get; set; }
 
         [Dependency]
@@ -43,6 +46,9 @@ namespace Phocalstream_Web.Controllers
         public ActionResult Index()
         {
             SearchModel model = new SearchModel();
+
+            Collection first = CollectionRepository.Find(c => c.Type == CollectionType.SITE).OrderBy(c => Guid.NewGuid()).First();
+            model.BackgroundImageID = first.CoverPhoto == null ? PhotoRepo.GetSiteDetails(first.Site).LastPhotoID : first.CoverPhoto.ID;
 
             model.AvailableTags = PhotoService.GetTagNames();
             model.SiteNames = SearchService.GetSiteNames();

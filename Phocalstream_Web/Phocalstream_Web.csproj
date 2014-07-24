@@ -304,6 +304,8 @@
     <Content Include="Content\carousel.css" />
     <Content Include="Content\CSS\Home.css" />
     <Content Include="Content\CSS\Photo.css" />
+    <Content Include="Content\CSS\Search.css" />
+    <Content Include="Content\CSS\typeahead.css" />
     <Content Include="Content\Images\About.png" />
     <Content Include="Content\Images\Collections.png" />
     <Content Include="Content\Images\ds.jpg" />

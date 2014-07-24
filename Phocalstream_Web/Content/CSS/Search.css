@@ -1,0 +1,72 @@
+﻿body {
+}
+
+.background {
+    position: fixed; 
+    top: -50%; 
+    left: -50%; 
+    width: 200%; 
+    height: 200%;
+}
+
+.shadow {
+    position: fixed; 
+    top: -50%; 
+    left: -50%; 
+    width: 200%; 
+    height: 200%;
+    opacity: 0.5;
+    background-color: black;
+}
+
+.background-img {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    margin: auto; 
+    min-width: 50%;
+    min-height: 50%;
+}
+
+.container {
+    vertical-align: middle;
+    margin: auto;
+    position: absolute;
+    top: 0; 
+    left: 0; 
+    bottom: 0; 
+    right: 0;
+}
+
+.content {
+    width: 100%;
+    position: relative;
+    z-index: 100;
+    color: white;
+}
+
+label {
+    color: white;
+}
+
+.search-row {
+    margin-bottom: 25px;
+}
+
+.title {
+    color: #59a9d1;
+}
+
+input[type=checkbox] {
+    visibility: hidden;
+}
+
+.sel-header {
+    font-size: 20px;
+}
+
+.selected {
+    color: #59a9d1;
+}
