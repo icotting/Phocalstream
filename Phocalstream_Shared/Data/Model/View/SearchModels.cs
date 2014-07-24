@@ -18,12 +18,6 @@ namespace Phocalstream_Shared.Data.Model.View
         [Display(Name = "Tags")]
         public string Tags { get; set; }
 
-        //Seasons
-        public bool Spring { get; set; }
-        public bool Summer { get; set; }
-        public bool Fall { get; set; }
-        public bool Winter { get; set; }
-
         //Months
         public bool January { get; set; }
         public bool February { get; set; }
@@ -37,12 +31,6 @@ namespace Phocalstream_Shared.Data.Model.View
         public bool October { get; set; }
         public bool November { get; set; }
         public bool December { get; set; }
-
-        //TimesOfDay
-        public bool Morning { get; set; }
-        public bool Afternoon { get; set; }
-        public bool Evening { get; set; }
-        public bool Night { get; set; }
 
         //HoursOfDay
         public bool Zero { get; set; }
@@ -70,17 +58,69 @@ namespace Phocalstream_Shared.Data.Model.View
         public bool TwentyTwo { get; set; }
         public bool TwentyThree { get; set; }
 
-        public string Seasons { get; set; }
-        public string Months { get; set; }
-        public string TimesOfDay { get; set; }
-        public string HoursOfDay { get; set; }
 
-        
         public ICollection<string> SiteNames { get; set; }
         public ICollection<string> AvailableTags { get; set; }
 
-
         public long BackgroundImageID { get; set; }
+
+        
+        public string CreateMonthString()
+        {
+            string months = null;
+
+            bool[] month_array = new bool[]
+            {
+                January, February, March, April, May, June, July, August, September, October, November, December
+            };
+
+            List<int> month_ints = new List<int>();
+
+            int count = month_array.Count();
+            for (int i = 0; i < count; i++)
+            {
+                if(month_array[i])
+                {
+                    month_ints.Add((i + 1));
+                }
+            }
+
+            if (month_ints.Count > 0)
+            {
+                months = string.Join(",", month_ints.Select(n => n.ToString()).ToArray());
+            }
+
+            return months;
+        }
+
+        public string CreateHourString()
+        {
+            string hours = null;
+
+            bool[] hour_array = new bool[]
+            {
+                Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven,
+                Twelve, Thirteen, Fourteen, Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, TwentyOne, TwentyTwo, TwentyThree
+            };
+
+            List<int> hour_ints = new List<int>();
+
+            int count = hour_array.Count();
+            for (int i = 0; i < count; i++)
+            {
+                if (hour_array[i])
+                {
+                    hour_ints.Add((i));
+                }
+            }
+
+            if (hour_ints.Count > 0)
+            {
+                hours = string.Join(",", hour_ints.Select(n => n.ToString()).ToArray());
+            }
+
+            return hours;
+        }
     }
 
     public class SearchResults

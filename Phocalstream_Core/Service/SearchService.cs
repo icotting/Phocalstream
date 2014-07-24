@@ -109,11 +109,8 @@ namespace Phocalstream_Service.Service
             List<Photo> matches = new List<Photo>();
 
             StringBuilder sqlcommand = new StringBuilder();
-            sqlcommand.Append("select Photos.ID from Photos " + 
-                "INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID " + 
-                "INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " + 
-                "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID " + 
-                "WHERE ");
+
+            sqlcommand.Append("select Photos.ID from Photos ");
 
             //Sites
             StringBuilder sitesBuilder = new StringBuilder();
@@ -138,48 +135,11 @@ namespace Phocalstream_Service.Service
 
             //months
             StringBuilder monthBuilder = new StringBuilder();
-            StringBuilder months = new StringBuilder();
 
-            //season
-            if (!String.IsNullOrWhiteSpace(model.Seasons))
+            string monthString = model.CreateMonthString();
+            if (!String.IsNullOrWhiteSpace(monthString))
             {
-                string[] seasons = model.Seasons.Split(',');
-
-                foreach (var season in seasons)
-                {
-                    switch (season.Trim())
-                    {
-                        case "Spring":
-                            months.Append(SpringMonths + ",");
-                            break;
-                        case "Summer":
-                            months.Append(SummerMonths + ",");
-                            break;
-                        case "Fall":
-                            months.Append(FallMonths + ",");
-                            break;
-                        case "Winter":
-                            months.Append(WinterMonths + ",");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-
-            //month
-            if (!String.IsNullOrWhiteSpace(model.Months))
-            {
-                months.Append(model.Months);
-            }
-
-            if(months.Length != 0)
-            {
-                if(months.ToString().EndsWith(","))
-                {
-                    months.Remove(months.Length - 1, 1);
-                }
-                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", months.ToString()));
+                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", monthString));
             }
 
             //date
@@ -205,48 +165,11 @@ namespace Phocalstream_Service.Service
 
             //hours
             StringBuilder hourBuilder = new StringBuilder();
-            StringBuilder hours = new StringBuilder();
 
-            //timesofday
-            if (!String.IsNullOrWhiteSpace(model.TimesOfDay))
+            string hourString = model.CreateHourString();
+            if (!String.IsNullOrWhiteSpace(hourString))
             {
-                string[] times = model.TimesOfDay.Split(',');
-
-                foreach (var time in times)
-                {
-                    switch (time.Trim())
-                    {
-                        case "Morning":
-                            hours.Append(MorningHours + ",");
-                            break;
-                        case "Afternoon":
-                            hours.Append(AfternoonHours + ",");
-                            break;
-                        case "Evening":
-                            hours.Append(EveningHours + ",");
-                            break;
-                        case "Night":
-                            hours.Append(NightHours + ",");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-
-            //hoursofday
-            if (!String.IsNullOrWhiteSpace(model.HoursOfDay))
-            {
-                hours.Append(model.HoursOfDay);
-            }
-
-            if (hours.Length != 0)
-            {
-                if (hours.ToString().EndsWith(","))
-                {
-                    hours.Remove(hours.Length - 1, 1);
-                }
-                hourBuilder.Append(string.Format("DATEPART(hh, Photos.Captured) IN ({0}) ", hours.ToString()));
+                hourBuilder.Append(string.Format("DATEPART(hh, Photos.Captured) IN ({0}) ", hourString));
             }
 
             
@@ -270,36 +193,46 @@ namespace Phocalstream_Service.Service
             }
 
 
+            StringBuilder sqlparameters = new StringBuilder();
             //merge the builders
             if (sitesBuilder.Length != 0)
             {
-                sqlcommand.Append(sitesBuilder + "AND ");
+                sqlcommand.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
+                sqlparameters.Append(sitesBuilder + "AND ");
             }
 
             if (monthBuilder.Length != 0)
             {
-                sqlcommand.Append(monthBuilder + "AND ");
+                sqlparameters.Append(monthBuilder + "AND ");
             }
 
             if (dateBuilder.Length != 0)
             {
-                sqlcommand.Append(dateBuilder + "AND ");
+                sqlparameters.Append(dateBuilder + "AND ");
             }
 
             if (hourBuilder.Length != 0)
             {
-                sqlcommand.Append(hourBuilder + "AND ");
+                sqlparameters.Append(hourBuilder + "AND ");
             }
 
             if (tagBuilder.Length != 0)
             {
-                sqlcommand.Append(tagBuilder);
+                sqlcommand.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
+                    "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID ");
+
+                sqlparameters.Append(tagBuilder);
             }
 
             //remove final AND if present
-            if(sqlcommand.ToString().EndsWith("AND "))
+            if (sqlparameters.ToString().EndsWith("AND "))
             {
-                sqlcommand.Remove(sqlcommand.Length - 4, 4);
+                sqlparameters.Remove(sqlparameters.Length - 4, 4);
+            }
+
+            if(sqlparameters.Length > 0)
+            {
+                sqlcommand.Append("WHERE " + sqlparameters);
             }
 
             List<long> photoIds = new List<long>();
