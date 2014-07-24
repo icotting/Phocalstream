@@ -15,7 +15,7 @@ namespace Phocalstream_Shared.Service
         void DeleteAllSearches();
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
         List<string> GetSiteNames();
-        List<Photo> Search(SearchModel model);
+        SearchMatches Search(SearchModel model);
         List<Photo> GetPhotosBySite(string siteString);
         List<Photo> GetPhotosBySeason(string seasonString);
         List<Photo> GetPhotosByMonth(string monthString);

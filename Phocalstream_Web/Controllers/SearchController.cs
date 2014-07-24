@@ -43,7 +43,7 @@ namespace Phocalstream_Web.Controllers
         public ISearchService SearchService { get; set; }
 
 
-        public ActionResult Index()
+        public ActionResult Index(int e = 0)
         {
             SearchModel model = new SearchModel();
 
@@ -53,52 +53,44 @@ namespace Phocalstream_Web.Controllers
             model.AvailableTags = PhotoService.GetTagNames();
             model.SiteNames = SearchService.GetSiteNames();
 
+            if (e != 0)
+            {
+                ViewBag.Message = "Zero photos matched those parameters, please try again.";
+            }
+
             return View(model);
         }
 
         public ActionResult AdvancedSearch(SearchModel model)
         {
-            Guid containerID = Guid.NewGuid();
+            //execute the search
+            SearchMatches result = SearchService.Search(model);
             
-            string search_path = SearchService.ValidateAndGetSearchPath();
-            string collection_path = Path.Combine(search_path, containerID.ToString(), "collection.dzc");
-
-
-            List<Photo> matches = new List<Photo>();
-
-            Collection c = new Collection();
-            c.Name = string.Format("Collection Created {0}", DateTime.Today.ToString("MM/dd/yyyy"));
-            c.ContainerID = containerID.ToString();
-            c.Type = CollectionType.SEARCH;
-
-            CollectionRepository.Insert(c);
-            Unit.Commit();
-
-            matches = SearchService.Search(model);
-            matches = matches.Distinct().OrderBy(p => p.ID).ToList<Photo>();
-            
-            List<string> fileNames = new List<string>();
-            StringBuilder photoIds = new StringBuilder();
-            
-            foreach (Photo photo in matches)
+            //if search yielded result, do proceed
+            if (result.Ids.Count > 0)
             {
-                fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
-                    string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+                Guid containerID = Guid.NewGuid();
 
-                photoIds.Append(photo.ID.ToString() + ",");
+                //save the collection
+                Collection c = new Collection();
+                c.Name = string.Format("Collection Created {0}", DateTime.Today.ToString("MM/dd/yyyy"));
+                c.ContainerID = containerID.ToString();
+                c.Type = CollectionType.SEARCH;
+                c.Photos = result.Matches;
+                CollectionRepository.Insert(c);
+                Unit.Commit();
+
+                //generate xml manifests
+                SearchService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches), 
+                    Path.Combine(SearchService.ValidateAndGetSearchPath(), containerID.ToString(), "collection.dzc"));
+                PhotoService.GeneratePivotManifest(containerID.ToString(), String.Join(",", result.Ids.ToArray()));
+
+                return RedirectToAction("SearchResult", new { collectionID = c.ID });
             }
-
-            photoIds.Remove(photoIds.Length - 1, 1);
-
-
-            c.Photos = matches;
-            Unit.Commit();
-
-
-            SearchService.GenerateCollectionManifest(fileNames, collection_path);
-            PhotoService.GeneratePivotManifest(containerID.ToString(), photoIds.ToString());
-
-            return RedirectToAction("SearchResult", new { collectionID = c.ID });
+            else
+            {
+                return RedirectToAction("Index", new { e = 1 });
+            }
         }
 
         public ActionResult SearchResult(int collectionID)
@@ -106,8 +98,7 @@ namespace Phocalstream_Web.Controllers
             SearchResults model = new SearchResults();
             
             Collection c = CollectionRepository.First(col => col.ID == collectionID);
-            model.Query = c.Name.Split()[0];
-
+            
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,

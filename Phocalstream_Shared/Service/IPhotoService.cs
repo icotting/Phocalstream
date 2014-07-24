@@ -18,5 +18,6 @@ namespace Phocalstream_Shared.Service
         List<string> GetUnusedTagNames(long photoID);
         List<string> GetTagNames();
         Photo AddTag(long photoID, string tags);
+        List<string> GetFileNames(List<Photo> photos);
     }
 }

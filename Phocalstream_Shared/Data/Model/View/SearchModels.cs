@@ -123,9 +123,14 @@ namespace Phocalstream_Shared.Data.Model.View
         }
     }
 
+    public class SearchMatches
+    {
+        public List<Photo.Photo> Matches { get; set; }
+        public List<long> Ids { get; set; }
+    }
+
     public class SearchResults
     {
-        public string Query { get; set; }
         public string CollectionUrl { get; set; }
     }
 

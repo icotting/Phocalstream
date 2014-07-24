@@ -104,8 +104,10 @@ namespace Phocalstream_Service.Service
             return SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
         }
 
-        public List<Photo> Search(SearchModel model)
+        public SearchMatches Search(SearchModel model)
         {
+            SearchMatches result = new SearchMatches();
+
             List<Photo> matches = new List<Photo>();
 
             StringBuilder sqlcommand = new StringBuilder();
@@ -254,7 +256,10 @@ namespace Phocalstream_Service.Service
 
             matches = PhotoRepository.Find(p => photoIds.Contains(p.ID)).ToList<Photo>();
 
-            return matches;
+            result.Matches = matches;
+            result.Ids = photoIds;
+
+            return result;
         }
          
         public List<Photo> GetPhotosBySite(string siteString)

@@ -365,5 +365,19 @@ namespace Phocalstream_Service.Service
 
             return photo;
         }
+
+        public List<string> GetFileNames(List<Photo> photos)
+        {
+            List<string> fileNames = new List<string>();
+            
+            foreach (Photo photo in photos)
+            {
+                fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
+                    string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+
+            }
+
+            return fileNames;
+        }
     }
 }
