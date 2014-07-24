@@ -99,44 +99,65 @@ namespace Phocalstream_Service.Service
         {
             SearchMatches result = new SearchMatches();
 
-            List<Photo> matches = new List<Photo>();
+            string hourString = model.CreateHourString();
+            string monthString = model.CreateMonthString();
 
-            StringBuilder sqlcommand = new StringBuilder();
-
-            sqlcommand.Append("select Photos.ID from Photos ");
-
-            //Sites
+            StringBuilder select = new StringBuilder();
+            StringBuilder parameters = new StringBuilder();
+            
             StringBuilder sitesBuilder = new StringBuilder();
+            StringBuilder tagBuilder = new StringBuilder();
+            StringBuilder monthBuilder = new StringBuilder();
+            StringBuilder dateBuilder = new StringBuilder();
+            StringBuilder hourBuilder = new StringBuilder();
+            
+            //Sites
             if(!String.IsNullOrWhiteSpace(model.Sites))
             {
+                List<string> siteNames = SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
                 string[] sites = model.Sites.Split(',');
 
                 bool first = true;
                 foreach (var site in sites)
                 {
-                    if (first)
+                    if (siteNames.Contains(site))
                     {
-                        sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", site));
-                        first = false;
-                    }
-                    else
-                    {
-                        sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", site));
+                        if (first)
+                        {
+                            sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", site));
+                            first = false;
+                        }
+                        else
+                        {
+                            sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", site));
+                        }
                     }
                 }
             }
 
-            //months
-            StringBuilder monthBuilder = new StringBuilder();
-
-            string monthString = model.CreateMonthString();
-            if (!String.IsNullOrWhiteSpace(monthString))
+            //tag
+            if (!String.IsNullOrWhiteSpace(model.Tags))
             {
-                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", monthString));
+                List<string> tagNames = TagRepository.GetAll().Select(t => t.Name).ToList<string>();
+                string[] tags = model.Tags.Split(',');
+
+                bool tagFirst = true;
+                foreach (var tag in tags)
+                {
+                    if (tagNames.Contains(tag))
+                    {
+                        if (!tagFirst)
+                        {
+                            tagBuilder.Append("OR ");
+                        }
+                        tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
+
+                        tagFirst = false;
+                    }
+                }
             }
 
             //date
-            StringBuilder dateBuilder = new StringBuilder();
             if (!String.IsNullOrWhiteSpace(model.Dates))
             {
                 string[] dates = model.Dates.Split(',');
@@ -156,99 +177,78 @@ namespace Phocalstream_Service.Service
                 }
             }
 
-            //hours
-            StringBuilder hourBuilder = new StringBuilder();
+            //months
+            if (!String.IsNullOrWhiteSpace(monthString))
+            {
+                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", monthString));
+            }
 
-            string hourString = model.CreateHourString();
+            //hours
             if (!String.IsNullOrWhiteSpace(hourString))
             {
                 hourBuilder.Append(string.Format("DATEPART(hh, Photos.Captured) IN ({0}) ", hourString));
             }
 
-            
-            //tag
-            StringBuilder tagBuilder = new StringBuilder();
-            if (!String.IsNullOrWhiteSpace(model.Tags))
-            {
-                string[] tags = model.Tags.Split(',');
 
-                bool tagFirst = true;
-                foreach (var tag in tags)
-                {
-                    if(!tagFirst)
-                    {
-                        tagBuilder.Append("OR ");
-                    }
-                    tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
-
-                    tagFirst = false;
-                }
-            }
-
-
-            StringBuilder sqlparameters = new StringBuilder();
             //merge the builders
+            select.Append("select Photos.ID from Photos ");
+
             if (sitesBuilder.Length != 0)
             {
-                sqlcommand.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
-                sqlparameters.Append(sitesBuilder + "AND ");
+                select.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
+                parameters.Append(sitesBuilder + "AND ");
             }
 
             if (monthBuilder.Length != 0)
             {
-                sqlparameters.Append(monthBuilder + "AND ");
+                parameters.Append(monthBuilder + "AND ");
             }
 
             if (dateBuilder.Length != 0)
             {
-                sqlparameters.Append(dateBuilder + "AND ");
+                parameters.Append(dateBuilder + "AND ");
             }
 
             if (hourBuilder.Length != 0)
             {
-                sqlparameters.Append(hourBuilder + "AND ");
+                parameters.Append(hourBuilder + "AND ");
             }
 
             if (tagBuilder.Length != 0)
             {
-                sqlcommand.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
+                select.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
                     "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID ");
-
-                sqlparameters.Append(tagBuilder);
+                parameters.Append(tagBuilder);
             }
 
             //remove final AND if present
-            if (sqlparameters.ToString().EndsWith("AND "))
+            if (parameters.Length > 0)
             {
-                sqlparameters.Remove(sqlparameters.Length - 4, 4);
+                if (parameters.ToString().EndsWith("AND "))
+                {
+                    parameters.Remove(parameters.Length - 4, 4);
+                }
+                select.Append("WHERE " + parameters);
             }
 
-            if(sqlparameters.Length > 0)
-            {
-                sqlcommand.Append("WHERE " + sqlparameters);
-            }
-
-            List<long> photoIds = new List<long>();
+            //run the query
+            result.Ids = new List<long>();
             using (SqlConnection conn = new SqlConnection(PathManager.GetDbConnection()))
             {
                 conn.Open();
 
-                using (SqlCommand command = new SqlCommand(sqlcommand.ToString(), conn))
+                using (SqlCommand command = new SqlCommand(select.ToString(), conn))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            photoIds.Add((long)reader["ID"]);
+                            result.Ids.Add((long)reader["ID"]);
                         }
                     }
                 }
             }
-
-            matches = PhotoRepository.Find(p => photoIds.Contains(p.ID)).ToList<Photo>();
-
-            result.Matches = matches;
-            result.Ids = photoIds;
+            result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID)).ToList<Photo>();
 
             return result;
         }
