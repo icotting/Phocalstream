@@ -23,14 +23,12 @@
     }
 
     <!-- Field for new tags -->
-    <div style="padding-left: 40px">
-        <div class="row">
-            <form role="form" class="col-lg-8">
-                <div class="form-group">
-                    <input id="tag-field" class="col-lg-8" type="text" />
-                </div>
-            </form>
-            <button id="tag-submit" class="btn btn-success col-lg-4">Add Tag</button>
+    <div class="row">
+        <div class="col-lg-8">
+            <input type="text" id="tag-field" />
+        </div>
+        <div class="col-lg-4">
+            <button id="tag-submit" class="btn btn-success full-width">Add Tag</button>
         </div>
     </div>
 </div>
@@ -66,7 +64,6 @@
         };
 
         $('#tag-field').tagsinput();
-
         $('#tag-field').tagsinput('input').typeahead({
             minLength: 2,
             highlight: true,
@@ -74,7 +71,10 @@
         {
             name: 'available-tags',
             source: substringMatcher(availableTags)
-        });
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#tag-field')));
 
         $('#tag-submit').click(function () {
             var tags = $("#tag-field").val();

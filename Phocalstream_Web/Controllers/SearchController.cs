@@ -61,6 +61,14 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
+        public ActionResult TagSearch(string tag)
+        {
+            SearchModel model = new SearchModel();
+            model.Tags = tag;
+
+            return RedirectToAction("AdvancedSearch", model);
+        }
+
         public ActionResult AdvancedSearch(SearchModel model)
         {
             //execute the search

@@ -9,7 +9,7 @@
   vertical-align: middle;
   border-radius: 4px;
   max-width: 100%;
-  line-height: 22px;
+  line-height: 24px;
 }
 .bootstrap-tagsinput input {
   border: none;
@@ -42,4 +42,7 @@
 }
 .bootstrap-tagsinput .tag [data-role="remove"]:hover:active {
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+.bootstrap-tagsinput .label {
+    font-size: 100% !important;
 }

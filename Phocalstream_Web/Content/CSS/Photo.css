@@ -92,7 +92,7 @@ ul {
     margin-top: 20pt;
     list-style: none;
     margin-left: 0px;
-    padding-left: 30px;
+    padding-left: 0px;
 }
 
 #imageCell {
@@ -159,4 +159,4 @@ ul {
     margin: 0 auto;
 }
 
-
+/* Tag Partial */

@@ -30,3 +30,40 @@
     margin-right: auto; 
     width: 140px;
 }
+
+/* Search Section*/
+.bootstrap-tagsinput {
+    line-height: 36px !important;
+}
+
+.label {
+    font-size: 100% !important;
+}
+
+.row {
+    margin-bottom: 15px;
+}
+
+a.btn:visited {
+    color: white;
+}
+
+::-webkit-input-placeholder {
+  color:    #808080;
+}
+
+input:-moz-placeholder {
+  color:    #808080;
+}
+
+::-moz-placeholder {
+  color:    #808080;
+}
+
+:-ms-input-placeholder {
+  color:    #808080;
+}
+
+.btn-default {
+    color: #333 !important;
+}

@@ -16,8 +16,14 @@
             "~/Content/bootstrap/css/bootstrap.min.css",
             "~/Content/Site.css",
             "~/Content/carousel.css",
-            "~/Content/CSS/Home.css" 
+            "~/Content/CSS/Home.css"
     )
+
+    <!-- Bootstrap Tags Input CSS and JS Files-->
+    <link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
+    <link href="~/Content/CSS/typeahead.css" rel="stylesheet">
+    <script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
+    <script src="~/Content/typeahead/typeahead.bundle.js"></script>
 
     <script type="text/javascript">
         var siteList = @Html.Raw(Json.Encode(Model.Collections));
@@ -120,6 +126,46 @@
 
     <div class="container marketing">
 
+        <div class="search">
+            <div class="row text-center">
+                <h2>Phocalsteam Image Search</h2>
+                <h3>Quickly find images matching a descriptive tag.</h3>
+            </div>
+            @using (@Html.BeginForm("TagSearch", "Search"))
+            { 
+                <div class="row">
+                    <div class="col-lg-9">
+                        <input type="text" id="tag-field" name="tag" placeholder="river, sunset, cows, etc." />
+                    </div>
+                    <div class="col-lg-3">
+                        <button class="btn btn-lg btn-success full-width" type="submit">Search</button>
+                    </div>
+                </div>
+            }
+            <div class="row">
+                @if (Model.Tags.Count > 2)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        <div class="col-lg-3">
+                            @Html.ActionLink("View the " + @Model.Tags[i] + " collection", "TagSearch", "Search", new { @tag = @Model.Tags[i] }, new { @class = "btn btn-primary full-width" })
+                        </div>
+                    }
+                <div class="col-lg-3">
+                    <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
+                </div>
+                }
+                else
+                {
+                <div class="col-lg-4 col-lg-offset-4">
+                    <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
+                </div>
+                }
+            </div>
+        </div>
+
+        <hr class="featurette-divider">
+
         <!-- Three columns of text below the carousel -->
         <div class="row">
             <div class="col-md-4">
@@ -167,3 +213,54 @@
     </div><!-- /.container -->
 </body>
 </html>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var availableTags = @Html.Raw(Json.Encode(Model.Tags));
+
+        var substringMatcher = function(strs) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
+
+                // an array that will be populated with substring matches
+                matches = [];
+
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
+
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                    if (substrRegex.test(str)) {
+
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({ value: str });
+                    }
+                });
+
+                cb(matches);
+            };
+        };
+
+        $('#tag-field').tagsinput();
+
+        $('#tag-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'available-tags',
+            source: substringMatcher(availableTags)
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+
+            if(this.tagsinput('items').length != 0) {
+                this.tagsinput('input').attr('placeholder','');
+            }
+
+        }, $('#tag-field')));
+    });
+</script>

@@ -1,22 +1,8 @@
-﻿.icon-github {
-    background: no-repeat url('../img/github-16px.png');
-    width: 16px;
-    height: 16px;
+﻿.bootstrap-tagsinput {
+    width: 100%; 
+    margin-bottom: 0px !important;
 }
 
-.bootstrap-tagsinput { width: 100%; }
-
-.accordion {
-	margin-bottom:-3px;
-}
-
-.accordion-group { 
-	border: none;
-}
-
-body {
-    padding-top: 40px;
-}
 .twitter-typeahead .tt-query,
 .twitter-typeahead .tt-hint {
   margin-bottom: 0;
@@ -45,6 +31,12 @@ body {
     line-height: 1.33;
 }
 
+.tt-input {
+    vertical-align: middle;
+    font-size: 16px !important;
+    line-height: normal !important;
+}
+
 .tt-dropdown-menu {
   min-width: 160px;
   margin-top: 2px;
@@ -70,8 +62,9 @@ body {
   padding: 3px 20px;
 }
 
-.tt-suggestion.tt-is-under-cursor {
+.tt-suggestion.tt-cursor {
   color: #fff;
+  cursor: pointer;
   background-color: #0081c2;
   background-image: -moz-linear-gradient(top, #0088cc, #0077b3);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0077b3));
@@ -82,7 +75,7 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0)
 }
 
-.tt-suggestion.tt-is-under-cursor a {
+.tt-suggestion.tt-cursor a {
   color: #fff;
 }
 

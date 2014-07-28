@@ -325,7 +325,7 @@ namespace Phocalstream_Service.Service
 
         public List<string> GetTagNames()
         {
-            return TagRepository.GetAll().Select(t => t.Name).ToList<string>();
+            return TagRepository.Find(t => !t.Name.Equals("")).Select(t => t.Name).ToList<string>();
         }
 
         public Photo AddTag(long photoID, string tags)

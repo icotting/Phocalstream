@@ -100,3 +100,7 @@ h2 {
 .content {
     margin-top: 100px;
 }
+
+.full-width {
+    width: 100%;
+}

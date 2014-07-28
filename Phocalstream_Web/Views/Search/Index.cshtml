@@ -1,13 +1,14 @@
 ﻿@model Phocalstream_Shared.Data.Model.View.SearchModel
 @{
+    ViewBag.Title = "Search";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@Styles.Render("~/Content/CSS/Search.css",
-    "~/Content/CSS/typeahead.css")
+@Styles.Render("~/Content/CSS/Search.css")
 
 <!-- Bootstrap Tags Input CSS and JS Files-->
 <link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
-<script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.min.js"></script>
+<link href="~/Content/CSS/typeahead.css" rel="stylesheet">
+<script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
 <script src="~/Content/typeahead/typeahead.bundle.js"></script>
 
 <div class="background">
@@ -553,7 +554,6 @@
         };
 
         $('#tag-field').tagsinput();
-
         $('#tag-field').tagsinput('input').typeahead({
             minLength: 2,
             highlight: true,
@@ -561,10 +561,12 @@
         {
             name: 'available-tags',
             source: substringMatcher(availableTags)
-        });
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#tag-field')));
 
         $('#site-field').tagsinput();
-
         $('#site-field').tagsinput('input').typeahead({
             minLength: 2,
             highlight: true,
@@ -572,10 +574,9 @@
         {
             name: 'sites',
             source: substringMatcher(sites)
-        });
-
-
-
-
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#site-field')));
     });
 </script>
