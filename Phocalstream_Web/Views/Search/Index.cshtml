@@ -1,85 +1,582 @@
-﻿@model Phocalstream_Web.Models.SearchResults
+﻿@model Phocalstream_Shared.Data.Model.View.SearchModel
 @{
     ViewBag.Title = "Search";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@Styles.Render("~/Content/CSS/Search.css")
 
-@section Styles
-{
-        <style type="text/css">
-        #silverlightControlHost {
-	        height: 100%;
-            width: 100%;
-	        text-align:center;
+<!-- Bootstrap Tags Input CSS and JS Files-->
+<link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
+<link href="~/Content/CSS/typeahead.css" rel="stylesheet">
+<script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
+<script src="~/Content/typeahead/typeahead.bundle.js"></script>
+
+<div class="background">
+    <img class="background-img" src="/api/photo/high/@Model.BackgroundImageID" />
+</div>
+
+<div class="shadow">
+
+</div>
+
+<div class="container">
+    <div class="content">
+        
+        @if(@ViewBag.Message != null)
+        {
+            <div class="alert alert-info alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                @ViewBag.Message
+            </div>
         }
+        
+        <div class="text-center">
+            <h1 class="page-header title">Phocalstream Power Search</h1>
+        </div>
 
-            #pivot {
-                position: absolute; 
-                top: 220px; 
-                bottom: 5px; 
-                width: 80%; 
-                min-width: 900px; 
-                z-index: 300;
+        @using (@Html.BeginForm("AdvancedSearch", "Search"))
+        {
+            <!-- Sites -->
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Sites)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(m => m.Sites, new { @id = "site-field" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Dates)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(m => m.Dates, new { @placeholder = "8/4/2011", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Tags)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(m => m.Tags, new { @id = "tag-field" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seasons -->
+            <div class="search-row">
+                <div class="page-header">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Seasons</label>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <label class="sel-header">Spring</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="sel-header">Summer</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="sel-header">Fall</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="sel-header">Winter</label>
+                        </div>
+                    </div>
+                </div>
+            <!--
+            </div>
+        
+            <!-- Months --> <!--
+            <div class="search-row">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Months</label>
+                    </div>
+                </div>
+                                -->
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.January) <label id="jan" class="sel-subheader">January</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.February) <label id="feb" class="sel-subheader">February</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.March) <label id="mar" class="sel-subheader">March</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.April) <label id="apr" class="sel-subheader">April</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.May) <label id="may" class="sel-subheader">May</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.June) <label id="jun" class="sel-subheader">June</label>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.July) <label id="jul" class="sel-subheader">July</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.August) <label id="aug" class="sel-subheader">August</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.September) <label id="sep" class="sel-subheader">September</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.October) <label id="oct" class="sel-subheader">October</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.November) <label id="nov" class="sel-subheader">November</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.December) <label id="dec" class="sel-subheader">December</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TimesOfDay -->
+            <div class="search-row">
+                <div class="page-header">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Times Of Day</label>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <label class="sel-header">Morning</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="sel-header">Afternoon</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="sel-header">Evening</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="sel-header">Night</label>
+                        </div>
+                    </div>
+                </div>
+            <!--
+            </div>
+            
+            <!-- HoursOfDay --> <!--
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Hours Of Day</label>
+                    </div>
+                </div>
+                -->
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Zero) <label id="0" class="sel-subheader">0000</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.One) <label id="1" class="sel-subheader">0100</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Two) <label id="2" class="sel-subheader">0200</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Three) <label id="3" class="sel-subheader">0300</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Four) <label id="4" class="sel-subheader">0400</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Five) <label id="5" class="sel-subheader">0500</label>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Six) <label id="6" class="sel-subheader">0600</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Seven) <label id="7" class="sel-subheader">0700</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Eight) <label id="8" class="sel-subheader">0800</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Nine) <label id="9" class="sel-subheader">0900</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Ten) <label id="10" class="sel-subheader">1000</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Eleven) <label id="11" class="sel-subheader">1100</label>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Twelve) <label id="12" class="sel-subheader">1200</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Thirteen) <label id="13" class="sel-subheader">1300</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Fourteen) <label id="14" class="sel-subheader">1400</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Fifteen) <label id="15" class="sel-subheader">1500</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Sixteen) <label id="16" class="sel-subheader">1600</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Seventeen) <label id="17" class="sel-subheader">1700</label>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Eighteen) <label id="18" class="sel-subheader">1800</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Nineteen) <label id="19" class="sel-subheader">1900</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.Twenty) <label id="20" class="sel-subheader">2000</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.TwentyOne) <label id="21" class="sel-subheader">2100</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.TwentyTwo) <label id="22" class="sel-subheader">2200</label>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.CheckBoxFor(m => m.TwentyThree) <label id="23" class="sel-subheader">2300</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <button class="btn btn-success col-md-4 col-md-offset-4" type="submit">Search</button>
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        
+        $('.sel-header').click(function() {
+            var toggle = !$(this).hasClass("selected");
+
+            $(this).toggleClass("selected");
+
+            var value = $(this).text();
+
+            switch(value) {
+                //seasons
+                case "Winter" :
+                    $("#dec").toggleClass("selected", toggle);
+                    $("#jan").toggleClass("selected", toggle);
+                    $("#feb").toggleClass("selected", toggle);
+
+                    $("#December").prop('checked', toggle);
+                    $("#January").prop('checked', toggle);
+                    $("#February").prop('checked', toggle);
+                    break;
+
+                case "Spring" :
+                    $("#mar").toggleClass("selected", toggle);
+                    $("#apr").toggleClass("selected", toggle);
+                    $("#may").toggleClass("selected", toggle);
+
+                    $("#March").prop('checked', toggle);
+                    $("#April").prop('checked', toggle);
+                    $("#May").prop('checked', toggle);
+                    break;
+
+                case "Summer" :
+                    $("#jun").toggleClass("selected", toggle);
+                    $("#jul").toggleClass("selected", toggle);
+                    $("#aug").toggleClass("selected", toggle);
+
+                    $("#June").prop('checked', toggle);
+                    $("#July").prop('checked', toggle);
+                    $("#August").prop('checked', toggle);
+                    break;
+
+                case "Fall" :
+                    $("#sep").toggleClass("selected", toggle);
+                    $("#oct").toggleClass("selected", toggle);
+                    $("#nov").toggleClass("selected", toggle);
+
+                    $("#September").prop('checked', toggle);
+                    $("#October").prop('checked', toggle);
+                    $("#November").prop('checked', toggle);
+                    break;
+               
+                //times
+                case "Morning" :
+                    $("#5").toggleClass("selected", toggle);
+                    $("#6").toggleClass("selected", toggle);
+                    $("#7").toggleClass("selected", toggle);
+                    $("#8").toggleClass("selected", toggle);
+                    $("#9").toggleClass("selected", toggle);
+                    $("#10").toggleClass("selected", toggle);
+                    $("#11").toggleClass("selected", toggle);
+
+                    $("#Five").prop('checked', toggle);
+                    $("#Six").prop('checked', toggle);
+                    $("#Seven").prop('checked', toggle);
+                    $("#Eight").prop('checked', toggle);
+                    $("#Nine").prop('checked', toggle);
+                    $("#Ten").prop('checked', toggle);
+                    $("#Eleven").prop('checked', toggle);
+                    break;
+
+                case "Afternoon" :
+                    $("#12").toggleClass("selected", toggle);
+                    $("#13").toggleClass("selected", toggle);
+                    $("#14").toggleClass("selected", toggle);
+                    $("#15").toggleClass("selected", toggle);
+                    $("#16").toggleClass("selected", toggle);
+
+                    $("#Twelve").prop('checked', toggle);
+                    $("#Thirteen").prop('checked', toggle);
+                    $("#Fourteen").prop('checked', toggle);
+                    $("#Fifteen").prop('checked', toggle);
+                    $("#Sixteen").prop('checked', toggle);
+                    break;
+
+                case "Evening" :
+                    $("#17").toggleClass("selected", toggle);
+                    $("#18").toggleClass("selected", toggle);
+                    $("#19").toggleClass("selected", toggle);
+                    $("#20").toggleClass("selected", toggle);
+
+                    $("#Seventeen").prop('checked', toggle);
+                    $("#Eighteen").prop('checked', toggle);
+                    $("#Nineteen").prop('checked', toggle);
+                    $("#Twenty").prop('checked', toggle);
+                    break;
+
+                case "Night" :
+                    $("#21").toggleClass("selected", toggle);
+                    $("#22").toggleClass("selected", toggle);
+                    $("#23").toggleClass("selected", toggle);
+                    $("#0").toggleClass("selected", toggle);
+                    $("#1").toggleClass("selected", toggle);
+                    $("#2").toggleClass("selected", toggle);
+                    $("#3").toggleClass("selected", toggle);
+                    $("#4").toggleClass("selected", toggle);
+
+                    $("#TwentyOne").prop('checked', toggle);
+                    $("#TwentyTwo").prop('checked', toggle);
+                    $("#TwentyThree").prop('checked', toggle);
+                    $("#Zero").prop('checked', toggle);
+                    $("#One").prop('checked', toggle);
+                    $("#Two").prop('checked', toggle);
+                    $("#Three").prop('checked', toggle);
+                    $("#Four").prop('checked', toggle);
+                    break;
             }
-        </style>
-}
+        });
 
+        $('.sel-subheader').click(function() {
+            var toggle = !$(this).hasClass("selected");
+            
+            $(this).toggleClass("selected", toggle);
 
-@section Scripts 
-{
-        <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
-        <script type="text/javascript">
-            function onSilverlightError(sender, args) {
-                var appSource = "";
-                if (sender != null && sender != 0) {
-                    appSource = sender.getHost().Source;
-                }
+            var value = $(this).text();
 
-                var errorType = args.ErrorType;
-                var iErrorCode = args.ErrorCode;
+            switch(value) {
+                //months
+                case "January" :
+                    $("#January").prop('checked', toggle);
+                    break;
+                case "February" :
+                    $("#February").prop('checked', toggle);
+                    break;
+                case "March" :
+                    $("#March").prop('checked', toggle);
+                    break;
+                case "April" :
+                    $("#April").prop('checked', toggle);
+                    break;
+                case "May" :
+                    $("#May").prop('checked', toggle);
+                    break;
+                case "June" :
+                    $("#June").prop('checked', toggle);
+                    break;
+                case "July" :
+                    $("#July").prop('checked', toggle);
+                    break;
+                case "August" :
+                    $("#August").prop('checked', toggle);
+                    break;
+                case "September" :
+                    $("#September").prop('checked', toggle);
+                    break;
+                case "October" :
+                    $("#October").prop('checked', toggle);
+                    break;
+                case "November" :
+                    $("#November").prop('checked', toggle);
+                    break;
+                case "December" :
+                    $("#December").prop('checked', toggle);
 
-                if (errorType == "ImageError" || errorType == "MediaError") {
-                    return;
-                }
+                //times
+                case "0000" :
+                    $("#Zero").prop('checked', toggle);
+                    break;
+                case "0100" :
+                    $("#One").prop('checked', toggle);
+                    break;
+                case "0200" :
+                    $("#Two").prop('checked', toggle);
+                    break;
+                case "0300" :
+                    $("#Three").prop('checked', toggle);
+                    break;
+                case "0400" :
+                    $("#Four").prop('checked', toggle);
+                    break;
+                case "0500" :
+                    $("#Five").prop('checked', toggle);
+                    break;
+                case "0600" :
+                    $("#Six").prop('checked', toggle);
+                    break;
+                case "0700" :
+                    $("#Seven").prop('checked', toggle);
+                    break;
+                case "0800" :
+                    $("#Eight").prop('checked', toggle);
+                    break;
+                case "0900" :
+                    $("#Nine").prop('checked', toggle);
+                    break;
+                case "1000" :
+                    $("#Ten").prop('checked', toggle);
+                    break;
+                case "1100" :
+                    $("#Eleven").prop('checked', toggle);
+                    break;
+                case "1200" :
+                    $("#Twelve").prop('checked', toggle);
+                    break;
+                case "1300" :
+                    $("#Thirteen").prop('checked', toggle);
+                    break;
+                case "1400" :
+                    $("#Fourteen").prop('checked', toggle);
+                    break;
+                case "1500" :
+                    $("#Fifteen").prop('checked', toggle);
+                    break;
+                case "1600" :
+                    $("#Sixteen").prop('checked', toggle);
+                    break;
+                case "1700" :
+                    $("#Seventeen").prop('checked', toggle);
+                    break;
+                case "1800" :
+                    $("#Eighteen").prop('checked', toggle);
+                    break;
+                case "1900" :
+                    $("#Nineteen").prop('checked', toggle);
+                    break;
+                case "2000" :
+                    $("#Twenty").prop('checked', toggle);
+                    break;
+                case "2100" :
+                    $("#TwentyOne").prop('checked', toggle);
+                    break;
+                case "2200" :
+                    $("#TwentyTwo").prop('checked', toggle);
+                    break;
+                case "2300" :
+                    $("#TwentyThree").prop('checked', toggle);
+                    break;
+            }
+        });
+    });
 
-                var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
+   
+</script>
 
-                errMsg += "Code: " + iErrorCode + "    \n";
-                errMsg += "Category: " + errorType + "       \n";
-                errMsg += "Message: " + args.ErrorMessage + "     \n";
+<script type="text/javascript">
+    $(document).ready(function() {
 
-                if (errorType == "ParserError") {
-                    errMsg += "File: " + args.xamlFile + "     \n";
-                    errMsg += "Line: " + args.lineNumber + "     \n";
-                    errMsg += "Position: " + args.charPosition + "     \n";
-                }
-                else if (errorType == "RuntimeError") {
-                    if (args.lineNumber != 0) {
-                        errMsg += "Line: " + args.lineNumber + "     \n";
-                        errMsg += "Position: " + args.charPosition + "     \n";
+        var availableTags = @Html.Raw(Json.Encode(Model.AvailableTags));
+        var sites = @Html.Raw(Json.Encode(Model.SiteNames));
+
+        var substringMatcher = function(strs) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
+
+                // an array that will be populated with substring matches
+                matches = [];
+
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
+
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                    if (substrRegex.test(str)) {
+
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({ value: str });
                     }
-                    errMsg += "MethodName: " + args.methodName + "     \n";
-                }
+                });
 
-                throw new Error(errMsg);
-            }
-        </script>
-}
+                cb(matches);
+            };
+        };
 
-<h2>Search</h2>
-Results for query: '@Html.DisplayTextFor(m => m.Query)'
+        $('#tag-field').tagsinput();
+        $('#tag-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'available-tags',
+            source: substringMatcher(availableTags)
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#tag-field')));
 
-<form id="pivot" runat="server">
-    <div id="silverlightControlHost">
-    <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
-		<param name="source" value="/ClientBin/Phocalstream_PivotView.xap"/>
-		<param name="onError" value="onSilverlightError" />
-		<param name="background" value="white" />
-		<param name="minRuntimeVersion" value="4.0.60310.0" />
-		<param name="autoUpgrade" value="true" />
-        <param name="initParams" value="collection=@Html.DisplayFor(model => model.CollectionUrl)" />
-		<a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" style="text-decoration:none">
- 			<img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" style="border-style:none"/>
-		</a>
-	</object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe></div>
-</form>
+        $('#site-field').tagsinput();
+        $('#site-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'sites',
+            source: substringMatcher(sites)
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#site-field')));
+    });
+</script>

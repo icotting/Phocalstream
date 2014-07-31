@@ -12,12 +12,12 @@ namespace Phocalstream_Shared.Data
     public interface IPhotoRepository
     {
         SiteDetails GetSiteDetails(CameraSite site);
-
+        
         /* These methods should be split off into a service */
         XmlDocument CreateDeepZoomForSite(long siteID);
         XmlDocument CreateDeepZomForList(string photoList);
         XmlDocument CreatePivotCollectionForSite(long siteID);
-        XmlDocument CreatePivotCollectionForList(string photoList);
+        XmlDocument CreatePivotCollectionForList(string collectionName, string photoList);
 
         ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort);
     }

@@ -15,6 +15,8 @@ using System.Web;
 using System.Web.Mvc;
 using Phocalstream_Shared.Data.Model.View;
 using System.IO;
+using Phocalstream_Service.Service;
+using Phocalstream_Shared.Service;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -30,6 +32,9 @@ namespace Phocalstream_Web.Controllers
         public IPhotoRepository PhotoRepository { get; set; }
 
         [Dependency]
+        public IPhotoService PhotoService { get; set; }
+
+        [Dependency]
         public IEntityRepository<Photo> PhotoEntityRepository { get; set; }
 
         //
@@ -39,7 +44,7 @@ namespace Phocalstream_Web.Controllers
             HomeViewModel model = new HomeViewModel();
             ICollection<Collection> collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
             model.Sites = collections.Select(c => GetDetailsForCollection(c));
-
+            model.Tags = PhotoService.GetTagNames();
             return View(model);
         }
 
@@ -69,8 +74,8 @@ namespace Phocalstream_Web.Controllers
         public ActionResult Downloads()
         {
             DownloadViewModel model = new DownloadViewModel();
-
-            model.DownloadPath = ConfigurationManager.AppSettings["downloadPath"];
+            
+            model.DownloadPath = PathManager.GetDownloadPath();
             FileInfo[] fileInfos = new DirectoryInfo(model.DownloadPath).GetFiles();
 
             Tuple<string, string>[] Files = new Tuple<string, string>[fileInfos.Length];

@@ -6,6 +6,7 @@ using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_Shared.Service;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
@@ -31,6 +32,9 @@ namespace Phocalstream_Web.Controllers
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [Dependency]
+        public IEntityRepository<Tag> TagRepository { get; set; }
+        
+        [Dependency]
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
@@ -45,15 +49,21 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IEntityRepository<User> UserRepository { get; set; }
 
+        [Dependency]
+        public IPhotoService PhotoService { get; set; }
+
+        
         public ActionResult Index(long photoID)
         {
             PhotoViewModel model = new PhotoViewModel();
-            model.Photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
+            model.Photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site, p => p.Tags);
             
             if (model.Photo == null)
             {
                 return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
             }
+
+            model.Photo.AvailableTags = PhotoService.GetUnusedTagNames(photoID);
 
             model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
                     Request.Url.Host,
@@ -234,11 +244,24 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public ActionResult AddTag(long photoID, string tags)
+       {
+           Photo photo = PhotoService.AddTag(photoID, tags);
+
+            if(photo == null)
+            {
+                return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
+            }
+
+            return PartialView("_TagPartial", photo);
+        }
+
         public ActionResult DeleteDownload(string fileName)
         {
             if (fileName.Equals("ALL"))
             {
-                FileInfo[] files = new DirectoryInfo(ConfigurationManager.AppSettings["downloadPath"]).GetFiles();
+                FileInfo[] files = new DirectoryInfo(PathManager.GetDownloadPath()).GetFiles();
                 foreach (var file in files)
                 {
                     file.Delete();
@@ -247,7 +270,7 @@ namespace Phocalstream_Web.Controllers
 
             else
             {
-                string filePath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+                string filePath = PathManager.GetDownloadPath() + fileName;
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -272,7 +295,7 @@ namespace Phocalstream_Web.Controllers
             long dataToRead;
 
             // Identify the file to download including its path.
-            string downloadPath = ConfigurationManager.AppSettings["downloadPath"] + fileName;
+            string downloadPath = PathManager.GetDownloadPath() + fileName;
 
             try
             {

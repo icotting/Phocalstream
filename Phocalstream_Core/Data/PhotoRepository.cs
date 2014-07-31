@@ -1,10 +1,13 @@
-﻿using Phocalstream_Shared.Data;
+﻿using Phocalstream_Service.Service;
+using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml;
@@ -51,7 +54,6 @@ namespace Phocalstream_Web.Application.Data
             return details;
         }
 
-
         public System.Xml.XmlDocument CreateDeepZoomForSite(long siteID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -71,7 +73,7 @@ namespace Phocalstream_Web.Application.Data
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                using (SqlCommand command = new SqlCommand("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in (" + photoList + ")", conn))
+                using (SqlCommand command = new SqlCommand(string.Format("select Photos.ID,BlobID,Width,Height,ContainerID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID IN ({0})", photoList), conn))
                 {
                     return CreateDeepZoomDocument(command, null);
                 }
@@ -80,13 +82,46 @@ namespace Phocalstream_Web.Application.Data
 
         public XmlDocument CreatePivotCollectionForSite(long siteID)
         {
+            string siteName = GetCameraSiteName(siteID);
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string siteName = "";
-                using (SqlCommand command = new SqlCommand(string.Format("select Name from CameraSites where ID = {0}", siteID), conn))
+                using (SqlCommand command = new SqlCommand("select ID, Captured from Photos where Site_ID = @id", conn))
                 {
+                    command.Prepare();
+                    command.Parameters.AddWithValue("@id", siteID);
+                    return CreatePivotDocument(siteName, command, null, CollectionType.SITE);
+                }
+            }
+        }
+
+        public XmlDocument CreatePivotCollectionForList(string collectionName, string photoList)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured, Site_ID from Photos where Photos.ID IN ({0})", photoList), conn))
+                {
+                    return CreatePivotDocument(collectionName, command, null, CollectionType.SEARCH);
+                }
+            }
+        }
+
+        public string GetCameraSiteName(long siteID)
+        {
+            string siteName = "";
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand command = new SqlCommand("select Name from CameraSites where ID = @id", conn))
+                {
+                    command.Prepare();
+                    command.Parameters.AddWithValue("@id", siteID);
+
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
@@ -95,17 +130,9 @@ namespace Phocalstream_Web.Application.Data
                         }
                     }
                 }
-
-                using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured from Photos where Site_ID = {0}", siteID), conn))
-                {
-                    return CreatePivotDocument(siteName, command, null, CollectionType.SITE);
-                }
             }
-        }
 
-        public XmlDocument CreatePivotCollectionForList(string photoList)
-        {
-            throw new NotImplementedException();
+            return siteName;
         }
 
         public ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort)
@@ -114,10 +141,11 @@ namespace Phocalstream_Web.Application.Data
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "select BlobID, ContainerID, Captured, Photos.ID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in (" + photoList + ")";
                 conn.Open();
-                using (SqlCommand command = new SqlCommand(query, conn))
+
+                using (SqlCommand command = new SqlCommand(string.Format("select BlobID, ContainerID, Captured, Photos.ID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in ({0})", photoList), conn))
                 {
+
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -218,13 +246,35 @@ namespace Phocalstream_Web.Application.Data
             facet.SetAttribute("Name", "Time of Year");
             facet.SetAttribute("Type", "String");
             facets.AppendChild(facet);
+
+            if (type == CollectionType.SEARCH)
+            {
+                facet = doc.CreateElement("FacetCategory");
+                facet.SetAttribute("Name", "Site");
+                facet.SetAttribute("Type", "String");
+                facets.AppendChild(facet);
+            }
+
             root.AppendChild(facets);
 
-            string dzCollection = (uri == null) ? string.Format("/dzc/{0}/collection.dzc", collectionName) 
-                : string.Format("{0}://{1}:{2}/dzc/{3}/collection.dzc", uri.Scheme,
-                uri.Host,
-                uri.Port,
-                collectionName);
+            string dzCollection = "";
+            if (type == CollectionType.SEARCH)
+            {
+                dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.SearchPath, collectionName)
+                    : string.Format("{0}://{1}:{2}/dzc/{3}{4}/collection.dzc", uri.Scheme,
+                    uri.Host,
+                    uri.Port,
+                    PathManager.SearchPath,
+                    collectionName);
+            }
+            else
+            {
+                dzCollection = (uri == null) ? string.Format("/dzc/{0}/collection.dzc", collectionName)
+                    : string.Format("{0}://{1}:{2}/dzc/{3}/collection.dzc", uri.Scheme,
+                    uri.Host,
+                    uri.Port,
+                    collectionName);
+            }
 
             XmlElement items = doc.CreateElement("Items");
             items.SetAttribute("ImgBase", dzCollection);
@@ -246,10 +296,20 @@ namespace Phocalstream_Web.Application.Data
         {
             DateTime captured = (DateTime)photo["Captured"];
 
+            string siteName;
+            if(includeSite)
+            {
+                 siteName = GetCameraSiteName((long)photo["Site_ID"]);
+            }
+            else
+            {
+                siteName = collectionName;
+            }
+
             XmlElement item = doc.CreateElement("Item");
             item.SetAttribute("Img", String.Format("#{0}", position));
             item.SetAttribute("Id", Convert.ToString(photo["ID"]));
-            item.SetAttribute("Name", string.Format("{0} {1}", collectionName, captured.ToString("MMM dd, yyyy hh:mm tt")));
+            item.SetAttribute("Name", string.Format("{0} {1}", siteName, captured.ToString("MMM dd, yyyy hh:mm tt")));
             item.SetAttribute("Href", "http://www.google.com");
 
             XmlElement facets = doc.CreateElement("Facets");
@@ -317,7 +377,7 @@ namespace Phocalstream_Web.Application.Data
                 facet = doc.CreateElement("Facet");
                 facet.SetAttribute("Name", "Site");
                 facetValue = doc.CreateElement("String");
-                facetValue.SetAttribute("Value", collectionName);
+                facetValue.SetAttribute("Value", siteName);
                 facet.AppendChild(facetValue);
                 facets.AppendChild(facet);
             }
