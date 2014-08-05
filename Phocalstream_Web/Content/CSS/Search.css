@@ -65,8 +65,17 @@ input[type=checkbox] {
 
 .sel-header {
     font-size: 20px;
+    cursor: pointer;
+}
+
+.sel-subheader {
+    cursor: pointer;
 }
 
 .selected {
     color: #5bc0de;
+}
+
+.padding-bottom {
+    padding-bottom: 50px;
 }
