@@ -53,9 +53,13 @@ namespace Phocalstream_Web.Controllers
             model.AvailableTags = PhotoService.GetTagNames();
             model.SiteNames = SearchService.GetSiteNames();
 
-            if (e != 0)
+            if (e == 1)
             {
                 ViewBag.Message = "Zero photos matched those parameters, please try again.";
+            }
+            else if (e == 2)
+            {
+                ViewBag.Message = "Please enter at least one (1) search parameter.";
             }
 
             return View(model);
@@ -63,14 +67,26 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult TagSearch(string tag)
         {
-            SearchModel model = new SearchModel();
-            model.Tags = tag;
+            if (String.IsNullOrWhiteSpace(tag))
+            {
+                return RedirectToAction("Index", "Home", new { e = 2 });
+            }
+            else
+            {
+                SearchModel model = new SearchModel();
+                model.Tags = tag;
 
-            return RedirectToAction("AdvancedSearch", model);
+                return RedirectToAction("AdvancedSearch", model);
+            }
         }
 
         public ActionResult AdvancedSearch(SearchModel model)
         {
+            if (model.IsEmpty())
+            {
+                return RedirectToAction("Index", new { e = 2 });
+            }
+
             //execute the search
             SearchMatches result = SearchService.Search(model);
             

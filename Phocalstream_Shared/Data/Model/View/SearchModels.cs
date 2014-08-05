@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -66,6 +67,43 @@ namespace Phocalstream_Shared.Data.Model.View
         public long BackgroundImageID { get; set; }
 
         
+        public bool IsEmpty()
+        {
+            bool[] month_array = new bool[]
+            {
+                January, February, March, April, May, June, July, August, September, October, November, December
+            };
+
+            bool[] hour_array = new bool[]
+            {
+                Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven,
+                Twelve, Thirteen, Fourteen, Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, TwentyOne, TwentyTwo, TwentyThree
+            };
+
+            foreach (bool month in month_array)
+            {
+                if(month)
+                {
+                    return false;
+                }
+            }
+
+            foreach (bool hour in hour_array)
+            {
+                if(hour)
+                {
+                    return false;
+                }
+            }
+
+            if(!String.IsNullOrWhiteSpace(Sites) || !String.IsNullOrWhiteSpace(Dates) || !String.IsNullOrWhiteSpace(Dates))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public string CreateMonthString()
         {
             string months = null;
@@ -139,21 +177,51 @@ namespace Phocalstream_Shared.Data.Model.View
                 name.Append("tagged with " + String.Join(", ", Tags.Split(',')) + " ");
             }
 
-            string months = CreateMonthString();
-            if (!String.IsNullOrWhiteSpace(months))
+            bool[] month_array = new bool[]
             {
-                name.Append("taken during " + months + " ");
+                January, February, March, April, May, June, July, August, September, October, November, December
+            };
+            List<string> monthNames = new List<string>();
+            for(int i = 0; i < month_array.Length; i++)
+            {
+                if(month_array[i])
+                {
+                    monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1));
+                }
+            }
+            if(monthNames.Count != 0)
+            {
+                name.Append("taken during " + String.Join(", ", monthNames.ToArray()) + " ");
             }
 
             if (!String.IsNullOrWhiteSpace(Dates))
             {
                 name.Append("taken on " + String.Join(", ", Dates.Split(',')) + " ");
             }
-            
-            string hours = CreateHourString();
-            if (!String.IsNullOrWhiteSpace(hours))
+
+            bool[] hour_array = new bool[]
             {
-                name.Append("during the hours of " + String.Join(", ", hours.Split(',')) + ".");
+                Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven,
+                Twelve, Thirteen, Fourteen, Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, TwentyOne, TwentyTwo, TwentyThree
+            };
+            List<string> hourNames = new List<string>();
+            for (int i = 0; i < hour_array.Length; i++)
+            {
+                if (hour_array[i])
+                {
+                    if (i < 10)
+                    {
+                        hourNames.Add("0" + Convert.ToString(i) + "00");
+                    }
+                    else
+                    {
+                        hourNames.Add(Convert.ToString(i) + "00");
+                    }
+                }
+            }
+            if(hourNames.Count != 0)
+            {
+                name.Append("during the hours of " + String.Join(", ", hourNames.ToArray()) + ".");
             }
 
             return name.ToString();

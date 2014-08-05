@@ -127,6 +127,14 @@
     <div class="container marketing">
 
         <div class="search">
+            @if (@ViewBag.Message != null)
+            {
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    @ViewBag.Message
+                </div>
+            }
+
             <div class="row text-center">
                 <h2>Phocalsteam Image Search</h2>
                 <h3>Quickly find images matching a descriptive tag.</h3>
