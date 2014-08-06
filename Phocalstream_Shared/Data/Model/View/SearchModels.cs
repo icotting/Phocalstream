@@ -237,6 +237,8 @@ namespace Phocalstream_Shared.Data.Model.View
     public class SearchResults
     {
         public string CollectionName { get; set; }
+        
+        [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int PhotoCount { get; set; }
         public string CollectionUrl { get; set; }
     }
