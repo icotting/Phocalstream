@@ -96,7 +96,7 @@ namespace Phocalstream_Shared.Data.Model.View
                 }
             }
 
-            if(!String.IsNullOrWhiteSpace(Sites) || !String.IsNullOrWhiteSpace(Dates) || !String.IsNullOrWhiteSpace(Dates))
+            if(String.IsNullOrWhiteSpace(Sites) && String.IsNullOrWhiteSpace(Dates) && String.IsNullOrWhiteSpace(Dates))
             {
                 return false;
             }
