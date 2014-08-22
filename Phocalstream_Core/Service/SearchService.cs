@@ -100,6 +100,34 @@ namespace Phocalstream_Service.Service
             SearchMatches result = new SearchMatches();
             result.Ids = new List<long>();
             
+            string select = GetSearchQuery(model);
+
+            if (!String.IsNullOrWhiteSpace(select)) 
+            {
+                //run the query (only if there are parameters selected)
+                using (SqlConnection conn = new SqlConnection(PathManager.GetDbConnection()))
+                {
+                    conn.Open();
+
+                    using (SqlCommand command = new SqlCommand(select.ToString(), conn))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                result.Ids.Add((long)reader["ID"]);
+                            }
+                        }
+                    }
+                }
+                result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID)).ToList<Photo>();
+            }
+            
+            return result;
+        }
+
+        private String GetSearchQuery(SearchModel model)
+        {
             string hourString = model.CreateHourString();
             string monthString = model.CreateMonthString();
 
@@ -172,7 +200,7 @@ namespace Phocalstream_Service.Service
                 select.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
                     "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID ");
                 parameters.Append(tagBuilder);
-            }
+            }   
 
             //remove final AND if present
             if (parameters.Length > 0)
@@ -183,26 +211,12 @@ namespace Phocalstream_Service.Service
                 }
                 select.Append("WHERE " + parameters);
 
-                //run the query (only if there are parameters selected)
-                using (SqlConnection conn = new SqlConnection(PathManager.GetDbConnection()))
-                {
-                    conn.Open();
-
-                    using (SqlCommand command = new SqlCommand(select.ToString(), conn))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                result.Ids.Add((long)reader["ID"]);
-                            }
-                        }
-                    }
-                }
-                result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID)).ToList<Photo>();
+                return select.ToString();
             }
-            
-            return result;
+            else 
+            {
+                return "";
+            }
         }
 
         private StringBuilder SiteQuery(string query)
