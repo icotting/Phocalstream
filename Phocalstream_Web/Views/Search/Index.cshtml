@@ -50,20 +50,6 @@
                 </div>
             </div>
 
-            <!-- Dates -->
-            <div class="search-row">
-                <div class="row">
-                    <div class="col-md-4">
-                        @Html.LabelFor(m => m.Dates)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        @Html.TextBoxFor(m => m.Dates, new { @placeholder = "8/4/2011", @class = "form-control" })
-                    </div>
-                </div>
-            </div>
-
             <!-- Tags -->
             <div class="search-row">
                 <div class="row">
@@ -78,6 +64,20 @@
                 </div>
             </div>
 
+            <!-- Dates -->
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Dates)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(m => m.Dates, new { @placeholder = "8/4/2011", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            
             <!-- Seasons -->
             <div class="search-row">
                 <div class="page-header">

@@ -96,12 +96,14 @@ namespace Phocalstream_Shared.Data.Model.View
                 }
             }
 
-            if(String.IsNullOrWhiteSpace(Sites) && String.IsNullOrWhiteSpace(Dates) && String.IsNullOrWhiteSpace(Dates))
+            if (!String.IsNullOrWhiteSpace(Sites) && !String.IsNullOrWhiteSpace(Dates) && !String.IsNullOrWhiteSpace(Dates))
+            {
+                return true;
+            }
+            else
             {
                 return false;
             }
-
-            return true;
         }
 
         public string CreateMonthString()

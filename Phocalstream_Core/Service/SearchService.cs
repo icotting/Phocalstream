@@ -32,11 +32,11 @@ namespace Phocalstream_Service.Service
         [Dependency]
         public IUnitOfWork Unit { get; set; }
 
-        
+
         public string ValidateAndGetSearchPath()
         {
             string search_path = PathManager.GetSearchPath();
-            if(!Directory.Exists(search_path))
+            if (!Directory.Exists(search_path))
             {
                 Directory.CreateDirectory(search_path);
             }
@@ -98,83 +98,36 @@ namespace Phocalstream_Service.Service
         public SearchMatches Search(SearchModel model)
         {
             SearchMatches result = new SearchMatches();
-
+            result.Ids = new List<long>();
+            
             string hourString = model.CreateHourString();
             string monthString = model.CreateMonthString();
 
             StringBuilder select = new StringBuilder();
             StringBuilder parameters = new StringBuilder();
-            
+
             StringBuilder sitesBuilder = new StringBuilder();
             StringBuilder tagBuilder = new StringBuilder();
             StringBuilder monthBuilder = new StringBuilder();
             StringBuilder dateBuilder = new StringBuilder();
             StringBuilder hourBuilder = new StringBuilder();
-            
-            //Sites
-            if(!String.IsNullOrWhiteSpace(model.Sites))
-            {
-                List<string> siteNames = SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
-                string[] sites = model.Sites.Split(',');
 
-                bool first = true;
-                foreach (var site in sites)
-                {
-                    if (siteNames.Contains(site))
-                    {
-                        if (first)
-                        {
-                            sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", site));
-                            first = false;
-                        }
-                        else
-                        {
-                            sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", site));
-                        }
-                    }
-                }
+            //Sites
+            if (!String.IsNullOrWhiteSpace(model.Sites))
+            {
+                sitesBuilder = SiteQuery(model.Sites);
             }
 
             //tag
             if (!String.IsNullOrWhiteSpace(model.Tags))
             {
-                List<string> tagNames = TagRepository.GetAll().Select(t => t.Name).ToList<string>();
-                string[] tags = model.Tags.Split(',');
-
-                bool tagFirst = true;
-                foreach (var tag in tags)
-                {
-                    if (tagNames.Contains(tag))
-                    {
-                        if (!tagFirst)
-                        {
-                            tagBuilder.Append("OR ");
-                        }
-                        tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
-
-                        tagFirst = false;
-                    }
-                }
+                tagBuilder = TagQuery(model.Tags);
             }
 
             //date
             if (!String.IsNullOrWhiteSpace(model.Dates))
             {
-                string[] dates = model.Dates.Split(',');
-
-                bool firstDate = true;
-                foreach (var d in dates)
-                {
-                    DateTime date = DateTime.Parse(d);
-                    if (!firstDate)
-                    {
-                        dateBuilder.Append("OR ");
-                    }
-                    dateBuilder.Append(string.Format("MONTH(Photos.Captured) = {0} AND DAY(Photos.Captured) = {1} AND YEAR(Photos.Captured) = {2} ",
-                        date.Month, date.Day, date.Year));
-                    
-                    firstDate = false;
-                }
+                dateBuilder = DateQuery(model.Dates);
             }
 
             //months
@@ -229,28 +182,138 @@ namespace Phocalstream_Service.Service
                     parameters.Remove(parameters.Length - 4, 4);
                 }
                 select.Append("WHERE " + parameters);
-            }
 
-            //run the query
-            result.Ids = new List<long>();
-            using (SqlConnection conn = new SqlConnection(PathManager.GetDbConnection()))
-            {
-                conn.Open();
-
-                using (SqlCommand command = new SqlCommand(select.ToString(), conn))
+                //run the query (only if there are parameters selected)
+                using (SqlConnection conn = new SqlConnection(PathManager.GetDbConnection()))
                 {
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    conn.Open();
+
+                    using (SqlCommand command = new SqlCommand(select.ToString(), conn))
                     {
-                        while (reader.Read())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            result.Ids.Add((long)reader["ID"]);
+                            while (reader.Read())
+                            {
+                                result.Ids.Add((long)reader["ID"]);
+                            }
                         }
                     }
                 }
+                result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID)).ToList<Photo>();
             }
-            result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID)).ToList<Photo>();
-
+            
             return result;
+        }
+
+        private StringBuilder SiteQuery(string query)
+        {
+            StringBuilder sitesBuilder = new StringBuilder();
+            //Get list of all site names to match to query
+            List<string> siteNames = SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
+            string[] sites = query.Split(',');
+
+            bool first = true;
+            foreach (var site in sites)
+            {
+                if (siteNames.Contains(site))
+                {
+                    if (first)
+                    {
+                        sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", site));
+                        first = false;
+                    }
+                    else
+                    {
+                        sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", site));
+                    }
+                }
+            }
+
+            return sitesBuilder;
+        }
+    
+        private StringBuilder TagQuery(string query)
+        {
+            StringBuilder tagBuilder = new StringBuilder();
+
+            List<string> tagNames = TagRepository.GetAll().Select(t => t.Name).ToList<string>();
+            string[] tags = query.Split(',');
+
+            bool tagFirst = true;
+            foreach (var tag in tags)
+            {
+                if (tagNames.Contains(tag))
+                {
+                    if(tagFirst)
+                    {
+                        tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
+                        tagFirst = false;
+                    }
+                    else
+                    {
+                        tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", tag));
+                    }
+                }
+            }
+
+            return tagBuilder;
+        }
+    
+        private StringBuilder DateQuery(string query)
+        {
+            StringBuilder dateBuilder = new StringBuilder();
+
+            string[] dates = query.Split(',');
+
+            bool firstDate = true;
+            foreach (var d in dates)
+            {
+                string tempDateString;
+
+                //case: mm/dd/yyyy to mm/dd/yyyy
+                if (d.Contains("to"))
+                {
+                    string[] dateRange = d.Split(new string[] { "to" }, StringSplitOptions.None);
+
+                    //get the first date
+                    DateTime first_date = DateTime.Parse(dateRange[0]);
+                    DateTime second_date = DateTime.Parse(dateRange[1]);
+
+                    tempDateString = string.Format("Photos.Captured BETWEEN '{0}' AND '{1}' ", first_date, second_date);
+                }
+                else
+                {
+                    //try to parse full date
+                    try
+                    {
+                        DateTime date = DateTime.Parse(d);
+                        tempDateString = string.Format("MONTH(Photos.Captured) = {0} AND DAY(Photos.Captured) = {1} AND YEAR(Photos.Captured) = {2} ",
+                                                date.Month, date.Day, date.Year);
+                    }
+                    catch (FormatException e)
+                    {
+                        tempDateString = "";
+                    }
+                    catch (InvalidDataException e)
+                    {
+                        tempDateString = "";
+                    }
+
+                }
+
+                if (!String.IsNullOrWhiteSpace(tempDateString))
+                {
+                    if (!firstDate)
+                    {
+                        dateBuilder.Append("OR ");
+                    }
+                    dateBuilder.Append(tempDateString);
+
+                    firstDate = false;
+                }
+            }
+
+            return dateBuilder;
         }
     }
 }
