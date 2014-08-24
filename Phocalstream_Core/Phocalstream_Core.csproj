@@ -72,9 +72,9 @@
     <Compile Include="Data\PhotoRepository.cs" />
     <Compile Include="Data\UnitOfWork.cs" />
     <Compile Include="Data\WaterDataRepository.cs" />
-    <Compile Include="Migrations\201406162013014_Initialise.cs" />
-    <Compile Include="Migrations\201406162013014_Initialise.Designer.cs">
-      <DependentUpon>201406162013014_Initialise.cs</DependentUpon>
+    <Compile Include="Migrations\201408240222258_InitialSchema.cs" />
+    <Compile Include="Migrations\201408240222258_InitialSchema.Designer.cs">
+      <DependentUpon>201408240222258_InitialSchema.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,12 +94,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201406162013014_Initialise.resx">
-      <DependentUpon>201406162013014_Initialise.cs</DependentUpon>
-    </EmbeddedResource>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <EmbeddedResource Include="Migrations\201408240222258_InitialSchema.resx">
+      <DependentUpon>201408240222258_InitialSchema.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
