@@ -40,7 +40,6 @@ namespace Phocalstream_Service.Service
         [Dependency]
         public IUnitOfWork Unit { get; set; }
 
-
         public Collection GetCollectionForProcessing(XmlNode siteData)
         {
             string siteName = siteData["Folder"].InnerText;

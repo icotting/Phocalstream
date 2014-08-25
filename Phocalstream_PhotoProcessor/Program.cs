@@ -82,6 +82,10 @@ namespace Phocalstream_PhotoProcessor
                 }
 
                 IEnumerable<string> toProcess = (from f in files where siteFiles.Contains(f) == false select f);
+                
+                siteFiles = new List<string>();
+                files = new string[0];
+
                 if ( toProcess.Count() != 0 )
                 {
                     Collection collection = _service.GetCollectionForProcessing(siteNode);
