@@ -250,4 +250,21 @@ namespace Phocalstream_Shared.Data.Model.View
         public List<Collection> Collections { get; set; }
         public string SearchPath { get; set; }
     }
+
+    public class QuickSearchModel
+    {
+        public string Sites { get; set; }
+        public string Tags { get; set; }
+        public string Dates { get; set; }
+        public string Hours { get; set; }
+        public string Months { get; set; }
+        public bool IsEmpty()
+        {
+            return String.IsNullOrWhiteSpace(Sites) 
+                && String.IsNullOrWhiteSpace(Tags)
+                && String.IsNullOrWhiteSpace(Dates) 
+                && String.IsNullOrWhiteSpace(Hours)
+                && String.IsNullOrWhiteSpace(Months);
+        }
+    }
 }

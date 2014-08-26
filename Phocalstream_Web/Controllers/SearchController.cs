@@ -64,6 +64,19 @@ namespace Phocalstream_Web.Controllers
 
             return View(model);
         }
+        
+        public ActionResult Knockout()
+        {
+            SearchModel model = new SearchModel();
+
+            Collection first = CollectionRepository.Find(c => c.Type == CollectionType.SITE).OrderBy(c => Guid.NewGuid()).First();
+            model.BackgroundImageID = first.CoverPhoto == null ? PhotoRepo.GetSiteDetails(first.Site).LastPhotoID : first.CoverPhoto.ID;
+
+            model.AvailableTags = PhotoService.GetTagNames();
+            model.SiteNames = SearchService.GetSiteNames();
+
+            return View(model);
+        }
 
         public ActionResult TagSearch(string tag)
         {

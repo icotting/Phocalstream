@@ -95,6 +95,40 @@ namespace Phocalstream_Service.Service
             return SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
         }
 
+        public int SearchResultCount(QuickSearchModel model)
+        {
+            string select = GetQuickSearchQuery(model);
+
+            return QuickSearch(select);
+        }
+
+        public int QuickSearch(string query)
+        {
+            List<long> Ids = new List<long>();
+
+            if (!String.IsNullOrWhiteSpace(query))
+            {
+                //run the query (only if there are parameters selected)
+                using (SqlConnection conn = new SqlConnection(PathManager.GetDbConnection()))
+                {
+                    conn.Open();
+
+                    using (SqlCommand command = new SqlCommand(query.ToString(), conn))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Ids.Add((long)reader["ID"]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Ids.Count;
+        }
+
         public SearchMatches Search(SearchModel model)
         {
             SearchMatches result = new SearchMatches();
@@ -124,6 +158,93 @@ namespace Phocalstream_Service.Service
             }
             
             return result;
+        }
+
+        private string GetQuickSearchQuery(QuickSearchModel model)
+        {
+            StringBuilder select = new StringBuilder();
+            StringBuilder parameters = new StringBuilder();
+
+            StringBuilder sitesBuilder = new StringBuilder();
+            StringBuilder tagBuilder = new StringBuilder();
+            StringBuilder monthBuilder = new StringBuilder();
+            StringBuilder dateBuilder = new StringBuilder();
+            StringBuilder hourBuilder = new StringBuilder();
+
+            //Sites
+            if (!String.IsNullOrWhiteSpace(model.Sites))
+            {
+                sitesBuilder = SiteQuery(model.Sites);
+            }
+
+            //tag
+            if (!String.IsNullOrWhiteSpace(model.Tags))
+            {
+                tagBuilder = TagQuery(model.Tags);
+            }
+
+            //date
+            if (!String.IsNullOrWhiteSpace(model.Dates))
+            {
+                dateBuilder = DateQuery(model.Dates);
+            }
+
+            //months
+            if (!String.IsNullOrWhiteSpace(model.Months))
+            {
+                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", model.Months));
+            }
+
+            //hours
+            if (!String.IsNullOrWhiteSpace(model.Hours))
+            {
+                hourBuilder.Append(string.Format("DATEPART(hh, Photos.Captured) IN ({0}) ", model.Hours));
+            }
+
+
+            //merge the builders
+            select.Append("select Photos.ID from Photos ");
+
+            if (sitesBuilder.Length != 0)
+            {
+                select.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
+                parameters.Append(sitesBuilder + "AND ");
+            }
+
+            if (monthBuilder.Length != 0)
+            {
+                parameters.Append(monthBuilder + "AND ");
+            }
+
+            if (dateBuilder.Length != 0)
+            {
+                parameters.Append(dateBuilder + "AND ");
+            }
+
+            if (hourBuilder.Length != 0)
+            {
+                parameters.Append(hourBuilder + "AND ");
+            }
+
+            if (tagBuilder.Length != 0)
+            {
+                select.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
+                    "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID ");
+                parameters.Append(tagBuilder);
+            }   
+
+                
+            //remove final AND if present
+            if (parameters.Length > 0)
+            {
+                if (parameters.ToString().EndsWith("AND "))
+                {
+                    parameters.Remove(parameters.Length - 4, 4);
+                }
+                select.Append("WHERE " + parameters);
+            }
+        
+            return select.ToString();
         }
 
         private String GetSearchQuery(SearchModel model)
