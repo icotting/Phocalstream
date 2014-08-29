@@ -20,6 +20,10 @@ namespace Phocalstream_Shared.Data.Model.View
         [Display(Name = "Tags")]
         public string Tags { get; set; }
 
+        public string Months { get; set; }
+        
+        public string Hours { get; set; }
+
         //Months
         public bool January { get; set; }
         public bool February { get; set; }
@@ -96,18 +100,20 @@ namespace Phocalstream_Shared.Data.Model.View
                 }
             }
 
-            if (!String.IsNullOrWhiteSpace(Sites) && !String.IsNullOrWhiteSpace(Dates) && !String.IsNullOrWhiteSpace(Dates))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return String.IsNullOrWhiteSpace(Sites)
+                && String.IsNullOrWhiteSpace(Tags)
+                && String.IsNullOrWhiteSpace(Dates)
+                && String.IsNullOrWhiteSpace(Hours) 
+                && String.IsNullOrWhiteSpace(Months);
         }
 
         public string CreateMonthString()
         {
+            if (!String.IsNullOrWhiteSpace(this.Months))
+            {
+                return this.Months;
+            }
+
             string months = null;
 
             bool[] month_array = new bool[]
@@ -136,6 +142,11 @@ namespace Phocalstream_Shared.Data.Model.View
 
         public string CreateHourString()
         {
+            if (!String.IsNullOrWhiteSpace(this.Hours))
+            {
+                return this.Hours;
+            }
+
             string hours = null;
 
             bool[] hour_array = new bool[]
@@ -179,16 +190,29 @@ namespace Phocalstream_Shared.Data.Model.View
                 name.Append("tagged with " + String.Join(", ", Tags.Split(',')) + " ");
             }
 
-            bool[] month_array = new bool[]
-            {
-                January, February, March, April, May, June, July, August, September, October, November, December
-            };
+            //MONTHS
             List<string> monthNames = new List<string>();
-            for(int i = 0; i < month_array.Length; i++)
+            if (!String.IsNullOrWhiteSpace(this.Months))
             {
-                if(month_array[i])
+                string[] months = this.Months.Split(',');
+                foreach (var m in months)
                 {
-                    monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1));
+                    monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Convert.ToInt16(m) + 1));
+                }
+
+            }
+            else 
+            {
+                bool[] month_array = new bool[]
+                {
+                    January, February, March, April, May, June, July, August, September, October, November, December
+                };
+                for(int i = 0; i < month_array.Length; i++)
+                {
+                    if(month_array[i])
+                    {
+                        monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1));
+                    }
                 }
             }
             if(monthNames.Count != 0)
@@ -201,23 +225,44 @@ namespace Phocalstream_Shared.Data.Model.View
                 name.Append("taken on " + String.Join(", ", Dates.Split(',')) + " ");
             }
 
-            bool[] hour_array = new bool[]
-            {
-                Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven,
-                Twelve, Thirteen, Fourteen, Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, TwentyOne, TwentyTwo, TwentyThree
-            };
-            List<string> hourNames = new List<string>();
-            for (int i = 0; i < hour_array.Length; i++)
-            {
-                if (hour_array[i])
+
+            //HOURS
+             List<string> hourNames = new List<string>();
+             if (!String.IsNullOrWhiteSpace(this.Hours))
+             {
+                 string[] hours = this.Hours.Split(',');
+                 foreach (var h in hours)
+                 {
+                     var hInt = Convert.ToInt16(h);
+                     if (hInt < 10)
+                     {
+                         hourNames.Add("0" + h + "00");
+                     }
+                     else
+                     {
+                         hourNames.Add(h + "00");
+                     }
+                 }
+             }
+             else
+             {
+                bool[] hour_array = new bool[]
                 {
-                    if (i < 10)
+                    Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven,
+                    Twelve, Thirteen, Fourteen, Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, TwentyOne, TwentyTwo, TwentyThree
+                };
+                for (int i = 0; i < hour_array.Length; i++)
+                {
+                    if (hour_array[i])
                     {
-                        hourNames.Add("0" + Convert.ToString(i) + "00");
-                    }
-                    else
-                    {
-                        hourNames.Add(Convert.ToString(i) + "00");
+                        if (i < 10)
+                        {
+                            hourNames.Add("0" + Convert.ToString(i) + "00");
+                        }
+                        else
+                        {
+                            hourNames.Add(Convert.ToString(i) + "00");
+                        }
                     }
                 }
             }

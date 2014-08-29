@@ -93,6 +93,19 @@ namespace Phocalstream_Web.Controllers
             }
         }
 
+        public ActionResult KnockoutAdvancedSearch(string hours, string months, string sites, string tags, string dates)
+        {
+            SearchModel model = new SearchModel();
+
+            model.Sites = sites;
+            model.Tags = tags;
+            model.Dates = dates;
+            model.Hours = hours;
+            model.Months = months;
+
+            return RedirectToAction("AdvancedSearch", model);
+        }
+
         public ActionResult AdvancedSearch(SearchModel model)
         {
             if (model.IsEmpty())
