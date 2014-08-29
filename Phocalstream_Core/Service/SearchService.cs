@@ -249,9 +249,6 @@ namespace Phocalstream_Service.Service
 
         private String GetSearchQuery(SearchModel model)
         {
-            string hourString = model.CreateHourString();
-            string monthString = model.CreateMonthString();
-
             StringBuilder select = new StringBuilder();
             StringBuilder parameters = new StringBuilder();
 
@@ -280,15 +277,15 @@ namespace Phocalstream_Service.Service
             }
 
             //months
-            if (!String.IsNullOrWhiteSpace(monthString))
+            if (!String.IsNullOrWhiteSpace(model.Months))
             {
-                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", monthString));
+                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", model.Months));
             }
 
             //hours
-            if (!String.IsNullOrWhiteSpace(hourString))
+            if (!String.IsNullOrWhiteSpace(model.Hours))
             {
-                hourBuilder.Append(string.Format("DATEPART(hh, Photos.Captured) IN ({0}) ", hourString));
+                hourBuilder.Append(string.Format("DATEPART(hh, Photos.Captured) IN ({0}) ", model.Hours));
             }
 
 

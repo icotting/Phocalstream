@@ -375,7 +375,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
-    <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Settings\_WaterImportPartial.cshtml" />
     <Content Include="Views\Photo\TimeLapse.cshtml" />
     <Content Include="Views\Photo\_WaterDataPartial.cshtml" />
@@ -387,8 +386,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\SearchResult.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Search\Knockout.cshtml" />
+    <Content Include="Views\Search\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

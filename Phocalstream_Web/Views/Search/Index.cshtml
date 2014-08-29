@@ -5,11 +5,14 @@
 }
 @Styles.Render("~/Content/CSS/Search.css")
 
-<!-- Bootstrap Tags Input CSS and JS Files-->
+<!-- Bootstrap Tags Input CSS and JS Files -->
 <link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
 <link href="~/Content/CSS/typeahead.css" rel="stylesheet">
 <script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
 <script src="~/Content/typeahead/typeahead.bundle.js"></script>
+
+<!-- Knockout.js -->
+<script src="~/Content/Scripts/knockout-3.2.0.js"></script>
 
 <div class="background">
     <img class="background-img" src="/api/photo/high/@Model.BackgroundImageID" />
@@ -21,503 +24,348 @@
 
 <div class="container">
     <div class="content">
-        
-        @if(@ViewBag.Message != null)
+
+        @if (@ViewBag.Message != null)
         {
             <div class="alert alert-info alert-dismissible" role="alert">
                 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 @ViewBag.Message
             </div>
         }
-        
+
         <div class="text-center">
             <h1 class="page-header title">Phocalstream Power Search</h1>
         </div>
 
-        @using (@Html.BeginForm("AdvancedSearch", "Search"))
-        {
-            <!-- Sites -->
-            <div class="search-row">
-                <div class="row">
-                    <div class="col-md-4">
-                        @Html.LabelFor(m => m.Sites)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        @Html.TextBoxFor(m => m.Sites, new { @id = "site-field" })
-                    </div>
+        <!-- Sites -->
+        <div class="search-row">
+            <div class="row">
+                <div class="col-md-4">
+                    Sites
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input id="site-field" data-bind="value: siteNames" />
+                </div>
+            </div>
+        </div>
 
-            <!-- Tags -->
-            <div class="search-row">
-                <div class="row">
-                    <div class="col-md-4">
-                        @Html.LabelFor(m => m.Tags)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        @Html.TextBoxFor(m => m.Tags, new { @id = "tag-field" })
-                    </div>
+        <!-- Tags -->
+        <div class="search-row">
+            <div class="row">
+                <div class="col-md-4">
+                    Tags
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input id="tag-field" data-bind="value: tagNames" />
+                </div>
+            </div>
+        </div>
 
-            <!-- Dates -->
-            <div class="search-row">
-                <div class="row">
-                    <div class="col-md-4">
-                        @Html.LabelFor(m => m.Dates)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        @Html.TextBoxFor(m => m.Dates, new { @placeholder = "8/4/2011", @class = "form-control" })
-                    </div>
+        <!-- Dates -->
+        <div class="search-row">
+            <div class="row">
+                <div class="col-md-4">
+                    Dates
                 </div>
             </div>
-            
-            <!-- Seasons -->
-            <div class="search-row">
-                <div class="page-header">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>Seasons</label>
-                        </div>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-md-3">
-                            <label class="sel-header">Spring</label>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="sel-header">Summer</label>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="sel-header">Fall</label>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="sel-header">Winter</label>
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input class="form-control" data-bind="value: dates" />
                 </div>
-            <!--
             </div>
-        
-            <!-- Months --> <!--
-            <div class="search-row">
+        </div>
 
+        <!-- Months -->
+        <div class="search-row">
+            <div class="page-header">
                 <div class="row">
                     <div class="col-md-4">
                         <label>Months</label>
                     </div>
                 </div>
-                                -->
-                <div class="row text-center">
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.January) <label id="jan" class="sel-subheader">January</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.February) <label id="feb" class="sel-subheader">February</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.March) <label id="mar" class="sel-subheader">March</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.April) <label id="apr" class="sel-subheader">April</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.May) <label id="may" class="sel-subheader">May</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.June) <label id="jun" class="sel-subheader">June</label>
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.July) <label id="jul" class="sel-subheader">July</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.August) <label id="aug" class="sel-subheader">August</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.September) <label id="sep" class="sel-subheader">September</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.October) <label id="oct" class="sel-subheader">October</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.November) <label id="nov" class="sel-subheader">November</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.December) <label id="dec" class="sel-subheader">December</label>
-                    </div>
+            </div>
+            <div class="row text-center" data-bind="foreach: months">
+                <div class="col-md-2">
+                    <label>
+                        <input type="checkbox" data-bind="value: month, checked: $root.selectedMonths, click: $root.toggleAssociation" />
+                        <span data-bind="css: { 'selected' : Selected }, text: name"></span>
+                    </label>
                 </div>
             </div>
-            
-            <!-- TimesOfDay -->
-            <div class="search-row">
-                <div class="page-header">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>Times Of Day</label>
-                        </div>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-md-3">
-                            <label class="sel-header">Morning</label>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="sel-header">Afternoon</label>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="sel-header">Evening</label>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="sel-header">Night</label>
-                        </div>
-                    </div>
-                </div>
-            <!--
-            </div>
-            
-            <!-- HoursOfDay --> <!--
-            <div class="search-row">
+        </div>
+
+        <!-- Hours -->
+        <div class="search-row">
+            <div class="page-header">
                 <div class="row">
                     <div class="col-md-4">
-                        <label>Hours Of Day</label>
-                    </div>
-                </div>
-                -->
-                <div class="row text-center">
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Zero) <label id="0" class="sel-subheader">0000</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.One) <label id="1" class="sel-subheader">0100</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Two) <label id="2" class="sel-subheader">0200</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Three) <label id="3" class="sel-subheader">0300</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Four) <label id="4" class="sel-subheader">0400</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Five) <label id="5" class="sel-subheader">0500</label>
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Six) <label id="6" class="sel-subheader">0600</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Seven) <label id="7" class="sel-subheader">0700</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Eight) <label id="8" class="sel-subheader">0800</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Nine) <label id="9" class="sel-subheader">0900</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Ten) <label id="10" class="sel-subheader">1000</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Eleven) <label id="11" class="sel-subheader">1100</label>
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Twelve) <label id="12" class="sel-subheader">1200</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Thirteen) <label id="13" class="sel-subheader">1300</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Fourteen) <label id="14" class="sel-subheader">1400</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Fifteen) <label id="15" class="sel-subheader">1500</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Sixteen) <label id="16" class="sel-subheader">1600</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Seventeen) <label id="17" class="sel-subheader">1700</label>
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Eighteen) <label id="18" class="sel-subheader">1800</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Nineteen) <label id="19" class="sel-subheader">1900</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.Twenty) <label id="20" class="sel-subheader">2000</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.TwentyOne) <label id="21" class="sel-subheader">2100</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.TwentyTwo) <label id="22" class="sel-subheader">2200</label>
-                    </div>
-                    <div class="col-md-2">
-                        @Html.CheckBoxFor(m => m.TwentyThree) <label id="23" class="sel-subheader">2300</label>
+                        <label>Times Of Day</label>
                     </div>
                 </div>
             </div>
-            
-            <div class="row padding-bottom">
-                <button class="btn btn-success col-md-4 col-md-offset-4" type="submit">Search</button>
+            <div class="row text-center" data-bind="foreach: hours">
+                <div class="col-md-2">
+                    <label>
+                        <input type="checkbox" data-bind="value: name, checked: $root.selectedHours, click: $root.toggleAssociation" />
+                        <span data-bind="css: { 'selected' : Selected }, text: name"></span>
+                    </label>
+                </div>
             </div>
-        }
+        </div>
+
+        <!-- Query and Results -->
+        <div class="search-results-box">
+            <div class="search-row text-center">
+                <div class="title page-header">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3 class="search-results"><strong data-bind="text: query"></strong></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-row text-center">
+                <div class="row">
+                    <div class="">
+                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo(s)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        
-        $('.sel-header').click(function() {
-            var toggle = !$(this).hasClass("selected");
 
-            $(this).toggleClass("selected");
+    function Month(month, name) {
+        var self = this;
 
-            var value = $(this).text();
+        self.month = month;
+        self.name = name;
+        self.Selected = ko.observable(false);
+    }
 
-            switch(value) {
-                //seasons
-                case "Winter" :
-                    $("#dec").toggleClass("selected", toggle);
-                    $("#jan").toggleClass("selected", toggle);
-                    $("#feb").toggleClass("selected", toggle);
+    function Hour(hour, name) {
+        var self = this;
 
-                    $("#December").prop('checked', toggle);
-                    $("#January").prop('checked', toggle);
-                    $("#February").prop('checked', toggle);
-                    break;
+        self.hour = hour;
+        self.name = name;
+        self.Selected = ko.observable(false);
+    }
 
-                case "Spring" :
-                    $("#mar").toggleClass("selected", toggle);
-                    $("#apr").toggleClass("selected", toggle);
-                    $("#may").toggleClass("selected", toggle);
+    function asyncComputed(evaluator, owner) {
+        var result = ko.observable();
 
-                    $("#March").prop('checked', toggle);
-                    $("#April").prop('checked', toggle);
-                    $("#May").prop('checked', toggle);
-                    break;
+        ko.computed(function () {
+            // Get the $.Deferred value, and then set up a callback so that when it's done,
+            // the output is transferred onto our "result" observable
+            evaluator.call(owner).done(result);
+        });
 
-                case "Summer" :
-                    $("#jun").toggleClass("selected", toggle);
-                    $("#jul").toggleClass("selected", toggle);
-                    $("#aug").toggleClass("selected", toggle);
+        return result;
+    }
 
-                    $("#June").prop('checked', toggle);
-                    $("#July").prop('checked', toggle);
-                    $("#August").prop('checked', toggle);
-                    break;
+    function ViewModel() {
+        var self = this;
 
-                case "Fall" :
-                    $("#sep").toggleClass("selected", toggle);
-                    $("#oct").toggleClass("selected", toggle);
-                    $("#nov").toggleClass("selected", toggle);
+        self.siteNames = ko.observable();
+        self.tagNames = ko.observable();
+        self.dates = ko.observable();
 
-                    $("#September").prop('checked', toggle);
-                    $("#October").prop('checked', toggle);
-                    $("#November").prop('checked', toggle);
-                    break;
-               
-                //times
-                case "Morning" :
-                    $("#5").toggleClass("selected", toggle);
-                    $("#6").toggleClass("selected", toggle);
-                    $("#7").toggleClass("selected", toggle);
-                    $("#8").toggleClass("selected", toggle);
-                    $("#9").toggleClass("selected", toggle);
-                    $("#10").toggleClass("selected", toggle);
-                    $("#11").toggleClass("selected", toggle);
+        self.selectedMonths = ko.observableArray();
+        self.months = ko.observableArray([
+            new Month(1, "January"),
+            new Month(2, "February"),
+            new Month(3, "March"),
+            new Month(4, "April"),
+            new Month(5, "May"),
+            new Month(6, "June"),
+            new Month(7, "July"),
+            new Month(8, "August"),
+            new Month(9, "September"),
+            new Month(10, "October"),
+            new Month(11, "November"),
+            new Month(12, "December")
+        ]);
 
-                    $("#Five").prop('checked', toggle);
-                    $("#Six").prop('checked', toggle);
-                    $("#Seven").prop('checked', toggle);
-                    $("#Eight").prop('checked', toggle);
-                    $("#Nine").prop('checked', toggle);
-                    $("#Ten").prop('checked', toggle);
-                    $("#Eleven").prop('checked', toggle);
-                    break;
+        self.selectedHours = ko.observableArray();
+        self.hours = ko.observableArray([
+            new Hour(0, "0000"),
+            new Hour(1, "0100"),
+            new Hour(2, "0200"),
+            new Hour(3, "0300"),
+            new Hour(4, "0400"),
+            new Hour(5, "0500"),
+            new Hour(6, "0600"),
+            new Hour(7, "0700"),
+            new Hour(8, "0800"),
+            new Hour(9, "0900"),
+            new Hour(10, "1000"),
+            new Hour(11, "1100"),
+            new Hour(12, "1200"),
+            new Hour(13, "1300"),
+            new Hour(14, "1400"),
+            new Hour(15, "1500"),
+            new Hour(16, "1600"),
+            new Hour(17, "1700"),
+            new Hour(18, "1800"),
+            new Hour(19, "1900"),
+            new Hour(20, "2000"),
+            new Hour(21, "2100"),
+            new Hour(22, "2200"),
+            new Hour(23, "2300")
+        ]);
 
-                case "Afternoon" :
-                    $("#12").toggleClass("selected", toggle);
-                    $("#13").toggleClass("selected", toggle);
-                    $("#14").toggleClass("selected", toggle);
-                    $("#15").toggleClass("selected", toggle);
-                    $("#16").toggleClass("selected", toggle);
+        self.toggleAssociation = function (item) {
+            var selected = item.Selected();
+            item.Selected(!selected);
+            return true;
+        }
 
-                    $("#Twelve").prop('checked', toggle);
-                    $("#Thirteen").prop('checked', toggle);
-                    $("#Fourteen").prop('checked', toggle);
-                    $("#Fifteen").prop('checked', toggle);
-                    $("#Sixteen").prop('checked', toggle);
-                    break;
+        self.monthText = ko.computed(function () {
+            var monthsSelected = self.selectedMonths();
+            monthsSelected.sort(function(a, b){return a-b} );
 
-                case "Evening" :
-                    $("#17").toggleClass("selected", toggle);
-                    $("#18").toggleClass("selected", toggle);
-                    $("#19").toggleClass("selected", toggle);
-                    $("#20").toggleClass("selected", toggle);
+            var months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ]
 
-                    $("#Seventeen").prop('checked', toggle);
-                    $("#Eighteen").prop('checked', toggle);
-                    $("#Nineteen").prop('checked', toggle);
-                    $("#Twenty").prop('checked', toggle);
-                    break;
+            var monthNameArray = [];
+            for (var i = 0; i < monthsSelected.length; i++) {
+                var index = monthsSelected[i];
+                monthNameArray.push(months[index - 1]);
+            }
 
-                case "Night" :
-                    $("#21").toggleClass("selected", toggle);
-                    $("#22").toggleClass("selected", toggle);
-                    $("#23").toggleClass("selected", toggle);
-                    $("#0").toggleClass("selected", toggle);
-                    $("#1").toggleClass("selected", toggle);
-                    $("#2").toggleClass("selected", toggle);
-                    $("#3").toggleClass("selected", toggle);
-                    $("#4").toggleClass("selected", toggle);
+            return monthNameArray.join(', ');
+        });
 
-                    $("#TwentyOne").prop('checked', toggle);
-                    $("#TwentyTwo").prop('checked', toggle);
-                    $("#TwentyThree").prop('checked', toggle);
-                    $("#Zero").prop('checked', toggle);
-                    $("#One").prop('checked', toggle);
-                    $("#Two").prop('checked', toggle);
-                    $("#Three").prop('checked', toggle);
-                    $("#Four").prop('checked', toggle);
-                    break;
+        self.hourText = ko.computed(function () {
+            var hoursSelected = self.selectedHours();
+            hoursSelected.sort();
+
+            return hoursSelected.join(', ');
+        });
+
+        self.hourQuery = ko.computed(function () {
+            var hours = self.selectedHours();
+
+            var trimmedHours = []
+            for (var i = 0; i < hours.length; i++) {
+                trimmedHours.push(hours[i].substring(0, 2));
+            }
+
+            return trimmedHours.toString();
+        });
+
+        self.query = ko.computed(function () {
+            var found = false;
+            var q = "Searching for photos ";
+
+            if (self.siteNames() != null && self.siteNames().length != 0) {
+                q += "from " + self.siteNames() + " ";
+                found = true;
+            }
+
+            if (self.tagNames() != null && self.tagNames().length != 0) {
+                if (found) {
+                    q += "and "
+                }
+                q += "tagged with " + self.tagNames() + " ";
+                found = true;
+            }
+
+            if (self.dates() != null && self.dates().length != 0) {
+                if (found) {
+                    q += "and "
+                }
+                q += "taken on " + self.dates() + " ";
+                found = true;
+            }
+
+            if (self.selectedMonths().length != 0) {
+                if (found) {
+                    q += "and "
+                }
+                q += "taken during the months of " + self.monthText() + " ";
+                found = true;
+            }
+
+            if (self.selectedHours().length != 0) {
+                if (found) {
+                    q += "and "
+                }
+                q += "taken during the hours of " + self.hourText() + " ";
+                found = true;
+            }
+
+            if (found) {
+                return q;
+            }
+            else {
+                return "Searching for all photos";
             }
         });
 
-        $('.sel-subheader').click(function() {
-            var toggle = !$(this).hasClass("selected");
-            
-            $(this).toggleClass("selected", toggle);
+        self.queryResults = asyncComputed(function () {
+            // Whenever "pageIndex", "sortColumn", or "sortDirection" change, this function will re-run
+            return $.ajax("/api/search/count", {
+                data: {
+                    hours: this.hourQuery(),
+                    months: this.selectedMonths().toString(),
+                    sites: this.siteNames,
+                    tags: this.tagNames,
+                    dates: this.dates
+                }
+            });
+        }, this);
 
-            var value = $(this).text();
+        self.search = function() {
+            var form;
+            form = $('<form />', {
+                action: '/search/knockoutadvancedsearch',
+                method: 'POST',
+                style: 'display: none;'
+            });
 
-            switch(value) {
-                //months
-                case "January" :
-                    $("#January").prop('checked', toggle);
-                    break;
-                case "February" :
-                    $("#February").prop('checked', toggle);
-                    break;
-                case "March" :
-                    $("#March").prop('checked', toggle);
-                    break;
-                case "April" :
-                    $("#April").prop('checked', toggle);
-                    break;
-                case "May" :
-                    $("#May").prop('checked', toggle);
-                    break;
-                case "June" :
-                    $("#June").prop('checked', toggle);
-                    break;
-                case "July" :
-                    $("#July").prop('checked', toggle);
-                    break;
-                case "August" :
-                    $("#August").prop('checked', toggle);
-                    break;
-                case "September" :
-                    $("#September").prop('checked', toggle);
-                    break;
-                case "October" :
-                    $("#October").prop('checked', toggle);
-                    break;
-                case "November" :
-                    $("#November").prop('checked', toggle);
-                    break;
-                case "December" :
-                    $("#December").prop('checked', toggle);
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'hours',
+                value: self.hourQuery()
+            }));
 
-                //times
-                case "0000" :
-                    $("#Zero").prop('checked', toggle);
-                    break;
-                case "0100" :
-                    $("#One").prop('checked', toggle);
-                    break;
-                case "0200" :
-                    $("#Two").prop('checked', toggle);
-                    break;
-                case "0300" :
-                    $("#Three").prop('checked', toggle);
-                    break;
-                case "0400" :
-                    $("#Four").prop('checked', toggle);
-                    break;
-                case "0500" :
-                    $("#Five").prop('checked', toggle);
-                    break;
-                case "0600" :
-                    $("#Six").prop('checked', toggle);
-                    break;
-                case "0700" :
-                    $("#Seven").prop('checked', toggle);
-                    break;
-                case "0800" :
-                    $("#Eight").prop('checked', toggle);
-                    break;
-                case "0900" :
-                    $("#Nine").prop('checked', toggle);
-                    break;
-                case "1000" :
-                    $("#Ten").prop('checked', toggle);
-                    break;
-                case "1100" :
-                    $("#Eleven").prop('checked', toggle);
-                    break;
-                case "1200" :
-                    $("#Twelve").prop('checked', toggle);
-                    break;
-                case "1300" :
-                    $("#Thirteen").prop('checked', toggle);
-                    break;
-                case "1400" :
-                    $("#Fourteen").prop('checked', toggle);
-                    break;
-                case "1500" :
-                    $("#Fifteen").prop('checked', toggle);
-                    break;
-                case "1600" :
-                    $("#Sixteen").prop('checked', toggle);
-                    break;
-                case "1700" :
-                    $("#Seventeen").prop('checked', toggle);
-                    break;
-                case "1800" :
-                    $("#Eighteen").prop('checked', toggle);
-                    break;
-                case "1900" :
-                    $("#Nineteen").prop('checked', toggle);
-                    break;
-                case "2000" :
-                    $("#Twenty").prop('checked', toggle);
-                    break;
-                case "2100" :
-                    $("#TwentyOne").prop('checked', toggle);
-                    break;
-                case "2200" :
-                    $("#TwentyTwo").prop('checked', toggle);
-                    break;
-                case "2300" :
-                    $("#TwentyThree").prop('checked', toggle);
-                    break;
-            }
-        });
-    });   
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'months',
+                value: self.selectedMonths().toString()
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'sites',
+                value: self.siteNames()
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'tags',
+                value: self.tagNames()
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'dates',
+                value: self.dates()
+            }));
+            form.appendTo('body').submit();
+        };
+    }
+
+    ko.applyBindings(new ViewModel())
 </script>
 
 <script type="text/javascript">
@@ -559,7 +407,7 @@
         {
             name: 'available-tags',
             source: substringMatcher(availableTags)
-        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
             this.tagsinput('add', datum.value);
             this.tagsinput('input').typeahead('val', '');
         }, $('#tag-field')));
@@ -572,7 +420,7 @@
         {
             name: 'sites',
             source: substringMatcher(sites)
-        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
             this.tagsinput('add', datum.value);
             this.tagsinput('input').typeahead('val', '');
         }, $('#site-field')));
