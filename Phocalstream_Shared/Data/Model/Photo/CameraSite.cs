@@ -18,13 +18,7 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public double Longitude { get; set; }
         public int CountyFips { get; set; }
         public string ContainerID { get; set; }
-<<<<<<< HEAD
-        
-=======
-
         public string DirectoryName { get; set; }
-
->>>>>>> origin/develop
         [NotMapped]
         public int PhotoCount { get; set; }
 

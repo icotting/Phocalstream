@@ -62,7 +62,8 @@ namespace Phocalstream_PhotoProcessor
                 string dirName = siteNode["Folder"].InnerText;
                 string[] files = Directory.GetFiles(Path.Combine(_path, dirName), "*.JPG", SearchOption.AllDirectories);
                 files = files.Select(f => f.Replace(_path, "")).ToArray<string>();
-                  
+                files = files.Select(f => f.Replace(@"\\", @"\")).ToArray<string>();
+
                 List<string> siteFiles = new List<string>();
                 
                 using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
@@ -81,7 +82,9 @@ namespace Phocalstream_PhotoProcessor
                     }
                 }
 
-                IEnumerable<string> toProcess = (from f in files where siteFiles.Contains(f) == false select f);
+                bool match = siteFiles.Contains(files[0]);
+
+                IEnumerable<string> toProcess = files.Except(siteFiles);
                 
                 siteFiles = new List<string>();
                 files = new string[0];
