@@ -82,8 +82,6 @@ namespace Phocalstream_PhotoProcessor
                     }
                 }
 
-                bool match = siteFiles.Contains(files[0]);
-
                 IEnumerable<string> toProcess = files.Except(siteFiles);
                 
                 siteFiles = new List<string>();
