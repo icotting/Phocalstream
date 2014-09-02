@@ -46,5 +46,25 @@ namespace Phocalstream_Web.Controllers.Api
 
             return message;
         }
+
+        [HttpGet]
+        [ActionName("photoId")]
+        public HttpResponseMessage SearchPhotoId(string hours, string months, string sites, string tags, string dates)
+        {
+            QuickSearchModel model = new QuickSearchModel();
+            model.Sites = sites;
+            model.Tags = tags;
+            model.Dates = dates;
+            model.Hours = hours;
+            model.Months = months;
+
+            long id = SearchService.SearchResultPhotoId(model);
+
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+            message.Content = new StringContent("/api/photo/high/" + Convert.ToString(id));
+
+            return message;
+
+        }
     }
 }

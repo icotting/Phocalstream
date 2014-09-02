@@ -14,8 +14,9 @@
 <!-- Knockout.js -->
 <script src="~/Content/Scripts/knockout-3.2.0.js"></script>
 
+
 <div class="background">
-    <img class="background-img" src="/api/photo/high/@Model.BackgroundImageID" />
+    <img class="background-img" data-bind="attr:{src: imagePath}"/>
 </div>
 
 <div class="shadow">
@@ -312,8 +313,19 @@
         });
 
         self.queryResults = asyncComputed(function () {
-            // Whenever "pageIndex", "sortColumn", or "sortDirection" change, this function will re-run
             return $.ajax("/api/search/count", {
+                data: {
+                    hours: this.hourQuery(),
+                    months: this.selectedMonths().toString(),
+                    sites: this.siteNames,
+                    tags: this.tagNames,
+                    dates: this.dates
+                }
+            });
+        }, this);
+
+        self.imagePath = asyncComputed(function() {
+            return $.ajax("/api/search/photoId", {
                 data: {
                     hours: this.hourQuery(),
                     months: this.selectedMonths().toString(),

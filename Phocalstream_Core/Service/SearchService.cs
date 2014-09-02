@@ -98,11 +98,28 @@ namespace Phocalstream_Service.Service
         public int SearchResultCount(QuickSearchModel model)
         {
             string select = GetQuickSearchQuery(model);
-
-            return QuickSearch(select);
+            List<long> ids = QuickSearch(select);
+            return ids.Count;
         }
 
-        public int QuickSearch(string query)
+        public long SearchResultPhotoId(QuickSearchModel model)
+        {
+            string select = GetQuickSearchQuery(model);
+            List<long> ids = QuickSearch(select);
+
+            if (ids.Count > 0)
+            {
+                Random r = new Random();
+                int index = r.Next(ids.Count);
+                return ids[index];
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public List<long> QuickSearch(string query)
         {
             List<long> Ids = new List<long>();
 
@@ -126,7 +143,7 @@ namespace Phocalstream_Service.Service
                 }
             }
 
-            return Ids.Count;
+            return Ids;
         }
 
         public SearchMatches Search(SearchModel model)
