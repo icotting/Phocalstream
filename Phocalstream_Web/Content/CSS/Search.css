@@ -79,3 +79,11 @@ input[type=checkbox] {
 .padding-bottom {
     padding-bottom: 50px;
 }
+
+.search-results {
+    margin: 0px !important;
+}
+
+.search-results-box {
+    margin-top: 75px;
+}

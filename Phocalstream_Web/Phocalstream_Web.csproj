@@ -264,6 +264,7 @@
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\Api\SearchController.cs" />
     <Compile Include="Controllers\Api\PhotoController.cs" />
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -348,6 +349,7 @@
     <Content Include="Content\Scripts\jquery.validate.min.js" />
     <Content Include="Content\Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\Scripts\knockout-2.1.0.js" />
+    <Content Include="Content\Scripts\knockout-3.2.0.js" />
     <Content Include="Content\Scripts\modernizr-2.5.3.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Site.css" />
@@ -373,7 +375,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
-    <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Settings\_WaterImportPartial.cshtml" />
     <Content Include="Views\Photo\TimeLapse.cshtml" />
     <Content Include="Views\Photo\_WaterDataPartial.cshtml" />
@@ -385,6 +386,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\SearchResult.cshtml" />
+    <Content Include="Views\Search\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -9,32 +9,32 @@
             "~/Content/CSS/Photo.css"
     )
    
-    @section Scripts 
-    {
-        <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
-        <script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
+@section Scripts 
+{
+    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
 
-	    <script type="text/javascript">
-	        Highcharts.theme = {
-	            colors: ["#DCDCDC", "#F5E938", "#FECC6E", "#FD9827", "#FC3638", "#650205", "#ff0066", "#eeaaee",
-                   "#55BF3B", "#DF5353", "#aaeeee"]
-	        };
+	<script type="text/javascript">
+	    Highcharts.theme = {
+	        colors: ["#DCDCDC", "#F5E938", "#FECC6E", "#FD9827", "#FC3638", "#650205", "#ff0066", "#eeaaee",
+                "#55BF3B", "#DF5353", "#aaeeee"]
+	    };
 
-	        // Apply the theme
-	        var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
-        </script>
+	    // Apply the theme
+	    var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+    </script>
 
-        <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
-        <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
-    	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
-        <script type="text/javascript">
-            function fullScreen() {
-                viewer.setFullPage(true);
-            }
-        </script>
+    <script type="text/javascript">
+        function fullScreen() {
+            viewer.setFullPage(true);
+        }
+    </script>
 
-    }
+}
 
 <div class="container">
 <div id="table">

@@ -64,7 +64,7 @@ namespace Phocalstream_Web.Controllers
 
             return View(model);
         }
-
+        
         public ActionResult TagSearch(string tag)
         {
             if (String.IsNullOrWhiteSpace(tag))
@@ -78,6 +78,19 @@ namespace Phocalstream_Web.Controllers
 
                 return RedirectToAction("AdvancedSearch", model);
             }
+        }
+
+        public ActionResult KnockoutAdvancedSearch(string hours, string months, string sites, string tags, string dates)
+        {
+            SearchModel model = new SearchModel();
+
+            model.Sites = sites;
+            model.Tags = tags;
+            model.Dates = dates;
+            model.Hours = hours;
+            model.Months = months;
+
+            return RedirectToAction("AdvancedSearch", model);
         }
 
         public ActionResult AdvancedSearch(SearchModel model)
