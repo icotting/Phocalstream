@@ -13,5 +13,6 @@ namespace Phocalstream_Web.Models.ViewModels
     {
         public ICollection<Collection> Collections { get; set; }
         public IEnumerable<SiteDetails> Sites { get; set; }
+        public List<string> Tags { get; set; }
     }
 }

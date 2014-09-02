@@ -1,85 +1,440 @@
-﻿@model Phocalstream_Web.Models.SearchResults
+﻿@model Phocalstream_Shared.Data.Model.View.SearchModel
 @{
     ViewBag.Title = "Search";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@Styles.Render("~/Content/CSS/Search.css")
 
-@section Styles
-{
-        <style type="text/css">
-        #silverlightControlHost {
-	        height: 100%;
-            width: 100%;
-	        text-align:center;
+<!-- Bootstrap Tags Input CSS and JS Files -->
+<link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
+<link href="~/Content/CSS/typeahead.css" rel="stylesheet">
+<script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
+<script src="~/Content/typeahead/typeahead.bundle.js"></script>
+
+<!-- Knockout.js -->
+<script src="~/Content/Scripts/knockout-3.2.0.js"></script>
+
+
+<div class="background">
+    <img class="background-img" data-bind="attr:{src: imagePath}"/>
+</div>
+
+<div class="shadow">
+
+</div>
+
+<div class="container">
+    <div class="content">
+
+        @if (@ViewBag.Message != null)
+        {
+            <div class="alert alert-info alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                @ViewBag.Message
+            </div>
         }
 
-            #pivot {
-                position: absolute; 
-                top: 220px; 
-                bottom: 5px; 
-                width: 80%; 
-                min-width: 900px; 
-                z-index: 300;
+        <div class="text-center">
+            <h1 class="page-header title">Phocalstream Power Search</h1>
+        </div>
+
+        <!-- Sites -->
+        <div class="search-row">
+            <div class="row">
+                <div class="col-md-4">
+                    Sites
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input id="site-field" data-bind="value: siteNames" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="search-row">
+            <div class="row">
+                <div class="col-md-4">
+                    Tags
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input id="tag-field" data-bind="value: tagNames" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="search-row">
+            <div class="row">
+                <div class="col-md-4">
+                    Dates
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input class="form-control" data-bind="value: dates" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Months -->
+        <div class="search-row">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Months</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-center" data-bind="foreach: months">
+                <div class="col-md-2">
+                    <label>
+                        <input type="checkbox" data-bind="value: month, checked: $root.selectedMonths, click: $root.toggleAssociation" />
+                        <span data-bind="css: { 'selected' : Selected }, text: name"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hours -->
+        <div class="search-row">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Times Of Day</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-center" data-bind="foreach: hours">
+                <div class="col-md-2">
+                    <label>
+                        <input type="checkbox" data-bind="value: name, checked: $root.selectedHours, click: $root.toggleAssociation" />
+                        <span data-bind="css: { 'selected' : Selected }, text: name"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Query and Results -->
+        <div class="search-results-box">
+            <div class="search-row text-center">
+                <div class="title page-header">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3 class="search-results"><strong data-bind="text: query"></strong></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-row text-center">
+                <div class="row">
+                    <div class="">
+                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo(s)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function Month(month, name) {
+        var self = this;
+
+        self.month = month;
+        self.name = name;
+        self.Selected = ko.observable(false);
+    }
+
+    function Hour(hour, name) {
+        var self = this;
+
+        self.hour = hour;
+        self.name = name;
+        self.Selected = ko.observable(false);
+    }
+
+    function asyncComputed(evaluator, owner) {
+        var result = ko.observable();
+
+        ko.computed(function () {
+            // Get the $.Deferred value, and then set up a callback so that when it's done,
+            // the output is transferred onto our "result" observable
+            evaluator.call(owner).done(result);
+        });
+
+        return result;
+    }
+
+    function ViewModel() {
+        var self = this;
+
+        self.siteNames = ko.observable();
+        self.tagNames = ko.observable();
+        self.dates = ko.observable();
+
+        self.selectedMonths = ko.observableArray();
+        self.months = ko.observableArray([
+            new Month(1, "January"),
+            new Month(2, "February"),
+            new Month(3, "March"),
+            new Month(4, "April"),
+            new Month(5, "May"),
+            new Month(6, "June"),
+            new Month(7, "July"),
+            new Month(8, "August"),
+            new Month(9, "September"),
+            new Month(10, "October"),
+            new Month(11, "November"),
+            new Month(12, "December")
+        ]);
+
+        self.selectedHours = ko.observableArray();
+        self.hours = ko.observableArray([
+            new Hour(0, "0000"),
+            new Hour(1, "0100"),
+            new Hour(2, "0200"),
+            new Hour(3, "0300"),
+            new Hour(4, "0400"),
+            new Hour(5, "0500"),
+            new Hour(6, "0600"),
+            new Hour(7, "0700"),
+            new Hour(8, "0800"),
+            new Hour(9, "0900"),
+            new Hour(10, "1000"),
+            new Hour(11, "1100"),
+            new Hour(12, "1200"),
+            new Hour(13, "1300"),
+            new Hour(14, "1400"),
+            new Hour(15, "1500"),
+            new Hour(16, "1600"),
+            new Hour(17, "1700"),
+            new Hour(18, "1800"),
+            new Hour(19, "1900"),
+            new Hour(20, "2000"),
+            new Hour(21, "2100"),
+            new Hour(22, "2200"),
+            new Hour(23, "2300")
+        ]);
+
+        self.toggleAssociation = function (item) {
+            var selected = item.Selected();
+            item.Selected(!selected);
+            return true;
+        }
+
+        self.monthText = ko.computed(function () {
+            var monthsSelected = self.selectedMonths();
+            monthsSelected.sort(function(a, b){return a-b} );
+
+            var months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ]
+
+            var monthNameArray = [];
+            for (var i = 0; i < monthsSelected.length; i++) {
+                var index = monthsSelected[i];
+                monthNameArray.push(months[index - 1]);
             }
-        </style>
-}
 
+            return monthNameArray.join(', ');
+        });
 
-@section Scripts 
-{
-        <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
-        <script type="text/javascript">
-            function onSilverlightError(sender, args) {
-                var appSource = "";
-                if (sender != null && sender != 0) {
-                    appSource = sender.getHost().Source;
+        self.hourText = ko.computed(function () {
+            var hoursSelected = self.selectedHours();
+            hoursSelected.sort();
+
+            return hoursSelected.join(', ');
+        });
+
+        self.hourQuery = ko.computed(function () {
+            var hours = self.selectedHours();
+
+            var trimmedHours = []
+            for (var i = 0; i < hours.length; i++) {
+                trimmedHours.push(hours[i].substring(0, 2));
+            }
+
+            return trimmedHours.toString();
+        });
+
+        self.query = ko.computed(function () {
+            var found = false;
+            var q = "Searching for photos ";
+
+            if (self.siteNames() != null && self.siteNames().length != 0) {
+                q += "from " + self.siteNames() + " ";
+                found = true;
+            }
+
+            if (self.tagNames() != null && self.tagNames().length != 0) {
+                if (found) {
+                    q += "and "
                 }
+                q += "tagged with " + self.tagNames() + " ";
+                found = true;
+            }
 
-                var errorType = args.ErrorType;
-                var iErrorCode = args.ErrorCode;
-
-                if (errorType == "ImageError" || errorType == "MediaError") {
-                    return;
+            if (self.dates() != null && self.dates().length != 0) {
+                if (found) {
+                    q += "and "
                 }
+                q += "taken on " + self.dates() + " ";
+                found = true;
+            }
 
-                var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
-
-                errMsg += "Code: " + iErrorCode + "    \n";
-                errMsg += "Category: " + errorType + "       \n";
-                errMsg += "Message: " + args.ErrorMessage + "     \n";
-
-                if (errorType == "ParserError") {
-                    errMsg += "File: " + args.xamlFile + "     \n";
-                    errMsg += "Line: " + args.lineNumber + "     \n";
-                    errMsg += "Position: " + args.charPosition + "     \n";
+            if (self.selectedMonths().length != 0) {
+                if (found) {
+                    q += "and "
                 }
-                else if (errorType == "RuntimeError") {
-                    if (args.lineNumber != 0) {
-                        errMsg += "Line: " + args.lineNumber + "     \n";
-                        errMsg += "Position: " + args.charPosition + "     \n";
+                q += "taken during the months of " + self.monthText() + " ";
+                found = true;
+            }
+
+            if (self.selectedHours().length != 0) {
+                if (found) {
+                    q += "and "
+                }
+                q += "taken during the hours of " + self.hourText() + " ";
+                found = true;
+            }
+
+            if (found) {
+                return q;
+            }
+            else {
+                return "Searching for all photos";
+            }
+        });
+
+        self.queryResults = asyncComputed(function () {
+            return $.ajax("/api/search/count", {
+                data: {
+                    hours: this.hourQuery(),
+                    months: this.selectedMonths().toString(),
+                    sites: this.siteNames,
+                    tags: this.tagNames,
+                    dates: this.dates
+                }
+            });
+        }, this);
+
+        self.imagePath = asyncComputed(function() {
+            return $.ajax("/api/search/photoId", {
+                data: {
+                    hours: this.hourQuery(),
+                    months: this.selectedMonths().toString(),
+                    sites: this.siteNames,
+                    tags: this.tagNames,
+                    dates: this.dates
+                }
+            });
+        }, this);
+
+        self.search = function() {
+            var form;
+            form = $('<form />', {
+                action: '/search/knockoutadvancedsearch',
+                method: 'POST',
+                style: 'display: none;'
+            });
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'hours',
+                value: self.hourQuery()
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'months',
+                value: self.selectedMonths().toString()
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'sites',
+                value: self.siteNames()
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'tags',
+                value: self.tagNames()
+            }));
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'dates',
+                value: self.dates()
+            }));
+            form.appendTo('body').submit();
+        };
+    }
+
+    ko.applyBindings(new ViewModel())
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var availableTags = @Html.Raw(Json.Encode(Model.AvailableTags));
+        var sites = @Html.Raw(Json.Encode(Model.SiteNames));
+
+        var substringMatcher = function(strs) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
+
+                // an array that will be populated with substring matches
+                matches = [];
+
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
+
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                    if (substrRegex.test(str)) {
+
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({ value: str });
                     }
-                    errMsg += "MethodName: " + args.methodName + "     \n";
-                }
+                });
 
-                throw new Error(errMsg);
-            }
-        </script>
-}
+                cb(matches);
+            };
+        };
 
-<h2>Search</h2>
-Results for query: '@Html.DisplayTextFor(m => m.Query)'
+        $('#tag-field').tagsinput();
+        $('#tag-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'available-tags',
+            source: substringMatcher(availableTags)
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#tag-field')));
 
-<form id="pivot" runat="server">
-    <div id="silverlightControlHost">
-    <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
-		<param name="source" value="/ClientBin/Phocalstream_PivotView.xap"/>
-		<param name="onError" value="onSilverlightError" />
-		<param name="background" value="white" />
-		<param name="minRuntimeVersion" value="4.0.60310.0" />
-		<param name="autoUpgrade" value="true" />
-        <param name="initParams" value="collection=@Html.DisplayFor(model => model.CollectionUrl)" />
-		<a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" style="text-decoration:none">
- 			<img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" style="border-style:none"/>
-		</a>
-	</object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe></div>
-</form>
+        $('#site-field').tagsinput();
+        $('#site-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'sites',
+            source: substringMatcher(sites)
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#site-field')));
+    });
+</script>

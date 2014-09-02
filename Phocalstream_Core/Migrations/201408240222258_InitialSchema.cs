@@ -3,7 +3,7 @@ namespace Phocalstream_Service.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initialise : DbMigration
+    public partial class InitialSchema : DbMigration
     {
         public override void Up()
         {
@@ -166,17 +166,17 @@ namespace Phocalstream_Service.Migrations
             DropForeignKey("dbo.PhotoAnnotations", "Photo_ID", "dbo.Photos");
             DropForeignKey("dbo.PhotoAnnotations", "Author_ID", "dbo.Users");
             DropForeignKey("dbo.MetaDatums", "Photo_ID", "dbo.Photos");
-            DropIndex("dbo.Collections", new[] { "Site_ID" });
             DropIndex("dbo.CollectionPhotos", new[] { "PhotoId" });
             DropIndex("dbo.CollectionPhotos", new[] { "CollectionId" });
-            DropIndex("dbo.Collections", new[] { "Owner_ID" });
-            DropIndex("dbo.Collections", new[] { "CoverPhoto_ID" });
             DropIndex("dbo.PhotoTags", new[] { "Tag_ID" });
             DropIndex("dbo.PhotoTags", new[] { "Photo_ID" });
-            DropIndex("dbo.Photos", new[] { "Site_ID" });
             DropIndex("dbo.PhotoAnnotations", new[] { "Photo_ID" });
             DropIndex("dbo.PhotoAnnotations", new[] { "Author_ID" });
             DropIndex("dbo.MetaDatums", new[] { "Photo_ID" });
+            DropIndex("dbo.Photos", new[] { "Site_ID" });
+            DropIndex("dbo.Collections", new[] { "Site_ID" });
+            DropIndex("dbo.Collections", new[] { "Owner_ID" });
+            DropIndex("dbo.Collections", new[] { "CoverPhoto_ID" });
             DropTable("dbo.CollectionPhotos");
             DropTable("dbo.PhotoTags");
             DropTable("dbo.Tags");

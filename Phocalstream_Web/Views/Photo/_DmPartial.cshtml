@@ -1,21 +1,5 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.DmData
 
-<!--
-<div id="DMInfo">
-    <ul>
-        <li>Type: <span class="value">@Html.DisplayFor(model => model.DMValues.Type)</span></li>
-        <li>Week: <span class="value">@Html.DisplayFor(model => model.DisplayDate)</span></li>
-        <li>Nothing: <span class="value">@Html.DisplayFor(model => model.DMValues.NonDrought)</span></li>
-        <li>D0: <span class="value">@Html.DisplayFor(model => model.DMValues.D0)</span></li>
-        <li>D1: <span class="value">@Html.DisplayFor(model => model.DMValues.D1)</span></li>
-        <li>D2: <span class="value">@Html.DisplayFor(model => model.DMValues.D2)</span></li>
-        <li>D3: <span class="value">@Html.DisplayFor(model => model.DMValues.D3)</span></li>
-        <li>D4: <span class="value">@Html.DisplayFor(model => model.DMValues.D4)</span></li>
-    </ul>
-</div>
-    -->
-<div style="clear: both;"></div>
-
 @if (Model.DMValues.NonDrought != 100)
 {
 	<script type="text/javascript">
@@ -94,8 +78,8 @@
 	    });
     </script>
 
-    <div id="open_container" style="min-width: 320px; height: 300px; margin: 0 auto"></div>
-    
+    <div id="open_container" class="dm_container"></div>
+
    	<script type="text/javascript">
 	    $(function ShowPie() {
 	        var chart;
@@ -144,31 +128,81 @@
 
 	</script>
 
-    <div id="pie_container" style="min-width: 320px; height: 300px; margin: 0 auto"></div>
+    <div id="pie_container" class="dm_container"></div>
 }
 else
 {
     <text> No drought recorded for @Html.DisplayFor(model => model.DMValues.Type). </text>
 }
 
+
 @if (Model.DMValues.Type.ToString().Equals("COUNTY"))
 {
-    <text>Change view to:</text>
-    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
-    <text> or </text>   
-    @Ajax.ActionLink("Enitre US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <text>Change view to: </text><a id="stateChange">State</a><text> or </text><a id="usChange">Entire US</a>
 }
 else if (Model.DMValues.Type.ToString().Equals("STATE"))
 {
-    <text>Change view to:</text>
-    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
-    <text> or </text> 
-    @Ajax.ActionLink("Entire US", "DroughtMonitorData", new { type = "US", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <text>Change view to: </text><a id="countyChange">County</a><text> or </text> <a id="usChange">Entire US</a>
 }
 else
 {
-    <text>Change view to:</text>    
-    @Ajax.ActionLink("County", "DroughtMonitorData", new { type = "County", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" }) 
-    <text> or </text> 
-    @Ajax.ActionLink("State", "DroughtMonitorData", new { type = "State", photoID = Model.PhotoID }, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <text>Change view to: </text><a id="countyChange">County</a><text> or </text><a id="stateChange">State</a>
 }
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $('#stateChange').click(function () {
+            $.ajax({
+                url: '@Url.Action("DroughtMonitorData", "Photo")',
+                type: 'GET',
+                cache: false,
+                data: {
+                    photoID: @Model.PhotoID,
+                    type: 'State'
+                },
+                success: function (data) {
+                    $('#dmPartial').html(data);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        });
+
+        $('#usChange').click(function () {
+            $.ajax({
+                url: '@Url.Action("DroughtMonitorData", "Photo")',
+                type: 'GET',
+                cache: false,
+                data: {
+                    photoID: @Model.PhotoID,
+                    type: 'US'
+                },
+                success: function (data) {
+                    $('#dmPartial').html(data);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        });
+
+        $('#countyChange').click(function () {
+            $.ajax({
+                url: '@Url.Action("DroughtMonitorData", "Photo")',
+                type: 'GET',
+                cache: false,
+                data: {
+                    photoID: @Model.PhotoID,
+                    type: 'County'
+                },
+                success: function (data) {
+                    $('#dmPartial').html(data);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        });
+    });
+    </script>

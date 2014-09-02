@@ -90,7 +90,13 @@ namespace Phocalstream_Web.Controllers.Api
             XmlDocument doc = null;
             if (col.Type == CollectionType.SITE)
             {
-                string rootDeepZoomPath = Path.Combine(ConfigurationManager.AppSettings["PhotoPath"], col.Site.DirectoryName);
+                string rootDeepZoomPath = Path.Combine(PathManager.GetPhotoPath(), col.Site.DirectoryName);
+                doc = new XmlDocument();
+                doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
+            }
+            else if (col.Type == CollectionType.SEARCH)
+            {
+                string rootDeepZoomPath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
                 doc = new XmlDocument();
                 doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
             }
@@ -142,14 +148,14 @@ namespace Phocalstream_Web.Controllers.Api
 
         private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
         {
-            string path = ConfigurationManager.AppSettings["rawPath"];
+            string path = PathManager.GetRawPath();
 
             if (String.IsNullOrEmpty(path))
             {
                 throw new Exception("The raw photo path is null or empty");
             }
 
-            string save_path = ConfigurationManager.AppSettings["downloadPath"];
+            string save_path = PathManager.GetDownloadPath();
             if (!Directory.Exists(save_path))
             {
                 Directory.CreateDirectory(save_path);

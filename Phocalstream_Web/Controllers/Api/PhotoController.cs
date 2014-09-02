@@ -1,5 +1,6 @@
 ﻿using Gif.Components;
 using Microsoft.Practices.Unity;
+using Phocalstream_Service.Service;
 using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
@@ -55,7 +56,7 @@ namespace Phocalstream_Web.Controllers.Api
             }
             else
             {
-                string basePath = ConfigurationManager.AppSettings["photoPath"];
+                string basePath = PathManager.GetPhotoPath();
                 string photoPath = string.Format("{0}/{1}/{2}.phocalstream/{3}.jpg", basePath, photo.Site.DirectoryName, photo.BlobID, res);
 
                 MemoryStream imageData = new MemoryStream();

@@ -14,5 +14,15 @@ namespace Phocalstream_Shared.Data.Model.Photo
 
         public string Name { get; set; }
         public ICollection<Photo> Photos { get; set; }
+
+        public Tag()
+        {
+
+        }
+
+        public Tag(string name)
+        {
+            this.Name = name;
+        }
     }
 }

@@ -6,14 +6,14 @@ namespace Phocalstream_Service.Migrations
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    [GeneratedCode("EntityFramework.Migrations", "6.0.1-21010")]
-    public sealed partial class Initialise : IMigrationMetadata
+    [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
+    public sealed partial class InitialSchema : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Initialise));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialSchema));
         
         string IMigrationMetadata.Id
         {
-            get { return "201406162013014_Initialise"; }
+            get { return "201408240222258_InitialSchema"; }
         }
         
         string IMigrationMetadata.Source
