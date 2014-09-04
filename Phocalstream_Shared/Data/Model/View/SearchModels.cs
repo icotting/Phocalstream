@@ -62,7 +62,7 @@ namespace Phocalstream_Shared.Data.Model.View
                 string[] months = this.Months.Split(',');
                 foreach (var m in months)
                 {
-                    monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Convert.ToInt16(m) + 1));
+                    monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Convert.ToInt16(m)));
                 }
 
             }
