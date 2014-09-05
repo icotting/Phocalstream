@@ -34,6 +34,32 @@
     width: 140px;
 }
 
+.siteImage {
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.siteCaption {
+    bottom: 45px;
+    left: 0px;
+    right: 15px;
+    position: absolute;
+    
+    margin-left: 15px;
+
+    background: rgba(0, 0, 0, .5);
+    color: white;
+}
+
+.siteColumn {
+    padding-bottom: 30px !important;
+}
+
+.siteCollection {
+    margin-top: 33px;
+}
+
 /* Search Section*/
 .bootstrap-tagsinput {
     line-height: 36px !important;

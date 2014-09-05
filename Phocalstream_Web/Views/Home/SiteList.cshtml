@@ -30,43 +30,54 @@
     <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
     <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
 }
-<div class="container content">
+<div class="container">
+    <div class="content">
 
-    <div class="tab-pane active" id="maptab">
-        <div class="row">
-            <div class="col-md-5">
-                <div id="siteList">
-                    <h1>Photo Collections</h1>
-                    <p>
-                        Using the map to the left, select from the available camera sites to view
-                        time-lapse photos and information about the site.
-                    </p>
-                </div>
+        <div id="sites">
+            <div class="row">
+                @foreach (var site in Model.Sites)
+                {
+                    <div class="col-md-6 siteColumn">
+                        <img class="siteImage" src="/api/photo/medium/@site.CoverPhotoID" alt="@site.SiteName">
+
+                        <div class="row">
+                            <div class="siteCaption">
+                                <div class="col-md-8">
+                                    <h1>@site.SiteName</h1>
+                                    <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <a class="siteCollection btn btn-default" href="/photo/cameracollection?siteId=@site.SiteID">View Collection</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
-            <div class="col-md-7">
-                <div id="mapcontainer">
-                    <div id="map">
+        </div>
 
+        <hr class="featurette-divider">
+
+        <div id="maptab">
+            <div class="row">
+                <div class="col-md-5">
+                    <div id="siteList">
+                        <h1>Photo Collections</h1>
+                        <p>
+                            Using the map to the left, select from the available camera sites to view
+                            time-lapse photos and information about the site.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div id="mapcontainer">
+                        <div id="map">
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="tab-pane" id="sites">
-        @foreach (var site in Model.Sites)
-        {
-            <div class="row">
-                <div class="col-md-6">
-                    <img src="/api/photo/low/@site.CoverPhotoID" alt="@site.SiteName">
-                </div>
-                <div class="col-md-6">
-                    <h1>@site.SiteName</h1>
-                    <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
-                    <a href="/photo/cameracollection?siteId=@site.SiteID">View Collection</a>
-                </div>
-            </div>
-        }
     </div>
-
 </div>
