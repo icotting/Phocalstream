@@ -28,7 +28,6 @@ namespace Phocalstream_Shared.Data.Model.View
         public ICollection<string> AvailableTags { get; set; }
 
         public long BackgroundImageID { get; set; }
-
         
         public bool IsEmpty()
         {

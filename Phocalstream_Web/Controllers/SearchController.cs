@@ -95,38 +95,52 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult AdvancedSearch(SearchModel model)
         {
+            //check if the model is empty
             if (model.IsEmpty())
             {
                 return RedirectToAction("Index", new { e = 2 });
             }
 
-            //execute the search
-            SearchMatches result = SearchService.Search(model);
-            
-            //if search yielded result, do proceed
-            if (result.Ids.Count > 0)
+            //check if the model exists
+            var collectionName = model.CreateCollectionName();
+            var containerID = collectionName.GetHashCode().ToString();
+
+            Collection existingCollection = CollectionRepository.Find(c => c.ContainerID == containerID).FirstOrDefault();
+            if (existingCollection != null)
             {
-                Guid containerID = Guid.NewGuid();
-
-                //save the collection
-                Collection c = new Collection();
-                c.Name = model.CreateCollectionName();
-                c.ContainerID = containerID.ToString();
-                c.Type = CollectionType.SEARCH;
-                c.Photos = result.Matches;
-                CollectionRepository.Insert(c);
-                Unit.Commit();
-
-                //generate xml manifests
-                SearchService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches), 
-                    Path.Combine(SearchService.ValidateAndGetSearchPath(), containerID.ToString(), "collection.dzc"));
-                PhotoService.GeneratePivotManifest(containerID.ToString(), String.Join(",", result.Ids.ToArray()));
-
-                return RedirectToAction("SearchResult", new { collectionID = c.ID });
+                return RedirectToAction("SearchResult", new { collectionID = existingCollection.ID });
             }
             else
             {
-                return RedirectToAction("Index", new { e = 1 });
+                //else, execute the search
+                SearchMatches result = SearchService.Search(model);
+
+                //if search yielded result, do proceed
+                if (result.Ids.Count > 0)
+                {
+                    //                Guid containerID = Guid.NewGuid();
+
+                    //save the collection
+                    Collection c = new Collection();
+                    c.Name = collectionName;
+                    c.ContainerID = containerID;
+                    //                c.ContainerID = containerID.ToString();
+                    c.Type = CollectionType.SEARCH;
+                    c.Photos = result.Matches;
+                    CollectionRepository.Insert(c);
+                    Unit.Commit();
+
+                    //generate xml manifests
+                    SearchService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches),
+                        Path.Combine(SearchService.ValidateAndGetSearchPath(), containerID, "collection.dzc"));
+                    PhotoService.GeneratePivotManifest(containerID, String.Join(",", result.Ids.ToArray()));
+
+                    return RedirectToAction("SearchResult", new { collectionID = c.ID });
+                }
+                else
+                {
+                    return RedirectToAction("Index", new { e = 1 });
+                }
             }
         }
 
