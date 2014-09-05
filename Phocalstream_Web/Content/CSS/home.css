@@ -16,12 +16,15 @@
     margin-top: 15px;
 }
 
-
 #sitesContainer {
     padding-right: 330px;
     left: 0px;
     right: 0px;
     position: relative;
+}
+
+#imageContainer {
+    height: 280px;
 }
 
 .imghead {
