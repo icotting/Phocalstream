@@ -24,7 +24,7 @@
 }
 
 #imageContainer {
-    height: 280px;
+    height: 400px;
 }
 
 .imghead {
@@ -58,6 +58,18 @@
 
 .siteCollection {
     margin-top: 33px;
+}
+
+.mapSiteCaption {
+    bottom: 15px;
+    left: 0px;
+    right: 15px;
+    position: absolute;
+    
+    margin-left: 15px;
+
+    background: rgba(0, 0, 0, .5);
+    color: white;
 }
 
 /* Search Section*/
