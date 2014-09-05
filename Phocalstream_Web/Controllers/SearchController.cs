@@ -101,30 +101,27 @@ namespace Phocalstream_Web.Controllers
                 return RedirectToAction("Index", new { e = 2 });
             }
 
-            //check if the model exists
             var collectionName = model.CreateCollectionName();
             var containerID = collectionName.GetHashCode().ToString();
 
+            //check if the model exists
             Collection existingCollection = CollectionRepository.Find(c => c.ContainerID == containerID).FirstOrDefault();
             if (existingCollection != null)
             {
                 return RedirectToAction("SearchResult", new { collectionID = existingCollection.ID });
             }
+            //else, execute the search
             else
             {
-                //else, execute the search
                 SearchMatches result = SearchService.Search(model);
 
                 //if search yielded result, do proceed
                 if (result.Ids.Count > 0)
                 {
-                    //                Guid containerID = Guid.NewGuid();
-
                     //save the collection
                     Collection c = new Collection();
                     c.Name = collectionName;
                     c.ContainerID = containerID;
-                    //                c.ContainerID = containerID.ToString();
                     c.Type = CollectionType.SEARCH;
                     c.Photos = result.Matches;
                     CollectionRepository.Insert(c);
@@ -137,6 +134,7 @@ namespace Phocalstream_Web.Controllers
 
                     return RedirectToAction("SearchResult", new { collectionID = c.ID });
                 }
+                //else, redirect back to search page
                 else
                 {
                     return RedirectToAction("Index", new { e = 1 });
