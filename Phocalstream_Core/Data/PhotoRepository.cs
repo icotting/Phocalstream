@@ -54,6 +54,37 @@ namespace Phocalstream_Web.Application.Data
             return details;
         }
 
+        public TagDetails GetTagDetails(Tag tag)
+        {
+            TagDetails details = new TagDetails();
+            details.TagName = tag.Name;
+            details.TagID = tag.ID;
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string command_string = "select min(Captured), max(Captured), count(*), max(Photos.ID) from Photos " +
+                                        "INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
+                                        "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID " +
+                                        "where PhotoTags.Tag_ID = @tagID";
+                using (SqlCommand command = new SqlCommand(command_string, conn))
+                {
+                    command.Parameters.AddWithValue("@tagID", tag.ID);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            details.First = reader.GetDateTime(0);
+                            details.Last = reader.GetDateTime(1);
+                            details.PhotoCount = reader.GetInt32(2);
+                            details.LastPhotoID = reader.GetInt64(3);
+                        }
+                    }
+                }
+            }
+            return details;
+        }
+
         public System.Xml.XmlDocument CreateDeepZoomForSite(long siteID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

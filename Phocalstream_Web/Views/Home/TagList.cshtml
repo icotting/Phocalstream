@@ -1,0 +1,58 @@
+﻿@model Phocalstream_Web.Models.ViewModels.TagViewModel
+
+@{
+    ViewBag.Title = "SiteList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Scripts.Render(
+            "~/Content/Scripts/jquery-1.7.1.min.js",
+            "~/Content/Scripts/jquery.unobtrusive-ajax.min.js",
+            "~/Content/bootstrap/js/bootstrap.min.js"
+    )
+
+@Styles.Render(
+            "~/Content/bootstrap/css/bootstrap.min.css",
+            "~/Content/Site.css",
+            "~/Content/carousel.css",
+            "~/Content/CSS/Home.css"
+    )
+
+@section scripts
+{
+    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+    <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
+    <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
+    <script type="text/javascript" src="http://seadragon.com/ajax/0.8/seadragon-min.js"></script>
+}
+<div class="container">
+    <div class="content">
+
+        <div class="text-center">
+            <h1 class="page-header">Phocalstream Image Tags</h1>
+        </div>
+
+        <div id="tags">
+            <div class="row">
+                @foreach (var tag in Model.TagDetails)
+                {
+                    <div class="col-md-6 siteColumn">
+                        <img class="siteImage" src="/api/photo/medium/@tag.CoverPhotoID" alt="@tag.TagName">
+
+                        <div class="row">
+                            <div class="siteCaption">
+                                <div class="col-md-8">
+                                    <h1>@tag.TagName</h1>
+                                    <p>@Html.DisplayFor(model => tag.PhotoCount) photos from @Html.DisplayFor(model => tag.First) to @Html.DisplayFor(model => tag.Last)</p>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <a class="siteCollection btn btn-default" href="/photo/cameracollection?siteId=@tag.TagID">View Collection</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

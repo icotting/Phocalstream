@@ -37,6 +37,9 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IEntityRepository<Photo> PhotoEntityRepository { get; set; }
 
+        [Dependency]
+        public IEntityRepository<Tag> TagRepository { get; set; }
+
         //
         // GET: /Home/
         public ActionResult Index(int e = 0)
@@ -77,6 +80,15 @@ namespace Phocalstream_Web.Controllers
             return PartialView("_SiteDetails", details);
         }
 
+        public ActionResult TagList()
+        {
+            TagViewModel model = new TagViewModel();
+            model.Tags = TagRepository.Find(t => !t.Name.Equals(""));
+            model.TagDetails = model.Tags.Select(t => GetDetailsForTag(t));
+            
+            return View(model);
+        }
+
         public ActionResult Downloads()
         {
             DownloadViewModel model = new DownloadViewModel();
@@ -103,6 +115,15 @@ namespace Phocalstream_Web.Controllers
 
             return details;
         }
+
+        private TagDetails GetDetailsForTag(Tag tag)
+        {
+            TagDetails details = PhotoRepository.GetTagDetails(tag);
+            details.CoverPhotoID = details.LastPhotoID;
+
+            return details;
+        }
+
 
         //Utility method to convert FileSize to correct string
         private static string ToFileSize(long source)
