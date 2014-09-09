@@ -42,6 +42,9 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public ISearchService SearchService { get; set; }
 
+        [Dependency]
+        public ICollectionService CollectionService { get; set; }
+
 
         public ActionResult Index(int e = 0)
         {
@@ -118,7 +121,7 @@ namespace Phocalstream_Web.Controllers
                 Unit.Commit();
 
                 //generate xml manifests
-                SearchService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches), 
+                CollectionService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches), 
                     Path.Combine(SearchService.ValidateAndGetSearchPath(), containerID.ToString(), "collection.dzc"));
                 PhotoService.GeneratePivotManifest(containerID.ToString(), String.Join(",", result.Ids.ToArray()));
 

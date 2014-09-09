@@ -62,9 +62,10 @@ namespace Phocalstream_Service.Service
             }
         }
 
+        //Do these delete methods need to be secured?
         public void DeleteAllSearches()
         {
-            List<Collection> collections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH).ToList();
+            IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH);
 
             foreach (var col in collections)
             {
@@ -78,16 +79,6 @@ namespace Phocalstream_Service.Service
                 CollectionRepository.Delete(col);
                 Unit.Commit();
             }
-        }
-
-        public void GenerateCollectionManifest(List<string> fileNames, string savePath)
-        {
-            CollectionCreator creator = new CollectionCreator();
-            creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-            creator.TileOverlap = 1;
-            creator.TileSize = 256;
-
-            creator.Create(fileNames, savePath);
         }
 
         public List<string> GetSiteNames()
