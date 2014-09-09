@@ -19,6 +19,7 @@ using System.Xml;
 using Phocalstream_Service.Service;
 using Ionic.Zip;
 using System.Diagnostics;
+using Phocalstream_Shared.Service;
 
 namespace Phocalstream_Web.Controllers.Api
 {
@@ -34,10 +35,17 @@ namespace Phocalstream_Web.Controllers.Api
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
-        public IUnitOfWork UnitOfWork { get; set; }
+        public IUnitOfWork Unit { get; set; }
 
         [Dependency]
         public IEntityRepository<User> UserRepository { get; set; }
+
+        [Dependency]
+        public IPhotoService PhotoService { get; set; }
+
+        [Dependency]
+        public ICollectionService CollectionService { get; set; }
+
 
         [HttpGet]
         [ActionName("updatecover")]
@@ -47,7 +55,7 @@ namespace Phocalstream_Web.Controllers.Api
             Photo photo = PhotoEntityRepository.Single(p => p.ID == photoId);
             col.CoverPhoto = photo;
             CollectionRepository.Update(col);
-            UnitOfWork.Commit();
+            Unit.Commit();
         }
 
         [HttpGet]
@@ -201,6 +209,31 @@ namespace Phocalstream_Web.Controllers.Api
 
             //after save, send email
             EmailService.SendMail(email, "Phocalstream Download", "Please visit " + downloadURL + " to download the images.");
+        }
+    
+        [HttpPost, ActionName("SaveUserCollection")]
+        public void SaveUserCollection(string collectionName, string photoIds)
+        {
+            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
+            List<Photo> photos = PhotoEntityRepository.Find(p => ids.Contains(p.ID)).ToList();
+
+            Guid containerID = Guid.NewGuid();
+
+            //save the collection
+            Collection c = new Collection();
+            c.Name = collectionName;
+            c.ContainerID = containerID.ToString();
+            c.Owner = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            c.Type = CollectionType.USER;
+            c.Photos = photos;
+            CollectionRepository.Insert(c);
+            Unit.Commit();
+
+            //generate xml manifests
+            string collectionPath = CollectionService.ValidateAndGetUserCollectionPath();
+            CollectionService.GenerateCollectionManifest(PhotoService.GetFileNames(photos),
+                Path.Combine(collectionPath, containerID.ToString(), "collection.dzc"));
+            PhotoService.GeneratePivotManifest(collectionPath, containerID.ToString(), String.Join(",", ids));
         }
     }
 }

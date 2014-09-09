@@ -15,4 +15,10 @@ namespace Phocalstream_Web.Models.ViewModels
         public string SiteCoords { get; set; }
         public SiteDetails SiteDetails { get; set; }
     }
+
+    public class UserCollectionViewModel
+    {
+        public User User { get; set; }
+        public IEnumerable<Collection> Collections { get; set; }
+    }
 }

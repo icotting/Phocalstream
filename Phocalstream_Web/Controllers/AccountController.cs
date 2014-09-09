@@ -16,6 +16,7 @@ using Phocalstream_Web.Models;
 using Microsoft.Practices.Unity;
 using System.Data.Entity;
 using Phocalstream_Shared.Data;
+using Phocalstream_Web.Models.ViewModels;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -24,6 +25,9 @@ namespace Phocalstream_Web.Controllers
     {
         [Dependency]
         public IEntityRepository<User> UserRepository { get; set; }
+
+        [Dependency]
+        public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
         public IUnitOfWork Unit { get; set; }
@@ -156,6 +160,17 @@ namespace Phocalstream_Web.Controllers
                 }
             }
             ViewBag.ReturnUrl = returnUrl;
+            return View(model);
+        }
+
+        public ActionResult UserCollections()
+        {
+            UserCollectionViewModel model = new UserCollectionViewModel();
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            model.User = User;
+            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID);
+
             return View(model);
         }
 

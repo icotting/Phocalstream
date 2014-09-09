@@ -11,6 +11,7 @@
 
 @section Scripts
     {
+    <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
     <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
     <script type="text/javascript">
 
@@ -80,8 +81,27 @@
    
         function downloadImages() {
            $.ajax({
-               url : '/api/sitecollection/RawDownload?photoIds='+visibleItems,
+                url : '/api/sitecollection/RawDownload?photoIds='+visibleItems,
                 type: "POST"
+            })
+        }
+
+        function saveCollectionPrompt() {
+            $("#silverlightControlHost").hide();
+            bootbox.prompt("Name this collection: ", function(result) {                
+                if (result === null) {                         
+                    $("#silverlightControlHost").show();                                                
+                } else {
+                    saveCollection(result);
+                    $("#silverlightControlHost").show();                                                
+                }
+            });
+        }
+
+        function saveCollection(collectionName) {
+            $.ajax({
+                url : '/api/sitecollection/SaveUserCollection?photoIds='+visibleItems+'&collectionName='+collectionName,
+                type : "POST"
             })
         }
     
@@ -139,6 +159,10 @@
 
 @section MenuItems
 {
+    @if (Request.IsAuthenticated)
+    {
+        <li><a href="javascript:saveCollectionPrompt()">Save Collection</a></li>
+    }
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
         <li><a href="javascript:setCover()">Set Cover</a></li>

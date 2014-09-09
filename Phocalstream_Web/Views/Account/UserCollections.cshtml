@@ -1,0 +1,16 @@
+﻿@model Phocalstream_Web.Models.ViewModels.UserCollectionViewModel
+@{
+    ViewBag.Title = "UserCollections";
+}
+
+<div class="container">
+    <div class="content">
+        <h2>UserCollections</h2>
+
+
+        @foreach (var c in Model.Collections)
+        {
+            <h2>@c.Name</h2>
+        }
+    </div>
+</div>
