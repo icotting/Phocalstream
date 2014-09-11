@@ -17,6 +17,7 @@ using Microsoft.Practices.Unity;
 using System.Data.Entity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Web.Models.ViewModels;
+using Phocalstream_Shared.Service;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -31,6 +32,9 @@ namespace Phocalstream_Web.Controllers
 
         [Dependency]
         public IUnitOfWork Unit { get; set; }
+
+        [Dependency]
+        public ICollectionService CollectionService { get; set; }
 
         public ActionResult UserProfile()
         {
@@ -172,6 +176,18 @@ namespace Phocalstream_Web.Controllers
             model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID);
 
             return View(model);
+        }
+
+        public ActionResult DeleteUserCollection(long collectionID)
+        {
+            CollectionService.DeleteUserCollection(collectionID);
+            return RedirectToAction("UserCollections", "Account");
+        }
+
+        public ActionResult DeleteUserCollections()
+        {
+            CollectionService.DeleteUserCollections(UserRepository.First(u => u.GoogleID == this.User.Identity.Name).ID);
+            return RedirectToAction("UserCollections", "Account");
         }
 
 

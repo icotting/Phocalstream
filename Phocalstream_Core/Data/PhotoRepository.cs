@@ -97,7 +97,7 @@ namespace Phocalstream_Web.Application.Data
             }
         }
 
-        public XmlDocument CreatePivotCollectionForList(string collectionName, string photoList)
+        public XmlDocument CreatePivotCollectionForList(string collectionName, string photoList, CollectionType type)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -105,7 +105,7 @@ namespace Phocalstream_Web.Application.Data
 
                 using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured, Site_ID from Photos where Photos.ID IN ({0})", photoList), conn))
                 {
-                    return CreatePivotDocument(collectionName, command, null, CollectionType.SEARCH);
+                    return CreatePivotDocument(collectionName, command, null, type);
                 }
             }
         }
@@ -247,7 +247,7 @@ namespace Phocalstream_Web.Application.Data
             facet.SetAttribute("Type", "String");
             facets.AppendChild(facet);
 
-            if (type == CollectionType.SEARCH)
+            if (type != CollectionType.SITE)
             {
                 facet = doc.CreateElement("FacetCategory");
                 facet.SetAttribute("Name", "Site");
@@ -265,6 +265,15 @@ namespace Phocalstream_Web.Application.Data
                     uri.Host,
                     uri.Port,
                     PathManager.SearchPath,
+                    collectionName);
+            }
+            else if (type == CollectionType.USER)
+            {
+                dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.UserCollectionPath, collectionName)
+                    : string.Format("{0}://{1}:{2}/dzc/{3}{4}/collection.dzc", uri.Scheme,
+                    uri.Host,
+                    uri.Port,
+                    PathManager.UserCollectionPath,
                     collectionName);
             }
             else

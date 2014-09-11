@@ -108,6 +108,12 @@ namespace Phocalstream_Web.Controllers.Api
                 doc = new XmlDocument();
                 doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
             }
+            else if (col.Type == CollectionType.USER)
+            {
+                string rootDeepZoomPath = Path.Combine(PathManager.GetUserCollectionPath(), col.ContainerID);
+                doc = new XmlDocument();
+                doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
+            }
             else
             {
                 doc = PhotoRepository.CreatePivotCollectionForSite(id);
@@ -233,7 +239,7 @@ namespace Phocalstream_Web.Controllers.Api
             string collectionPath = CollectionService.ValidateAndGetUserCollectionPath();
             CollectionService.GenerateCollectionManifest(PhotoService.GetFileNames(photos),
                 Path.Combine(collectionPath, containerID.ToString(), "collection.dzc"));
-            PhotoService.GeneratePivotManifest(collectionPath, containerID.ToString(), String.Join(",", ids));
+            PhotoService.GeneratePivotManifest(collectionPath, containerID.ToString(), String.Join(",", ids), CollectionType.USER);
         }
     }
 }

@@ -388,7 +388,6 @@
     <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\SearchResult.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\UserCollections.cshtml" />
   </ItemGroup>
   <ItemGroup>

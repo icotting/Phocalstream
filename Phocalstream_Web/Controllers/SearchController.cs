@@ -124,7 +124,7 @@ namespace Phocalstream_Web.Controllers
                 string searchPath = SearchService.ValidateAndGetSearchPath();
                 CollectionService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches), 
                     Path.Combine(searchPath, containerID.ToString(), "collection.dzc"));
-                PhotoService.GeneratePivotManifest(searchPath, containerID.ToString(), String.Join(",", result.Ids.ToArray()));
+                PhotoService.GeneratePivotManifest(searchPath, containerID.ToString(), String.Join(",", result.Ids.ToArray()), CollectionType.SEARCH);
 
                 return RedirectToAction("SearchResult", new { collectionID = c.ID });
             }
