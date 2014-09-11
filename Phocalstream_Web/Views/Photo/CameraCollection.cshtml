@@ -1,5 +1,4 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.CollectionViewModel
-
 @{
     ViewBag.Title = Model.Collection.Site.Name;
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -72,11 +71,16 @@
         }
         
         function downloadPrompt() {
-            var response = confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.");
-
-            if (response) {
-                downloadImages();
-            } 
+            $("#silverlightControlHost").hide();
+            bootbox.confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.", function(result) {
+                if(result) {
+                    downloadImages();
+                    $("#silverlightControlHost").show();                                                
+                }
+                else {
+                    $("#silverlightControlHost").show();                                                
+                }
+            }); 
         }
    
         function downloadImages() {

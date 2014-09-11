@@ -9,6 +9,7 @@
 
 @section Scripts 
 {
+    <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
     <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
     <script type="text/javascript">
 
@@ -53,16 +54,40 @@
         }
 
         function downloadPrompt() {
-            var response = confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.");
-
-            if (response) {
-                downloadImages();
-            }
+            $("#silverlightControlHost").hide();
+            bootbox.confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.", function (result) {
+                if (result) {
+                    downloadImages();
+                    $("#silverlightControlHost").show();
+                }
+                else {
+                    $("#silverlightControlHost").show();
+                }
+            });
         }
 
         function downloadImages() {
             $.ajax({
                 url: '/api/sitecollection/RawDownload?photoIds=' + visibleItems,
+                type: "POST"
+            })
+        }
+
+        function saveCollectionPrompt() {
+            $("#silverlightControlHost").hide();
+            bootbox.prompt("Name this collection: ", function (result) {
+                if (result === null) {
+                    $("#silverlightControlHost").show();
+                } else {
+                    saveCollection(result);
+                    $("#silverlightControlHost").show();
+                }
+            });
+        }
+
+        function saveCollection(collectionName) {
+            $.ajax({
+                url: '/api/sitecollection/SaveUserCollection?photoIds=' + visibleItems + '&collectionName=' + collectionName,
                 type: "POST"
             })
         }
@@ -98,6 +123,10 @@
 
 @section MenuItems
 {
+    @if (Request.IsAuthenticated)
+    {
+        <li><a href="javascript:saveCollectionPrompt()">Save Collection</a></li>
+    }
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
         <li><a href="javascript:downloadPrompt()">Download Images</a></li>
