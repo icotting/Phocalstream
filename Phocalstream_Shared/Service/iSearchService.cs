@@ -15,8 +15,9 @@ namespace Phocalstream_Shared.Service
         void DeleteAllSearches();
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
         List<string> GetSiteNames();
-        int SearchResultCount(QuickSearchModel model);
-        long SearchResultPhotoId(QuickSearchModel model);
+        int SearchResultCount(SearchModel model);
+        long SearchResultPhotoId(SearchModel model);
+        void ValidateCache(SearchModel model, int currentCount);
         SearchMatches Search(SearchModel model);
     }
 }
