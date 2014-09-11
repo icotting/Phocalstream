@@ -1,0 +1,40 @@
+﻿@model Phocalstream_Web.Models.ViewModels.TagViewModel
+
+@{
+    ViewBag.Title = "TagList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/CSS/Home.css")
+
+<div class="container">
+    <div class="content">
+
+        <div class="text-center">
+            <h1 class="page-header">Phocalstream Image Tags</h1>
+        </div>
+
+        <div id="tags">
+            <div class="row">
+                @foreach (var tag in Model.TagDetails)
+                {
+                    <div class="col-md-6 siteColumn">
+                        <img class="siteImage" src="/api/photo/medium/@tag.CoverPhotoID" alt="@tag.TagName">
+
+                        <div class="row">
+                            <div class="siteCaption">
+                                <div class="col-md-8">
+                                    <h1>@tag.TagName</h1>
+                                    <p>@Html.DisplayFor(model => tag.PhotoCount) photos from @Html.DisplayFor(model => tag.First) to @Html.DisplayFor(model => tag.Last)</p>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <a class="siteCollection btn btn-default" href="/search/tagsearch?tag=@tag.TagName">View Images</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

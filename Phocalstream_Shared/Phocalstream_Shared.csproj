@@ -79,6 +79,7 @@
     <Compile Include="Data\Model\Photo\TimelapseFrame.cs" />
     <Compile Include="Data\Model\View\SearchModels.cs" />
     <Compile Include="Data\Model\View\SiteDetails.cs" />
+    <Compile Include="Data\Model\View\TagDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\IPhotoService.cs" />
     <Compile Include="Service\ISearchService.cs" />

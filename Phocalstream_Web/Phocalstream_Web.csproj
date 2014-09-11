@@ -281,6 +281,7 @@
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
     <Compile Include="Models\ViewModels\SettingsViewModel.cs" />
+    <Compile Include="Models\ViewModels\TagViewModel.cs" />
     <Compile Include="Models\ViewModels\TimelapseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -387,6 +388,7 @@
     <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\SearchResult.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
+    <Content Include="Views\Home\TagList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
