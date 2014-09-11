@@ -86,14 +86,14 @@ namespace Phocalstream_Service.Service
             return SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
         }
 
-        public int SearchResultCount(QuickSearchModel model)
+        public int SearchResultCount(SearchModel model)
         {
             string select = GetQuickSearchQuery(model);
             List<long> ids = QuickSearch(select);
             return ids.Count;
         }
 
-        public long SearchResultPhotoId(QuickSearchModel model)
+        public long SearchResultPhotoId(SearchModel model)
         {
             string select = GetQuickSearchQuery(model);
             List<long> ids = QuickSearch(select);
@@ -109,6 +109,7 @@ namespace Phocalstream_Service.Service
                 return 0;
             }
         }
+
 
         public List<long> QuickSearch(string query)
         {
@@ -135,6 +136,22 @@ namespace Phocalstream_Service.Service
             }
 
             return Ids;
+        }
+
+        public void ValidateCache(SearchModel model, int currentCount)
+        {
+            var collectionName = model.CreateCollectionName();
+            var containerID = collectionName.GetHashCode().ToString();
+
+            Collection collection = CollectionRepository.Find(c => c.ContainerID == containerID, c => c.Photos).FirstOrDefault();
+
+            if (collection != null)
+            {
+                if (collection.Photos.Count() != currentCount)
+                {
+                    DeleteSearch(collection.ID);
+                }
+            }
         }
 
         public SearchMatches Search(SearchModel model)
@@ -168,7 +185,7 @@ namespace Phocalstream_Service.Service
             return result;
         }
 
-        private string GetQuickSearchQuery(QuickSearchModel model)
+        private string GetQuickSearchQuery(SearchModel model)
         {
             StringBuilder select = new StringBuilder();
             StringBuilder parameters = new StringBuilder();

@@ -32,7 +32,7 @@ namespace Phocalstream_Web.Controllers.Api
         [ActionName("count")]
         public HttpResponseMessage SearchCount(string hours, string months, string sites, string tags, string dates)
         {
-            QuickSearchModel model = new QuickSearchModel();
+            SearchModel model = new SearchModel();
             model.Sites = sites;
             model.Tags = tags;
             model.Dates = dates;
@@ -40,6 +40,9 @@ namespace Phocalstream_Web.Controllers.Api
             model.Months = months;
 
             int count = SearchService.SearchResultCount(model);
+
+            //check the search cache
+            SearchService.ValidateCache(model, count);
 
             HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
             message.Content = new StringContent(Convert.ToString(count));
@@ -51,7 +54,7 @@ namespace Phocalstream_Web.Controllers.Api
         [ActionName("photoId")]
         public HttpResponseMessage SearchPhotoId(string hours, string months, string sites, string tags, string dates)
         {
-            QuickSearchModel model = new QuickSearchModel();
+            SearchModel model = new SearchModel();
             model.Sites = sites;
             model.Tags = tags;
             model.Dates = dates;

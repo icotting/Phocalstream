@@ -16,7 +16,6 @@
     margin-top: 15px;
 }
 
-
 #sitesContainer {
     padding-right: 330px;
     left: 0px;
@@ -24,11 +23,53 @@
     position: relative;
 }
 
+#imageContainer {
+    height: 400px;
+}
+
 .imghead {
     display: block; 
     margin-left: auto; 
     margin-right: auto; 
     width: 140px;
+}
+
+.siteImage {
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.siteCaption {
+    bottom: 45px;
+    left: 0px;
+    right: 15px;
+    position: absolute;
+    
+    margin-left: 15px;
+
+    background: rgba(0, 0, 0, .5);
+    color: white;
+}
+
+.siteColumn {
+    padding-bottom: 30px !important;
+}
+
+.siteCollection {
+    margin-top: 33px;
+}
+
+.mapSiteCaption {
+    bottom: 15px;
+    left: 0px;
+    right: 15px;
+    position: absolute;
+    
+    margin-left: 15px;
+
+    background: rgba(0, 0, 0, .5);
+    color: white;
 }
 
 /* Search Section*/

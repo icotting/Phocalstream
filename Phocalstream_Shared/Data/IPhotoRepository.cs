@@ -12,6 +12,7 @@ namespace Phocalstream_Shared.Data
     public interface IPhotoRepository
     {
         SiteDetails GetSiteDetails(CameraSite site);
+        TagDetails GetTagDetails(Tag Tag);
         
         /* These methods should be split off into a service */
         XmlDocument CreateDeepZoomForSite(long siteID);

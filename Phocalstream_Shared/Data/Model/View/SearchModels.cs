@@ -28,7 +28,6 @@ namespace Phocalstream_Shared.Data.Model.View
         public ICollection<string> AvailableTags { get; set; }
 
         public long BackgroundImageID { get; set; }
-
         
         public bool IsEmpty()
         {
@@ -44,13 +43,13 @@ namespace Phocalstream_Shared.Data.Model.View
             StringBuilder name = new StringBuilder(); 
             name.Append("Showing photos ");
 
-            if(!String.IsNullOrWhiteSpace(Sites))
+            if(!String.IsNullOrWhiteSpace(Sites) && !Sites.Equals("undefined"))
             {
 
                 name.Append("from " + String.Join(", ", Sites.Split(',')) + " ");
             }
 
-            if (!String.IsNullOrWhiteSpace(Tags))
+            if (!String.IsNullOrWhiteSpace(Tags) && !Tags.Equals("undefined"))
             {
                 name.Append("tagged with " + String.Join(", ", Tags.Split(',')) + " ");
             }
@@ -62,7 +61,7 @@ namespace Phocalstream_Shared.Data.Model.View
                 string[] months = this.Months.Split(',');
                 foreach (var m in months)
                 {
-                    monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Convert.ToInt16(m) + 1));
+                    monthNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Convert.ToInt16(m)));
                 }
 
             }
@@ -71,7 +70,7 @@ namespace Phocalstream_Shared.Data.Model.View
                 name.Append("taken during " + String.Join(", ", monthNames.ToArray()) + " ");
             }
 
-            if (!String.IsNullOrWhiteSpace(Dates))
+            if (!String.IsNullOrWhiteSpace(Dates) && !Dates.Equals("undefined"))
             {
                 name.Append("taken on " + String.Join(", ", Dates.Split(',')) + " ");
             }
@@ -123,22 +122,5 @@ namespace Phocalstream_Shared.Data.Model.View
     {
         public List<Collection> Collections { get; set; }
         public string SearchPath { get; set; }
-    }
-
-    public class QuickSearchModel
-    {
-        public string Sites { get; set; }
-        public string Tags { get; set; }
-        public string Dates { get; set; }
-        public string Hours { get; set; }
-        public string Months { get; set; }
-        public bool IsEmpty()
-        {
-            return String.IsNullOrWhiteSpace(Sites) 
-                && String.IsNullOrWhiteSpace(Tags)
-                && String.IsNullOrWhiteSpace(Dates) 
-                && String.IsNullOrWhiteSpace(Hours)
-                && String.IsNullOrWhiteSpace(Months);
-        }
     }
 }
