@@ -84,6 +84,12 @@
         <div style="margin-top: 20px;" id="tagPartial">
             @{ Html.RenderPartial("_TagPartial", Model.Photo); }
         </div>
+        @if (Request.IsAuthenticated)
+        { 
+            <div style="margin-top: 20px;" id="userCollectionPartial">
+                @{ Html.RenderPartial("_UserCollectionPartial", Model.UserCollections); }
+            </div>
+        }
     </div>
 </div>
 </div>

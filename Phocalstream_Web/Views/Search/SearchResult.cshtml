@@ -87,7 +87,7 @@
 
         function saveCollection(collectionName) {
             $.ajax({
-                url: '/api/sitecollection/SaveUserCollection?photoIds=' + visibleItems + '&collectionName=' + collectionName,
+                url: '/api/usercollection/SaveUserCollection?photoIds=' + visibleItems + '&collectionName=' + collectionName,
                 type: "POST"
             })
         }

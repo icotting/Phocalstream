@@ -13,6 +13,7 @@ namespace Phocalstream_Shared.Service
         void DeleteUserCollections(long userID);
         void DeleteAllUserCollections();
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
+        void TogglePhotoInUserCollection(long photoID, long collectionID);
         
     }
 }

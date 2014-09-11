@@ -1,0 +1,49 @@
+﻿@model List<Phocalstream_Web.Models.ViewModels.UserCollection>
+@{
+    ViewBag.Title = "_UserCollectionPartial";
+}
+
+<h2>Your Collections</h2>
+
+@foreach (var col in Model)
+{
+    <div class="row">
+        <div class="col-md-9">
+            <h4>@col.CollectionName</h4>
+        </div>
+        <div class="col-md-3">
+            @if (col.Added)
+            {
+                <button id="@col.CollectionID" class="user-collection-toggle btn btn-success full-width"><span class="glyphicon glyphicon-check"></span></button>
+            }
+            else
+            {
+                <button id="@col.CollectionID" class="user-collection-toggle btn btn-warning full-width"><span class="glyphicon glyphicon-unchecked"></span></button>
+            }
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $('.user-collection-toggle').click(function () {
+        var id = this.id;
+            
+        $.ajax({
+            url: '@Url.Action("TogglePhotoInUserCollection", "Photo")',
+            type: 'POST',
+            cache: false,
+            data: {
+                photoID: @Model.First().PhotoID,
+                collectionID: id 
+            },
+            success: function (data) {
+                $('#userCollectionPartial').html(data);
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    });
+</script>
+

@@ -52,6 +52,9 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IPhotoService PhotoService { get; set; }
 
+        [Dependency]
+        public ICollectionService CollectionService { get; set; }
+
         
         public ActionResult Index(long photoID)
         {
@@ -81,6 +84,8 @@ namespace Phocalstream_Web.Controllers
             model.WaterData = LoadWaterData(model.Photo.Site.Latitude, model.Photo.Site.Longitude, model.Photo.Captured);
             model.WaterData.PhotoID = photoID;
 
+            model.UserCollections = LoadUserCollections(photoID);
+            
             return View(model);
         }
 
@@ -225,6 +230,36 @@ namespace Phocalstream_Web.Controllers
             return week;
         } //End LoadDMDataValues
 
+        private List<UserCollection> LoadUserCollections(long photoID)
+        {
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            if (User != null)
+            {
+                List<UserCollection> UserCollections = new List<UserCollection>();
+
+                IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
+
+                foreach (var col in collections)
+                {
+                    UserCollection userCollection = new UserCollection();
+                    userCollection.PhotoID = photoID;
+
+                    userCollection.CollectionID = col.ID;
+                    userCollection.CollectionName = col.Name;
+
+                    userCollection.Added = col.Photos.Select(p => p.ID).Contains(photoID);
+
+                    UserCollections.Add(userCollection);
+                }
+
+                return UserCollections;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         [HttpPost]
         public ActionResult TimeLapse(string photoIds)
         {
@@ -246,7 +281,7 @@ namespace Phocalstream_Web.Controllers
 
         [HttpPost]
         public ActionResult AddTag(long photoID, string tags)
-       {
+        {
            Photo photo = PhotoService.AddTag(photoID, tags);
 
             if(photo == null)
@@ -255,6 +290,15 @@ namespace Phocalstream_Web.Controllers
             }
 
             return PartialView("_TagPartial", photo);
+        }
+
+        [HttpPost]
+        public ActionResult TogglePhotoInUserCollection(long photoID, long collectionID)
+        {
+            CollectionService.TogglePhotoInUserCollection(photoID, collectionID);
+            List<UserCollection> userCollections = LoadUserCollections(photoID);
+
+            return PartialView("_UserCollectionPartial", userCollections);
         }
 
         public ActionResult DeleteDownload(string fileName)

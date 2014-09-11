@@ -18,6 +18,9 @@ namespace Phocalstream_Service.Service
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
+        public IEntityRepository<Photo> PhotoRepository { get; set; }
+
+        [Dependency]
         public IUnitOfWork Unit { get; set; }
 
 
@@ -99,5 +102,25 @@ namespace Phocalstream_Service.Service
             creator.Create(fileNames, savePath);
         }
 
+        public void TogglePhotoInUserCollection(long photoID, long collectionID)
+        {
+            Collection col = CollectionRepository.First(c => c.ID == collectionID, c => c.Photos);
+
+            if (col.Type == CollectionType.USER)
+            {
+                Photo photo = PhotoRepository.Find(photoID);
+
+                if (col.Photos.Contains(photo))
+                {
+                    col.Photos.Remove(photo);
+                }
+                else
+                {
+                    col.Photos.Add(photo);
+                }
+
+                Unit.Commit();
+            }
+        }
     }
 }

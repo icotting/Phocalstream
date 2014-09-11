@@ -16,6 +16,7 @@ namespace Phocalstream_Web.Models.ViewModels
         public string SiteCoords { get; set; }
         public DmData DroughtMonitorData { get; set; }
         public WaterFlowData WaterData { get; set; }
+        public List<UserCollection> UserCollections { get; set; }
     }
 
     public class DmData
@@ -42,4 +43,13 @@ namespace Phocalstream_Web.Models.ViewModels
         public WaterParameterCode ParameterInfo { get; set; }
         public String chartDataValues { get; set; }
     }
+
+    public class UserCollection
+    {
+        public long PhotoID { get; set; }
+        public string CollectionName { get; set; }
+        public long CollectionID { get; set; }
+        public bool Added { get; set; }
+    }
+
 }

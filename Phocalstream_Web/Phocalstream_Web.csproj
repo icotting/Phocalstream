@@ -267,6 +267,7 @@
     <Compile Include="Controllers\Api\SearchController.cs" />
     <Compile Include="Controllers\Api\PhotoController.cs" />
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
+    <Compile Include="Controllers\Api\UserCollectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -389,9 +390,12 @@
     <Content Include="Views\Search\SearchResult.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Account\UserCollections.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Photo\_UserCollectionPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\UserCollection\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
