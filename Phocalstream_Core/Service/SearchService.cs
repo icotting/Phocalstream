@@ -358,11 +358,7 @@ namespace Phocalstream_Service.Service
 
                         tempDateString = string.Format("Photos.Captured BETWEEN '{0}' AND '{1}' ", first_date, second_date);
                     }
-                    catch (FormatException e)
-                    {
-                 //       tempDateString = "";
-                    }
-
+                    catch (FormatException e) { }
                 }
                 else
                 {
@@ -385,17 +381,10 @@ namespace Phocalstream_Service.Service
 
                                 tempDateString = string.Format("Photos.Captured BETWEEN '{0}' AND '{1}' ", new_first_date, new_second_date);
                             }
-                            catch (FormatException ex)
-                            {
-                   //             tempDateString = "";
-                            }
+                            catch (FormatException ex) { }
                         }
                     }
-                    catch (InvalidDataException e)
-                    {
-                     //   tempDateString = "";
-                    }
-
+                    catch (InvalidDataException e) { }
                 }
 
                 if (!String.IsNullOrWhiteSpace(tempDateString))
