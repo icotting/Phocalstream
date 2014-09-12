@@ -242,29 +242,29 @@ namespace Phocalstream_Service.Service
             if (sitesBuilder.Length != 0)
             {
                 select.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
-                parameters.Append(sitesBuilder + "AND ");
+                parameters.Append("(" + sitesBuilder + ")" + " AND ");
             }
 
             if (monthBuilder.Length != 0)
             {
-                parameters.Append(monthBuilder + "AND ");
+                parameters.Append("(" + monthBuilder + ")" + " AND ");
             }
 
             if (dateBuilder.Length != 0)
             {
-                parameters.Append(dateBuilder + "AND ");
+                parameters.Append("(" + dateBuilder + ")" + " AND ");
             }
 
             if (hourBuilder.Length != 0)
             {
-                parameters.Append(hourBuilder + "AND ");
+                parameters.Append("(" + hourBuilder + ")" + " AND ");
             }
 
             if (tagBuilder.Length != 0)
             {
                 select.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
                     "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID ");
-                parameters.Append(tagBuilder);
+                parameters.Append("(" + tagBuilder + ")");
             }   
 
             //remove final AND if present
@@ -277,7 +277,7 @@ namespace Phocalstream_Service.Service
                 select.Append("WHERE " + parameters);
             }
 
-            return select.ToString();
+           return select.ToString();
         }
 
         private StringBuilder SiteQuery(string query)
