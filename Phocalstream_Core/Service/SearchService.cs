@@ -97,14 +97,14 @@ namespace Phocalstream_Service.Service
 
         public int SearchResultCount(SearchModel model)
         {
-            string select = GetQuickSearchQuery(model);
+            string select = GetSearchQuery(model);
             List<long> ids = QuickSearch(select);
             return ids.Count;
         }
 
         public long SearchResultPhotoId(SearchModel model)
         {
-            string select = GetQuickSearchQuery(model);
+            string select = GetSearchQuery(model);
             List<long> ids = QuickSearch(select);
 
             if (ids.Count > 0)
@@ -194,93 +194,6 @@ namespace Phocalstream_Service.Service
             return result;
         }
 
-        private string GetQuickSearchQuery(SearchModel model)
-        {
-            StringBuilder select = new StringBuilder();
-            StringBuilder parameters = new StringBuilder();
-
-            StringBuilder sitesBuilder = new StringBuilder();
-            StringBuilder tagBuilder = new StringBuilder();
-            StringBuilder monthBuilder = new StringBuilder();
-            StringBuilder dateBuilder = new StringBuilder();
-            StringBuilder hourBuilder = new StringBuilder();
-
-            //Sites
-            if (!String.IsNullOrWhiteSpace(model.Sites))
-            {
-                sitesBuilder = SiteQuery(model.Sites);
-            }
-
-            //tag
-            if (!String.IsNullOrWhiteSpace(model.Tags))
-            {
-                tagBuilder = TagQuery(model.Tags);
-            }
-
-            //date
-            if (!String.IsNullOrWhiteSpace(model.Dates))
-            {
-                dateBuilder = DateQuery(model.Dates);
-            }
-
-            //months
-            if (!String.IsNullOrWhiteSpace(model.Months))
-            {
-                monthBuilder.Append(string.Format("MONTH(Photos.Captured) IN ({0}) ", model.Months));
-            }
-
-            //hours
-            if (!String.IsNullOrWhiteSpace(model.Hours))
-            {
-                hourBuilder.Append(string.Format("DATEPART(hh, Photos.Captured) IN ({0}) ", model.Hours));
-            }
-
-
-            //merge the builders
-            select.Append("select Photos.ID from Photos ");
-
-            if (sitesBuilder.Length != 0)
-            {
-                select.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
-                parameters.Append(sitesBuilder + "AND ");
-            }
-
-            if (monthBuilder.Length != 0)
-            {
-                parameters.Append(monthBuilder + "AND ");
-            }
-
-            if (dateBuilder.Length != 0)
-            {
-                parameters.Append(dateBuilder + "AND ");
-            }
-
-            if (hourBuilder.Length != 0)
-            {
-                parameters.Append(hourBuilder + "AND ");
-            }
-
-            if (tagBuilder.Length != 0)
-            {
-                select.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
-                    "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID ");
-                parameters.Append(tagBuilder);
-            }   
-
-                
-            //remove final AND if present
-            if (parameters.Length > 0)
-            {
-                if (parameters.ToString().EndsWith("AND "))
-                {
-                    parameters.Remove(parameters.Length - 4, 4);
-                }
-                select.Append("WHERE " + parameters);
-            }
-        
-            return select.ToString();
-        }
-
         private String GetSearchQuery(SearchModel model)
         {
             StringBuilder select = new StringBuilder();
@@ -362,13 +275,9 @@ namespace Phocalstream_Service.Service
                     parameters.Remove(parameters.Length - 4, 4);
                 }
                 select.Append("WHERE " + parameters);
+            }
 
-                return select.ToString();
-            }
-            else 
-            {
-                return "";
-            }
+            return select.ToString();
         }
 
         private StringBuilder SiteQuery(string query)
@@ -434,18 +343,26 @@ namespace Phocalstream_Service.Service
             bool firstDate = true;
             foreach (var d in dates)
             {
-                string tempDateString;
+                string tempDateString = "";
 
                 //case: mm/dd/yyyy to mm/dd/yyyy
                 if (d.Contains("to"))
                 {
-                    string[] dateRange = d.Split(new string[] { "to" }, StringSplitOptions.None);
+                    try
+                    {
+                        string[] dateRange = d.Split(new string[] { "to" }, StringSplitOptions.None);
 
-                    //get the first date
-                    DateTime first_date = DateTime.Parse(dateRange[0]);
-                    DateTime second_date = DateTime.Parse(dateRange[1]);
+                        //get the first date
+                        DateTime first_date = DateTime.Parse(dateRange[0]);
+                        DateTime second_date = DateTime.Parse(dateRange[1]);
 
-                    tempDateString = string.Format("Photos.Captured BETWEEN '{0}' AND '{1}' ", first_date, second_date);
+                        tempDateString = string.Format("Photos.Captured BETWEEN '{0}' AND '{1}' ", first_date, second_date);
+                    }
+                    catch (FormatException e)
+                    {
+                 //       tempDateString = "";
+                    }
+
                 }
                 else
                 {
@@ -458,11 +375,25 @@ namespace Phocalstream_Service.Service
                     }
                     catch (FormatException e)
                     {
-                        tempDateString = "";
+                        //catch the case where someone just enters a year
+                        if (d.Length == 4)
+                        {
+                            try
+                            {
+                                DateTime new_first_date = DateTime.Parse("1/1/" + d);
+                                DateTime new_second_date = DateTime.Parse("12/31/" + d).AddDays(1);
+
+                                tempDateString = string.Format("Photos.Captured BETWEEN '{0}' AND '{1}' ", new_first_date, new_second_date);
+                            }
+                            catch (FormatException ex)
+                            {
+                   //             tempDateString = "";
+                            }
+                        }
                     }
                     catch (InvalidDataException e)
                     {
-                        tempDateString = "";
+                     //   tempDateString = "";
                     }
 
                 }
