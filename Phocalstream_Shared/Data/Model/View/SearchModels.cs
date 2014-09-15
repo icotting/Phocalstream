@@ -83,15 +83,7 @@ namespace Phocalstream_Shared.Data.Model.View
                 string[] hours = this.Hours.Split(',');
                 foreach (var h in hours)
                 {
-                    var hInt = Convert.ToInt16(h);
-                    if (hInt < 10)
-                    {
-                        hourNames.Add("0" + h + "00");
-                    }
-                    else
-                    {
-                        hourNames.Add(h + "00");
-                    }
+                    hourNames.Add(h + "00");
                 }
             }
             if(hourNames.Count != 0)
