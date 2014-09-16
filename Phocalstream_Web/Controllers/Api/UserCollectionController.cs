@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Unity;
+﻿ using Microsoft.Practices.Unity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Service;
@@ -38,26 +38,15 @@ namespace Phocalstream_Web.Controllers.Api
         [HttpPost, ActionName("SaveUserCollection")]
         public void SaveUserCollection(string collectionName, string photoIds)
         {
-            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
-            List<Photo> photos = PhotoRepository.Find(p => ids.Contains(p.ID)).ToList();
+            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            CollectionService.NewUserCollection(user, collectionName, photoIds);
+        }
 
-            Guid containerID = Guid.NewGuid();
-
-            //save the collection
-            Collection c = new Collection();
-            c.Name = collectionName;
-            c.ContainerID = containerID.ToString();
-            c.Owner = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
-            c.Type = CollectionType.USER;
-            c.Photos = photos;
-            CollectionRepository.Insert(c);
-            Unit.Commit();
-
-            //generate xml manifests
-            string collectionPath = CollectionService.ValidateAndGetUserCollectionPath();
-            CollectionService.GenerateCollectionManifest(PhotoService.GetFileNames(photos),
-                Path.Combine(collectionPath, containerID.ToString(), "collection.dzc"));
-            PhotoService.GeneratePivotManifest(collectionPath, containerID.ToString(), String.Join(",", ids), CollectionType.USER);
+        [HttpPost, ActionName("AddToCollection")]
+        public void AddToExistingUserCollection(string collectionIds, string photoIds)
+        {
+            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            CollectionService.AddToExistingUserCollection(user, collectionIds, photoIds);
         }
 
     }

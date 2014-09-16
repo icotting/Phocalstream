@@ -114,6 +114,15 @@ namespace Phocalstream_Web.Controllers
             List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
             model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
             
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionViewModel userCollectionModel = new UserCollectionViewModel();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
+            }
+
             return View(model);
         }
 
@@ -230,29 +239,31 @@ namespace Phocalstream_Web.Controllers
             return week;
         } //End LoadDMDataValues
 
-        private List<UserCollection> LoadUserCollections(long photoID)
+        private UserCollectionData LoadUserCollections(long photoID)
         {
             Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
             if (User != null)
             {
-                List<UserCollection> UserCollections = new List<UserCollection>();
+                UserCollectionData model = new UserCollectionData();
+                model.PhotoID = photoID;
 
+                List<UserCollection> userCollections = new List<UserCollection>();
                 IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
 
                 foreach (var col in collections)
                 {
                     UserCollection userCollection = new UserCollection();
-                    userCollection.PhotoID = photoID;
-
+                    
                     userCollection.CollectionID = col.ID;
                     userCollection.CollectionName = col.Name;
 
                     userCollection.Added = col.Photos.Select(p => p.ID).Contains(photoID);
 
-                    UserCollections.Add(userCollection);
+                    userCollections.Add(userCollection);
                 }
 
-                return UserCollections;
+                model.Collections = userCollections;
+                return model;
             }
             else
             {
@@ -296,9 +307,20 @@ namespace Phocalstream_Web.Controllers
         public ActionResult TogglePhotoInUserCollection(long photoID, long collectionID)
         {
             CollectionService.TogglePhotoInUserCollection(photoID, collectionID);
-            List<UserCollection> userCollections = LoadUserCollections(photoID);
+            UserCollectionData model = LoadUserCollections(photoID);
 
-            return PartialView("_UserCollectionPartial", userCollections);
+            return PartialView("_UserCollectionPartial", model);
+        }
+
+        [HttpPost]
+        public ActionResult NewUserCollection(string collectionName, long photoID)
+        {
+            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            CollectionService.NewUserCollection(user, collectionName, Convert.ToString(photoID));
+
+            UserCollectionData model = LoadUserCollections(photoID);
+
+            return PartialView("_UserCollectionPartial", model);
         }
 
         public ActionResult DeleteDownload(string fileName)

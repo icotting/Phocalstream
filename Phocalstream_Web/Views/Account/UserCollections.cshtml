@@ -31,6 +31,9 @@
                                         Collection Name
                                     </th>
                                     <th class="text-center">
+                                        Photo Count
+                                    </th>
+                                    <th class="text-center">
                                         Delete?
                                     </th>
                                 </tr>
@@ -40,6 +43,9 @@
                                 <tr>
                                     <td class="text-center">
                                         @Html.ActionLink(@c.Name, "SearchResult", "Search", new { collectionID = c.ID }, null)
+                                    </td>
+                                    <td class="text-center">
+                                        @c.Photos.Count photos
                                     </td>
                                     <td class="text-center">
                                         <a class="icon-delete no-underline" href="@Url.Action("DeleteUserCollection", "Account", new { collectionID = c.ID })">Delete</a>

@@ -173,7 +173,7 @@ namespace Phocalstream_Web.Controllers
 
             Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
             model.User = User;
-            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID);
+            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
 
             return View(model);
         }

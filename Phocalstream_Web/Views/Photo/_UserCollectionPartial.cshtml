@@ -1,17 +1,25 @@
-﻿@model List<Phocalstream_Web.Models.ViewModels.UserCollection>
+﻿@model Phocalstream_Web.Models.ViewModels.UserCollectionData
 @{
     ViewBag.Title = "_UserCollectionPartial";
 }
 
 <h2>Your Collections</h2>
 
-@foreach (var col in Model)
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <button id="addNew" class="btn btn-info full-width"><span class="glyphicon glyphicon-plus"></span> Start New Collection</button>
+    </div>
+</div>
+
+<hr class="featurette-divider" />
+
+@foreach (var col in Model.Collections)
 {
-    <div class="row">
+    <div class="row collection-row">
         <div class="col-md-9">
-            <h4>@col.CollectionName</h4>
+            <h4>@Html.ActionLink(@col.CollectionName, "SearchResult", "Search", new { collectionId = @col.CollectionID }, null)</h4>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 collection-button">
             @if (col.Added)
             {
                 <button id="@col.CollectionID" class="user-collection-toggle btn btn-success full-width"><span class="glyphicon glyphicon-check"></span></button>
@@ -34,7 +42,7 @@
             type: 'POST',
             cache: false,
             data: {
-                photoID: @Model.First().PhotoID,
+                photoID: @Model.PhotoID,
                 collectionID: id 
             },
             success: function (data) {
@@ -44,6 +52,31 @@
                 alert(err.responseText);
             }
         });
+    });
+
+    $("#addNew").click(function () {
+        bootbox.prompt("Name this collection: ", function(result) {                
+            if (result === null) {                         
+        
+            } else {
+                $.ajax({
+                    url: '@Url.Action("NewUserCollection", "Photo")',
+                    type: 'POST',
+                    data: {
+                        collectionName: result,
+                        photoID: @Model.PhotoID
+                    },
+                    success: function (data) {
+                        $('#userCollectionPartial').html(data);
+                    },
+                    error: function (err) {
+                        alert(err.responseText);
+                    }
+                });
+            }
+        });
+
+       
     });
 </script>
 

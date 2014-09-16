@@ -23,6 +23,9 @@ namespace Phocalstream_Service.Service
         [Dependency]
         public IUnitOfWork Unit { get; set; }
 
+        [Dependency]
+        public IPhotoService PhotoService { get; set; }
+
 
         public string ValidateAndGetUserCollectionPath()
         {
@@ -100,6 +103,45 @@ namespace Phocalstream_Service.Service
             creator.TileSize = 256;
 
             creator.Create(fileNames, savePath);
+        }
+
+        public void NewUserCollection(User user, string collectionName, string photoIds)
+        {
+            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
+            List<Photo> photos = PhotoRepository.Find(p => ids.Contains(p.ID)).ToList();
+
+            Guid containerID = Guid.NewGuid();
+
+            //save the collection
+            Collection c = new Collection();
+            c.Name = collectionName;
+            c.ContainerID = containerID.ToString();
+            c.Owner = user;
+            c.Type = CollectionType.USER;
+            c.Photos = photos;
+            CollectionRepository.Insert(c);
+            Unit.Commit();
+
+            //generate xml manifests
+            string collectionPath = ValidateAndGetUserCollectionPath();
+            GenerateCollectionManifest(PhotoService.GetFileNames(photos),
+                Path.Combine(collectionPath, containerID.ToString(), "collection.dzc"));
+            PhotoService.GeneratePivotManifest(collectionPath, containerID.ToString(), String.Join(",", ids), CollectionType.USER);
+        }
+
+        public void AddToExistingUserCollection(User user, string collectionIds, string photoIds)
+        {
+            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
+            List<Photo> photos = PhotoRepository.Find(p => ids.Contains(p.ID)).ToList();
+
+            long[] cIds = collectionIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
+            List<Collection> collections = CollectionRepository.Find(c => cIds.Contains(c.ID) && c.Type == CollectionType.USER, c => c.Photos).ToList();
+
+            foreach (var col in collections)
+            {
+                col.Photos = col.Photos.Union(photos).ToList();
+                Unit.Commit();
+            }
         }
 
         public void TogglePhotoInUserCollection(long photoID, long collectionID)
