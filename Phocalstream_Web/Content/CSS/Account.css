@@ -2,3 +2,48 @@
 }
 
 /* User Profile */
+
+
+/* User Collections */
+.siteImage {
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.siteCaption {
+    bottom: 45px;
+    left: 0px;
+    right: 15px;
+    position: absolute;
+    
+    margin-left: 15px;
+
+    background: rgba(0, 0, 0, .5);
+    color: white;
+}
+
+.siteDelete {
+    top: 0px;
+    right: 15px;
+    position: absolute;
+
+    background: rgba(0, 0, 0, .5);
+    color: white !important;
+}
+
+.text-white {
+    color: white !important;
+}
+
+.siteColumn {
+    padding-bottom: 30px !important;
+}
+
+.siteCollection {
+    margin-top: 33px;
+}
+
+.row {
+    margin-bottom: 15px;
+}

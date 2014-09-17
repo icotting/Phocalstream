@@ -175,6 +175,12 @@ namespace Phocalstream_Web.Controllers
             model.User = User;
             model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
 
+            foreach (var col in model.Collections)
+            {
+                col.CoverPhoto = col.Photos.Last(); 
+            }
+
+
             return View(model);
         }
 

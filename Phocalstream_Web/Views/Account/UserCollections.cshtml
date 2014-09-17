@@ -4,58 +4,47 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="content">
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <div class="well">
-                <div class="row">
-                    <div class="col-md-10 h2 no-margin">@Model.User.FirstName's Collections</div>
-                    <a class="btn btn-danger col-md-2 button-override" href="@Url.Action("DeleteUserCollections", "Account")">Delete All Collections</a>
-                </div>
-            </div>
+@Styles.Render("~/Content/CSS/Account.css")
 
-            @if (Model.Collections.Count() == 0)
-            {
-                <div class="col-md-12 well text-center">
-                    You haven't created any collections yet!
-                </div>
-            }
-            else
-            {
-                <div class="row">
-                    <div class="col-md-12">
-                        <table class="table table-bordered table-condensed">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">
-                                        Collection Name
-                                    </th>
-                                    <th class="text-center">
-                                        Photo Count
-                                    </th>
-                                    <th class="text-center">
-                                        Delete?
-                                    </th>
-                                </tr>
-                            </thead>
-                            @foreach (var c in Model.Collections)
-                            {
-                                <tr>
-                                    <td class="text-center">
-                                        @Html.ActionLink(@c.Name, "SearchResult", "Search", new { collectionID = c.ID }, null)
-                                    </td>
-                                    <td class="text-center">
-                                        @c.Photos.Count photos
-                                    </td>
-                                    <td class="text-center">
-                                        <a class="icon-delete no-underline" href="@Url.Action("DeleteUserCollection", "Account", new { collectionID = c.ID })">Delete</a>
-                                    </td>
-                                </tr>
-                            }
-                        </table>
-                    </div>
-                </div>
-            }
+<div class="container">
+    <div class="content">
+        <div class="text-center">
+            <h1 class="page-header">@Model.User.FirstName's Collections</h1>
         </div>
+
+        @if (Model.Collections.Count() == 0)
+        {
+            <div class="col-md-12 well text-center">
+                You haven't created any collections yet!
+            </div>
+        }
+        else
+        {
+            <!-- New Format -->
+            <div class="row">
+                @foreach (var col in Model.Collections)
+                {
+                    <div class="col-md-6 siteColumn">
+                        <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
+
+                        <div class="siteDelete">
+                            <a class="btn text-white no-underline" href="@Url.Action("DeleteUserCollection", "Account", new { collectionID = col.ID })"><span class="glyphicon glyphicon-remove"></span> Delete</a>
+                        </div>
+
+                        <div class="row">
+                            <div class="siteCaption">
+                                <div class="col-md-8">
+                                    <h1>@col.Name</h1>
+                                    <p>@Html.DisplayFor(model => col.Photos.Count) photos </p>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <a class="siteCollection btn btn-default" href="/search/searchresult?collectionId=@col.ID">View Images</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </div>
