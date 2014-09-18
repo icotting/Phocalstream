@@ -72,9 +72,9 @@
     <Compile Include="Data\PhotoRepository.cs" />
     <Compile Include="Data\UnitOfWork.cs" />
     <Compile Include="Data\WaterDataRepository.cs" />
-    <Compile Include="Migrations\201408240222258_InitialSchema.cs" />
-    <Compile Include="Migrations\201408240222258_InitialSchema.Designer.cs">
-      <DependentUpon>201408240222258_InitialSchema.cs</DependentUpon>
+    <Compile Include="Migrations\201409181824156_RemoveGoogleID.cs" />
+    <Compile Include="Migrations\201409181824156_RemoveGoogleID.Designer.cs">
+      <DependentUpon>201409181824156_RemoveGoogleID.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,8 +97,8 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201408240222258_InitialSchema.resx">
-      <DependentUpon>201408240222258_InitialSchema.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201409181824156_RemoveGoogleID.resx">
+      <DependentUpon>201409181824156_RemoveGoogleID.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -27,18 +28,11 @@ namespace Phocalstream_Web.Application
 
             try
             {
-                System.Net.HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(connectionString);
-                myRequest.Credentials = CredentialCache.DefaultCredentials;
-                //// Get the response
-                WebResponse webResponse = myRequest.GetResponse();
-                Stream respStream = webResponse.GetResponseStream();
-                ////
-                StreamReader ioStream = new StreamReader(respStream);
-                string pageContent = ioStream.ReadToEnd();
-                //// Close streams
-                ioStream.Close();
-                respStream.Close();
-                return pageContent;
+                using (WebClient client = new WebClient())
+                {
+                    byte[] token = client.DownloadData(connectionString);
+                    return Encoding.UTF8.GetString(token);
+                }
             }
             catch (Exception e)
             {
@@ -54,7 +48,7 @@ namespace Phocalstream_Web.Application
                 return null;
             }
             string access_token = token.Substring(token.IndexOf("access_token="), token.IndexOf("&"));
-            string data = GetHTML(graphApiMe + "fields=id,name,email,username,gender,link&" + access_token);
+            string data = GetHTML(graphApiMe + "fields=id,name,email,gender,link&" + access_token);
 
             Dictionary<string, string> userData = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
             return userData;
@@ -92,9 +86,9 @@ namespace Phocalstream_Web.Application
                 return new AuthenticationResult(false, ProviderName, null, null, null);
 
             string id = userData["id"];
-            string username = userData["username"];
+            string username = userData["id"];
             userData.Remove("id");
-            userData.Remove("username");
+            userData.Remove("id");
 
             AuthenticationResult result = new AuthenticationResult(true, ProviderName, id, username, userData);
             return result;

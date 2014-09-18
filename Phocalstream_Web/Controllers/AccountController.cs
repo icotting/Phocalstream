@@ -30,7 +30,7 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult UserProfile()
         {
-            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);            
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);            
             return View(new UserManageModel() { User = user });
         }
 
@@ -128,13 +128,13 @@ namespace Phocalstream_Web.Controllers
             if (ModelState.IsValid)
             {
                 // Insert a new user into the database
-                User user = UserRepository.First(u => u.GoogleID == model.ProviderUserName);
+                User user = UserRepository.First(u => u.ProviderID == model.ProviderUserName);
 
                 // Check if user already exists
                 if (user == null)
                 {
                     // Insert name into the profile table
-                    model.User.GoogleID = model.ProviderUserName;
+                    model.User.ProviderID = model.ProviderUserName;
                     model.User.Role = UserRole.STANDARD;
                     UserRepository.Insert(model.User);
                     Unit.Commit();

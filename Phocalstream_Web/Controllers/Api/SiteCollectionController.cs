@@ -134,7 +134,7 @@ namespace Phocalstream_Web.Controllers.Api
                 }
             }
 
-            string email = UserRepository.First(u => u.GoogleID == this.User.Identity.Name).EmailAddress;
+            string email = UserRepository.First(u => u.ProviderID == this.User.Identity.Name).EmailAddress;
 
             string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
 
