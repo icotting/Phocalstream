@@ -96,11 +96,15 @@
                     }
                     else
                     {
-                        using (@Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "navbar-form navbar-right", role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-success">Sign in</button>
-                        }
+                        <li>
+                            <div>
+                                @using (@Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "navbar-form navbar-right", role = "form" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="image" style="height: 30px;" src="~/Content/Images/FacebookButton.png" />
+                                }
+                            </div>
+                        </li>
                     }
                 </ul>
             </div>

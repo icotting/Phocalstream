@@ -27,9 +27,7 @@
         <td>
             @using (@Html.BeginForm("Login", "Account"))
             {
-                @Html.AntiForgeryToken()
-                <input type="image" src="~/Content/Images/FB-f-Logo__blue_58.png"/>
-                
+                @Html.AntiForgeryToken()                
                 <input style="width: 30px;" type="image" src="~/Content/Images/Login.png" alt="Login" />
             }
         </td>
