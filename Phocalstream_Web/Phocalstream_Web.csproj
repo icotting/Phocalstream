@@ -261,6 +261,7 @@
     <Compile Include="Application\Admin\WaterDataImporter.cs" />
     <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="Application\ExceptionFilter.cs" />
+    <Compile Include="Application\FacebookIdentityClient.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />

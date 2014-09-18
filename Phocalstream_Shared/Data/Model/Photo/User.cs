@@ -11,7 +11,7 @@ namespace Phocalstream_Shared.Data.Model.Photo
     {
         [Key]
         public int ID { get; set; }
-        public string GoogleID { get; set; }
+        public string ProviderID { get; set; }
 
         [Display(Name = "First name")]
         [Required]

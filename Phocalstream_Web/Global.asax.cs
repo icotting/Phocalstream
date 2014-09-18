@@ -32,7 +32,7 @@ namespace Phocalstream_Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             AuthConfig.RegisterAuth();
-            WebSecurity.InitializeDatabaseConnection("DbConnection", "Users", "ID", "GoogleID", true);
+            WebSecurity.InitializeDatabaseConnection("DbConnection", "Users", "ID", "ProviderID", true);
 
             Scheduler.getInstance().AddJobToSchedule(new DmImporterJob());
             Scheduler.getInstance().AddJobToSchedule(new WaterImporterJob());
