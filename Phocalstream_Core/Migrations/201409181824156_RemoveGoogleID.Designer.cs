@@ -7,13 +7,13 @@ namespace Phocalstream_Service.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
-    public sealed partial class InitialSchema : IMigrationMetadata
+    public sealed partial class RemoveGoogleID : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialSchema));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(RemoveGoogleID));
         
         string IMigrationMetadata.Id
         {
-            get { return "201408240222258_InitialSchema"; }
+            get { return "201409181824156_RemoveGoogleID"; }
         }
         
         string IMigrationMetadata.Source

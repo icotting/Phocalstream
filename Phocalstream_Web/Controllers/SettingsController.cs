@@ -38,8 +38,8 @@ namespace Phocalstream_Web.Controllers
             foreach (var user in users)
             {
                 model.UserList.Add(new ManagedUser() { User = user, 
-                    isAdmin = Roles.IsUserInRole(user.GoogleID, "Admin"),
-                    isCurrentUser = (this.User.Identity.Name == user.GoogleID)
+                    isAdmin = Roles.IsUserInRole(user.ProviderID, "Admin"),
+                    isCurrentUser = (this.User.Identity.Name == user.ProviderID)
                 });
             }
             return View(model);
@@ -64,7 +64,7 @@ namespace Phocalstream_Web.Controllers
             User user = UserRepository.Find(id);
             if (user != null)
             {
-                Roles.AddUserToRole(user.GoogleID, "Admin");
+                Roles.AddUserToRole(user.ProviderID, "Admin");
             }
            
             return RedirectToAction("Index");
@@ -76,7 +76,7 @@ namespace Phocalstream_Web.Controllers
             User user = UserRepository.Find(id);
             if (user != null)
             {
-                Roles.RemoveUserFromRole(user.GoogleID, "Admin");
+                Roles.RemoveUserFromRole(user.ProviderID, "Admin");
             }
 
             return RedirectToAction("Index");

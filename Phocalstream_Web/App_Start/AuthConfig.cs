@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Web.WebPages.OAuth;
+using System.Configuration;
+using Phocalstream_Web.Application;
 
 namespace Phocalstream_Web
 {
@@ -21,11 +23,10 @@ namespace Phocalstream_Web
             //    consumerKey: "",
             //    consumerSecret: "");
 
-            //OAuthWebSecurity.RegisterFacebookClient(
-            //    appId: "",
-            //    appSecret: "");
+            OAuthWebSecurity.RegisterClient(new FacebookIdentityClient(ConfigurationManager.AppSettings["facebookAppID"], ConfigurationManager.AppSettings["facebookAppSecret"], 
+                "email,user_likes,friends_likes,user_birthday,publish_checkins,publish_stream"), "Facebook", null);
 
-            OAuthWebSecurity.RegisterGoogleClient();
+            //OAuthWebSecurity.RegisterGoogleClient();
         }
     }
 }
