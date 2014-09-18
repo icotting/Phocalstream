@@ -117,7 +117,7 @@ namespace Phocalstream_Web.Controllers
             Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
             if (User != null)
             {
-                UserCollectionViewModel userCollectionModel = new UserCollectionViewModel();
+                UserCollectionList userCollectionModel = new UserCollectionList();
                 userCollectionModel.User = User;
                 userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
                 model.UserCollections = userCollectionModel;

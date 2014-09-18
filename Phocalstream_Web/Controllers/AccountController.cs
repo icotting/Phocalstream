@@ -18,6 +18,7 @@ using System.Data.Entity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Web.Models.ViewModels;
 using Phocalstream_Shared.Service;
+using Phocalstream_Shared.Data.Model.View;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -169,7 +170,7 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult UserCollections()
         {
-            UserCollectionViewModel model = new UserCollectionViewModel();
+            UserCollectionList model = new UserCollectionList();
 
             Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
             model.User = User;
@@ -196,6 +197,27 @@ namespace Phocalstream_Web.Controllers
             return RedirectToAction("UserCollections", "Account");
         }
 
+        public ActionResult UserDefinedCollection(long collectionID)
+        {
+            UserDefinedCollection model = new UserDefinedCollection();
+            
+            Collection c = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            model.CollectionName = c.Name;
+
+            model.PhotoCount = c.Photos.Count;
+
+            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
+                Request.Url.Host,
+                Request.Url.Port,
+                c.ID);
+
+            if (c.Status == CollectionStatus.INVALID)
+            {
+                CollectionService.UpdateUserCollection(c);
+            }
+
+            return View(model);
+        }
 
         #region Helpers
         private ActionResult RedirectToLocal(string returnUrl)

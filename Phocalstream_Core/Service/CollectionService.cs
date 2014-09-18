@@ -118,15 +118,12 @@ namespace Phocalstream_Service.Service
             c.ContainerID = containerID.ToString();
             c.Owner = user;
             c.Type = CollectionType.USER;
+            c.Status = CollectionStatus.COMPLETE;
             c.Photos = photos;
             CollectionRepository.Insert(c);
             Unit.Commit();
 
-            //generate xml manifests
-            string collectionPath = ValidateAndGetUserCollectionPath();
-            GenerateCollectionManifest(PhotoService.GetFileNames(photos),
-                Path.Combine(collectionPath, containerID.ToString(), "collection.dzc"));
-            PhotoService.GeneratePivotManifest(collectionPath, containerID.ToString(), String.Join(",", ids), CollectionType.USER);
+            GenerateManifests(containerID.ToString(), ids, photos);
         }
 
         public void AddToExistingUserCollection(User user, string collectionIds, string photoIds)
@@ -140,6 +137,7 @@ namespace Phocalstream_Service.Service
             foreach (var col in collections)
             {
                 col.Photos = col.Photos.Union(photos).ToList();
+                col.Status = CollectionStatus.INVALID;
                 Unit.Commit();
             }
         }
@@ -161,8 +159,43 @@ namespace Phocalstream_Service.Service
                     col.Photos.Add(photo);
                 }
 
+                col.Status = CollectionStatus.INVALID;
                 Unit.Commit();
             }
+        }
+    
+        public void UpdateUserCollection(Collection collection)
+        {
+            DeleteManifests(collection.ContainerID);
+            GenerateManifests(collection.ContainerID, collection.Photos.Select(p => p.ID).ToArray(), collection.Photos.ToList());
+
+            collection.Status = CollectionStatus.COMPLETE;
+            Unit.Commit();
+        }
+
+        private void DeleteManifests(string containerID)
+        {
+            string collectionPath = ValidateAndGetUserCollectionPath();
+
+            string collectionManifestPath = Path.Combine(collectionPath, containerID, "collection.dzc");
+            if (File.Exists(collectionManifestPath))
+            {
+                File.Delete(collectionManifestPath);
+            }
+
+            string pivotManifestPath = Path.Combine(collectionPath, containerID, "site.cxml");
+            if (File.Exists(pivotManifestPath))
+            {
+                File.Delete(pivotManifestPath);
+            }
+        }
+
+        private void GenerateManifests(string containerID, long[] ids, List<Photo> photos)
+        {
+            string collectionPath = ValidateAndGetUserCollectionPath();
+            GenerateCollectionManifest(PhotoService.GetFileNames(photos),
+                Path.Combine(collectionPath, containerID, "collection.dzc"));
+            PhotoService.GeneratePivotManifest(collectionPath, containerID, String.Join(",", ids), CollectionType.USER);
         }
     }
 }

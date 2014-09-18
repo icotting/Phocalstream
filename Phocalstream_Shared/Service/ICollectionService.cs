@@ -17,6 +17,7 @@ namespace Phocalstream_Shared.Service
         void NewUserCollection(User user, string collectionName, string photoIds);
         void AddToExistingUserCollection(User user, string collectionIds, string photoIds);
         void TogglePhotoInUserCollection(long photoID, long collectionID);
+        void UpdateUserCollection(Collection collection);
         
     }
 }
