@@ -31,6 +31,9 @@ namespace Phocalstream_Web.Controllers
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [Dependency]
+        public IEntityRepository<User> UserRepository { get; set; }
+
+        [Dependency]
         public IPhotoRepository PhotoRepo { get; set; }
 
         [Dependency]
@@ -149,16 +152,27 @@ namespace Phocalstream_Web.Controllers
         public ActionResult SearchResult(int collectionID)
         {
             SearchResults model = new SearchResults();
-            
-            Collection c = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
-            model.CollectionName = c.Name;
 
-            model.PhotoCount = c.Photos.Count;
+            Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            model.CollectionName = collection.Name;
+
+            model.First = collection.Photos.First().Captured;
+            model.Last = collection.Photos.Last().Captured;
+            model.PhotoCount = collection.Photos.Count;
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,
-                c.ID);
+                collection.ID);
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionList userCollectionModel = new UserCollectionList();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
+            }
 
             return View(model);
         }

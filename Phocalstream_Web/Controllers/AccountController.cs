@@ -201,19 +201,30 @@ namespace Phocalstream_Web.Controllers
         {
             UserDefinedCollection model = new UserDefinedCollection();
             
-            Collection c = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
-            model.CollectionName = c.Name;
+            Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            model.CollectionName = collection.Name;
 
-            model.PhotoCount = c.Photos.Count;
+            model.First = collection.Photos.First().Captured;
+            model.Last = collection.Photos.Last().Captured;
+            model.PhotoCount = collection.Photos.Count;
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,
-                c.ID);
+                collection.ID);
 
-            if (c.Status == CollectionStatus.INVALID)
+            if (collection.Status == CollectionStatus.INVALID)
             {
-                CollectionService.UpdateUserCollection(c);
+                CollectionService.UpdateUserCollection(collection);
+            }
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionList userCollectionModel = new UserCollectionList();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
             }
 
             return View(model);
