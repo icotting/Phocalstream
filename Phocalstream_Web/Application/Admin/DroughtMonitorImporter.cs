@@ -137,7 +137,7 @@ namespace Phocalstream_Web.Application.Admin
                         if (type != DMDataType.ALL)
                         {
                             //Get information
-                            string url = String.Format(@"http://torka.unl.edu/DroughtMonitor/Export/?mode=table&aoi={0}&date={1}", type.ToString().ToLower(), week.ToString("yyyyMMdd"));
+                            string url = String.Format(@"http://usdmdataservices.unl.edu/?mode=table&aoi={0}&date={1}", type.ToString().ToLower(), week.ToString("yyyyMMdd"));
                             WebClient client = new WebClient();
                             string response = client.DownloadString(url);
 
