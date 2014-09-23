@@ -396,6 +396,7 @@
     <Content Include="Views\Photo\_UserCollectionPartial.cshtml" />
     <Content Include="Views\Home\TagList.cshtml" />
     <Content Include="Views\Account\UserDefinedCollection.cshtml" />
+    <Content Include="Views\Account\EditUserCollection.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

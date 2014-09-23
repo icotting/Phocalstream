@@ -1,0 +1,38 @@
+﻿@model Phocalstream_Shared.Data.Model.Photo.Collection
+@{
+    ViewBag.Title = "EditUserCollection";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/CSS/Account.css")
+
+<div class="container">
+    <div class="content">
+        <div class="text-center">
+            <h1 class="page-header">@Model.Name</h1>
+        </div>
+
+        <div class="row">
+            @foreach (var p in Model.Photos)
+            {
+                <div class="col-md-3 siteColumn" id="@p.ID">
+                    <img class="siteImage" id="@p.ID" src="/api/photo/low/@p.ID" alt="@p.FileName" />
+
+                    <div class="siteDelete">
+                        <a class="btn btn-sm text-white no-underline remove" id="@p.ID" href="javascript:remove()"><span class="glyphicon glyphicon-remove"></span></a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.remove').click(function () {
+            var id = $(this).attr('id');
+            $(document).find('#' + id).remove();
+        });
+    });
+</script>
+

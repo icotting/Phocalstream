@@ -165,7 +165,7 @@ namespace Phocalstream_Web.Controllers
                 Request.Url.Port,
                 collection.ID);
 
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             if (User != null)
             {
                 UserCollectionList userCollectionModel = new UserCollectionList();

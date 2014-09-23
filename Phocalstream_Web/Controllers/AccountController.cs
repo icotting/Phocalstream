@@ -172,7 +172,7 @@ namespace Phocalstream_Web.Controllers
         {
             UserCollectionList model = new UserCollectionList();
 
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             model.User = User;
             model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
 
@@ -193,8 +193,15 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult DeleteUserCollections()
         {
-            CollectionService.DeleteUserCollections(UserRepository.First(u => u.GoogleID == this.User.Identity.Name).ID);
+            CollectionService.DeleteUserCollections(UserRepository.First(u => u.ProviderID == this.User.Identity.Name).ID);
             return RedirectToAction("UserCollections", "Account");
+        }
+
+        public ActionResult EditUserCollection(long collectionID)
+        {
+            Collection collection = CollectionRepository.First(c => c.ID == collectionID, c => c.Photos);
+
+            return View(collection);
         }
 
         public ActionResult UserDefinedCollection(long collectionID)
@@ -218,7 +225,7 @@ namespace Phocalstream_Web.Controllers
                 CollectionService.UpdateUserCollection(collection);
             }
 
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             if (User != null)
             {
                 UserCollectionList userCollectionModel = new UserCollectionList();

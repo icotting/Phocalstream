@@ -38,14 +38,14 @@ namespace Phocalstream_Web.Controllers.Api
         [HttpPost, ActionName("SaveUserCollection")]
         public void SaveUserCollection(string collectionName, string photoIds)
         {
-            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             CollectionService.NewUserCollection(user, collectionName, photoIds);
         }
 
         [HttpPost, ActionName("AddToCollection")]
         public void AddToExistingUserCollection(string collectionIds, string photoIds)
         {
-            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             CollectionService.AddToExistingUserCollection(user, collectionIds, photoIds);
         }
 

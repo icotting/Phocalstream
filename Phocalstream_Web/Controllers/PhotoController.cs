@@ -113,8 +113,8 @@ namespace Phocalstream_Web.Controllers
 
             List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
             model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
-            
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             if (User != null)
             {
                 UserCollectionList userCollectionModel = new UserCollectionList();
@@ -241,7 +241,7 @@ namespace Phocalstream_Web.Controllers
 
         private UserCollectionData LoadUserCollections(long photoID)
         {
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             if (User != null)
             {
                 UserCollectionData model = new UserCollectionData();
@@ -315,7 +315,7 @@ namespace Phocalstream_Web.Controllers
         [HttpPost]
         public ActionResult NewUserCollection(string collectionName, long photoID)
         {
-            User user = UserRepository.First(u => u.GoogleID == this.User.Identity.Name);
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             CollectionService.NewUserCollection(user, collectionName, Convert.ToString(photoID));
 
             UserCollectionData model = LoadUserCollections(photoID);

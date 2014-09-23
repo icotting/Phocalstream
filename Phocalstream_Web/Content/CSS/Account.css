@@ -13,12 +13,10 @@
 
 .siteCaption {
     bottom: 45px;
-    left: 0px;
+    left: 15px;
     right: 15px;
     position: absolute;
     
-    margin-left: 15px;
-
     background: rgba(0, 0, 0, .5);
     color: white;
 }
@@ -26,6 +24,15 @@
 .siteDelete {
     top: 0px;
     right: 15px;
+    position: absolute;
+
+    background: rgba(0, 0, 0, .5);
+    color: white !important;
+}
+
+.siteEdit {
+    top: 0px;
+    left: 15px;
     position: absolute;
 
     background: rgba(0, 0, 0, .5);
