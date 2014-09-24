@@ -104,3 +104,14 @@ h2 {
 .full-width {
     width: 100%;
 }
+
+.index-navbar-right {
+    margin-right: 15px !important;
+}
+
+.facebook-login {
+    height: 30px;
+    width: 140px;
+    margin-top: 10px;
+    margin-right: 15px;
+}
