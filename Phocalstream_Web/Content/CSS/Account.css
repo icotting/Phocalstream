@@ -1,18 +1,81 @@
 ﻿body {
 }
 
- .profile {
-    width: 50%;
-    margin-bottom: 20px;
-    margin-left: 15px;
-    font-size: 12pt;
-}
-
 /* User Profile */
-.notice {
-    color: #63dc30;
-    font-weight: 500;
-    font-size: 10pt;
-    margin-bottom: 10px;
+
+
+/* User Collections */
+.siteImage {
+    height: 100%;
+    width: 100%;
+    z-index: -1;
 }
 
+.siteCaption {
+    bottom: 45px;
+    left: 15px;
+    right: 15px;
+    position: absolute;
+    
+    background: rgba(0, 0, 0, .5);
+    color: white;
+}
+
+.siteDelete {
+    top: 0px;
+    right: 15px;
+    position: absolute;
+
+    background: rgba(0, 0, 0, .5);
+    color: white !important;
+}
+
+.siteEdit {
+    top: 0px;
+    left: 15px;
+    position: absolute;
+
+    background: rgba(0, 0, 0, .5);
+    color: white !important;
+}
+
+.siteToDelete {
+    top: 0px;
+    left: 15px;
+    right: 15px;
+    bottom: 30px;
+
+    position: absolute;
+    
+    background: rgba(0, 0, 0, .8);
+}
+
+.text-white {
+    color: white !important;
+}
+
+.siteColumn {
+    padding-bottom: 30px !important;
+}
+
+.siteCollection {
+    margin-top: 33px;
+}
+
+.row {
+    margin-bottom: 15px;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.relative {
+    position: relative;
+}
+
+.save-changes {
+    top: 3px;
+    right: 0px;
+    position: absolute;
+}

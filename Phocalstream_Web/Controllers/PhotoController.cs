@@ -52,6 +52,9 @@ namespace Phocalstream_Web.Controllers
         [Dependency]
         public IPhotoService PhotoService { get; set; }
 
+        [Dependency]
+        public ICollectionService CollectionService { get; set; }
+
         
         public ActionResult Index(long photoID)
         {
@@ -81,6 +84,8 @@ namespace Phocalstream_Web.Controllers
             model.WaterData = LoadWaterData(model.Photo.Site.Latitude, model.Photo.Site.Longitude, model.Photo.Captured);
             model.WaterData.PhotoID = photoID;
 
+            model.UserCollections = LoadUserCollections(photoID);
+            
             return View(model);
         }
 
@@ -108,7 +113,16 @@ namespace Phocalstream_Web.Controllers
 
             List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
             model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
-            
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionList userCollectionModel = new UserCollectionList();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
+            }
+
             return View(model);
         }
 
@@ -225,6 +239,38 @@ namespace Phocalstream_Web.Controllers
             return week;
         } //End LoadDMDataValues
 
+        private UserCollectionData LoadUserCollections(long photoID)
+        {
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionData model = new UserCollectionData();
+                model.PhotoID = photoID;
+
+                List<UserCollection> userCollections = new List<UserCollection>();
+                IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
+
+                foreach (var col in collections)
+                {
+                    UserCollection userCollection = new UserCollection();
+                    
+                    userCollection.CollectionID = col.ID;
+                    userCollection.CollectionName = col.Name;
+
+                    userCollection.Added = col.Photos.Select(p => p.ID).Contains(photoID);
+
+                    userCollections.Add(userCollection);
+                }
+
+                model.Collections = userCollections;
+                return model;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         [HttpPost]
         public ActionResult TimeLapse(string photoIds)
         {
@@ -246,7 +292,7 @@ namespace Phocalstream_Web.Controllers
 
         [HttpPost]
         public ActionResult AddTag(long photoID, string tags)
-       {
+        {
            Photo photo = PhotoService.AddTag(photoID, tags);
 
             if(photo == null)
@@ -255,6 +301,26 @@ namespace Phocalstream_Web.Controllers
             }
 
             return PartialView("_TagPartial", photo);
+        }
+
+        [HttpPost]
+        public ActionResult TogglePhotoInUserCollection(long photoID, long collectionID)
+        {
+            CollectionService.TogglePhotoInUserCollection(photoID, collectionID);
+            UserCollectionData model = LoadUserCollections(photoID);
+
+            return PartialView("_UserCollectionPartial", model);
+        }
+
+        [HttpPost]
+        public ActionResult NewUserCollection(string collectionName, long photoID)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            CollectionService.NewUserCollection(user, collectionName, Convert.ToString(photoID));
+
+            UserCollectionData model = LoadUserCollections(photoID);
+
+            return PartialView("_UserCollectionPartial", model);
         }
 
         public ActionResult DeleteDownload(string fileName)

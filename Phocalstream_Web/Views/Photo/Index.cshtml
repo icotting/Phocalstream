@@ -24,6 +24,8 @@
 	    var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
     </script>
 
+    <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+    
     <script type="text/javascript" src="/Content/Scripts/Silverlight.js"></script>
     <script type="text/javascript" src="/Content/Scripts/ClientBin.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
@@ -84,6 +86,12 @@
         <div style="margin-top: 20px;" id="tagPartial">
             @{ Html.RenderPartial("_TagPartial", Model.Photo); }
         </div>
+        @if (Request.IsAuthenticated)
+        { 
+            <div style="margin-top: 20px;" id="userCollectionPartial">
+                @{ Html.RenderPartial("_UserCollectionPartial", Model.UserCollections); }
+            </div>
+        }
     </div>
 </div>
 </div>

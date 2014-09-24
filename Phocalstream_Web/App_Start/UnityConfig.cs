@@ -30,6 +30,7 @@ namespace Phocalstream_Web
 
             container.RegisterType(typeof(IPhotoService), typeof(PhotoService));
             container.RegisterType(typeof(ISearchService), typeof(SearchService));
+            container.RegisterType(typeof(ICollectionService), typeof(CollectionService));
             container.RegisterType(typeof(IUnitOfWork), typeof(UnitOfWork));
             container.RegisterType(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             container.RegisterType(typeof(DbContext), typeof(ApplicationContext));

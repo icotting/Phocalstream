@@ -27,7 +27,7 @@ namespace Phocalstream_Web.Application
             if (resource.Contains("/dzc/"))
             {
                 string blobRequest;
-                if (resource.Contains(PathManager.SearchPath) || resource.Contains(PathManager.PhotoPath))
+                if (resource.Contains(PathManager.SearchPath) || resource.Contains(PathManager.PhotoPath) || resource.Contains(PathManager.UserCollectionPath))
                 {
                     blobRequest = Path.Combine(basePath, resource.Substring(resource.IndexOf("/dzc/") + 5));
                 }

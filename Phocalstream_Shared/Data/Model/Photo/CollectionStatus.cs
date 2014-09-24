@@ -9,6 +9,7 @@ namespace Phocalstream_Shared.Data.Model.Photo
     public enum CollectionStatus
     {
         PROCESSING,
-        COMPLETE
+        COMPLETE,
+        INVALID
     }
 }

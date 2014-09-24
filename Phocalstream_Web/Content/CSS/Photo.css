@@ -63,6 +63,11 @@
     border:0px
 }
 
+/* Camera Collection - User Collection */
+.user-collection-list {
+    margin: 0px !important;
+}
+
 /* Index */
  #siteInfo h1 {
     font-weight: 100;            
@@ -160,3 +165,13 @@ ul {
 }
 
 /* Tag Partial */
+
+
+/* User Collection Partial */
+.collection-button {
+    margin-top: 3px;
+}
+
+.collection-row {
+    margin-bottom: 5px;
+}
