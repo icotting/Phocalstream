@@ -175,3 +175,39 @@ ul {
 .collection-row {
     margin-bottom: 5px;
 }
+
+/* SiteDashboard */
+.siteImage {
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.siteCaption {
+    bottom: 30px;
+    left: 0px;
+    right: 15px;
+    position: absolute;
+    
+    margin-left: 15px;
+
+    background: rgba(0, 0, 0, .5);
+    color: white;
+}
+
+.siteColumn {
+    padding-bottom: 30px !important;
+}
+
+.siteCollection {
+    margin-top: 25px;
+}
+
+.dashboardData {
+    margin-bottom: 30px !important;
+    background-color: white;
+    border: 1px solid lightgray;
+}
+#popularTags {
+   
+}

@@ -4,12 +4,70 @@
         Layout = "~/Views/Shared/_Layout.cshtml";
     }
 
+@Styles.Render("~/Content/CSS/Photo.css")
+
+<script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
+<script type="text/javascript">
+	    Highcharts.theme = {
+	        colors: ["#DCDCDC", "#F5E938", "#FECC6E", "#FD9827", "#FC3638", "#650205", "#ff0066", "#eeaaee",
+                "#55BF3B", "#DF5353", "#aaeeee"]
+	    };
+
+	    // Apply the theme
+	    var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+</script>
+
 
 <div class="container">
     <div class="content">
 
         <div class="text-center">
             <h1 class="page-header">@Model.CollectionViewModel.Collection.Name Dashboard</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    
+                    @foreach (var y in Model.Years)
+                    {
+                        <div class="col-md-6 siteColumn">
+                            <img class="siteImage" src="/api/photo/medium/@y.CoverPhotoID" alt="@y.Year">
+
+                            <div class="row">
+                                <div class="siteCaption">
+                                    <div class="col-md-8">
+                                        <h3>@y.Year</h3>
+                                        <h4>@y.PhotoCount photos</h4>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <a class="siteCollection btn btn-default" href="/photo/cameracollection?siteId=@Model.CollectionViewModel.Collection.Site.ID">View @y.Year</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12 dashboardData" id="popularTags">
+                        <h3>Popular Tags</h3>
+                        <hr class="featurette-divider" />
+                        <h4>Tag One</h4>
+                        <h5>Tag Two</h5>
+                        <h6>Tag Three</h6>
+                        <h6>Tag Four</h6>
+                        <h6>Tag Four</h6>
+                    </div>
+                    <div class="col-md-12 dashboardData">
+                        @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
+                    </div>
+                     <div class="col-md-12 dashboardData">
+                        @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
+                    </div>
+                </div>
+            </div>
         </div>
 
 
