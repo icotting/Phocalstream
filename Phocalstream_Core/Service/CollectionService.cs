@@ -113,13 +113,15 @@ namespace Phocalstream_Service.Service
             Guid containerID = Guid.NewGuid();
 
             //save the collection
-            Collection c = new Collection();
-            c.Name = collectionName;
-            c.ContainerID = containerID.ToString();
-            c.Owner = user;
-            c.Type = CollectionType.USER;
-            c.Status = CollectionStatus.COMPLETE;
-            c.Photos = photos;
+            Collection c = new Collection() 
+            {
+                Name = collectionName,
+                ContainerID = containerID.ToString(),
+                Owner = user,
+                Type = CollectionType.USER,
+                Status = CollectionStatus.COMPLETE,
+                Photos = photos
+            };
             CollectionRepository.Insert(c);
             Unit.Commit();
 
@@ -138,8 +140,8 @@ namespace Phocalstream_Service.Service
             {
                 col.Photos = col.Photos.Union(photos).ToList();
                 col.Status = CollectionStatus.INVALID;
-                Unit.Commit();
             }
+            Unit.Commit();
         }
 
         public void RemoveFromExistingUserCollection(User user, long collectionID, string photoIds)
