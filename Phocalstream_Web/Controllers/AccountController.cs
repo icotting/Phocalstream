@@ -16,6 +16,9 @@ using Phocalstream_Web.Models;
 using Microsoft.Practices.Unity;
 using System.Data.Entity;
 using Phocalstream_Shared.Data;
+using Phocalstream_Web.Models.ViewModels;
+using Phocalstream_Shared.Service;
+using Phocalstream_Shared.Data.Model.View;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -26,7 +29,13 @@ namespace Phocalstream_Web.Controllers
         public IEntityRepository<User> UserRepository { get; set; }
 
         [Dependency]
+        public IEntityRepository<Collection> CollectionRepository { get; set; }
+
+        [Dependency]
         public IUnitOfWork Unit { get; set; }
+
+        [Dependency]
+        public ICollectionService CollectionService { get; set; }
 
         public ActionResult UserProfile()
         {
@@ -159,6 +168,74 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
+        public ActionResult UserCollections()
+        {
+            UserCollectionList model = new UserCollectionList();
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            model.User = User;
+            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
+
+            foreach (var col in model.Collections)
+            {
+                col.CoverPhoto = col.Photos.Last(); 
+            }
+
+
+            return View(model);
+        }
+
+        public ActionResult DeleteUserCollection(long collectionID)
+        {
+            CollectionService.DeleteUserCollection(collectionID);
+            return RedirectToAction("UserCollections", "Account");
+        }
+
+        public ActionResult DeleteUserCollections()
+        {
+            CollectionService.DeleteUserCollections(UserRepository.First(u => u.ProviderID == this.User.Identity.Name).ID);
+            return RedirectToAction("UserCollections", "Account");
+        }
+
+        public ActionResult EditUserCollection(long collectionID)
+        {
+            Collection collection = CollectionRepository.First(c => c.ID == collectionID, c => c.Photos);
+
+            return View(collection);
+        }
+
+        public ActionResult UserDefinedCollection(long collectionID)
+        {
+            UserDefinedCollection model = new UserDefinedCollection();
+            
+            Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            model.CollectionName = collection.Name;
+
+            model.First = collection.Photos.First().Captured;
+            model.Last = collection.Photos.Last().Captured;
+            model.PhotoCount = collection.Photos.Count;
+
+            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
+                Request.Url.Host,
+                Request.Url.Port,
+                collection.ID);
+
+            if (collection.Status == CollectionStatus.INVALID)
+            {
+                CollectionService.UpdateUserCollection(collection);
+            }
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionList userCollectionModel = new UserCollectionList();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
+            }
+
+            return View(model);
+        }
 
         #region Helpers
         private ActionResult RedirectToLocal(string returnUrl)

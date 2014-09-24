@@ -268,6 +268,7 @@
     <Compile Include="Controllers\Api\SearchController.cs" />
     <Compile Include="Controllers\Api\PhotoController.cs" />
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
+    <Compile Include="Controllers\Api\UserCollectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -343,6 +344,7 @@
     <Content Include="Content\CSS\Account.css" />
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="Content\Images\wff.jpg" />
+    <Content Include="Content\Scripts\bootbox.min.js" />
     <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
     <Content Include="Content\Scripts\jquery-2.1.1.js" />
@@ -390,10 +392,16 @@
     <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\SearchResult.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
+    <Content Include="Views\Account\UserCollections.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Photo\_UserCollectionPartial.cshtml" />
     <Content Include="Views\Home\TagList.cshtml" />
+    <Content Include="Views\Account\UserDefinedCollection.cshtml" />
+    <Content Include="Views\Account\EditUserCollection.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\UserCollection\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

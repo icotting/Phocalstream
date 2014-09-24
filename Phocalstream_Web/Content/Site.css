@@ -97,6 +97,10 @@ h2 {
     color: white !important;
 }
 
+.no-margin {
+    margin: 0px !important;
+}
+
 .content {
     margin-top: 100px;
 }

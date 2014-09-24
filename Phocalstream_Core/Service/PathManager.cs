@@ -18,7 +18,7 @@ namespace Phocalstream_Service.Service
         public static string PhotoPath = ConfigurationManager.AppSettings["photoPath"];
         public static string SearchPath = ConfigurationManager.AppSettings["searchPath"];
         public static string DownloadPath = ConfigurationManager.AppSettings["downloadPath"];
-
+        public static string UserCollectionPath = ConfigurationManager.AppSettings["userCollectionPath"];
 
         //DB Connection Strings
         public static string DbConnection = ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString;
@@ -46,6 +46,11 @@ namespace Phocalstream_Service.Service
         public static string GetDownloadPath()
         {
             return string.Format("{0}{1}", BasePath, DownloadPath);
+        }
+
+        public static string GetUserCollectionPath()
+        {
+            return string.Format("{0}{1}", BasePath, UserCollectionPath);
         }
 
         public static string GetDbConnection()

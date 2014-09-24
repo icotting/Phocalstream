@@ -19,6 +19,7 @@ using System.Xml;
 using Phocalstream_Service.Service;
 using Ionic.Zip;
 using System.Diagnostics;
+using Phocalstream_Shared.Service;
 
 namespace Phocalstream_Web.Controllers.Api
 {
@@ -34,10 +35,17 @@ namespace Phocalstream_Web.Controllers.Api
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
-        public IUnitOfWork UnitOfWork { get; set; }
+        public IUnitOfWork Unit { get; set; }
 
         [Dependency]
         public IEntityRepository<User> UserRepository { get; set; }
+
+        [Dependency]
+        public IPhotoService PhotoService { get; set; }
+
+        [Dependency]
+        public ICollectionService CollectionService { get; set; }
+
 
         [HttpGet]
         [ActionName("updatecover")]
@@ -47,7 +55,7 @@ namespace Phocalstream_Web.Controllers.Api
             Photo photo = PhotoEntityRepository.Single(p => p.ID == photoId);
             col.CoverPhoto = photo;
             CollectionRepository.Update(col);
-            UnitOfWork.Commit();
+            Unit.Commit();
         }
 
         [HttpGet]
@@ -97,6 +105,12 @@ namespace Phocalstream_Web.Controllers.Api
             else if (col.Type == CollectionType.SEARCH)
             {
                 string rootDeepZoomPath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
+                doc = new XmlDocument();
+                doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
+            }
+            else if (col.Type == CollectionType.USER)
+            {
+                string rootDeepZoomPath = Path.Combine(PathManager.GetUserCollectionPath(), col.ContainerID);
                 doc = new XmlDocument();
                 doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
             }
