@@ -49,5 +49,11 @@ namespace Phocalstream_Web.Controllers.Api
             CollectionService.AddToExistingUserCollection(user, collectionIds, photoIds);
         }
 
+        [HttpPost, ActionName("RemoveFromCollection")]
+        public void RemoveFromExistingUserCollection(long collectionID, string photoIds)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            CollectionService.RemoveFromExistingUserCollection(user, collectionID, photoIds);
+        }
     }
 }

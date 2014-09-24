@@ -39,6 +39,17 @@
     color: white !important;
 }
 
+.siteToDelete {
+    top: 0px;
+    left: 15px;
+    right: 15px;
+    bottom: 30px;
+
+    position: absolute;
+    
+    background: rgba(0, 0, 0, .8);
+}
+
 .text-white {
     color: white !important;
 }
@@ -53,4 +64,18 @@
 
 .row {
     margin-bottom: 15px;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.relative {
+    position: relative;
+}
+
+.save-changes {
+    top: 3px;
+    right: 0px;
+    position: absolute;
 }

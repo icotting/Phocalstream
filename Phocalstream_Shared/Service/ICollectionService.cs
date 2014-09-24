@@ -16,6 +16,7 @@ namespace Phocalstream_Shared.Service
         void GenerateCollectionManifest(List<string> fileNames, string savePath);
         void NewUserCollection(User user, string collectionName, string photoIds);
         void AddToExistingUserCollection(User user, string collectionIds, string photoIds);
+        void RemoveFromExistingUserCollection(User user, long collectionID, string photoIDs);
         void TogglePhotoInUserCollection(long photoID, long collectionID);
         void UpdateUserCollection(Collection collection);
         

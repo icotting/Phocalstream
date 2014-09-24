@@ -8,8 +8,12 @@
 
 <div class="container">
     <div class="content">
-        <div class="text-center">
+        <div class="text-center relative">
             <h1 class="page-header">@Model.Name</h1>
+            <div class="save-changes invisible">
+                <button onclick="javascript:cancel()" class="btn btn-warning">Discard</button>
+                <button onclick="javascript:save()" class="btn btn-success">Save Changes</button>
+            </div>
         </div>
 
         <div class="row">
@@ -17,6 +21,8 @@
             {
                 <div class="col-md-3 siteColumn" id="@p.ID">
                     <img class="siteImage" id="@p.ID" src="/api/photo/low/@p.ID" alt="@p.FileName" />
+
+                    <div class="siteToDelete invisible"></div>
 
                     <div class="siteDelete">
                         <a class="btn btn-sm text-white no-underline remove" id="@p.ID" href="javascript:remove()"><span class="glyphicon glyphicon-remove"></span></a>
@@ -28,11 +34,45 @@
 </div>
 
 <script type="text/javascript">
+
+    var toRemove = [];
+
     $(document).ready(function () {
         $('.remove').click(function () {
             var id = $(this).attr('id');
-            $(document).find('#' + id).remove();
+            var object = $(document).find('#' + id + ">.siteToDelete");
+
+            var hasClass = object.hasClass("invisible");
+
+            object.toggleClass("invisible", !hasClass);
+
+            if (hasClass) {
+                toRemove.push(id);
+            } else {
+                var index = toRemove.indexOf(id);
+                toRemove.splice(index, 1);
+            }
+            
+            if (toRemove.length == 0) {
+                $(".save-changes").addClass("invisible");
+            } else if (toRemove.length == 1) {
+                $(".save-changes").removeClass("invisible");
+            } else {
+
+            }
         });
+
     });
+
+    function save() {
+        $.ajax({
+            url: '/api/usercollection/RemoveFromCollection?collectionId=' + @Model.ID.ToString() + '&photoIds=' + toRemove.join(','),
+            type: 'POST'
+        });
+    }
+
+    function cancel() {
+        location.reload();
+    }
 </script>
 

@@ -142,6 +142,18 @@ namespace Phocalstream_Service.Service
             }
         }
 
+        public void RemoveFromExistingUserCollection(User user, long collectionID, string photoIds)
+        {
+            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
+            List<Photo> photos = PhotoRepository.Find(p => ids.Contains(p.ID)).ToList();
+
+            Collection collection = CollectionRepository.First(c => c.ID == collectionID && c.Type == CollectionType.USER, c => c.Photos);
+
+            collection.Photos = collection.Photos.Except(photos).ToList();
+            collection.Status = CollectionStatus.INVALID;
+            Unit.Commit();
+        }
+
         public void TogglePhotoInUserCollection(long photoID, long collectionID)
         {
             Collection col = CollectionRepository.First(c => c.ID == collectionID, c => c.Photos);
