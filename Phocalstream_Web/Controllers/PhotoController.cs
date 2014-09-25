@@ -107,6 +107,11 @@ namespace Phocalstream_Web.Controllers
             model.Years = GetSiteYearSummary(siteID);
             model.Tags = GetSiteTagSummary(siteID);
 
+            //Photo Frequency
+            model.PhotoFrequency = GetPhotoFrequencyData(siteID);
+            model.PhotoFrequency.SiteName = model.CollectionViewModel.Collection.Site.Name;
+            model.PhotoFrequency.StartDate = model.CollectionViewModel.SiteDetails.First;
+
             DateTime lastPhotoDate = PhotoRepository.Find(p => p.Site.ID == siteID).OrderBy(p => p.Captured).Last().Captured;
 
             model.DroughtMonitorData = LoadDMData(DMDataType.COUNTY, lastPhotoDate, model.CollectionViewModel.Collection.Site.CountyFips);
@@ -457,9 +462,43 @@ namespace Phocalstream_Web.Controllers
         {
             List<PopularTagModel> Tags = new List<PopularTagModel>();
 
-            
+            List<Tag> tags = TagRepository.GetAll().ToList();
+
+            foreach (var tag in tags)
+            {
+                PopularTagModel model = new PopularTagModel();
+                model.Tag = tag.Name;
+
+                /* This might need to be an actual SQL query.. */
+                //model.Count = PhotoRepository.Find(p => p.Site.ID == siteID && p.Tags.Contains(tag))
+                Tags.Add(model);
+            }
 
             return Tags;
+        }
+
+        private PhotoFrequencyData GetPhotoFrequencyData(long siteID)
+        {
+            PhotoFrequencyData model = new PhotoFrequencyData();
+
+            var data = PhotoRepository.Find(p => p.Site.ID == siteID)
+                                      .GroupBy(p => p.Captured.Date)
+                                      .Select(group => new
+                                        {
+                                            Date = group.Key,
+                                            Count = group.Count()
+                                        })
+                                      .OrderBy(x => x.Date);
+
+            model.FrequencyDataValues = "";
+            foreach (var d in data)
+            {
+                model.FrequencyDataValues += d.Count + ", ";
+            }
+
+            model.FrequencyDataValues = model.FrequencyDataValues.Substring(0, model.FrequencyDataValues.Length - 2);
+
+            return model;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Phocalstream_Web.Models.ViewModels
         public CollectionViewModel CollectionViewModel { get; set; }
         public List<SiteYearModel> Years { get; set; }
         public List<PopularTagModel> Tags { get; set; }
+        public PhotoFrequencyData PhotoFrequency { get; set; }
         public DmData DroughtMonitorData { get; set; }
         public WaterFlowData WaterData { get; set; }
     }
@@ -26,4 +27,12 @@ namespace Phocalstream_Web.Models.ViewModels
         public string Tag { get; set; }
         public int Count { get; set; }
     }
+
+    public class PhotoFrequencyData
+    {
+        public string SiteName { get; set; }
+        public String FrequencyDataValues { get; set; }
+        public DateTime StartDate { get; set; }
+    }
+
 }

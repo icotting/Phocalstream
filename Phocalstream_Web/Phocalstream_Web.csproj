@@ -400,6 +400,7 @@
     <Content Include="Views\Account\UserDefinedCollection.cshtml" />
     <Content Include="Views\Account\EditUserCollection.cshtml" />
     <Content Include="Views\Photo\SiteDashboard.cshtml" />
+    <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
