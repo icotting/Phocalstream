@@ -31,6 +31,9 @@ namespace Phocalstream_Web.Models.ViewModels
 
     public class DmMapData
     {
+        public string SiteName { get; set; }
+        public double Lat { get; set; }
+        public double Lon { get; set; }
         public string DataWeek { get; set; }
     }
 

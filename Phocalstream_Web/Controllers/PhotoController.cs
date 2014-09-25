@@ -112,10 +112,14 @@ namespace Phocalstream_Web.Controllers
             model.PhotoFrequency.SiteName = model.CollectionViewModel.Collection.Site.Name;
             model.PhotoFrequency.StartDate = model.CollectionViewModel.SiteDetails.First;
 
-            DateTime lastPhotoDate = PhotoRepository.Find(p => p.Site.ID == siteID).OrderBy(p => p.Captured).Last().Captured;
+            Photo lastPhoto = PhotoRepository.Find(p => p.Site.ID == siteID).OrderBy(p => p.Captured).Last();
+            DateTime lastPhotoDate = lastPhoto.Captured;
 
             model.DroughtMonitorData = LoadDMData(DMDataType.COUNTY, lastPhotoDate, model.CollectionViewModel.Collection.Site.CountyFips);
+            model.DroughtMonitorData.PhotoID = lastPhoto.ID;
+
             model.WaterData = LoadWaterData(model.CollectionViewModel.Collection.Site.Latitude, model.CollectionViewModel.Collection.Site.Longitude, lastPhotoDate);
+            model.WaterData.PhotoID = lastPhoto.ID;
 
             return View(model);
         }

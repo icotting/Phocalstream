@@ -16,6 +16,7 @@
 	    // Apply the theme
 	    var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
 </script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
 
 <div class="container">
@@ -27,8 +28,8 @@
 
         <div class="row">
             <div class="col-md-8">
-                <div class="row">
-                    
+                <div class="row dashboardRow">
+
                     @foreach (var y in Model.Years)
                     {
                         <div class="col-md-6 siteColumn">
@@ -49,14 +50,31 @@
                     }
                 </div>
 
-                <div class="row">
+                <div class="row dashboardRow">
                     <div class="col-md-12">
                         @{ Html.RenderPartial("_PhotoFrequencyPartial", Model.PhotoFrequency); }
                     </div>
                 </div>
+
+                <div class="row dashboardRow">
+                    <div class="col-md-12">
+                        @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { 
+                               SiteName = Model.CollectionViewModel.Collection.Site.Name,
+                               Lat = Model.CollectionViewModel.Collection.Site.Latitude,
+                               Lon = Model.CollectionViewModel.Collection.Site.Longitude,
+                               DataWeek = Model.DroughtMonitorData.DataWeek 
+                           }); }
+                    </div>
+                </div>
+
+                <div class="row dashboardRow">
+                    <div class="col-md-12">
+                        @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }
+                    </div>
+                </div>
             </div>
             <div class="col-md-4">
-                <div class="row">
+                <div class="row dashboardRow">
                     <div class="col-md-12 dashboardData" id="popularTags">
                         <h3>Popular Tags</h3>
                         <hr class="featurette-divider" />
@@ -66,10 +84,14 @@
                         <h6>Tag Four</h6>
                         <h6>Tag Four</h6>
                     </div>
-                    <div class="col-md-12 dashboardData">
+                </div>
+                <div class="row dashboardRow">
+                    <div class="col-md-12 dashboardData" id="wdPartial">
                         @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
                     </div>
-                     <div class="col-md-12 dashboardData">
+                </div>
+                <div class="row dashboardRow">
+                    <div class="col-md-12 dashboardData" id="dmPartial">
                         @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
                     </div>
                 </div>

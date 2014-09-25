@@ -147,7 +147,6 @@ ul {
     top: 0px; 
     left: 0px; 
     height:500px; 
-    margin-bottom: 20px;
 }
 
 /* WaterChart Partial */
@@ -184,7 +183,7 @@ ul {
 }
 
 .siteCaption {
-    bottom: 30px;
+    bottom: 0px;
     left: 0px;
     right: 15px;
     position: absolute;
@@ -195,7 +194,7 @@ ul {
     color: white;
 }
 
-.siteColumn {
+.dashboardRow {
     padding-bottom: 30px !important;
 }
 
@@ -204,7 +203,6 @@ ul {
 }
 
 .dashboardData {
-    margin-bottom: 30px !important;
     background-color: white;
     border: 1px solid lightgray;
 }
