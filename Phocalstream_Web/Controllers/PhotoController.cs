@@ -466,15 +466,13 @@ namespace Phocalstream_Web.Controllers
         {
             List<PopularTagModel> Tags = new List<PopularTagModel>();
 
-            List<Tag> tags = TagRepository.GetAll().ToList();
+            var tags = PhotoService.GetPopularTagsForSite(siteID);
 
             foreach (var tag in tags)
             {
                 PopularTagModel model = new PopularTagModel();
-                model.Tag = tag.Name;
-
-                /* This might need to be an actual SQL query.. */
-                //model.Count = PhotoRepository.Find(p => p.Site.ID == siteID && p.Tags.Contains(tag))
+                model.Tag = tag.Item1;
+                model.Count = tag.Item2;
                 Tags.Add(model);
             }
 

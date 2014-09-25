@@ -26,78 +26,72 @@
             <h1 class="page-header">@Model.CollectionViewModel.Collection.Name Dashboard</h1>
         </div>
 
-        <div class="row">
-            <div class="col-md-8">
-                <div class="row dashboardRow">
+        <!-- Yearly Summaries -->
+        <div class="row dashboardRow">
+            @foreach (var y in Model.Years)
+            {
+                <div class="col-md-4 siteColumn">
+                    <img class="siteImage" src="/api/photo/medium/@y.CoverPhotoID" alt="@y.Year">
 
-                    @foreach (var y in Model.Years)
-                    {
-                        <div class="col-md-6 siteColumn">
-                            <img class="siteImage" src="/api/photo/medium/@y.CoverPhotoID" alt="@y.Year">
-
-                            <div class="row">
-                                <div class="siteCaption">
-                                    <div class="col-md-8">
-                                        <h3>@y.Year</h3>
-                                        <h4>@y.PhotoCount photos</h4>
-                                    </div>
-                                    <div class="col-md-4 text-right">
-                                        <a class="siteCollection btn btn-default" href="/photo/cameracollection?siteId=@Model.CollectionViewModel.Collection.Site.ID">View @y.Year</a>
-                                    </div>
-                                </div>
+                    <div class="row">
+                        <div class="siteCaption">
+                            <div class="col-md-8">
+                                <h3>@y.Year</h3>
+                                <h4>@y.PhotoCount photos</h4>
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <a class="siteCollection btn btn-default" href="/photo/cameracollection?siteId=@Model.CollectionViewModel.Collection.Site.ID">View @y.Year</a>
                             </div>
                         </div>
-                    }
-                </div>
-
-                <div class="row dashboardRow">
-                    <div class="col-md-12">
-                        @{ Html.RenderPartial("_PhotoFrequencyPartial", Model.PhotoFrequency); }
                     </div>
                 </div>
+            }
+        </div>
 
-                <div class="row dashboardRow">
-                    <div class="col-md-12">
-                        @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { 
-                               SiteName = Model.CollectionViewModel.Collection.Site.Name,
-                               Lat = Model.CollectionViewModel.Collection.Site.Latitude,
-                               Lon = Model.CollectionViewModel.Collection.Site.Longitude,
-                               DataWeek = Model.DroughtMonitorData.DataWeek 
-                           }); }
-                    </div>
-                </div>
-
-                <div class="row dashboardRow">
-                    <div class="col-md-12">
-                        @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }
-                    </div>
-                </div>
+        <!-- Photo Frequency and Popular Tags -->
+        <div class="row dashboardRow">
+            <div class="col-md-8">
+                @{ Html.RenderPartial("_PhotoFrequencyPartial", Model.PhotoFrequency); }
             </div>
-            <div class="col-md-4">
-                <div class="row dashboardRow">
-                    <div class="col-md-12 dashboardData" id="popularTags">
-                        <h3>Popular Tags</h3>
-                        <hr class="featurette-divider" />
-                        <h4>Tag One</h4>
-                        <h5>Tag Two</h5>
-                        <h6>Tag Three</h6>
-                        <h6>Tag Four</h6>
-                        <h6>Tag Four</h6>
-                    </div>
-                </div>
-                <div class="row dashboardRow">
-                    <div class="col-md-12 dashboardData" id="wdPartial">
-                        @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
-                    </div>
-                </div>
-                <div class="row dashboardRow">
-                    <div class="col-md-12 dashboardData" id="dmPartial">
-                        @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
-                    </div>
-                </div>
+
+            <div class="col-md-4 dashboardData" id="popularTags">
+                <h3>Popular Tags</h3>
+                <hr class="featurette-divider" />
+                @foreach (var t in Model.Tags)
+                {
+                    <h4>@t.Tag -- @t.Count</h4>
+                }
             </div>
         </div>
 
+        <!-- Stream Flow and Water Data -->
+        <div class="row dashboardRow">
+            <div class="col-md-8">
+                @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }
+            </div>
+            <div class="col-md-4 dashboardData" id="wdPartial">
+                @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
+            </div>
+        </div>
+        <!-- End Stream Flow and Water Data -->
+
+
+        <!-- Drought Map and Charts -->
+        <div class="row dashboardRow">
+            <div class="col-md-8">
+                @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData()
+                    {
+                        SiteName = Model.CollectionViewModel.Collection.Site.Name,
+                        Lat = Model.CollectionViewModel.Collection.Site.Latitude,
+                        Lon = Model.CollectionViewModel.Collection.Site.Longitude,
+                        DataWeek = Model.DroughtMonitorData.DataWeek
+                    }); }
+            </div>
+            <div class="col-md-4 dashboardData" id="dmPartial">
+                @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
+            </div>
+        </div>
+        <!-- End Drought Map and Charts -->
 
     </div>
 </div>
