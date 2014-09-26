@@ -69,7 +69,7 @@ namespace Phocalstream_Web.Controllers.Api
 
             foreach ( Collection c in collections) 
             {
-                details.Add(new { Details = GetDetailsForCollection(c), Site = c.Site });
+                details.Add(new { Details = GetDetailsForCollection(c), Latitude = c.Site.Latitude, Longitude = c.Site.Longitude });
             }
 
             return details;
