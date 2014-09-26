@@ -6,6 +6,8 @@
 
 @Styles.Render("~/Content/CSS/Photo.css")
 
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 <script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
 <script type="text/javascript">
 	    Highcharts.theme = {
@@ -16,15 +18,30 @@
 	    // Apply the theme
 	    var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
 </script>
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+<script type="text/javascript">
+
+    function viewAll() {
+        bootbox.confirm("Are you sure you want to view all " + @Html.DisplayFor(model => Model.CollectionViewModel.SiteDetails.PhotoCount) + " images? \n" + 
+                "This may take some time to load. Please be patient.", function (result) {
+                    if (result) {
+                        location.href = '@Url.Action("CameraCollection", "Photo", new { @siteID = @Model.CollectionViewModel.Collection.Site.ID })';
+                    }
+                    else {
+                    }
+        });
+    }
+
+</script>
 
 
 <div class="container">
     <div class="content">
 
-        <div class="text-center">
+        <div class="text-center relative">
             <h1 class="page-header">@Model.CollectionViewModel.Collection.Name Dashboard</h1>
-        </div>
+            <button onclick="javascript:viewAll()" class="btn btn-info view-all">View All Images</button>
+        </div>        
 
         <!-- Yearly Summaries -->
         <div class="row dashboardRow">
@@ -40,7 +57,9 @@
                                 <h4>@y.PhotoCount photos</h4>
                             </div>
                             <div class="col-md-4 text-right">
-                                <a class="siteCollection btn btn-default" href="/photo/cameracollection?siteId=@Model.CollectionViewModel.Collection.Site.ID">View @y.Year</a>
+                                @Html.ActionLink("View " + Html.DisplayFor(model => y.Year), "KnockoutAdvancedSearch", "Search", new {
+                                    @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = "", @dates = y.Year
+                                } , new { @class="siteCollection btn btn-default" })
                             </div>
                         </div>
                     </div>
@@ -56,11 +75,16 @@
 
             <div class="col-md-4 dashboardData" id="popularTags">
                 <h3>Popular Tags</h3>
-                <hr class="featurette-divider" />
-                @foreach (var t in Model.Tags)
-                {
-                    <h4>@t.Tag -- @t.Count</h4>
-                }
+                <ul class="list-group user-collection-list">
+                    @foreach (var t in Model.Tags)
+                    {
+                        <li id="@t.Item1" class="list-group-item">
+                            <span class="badge">@t.Item2</span>@Html.ActionLink(Html.DisplayFor(model => t.Item1).ToString(), "KnockoutAdvancedSearch", "Search", new {
+                                @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = @t.Item1, @dates = ""
+                            }, new { @class = "" })
+                        </li>
+                    }
+                </ul>
             </div>
         </div>
 

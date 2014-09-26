@@ -375,6 +375,7 @@ namespace Phocalstream_Service.Service
                         "INNER JOIN PhotoTags ON Tags.ID = PhotoTags.Tag_ID " +
                         "INNER JOIN Photos ON PhotoTags.Photo_ID = Photos.ID " +
                         "WHERE Photos.Site_ID = @siteID " +
+                        "AND Tags.Name <> '' " +
                         "GROUP BY Tags.Name";
                 using (SqlCommand command = new SqlCommand(commandString, conn))
                 {
@@ -391,7 +392,6 @@ namespace Phocalstream_Service.Service
                             PopularTags.Add(tuple);
                         }
                     }
-
                 }
             }
 

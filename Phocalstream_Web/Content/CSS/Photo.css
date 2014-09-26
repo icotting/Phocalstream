@@ -206,6 +206,14 @@ ul {
     background-color: white;
     border: 1px solid lightgray;
 }
-#popularTags {
-    height: 240px;  
+
+.relative {
+    position: relative;
 }
+
+.view-all {
+    top: 3px;
+    right: 0px;
+    position: absolute;
+}
+

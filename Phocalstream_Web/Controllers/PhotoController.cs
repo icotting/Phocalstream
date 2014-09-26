@@ -105,7 +105,7 @@ namespace Phocalstream_Web.Controllers
 
             model.CollectionViewModel = GetCollectionViewModel(siteID);
             model.Years = GetSiteYearSummary(siteID);
-            model.Tags = GetSiteTagSummary(siteID);
+            model.Tags = PhotoService.GetPopularTagsForSite(siteID);
 
             //Photo Frequency
             model.PhotoFrequency = GetPhotoFrequencyData(siteID);
@@ -460,23 +460,6 @@ namespace Phocalstream_Web.Controllers
             }
 
             return Years;
-        }
-
-        private List<PopularTagModel> GetSiteTagSummary(long siteID)
-        {
-            List<PopularTagModel> Tags = new List<PopularTagModel>();
-
-            var tags = PhotoService.GetPopularTagsForSite(siteID);
-
-            foreach (var tag in tags)
-            {
-                PopularTagModel model = new PopularTagModel();
-                model.Tag = tag.Item1;
-                model.Count = tag.Item2;
-                Tags.Add(model);
-            }
-
-            return Tags;
         }
 
         private PhotoFrequencyData GetPhotoFrequencyData(long siteID)
