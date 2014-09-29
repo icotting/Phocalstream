@@ -184,6 +184,11 @@ namespace Phocalstream_Web.Controllers
 
             return View(model);
         }
+        
+        public ActionResult UploadPhotos()
+        {
+            return View();
+        }
 
         public ActionResult DeleteUserCollection(long collectionID)
         {
@@ -267,5 +272,7 @@ namespace Phocalstream_Web.Controllers
                 OAuthWebSecurity.RequestAuthentication(Provider, ReturnUrl);
             }
         }
+
+      
     }
 }

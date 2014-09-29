@@ -8,9 +8,13 @@
 
 <div class="container">
     <div class="content">
-        <div class="text-center">
-            <h1 class="page-header">@Model.User.FirstName's Collections</h1>
+        <div class="text-center relative">
+            <h1 class="page-header">@Model.User.FirstName 's Collections</h1>
+            <div class="save-changes">
+                @Html.ActionLink("Upload Photos", "UploadPhotos", "Account", null, new { @class = "btn btn-info"})
+            </div>
         </div>
+
 
         @if (Model.Collections.Count() == 0)
         {

@@ -268,6 +268,7 @@
     <Compile Include="Controllers\Api\SearchController.cs" />
     <Compile Include="Controllers\Api\PhotoController.cs" />
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
+    <Compile Include="Controllers\Api\UploadController.cs" />
     <Compile Include="Controllers\Api\UserCollectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
@@ -298,10 +299,13 @@
     <Content Include="Content\bootstrap-tags\js\bootstrap-tagsinput-angular.js" />
     <Content Include="Content\bootstrap-tags\js\bootstrap-tagsinput.js" />
     <Content Include="Content\bootstrap-tags\js\bootstrap-tagsinput.min.js" />
+    <Content Include="Content\bootstrap\css\bootstrap-responsive.css" />
     <Content Include="Content\bootstrap\css\bootstrap-theme.css" />
     <Content Include="Content\bootstrap\css\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap\css\bootstrap.css" />
     <Content Include="Content\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Content\file-upload\jquery.fileupload-ui-noscript.css" />
+    <Content Include="Content\file-upload\jquery.fileupload-ui.css" />
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\bootstrap\js\bootstrap.js" />
     <Content Include="Content\bootstrap\js\bootstrap.min.js" />
@@ -310,6 +314,9 @@
     <Content Include="Content\CSS\Photo.css" />
     <Content Include="Content\CSS\Search.css" />
     <Content Include="Content\CSS\typeahead.css" />
+    <Content Include="Content\file-upload\jquery.fileupload-ui.js" />
+    <Content Include="Content\file-upload\jquery.fileupload.js" />
+    <Content Include="Content\file-upload\jquery.iframe-transport.js" />
     <Content Include="Content\Images\About.png" />
     <Content Include="Content\Images\Collections.png" />
     <Content Include="Content\Images\ds.jpg" />
@@ -350,6 +357,8 @@
     <Content Include="Content\Scripts\jquery-2.1.1.js" />
     <Content Include="Content\Scripts\jquery-2.1.1.min.js" />
     <Content Include="Content\Scripts\jquery-ui-1.8.20.min.js" />
+    <Content Include="Content\Scripts\jquery-ui-1.9.2.js" />
+    <Content Include="Content\Scripts\jquery.ui.widget.js" />
     <Content Include="Content\Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Content\Scripts\jquery.validate.min.js" />
     <Content Include="Content\Scripts\jquery.validate.unobtrusive.min.js" />
@@ -398,9 +407,11 @@
     <Content Include="Views\Home\TagList.cshtml" />
     <Content Include="Views\Account\UserDefinedCollection.cshtml" />
     <Content Include="Views\Account\EditUserCollection.cshtml" />
+    <Content Include="Views\Account\UploadPhotos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Upload\" />
     <Folder Include="Views\UserCollection\" />
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,7 @@ namespace Phocalstream_Shared.Service
     {
         Collection GetCollectionForProcessing(XmlNode siteData);
         Photo ProcessPhoto(string fileName, CameraSite site);
+        Photo ProcessUserPhoto(string fileName, User user);
         void ProcessCollection(Collection collection);
         void GeneratePivotManifest(CameraSite site);
         void GeneratePivotManifest(string basePath, string collectionID, string photoList, CollectionType type);
