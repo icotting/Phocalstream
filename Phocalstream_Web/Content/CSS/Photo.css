@@ -194,6 +194,10 @@ ul {
     color: white;
 }
 
+.siteColumn {
+    margin-bottom: 30px !important;
+}
+
 .dashboardRow {
     padding-bottom: 30px !important;
 }

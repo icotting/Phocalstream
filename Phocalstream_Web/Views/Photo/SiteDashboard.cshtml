@@ -44,7 +44,7 @@
         </div>        
 
         <!-- Yearly Summaries -->
-        <div class="row dashboardRow">
+        <div class="row">
             @foreach (var y in Model.Years)
             {
                 <div class="col-md-4 siteColumn">
@@ -59,7 +59,7 @@
                             <div class="col-md-4 text-right">
                                 @Html.ActionLink("View " + Html.DisplayFor(model => y.Year), "KnockoutAdvancedSearch", "Search", new {
                                     @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = "", @dates = y.Year
-                                } , new { @class="siteCollection btn btn-default" })
+                                } , new { @class = "siteCollection btn btn-default" })
                             </div>
                         </div>
                     </div>
