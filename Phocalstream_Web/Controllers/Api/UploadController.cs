@@ -8,33 +8,54 @@ using System.Web;
 using System.Threading;
 using System.Web.UI;
 using System.IO;
+using Phocalstream_Service.Service;
+using Microsoft.Practices.Unity;
+using Phocalstream_Shared.Service;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Shared.Data;
+using System.Threading.Tasks;
 
 namespace Phocalstream_Web.Controllers.Api
 {
     public class UploadController : ApiController
     {
+        [Dependency]
+        public IPhotoService PhotoService { get; set; }
+
+        [Dependency]
+        public IEntityRepository<User> UserRepository { get; set; }
+
         // Enable both Get and Post so that our jquery call can send data, and get a status
         [HttpGet]
         [HttpPost]
-        public HttpResponseMessage Upload()
+        async public Task<HttpResponseMessage> Upload()
         {
-            // Get a reference to the file that our jQuery sent.  Even with multiple files, they will all be their own request and be the 0 index
-            HttpPostedFile file = HttpContext.Current.Request.Files[0];
+            // Check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
 
-            // do something with the file in this space 
-            // {....}
-            // end of file doing
+            string root = HttpContext.Current.Server.MapPath("~/App_Data");
+            var provider = new MultipartFormDataStreamProvider(root);
 
-            // Now we need to wire up a response so that the calling script understands what happened
-            HttpContext.Current.Response.ContentType = "text/plain";
-            var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            var result = new { name = file.FileName };
+            try
+            {
+                // Read the form data.
+                await Request.Content.ReadAsMultipartAsync(provider);
 
-            HttpContext.Current.Response.Write(serializer.Serialize(result));
-            HttpContext.Current.Response.StatusCode = 200;
-
-            // For compatibility with IE's "done" event we need to return a result as well as setting the context.response
-            return new HttpResponseMessage(HttpStatusCode.OK);
+                // This illustrates how to get the file names.
+                foreach (MultipartFileData file in provider.FileData)
+                {
+                    Console.WriteLine(file.Headers.ContentDisposition.FileName);
+                    Console.WriteLine("Server file path: " + file.LocalFileName);
+                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (System.Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
     }
 }

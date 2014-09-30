@@ -145,7 +145,7 @@ namespace Phocalstream_Service.Service
             }
         }
         
-        public Photo ProcessUserPhoto(string fileName, User user)
+        public Photo ProcessUserPhoto(string filePath, User user)
         {
             string userFolder = Path.Combine(PathManager.GetUserCollectionPath(), Convert.ToString(user.ID));
             if (!Directory.Exists(userFolder))
@@ -153,27 +153,25 @@ namespace Phocalstream_Service.Service
                 Directory.CreateDirectory(userFolder);
             }
 
-            //needs to be the path to the current file
-            string relativeName = fileName;
-            fileName = Path.Combine(userFolder, fileName);
-            FileInfo info = new FileInfo(fileName);
-
+            FileInfo info = new FileInfo(filePath);
+            string fileName = info.Name;
             try
             {
                 // create the directory for the image and its components
-                string basePath = Path.Combine(userFolder, relativeName, string.Format("{0}.phocalstream", info.Name));
+                string basePath = Path.Combine(userFolder, string.Format("{0}.phocalstream", fileName));
                 if (!Directory.Exists(basePath))
                 {
                     Directory.CreateDirectory(basePath);
                 }
 
                 // open a Bitmap for the image to parse the meta data from
-                using (System.Drawing.Image img = System.Drawing.Image.FromFile(fileName))
+                using (System.Drawing.Image img = System.Drawing.Image.FromFile(filePath))
                 {
                     Photo photo = CreatePhotoWithProperties(img, info);
-                    photo.FileName = relativeName;
+                    photo.FileName = fileName;
 
                     PhotoRepository.Insert(photo);
+                    Unit.Commit();
 
                     // only generate the phocalstream image if it has not already been generated
                     if (File.Exists(Path.Combine(basePath, @"High.jpg")) == false)
