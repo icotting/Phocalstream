@@ -42,7 +42,7 @@
 <div id="table">
     <div id="imageCell">
         <div id="imageContainer">
-
+            
         </div>
         <span ><small>You can use your mouse to pan and zoom the image or view in <a href="javascript:fullScreen()">fullscreen</a>.</small></span>
         <script type="text/javascript">
@@ -55,7 +55,12 @@
             viewer.openDzi("@Html.DisplayFor(model => model.ImageUrl)");
         </script>
         <div class="data-partial">
-            @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() { DataWeek = Model.DroughtMonitorData.DataWeek }); }
+            @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() {
+                   SiteName = Model.Photo.Site.Name,
+                   Lat = Model.Photo.Site.Latitude,
+                   Lon = Model.Photo.Site.Longitude,
+                   DataWeek = Model.DroughtMonitorData.DataWeek 
+               }); }
         </div>
         <div class="data-partial">
             @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }

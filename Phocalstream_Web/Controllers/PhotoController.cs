@@ -99,30 +99,34 @@ namespace Phocalstream_Web.Controllers
             return PartialView("_PhotoInfo", model);
         }
 
+        public ActionResult SiteDashboard(long siteID)
+        {
+            SiteDashboardViewModel model = new SiteDashboardViewModel();
+
+            model.CollectionViewModel = GetCollectionViewModel(siteID);
+            model.Years = GetSiteYearSummary(siteID);
+            model.Tags = PhotoService.GetPopularTagsForSite(siteID);
+
+            //Photo Frequency
+            model.PhotoFrequency = GetPhotoFrequencyData(siteID);
+            model.PhotoFrequency.SiteName = model.CollectionViewModel.Collection.Site.Name;
+            model.PhotoFrequency.StartDate = model.CollectionViewModel.SiteDetails.First;
+
+            Photo lastPhoto = PhotoRepository.Find(p => p.Site.ID == siteID).OrderBy(p => p.Captured).Last();
+            DateTime lastPhotoDate = lastPhoto.Captured;
+
+            model.DroughtMonitorData = LoadDMData(DMDataType.COUNTY, lastPhotoDate, model.CollectionViewModel.Collection.Site.CountyFips);
+            model.DroughtMonitorData.PhotoID = lastPhoto.ID;
+
+            model.WaterData = LoadWaterData(model.CollectionViewModel.Collection.Site.Latitude, model.CollectionViewModel.Collection.Site.Longitude, lastPhotoDate);
+            model.WaterData.PhotoID = lastPhoto.ID;
+
+            return View(model);
+        }
+
         public ActionResult CameraCollection(long siteID)
         {
-            CollectionViewModel model = new CollectionViewModel();
-
-            model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
-
-            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
-                Request.Url.Host,
-                Request.Url.Port,
-                model.Collection.ID);
-            model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
-
-            List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
-            model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
-
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
-            if (User != null)
-            {
-                UserCollectionList userCollectionModel = new UserCollectionList();
-                userCollectionModel.User = User;
-                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
-                model.UserCollections = userCollectionModel;
-            }
-
+            CollectionViewModel model = GetCollectionViewModel(siteID);
             return View(model);
         }
 
@@ -416,6 +420,70 @@ namespace Phocalstream_Web.Controllers
                 }
                 Response.Close();
             }
+        }
+    
+        private CollectionViewModel GetCollectionViewModel(long siteID)
+        {
+            CollectionViewModel model = new CollectionViewModel();
+
+            model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
+
+            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
+                Request.Url.Host,
+                Request.Url.Port,
+                model.Collection.ID);
+            model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
+
+            List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
+            model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
+
+            return model;
+        }
+    
+        private List<SiteYearModel> GetSiteYearSummary(long siteID)
+        {
+            List<SiteYearModel> Years = new List<SiteYearModel>();
+
+            List<int> yearStrings = PhotoRepository.Find(p => p.Site.ID == siteID).Select(p => p.Captured.Year).Distinct().ToList<int>();
+
+            foreach (int y in yearStrings)
+            {
+                SiteYearModel model = new SiteYearModel();
+
+                model.Year = Convert.ToString(y);
+
+                IEnumerable<long> photoIds = PhotoRepository.Find(p => p.Site.ID == siteID && p.Captured.Year == y).Select(p => p.ID).OrderBy(p => new Guid());
+                model.PhotoCount = photoIds.Count();
+                model.CoverPhotoID = photoIds.First();
+
+                Years.Add(model);
+            }
+
+            return Years;
+        }
+
+        private PhotoFrequencyData GetPhotoFrequencyData(long siteID)
+        {
+            PhotoFrequencyData model = new PhotoFrequencyData();
+
+            var data = PhotoRepository.Find(p => p.Site.ID == siteID)
+                                      .GroupBy(p => p.Captured.Date)
+                                      .Select(group => new
+                                        {
+                                            Date = group.Key,
+                                            Count = group.Count()
+                                        })
+                                      .OrderBy(x => x.Date);
+
+            model.FrequencyDataValues = "";
+            foreach (var d in data)
+            {
+                model.FrequencyDataValues += d.Count + ", ";
+            }
+
+            model.FrequencyDataValues = model.FrequencyDataValues.Substring(0, model.FrequencyDataValues.Length - 2);
+
+            return model;
         }
     }
 }

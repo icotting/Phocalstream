@@ -365,6 +365,39 @@ namespace Phocalstream_Service.Service
             return photo;
         }
 
+        public List<Tuple<string, int>> GetPopularTagsForSite(long siteID)
+        {
+            List<Tuple<string, int>> PopularTags = new List<Tuple<string, int>>();
+            using (SqlConnection conn = new SqlConnection(PathManager.DbConnection))
+            {
+                conn.Open();
+                string commandString = "select Tags.Name, Count(*) from Tags " + 
+                        "INNER JOIN PhotoTags ON Tags.ID = PhotoTags.Tag_ID " +
+                        "INNER JOIN Photos ON PhotoTags.Photo_ID = Photos.ID " +
+                        "WHERE Photos.Site_ID = @siteID " +
+                        "AND Tags.Name <> '' " +
+                        "GROUP BY Tags.Name";
+                using (SqlCommand command = new SqlCommand(commandString, conn))
+                {
+                    command.Parameters.AddWithValue("@siteID", siteID);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Tuple<string, int> tuple = new Tuple<string, int>(
+                                reader.GetString(0),
+                                reader.GetInt32(1)
+                            );
+
+                            PopularTags.Add(tuple);
+                        }
+                    }
+                }
+            }
+
+            return PopularTags;
+        }
+
         public List<string> GetFileNames(List<Photo> photos)
         {
             List<string> fileNames = new List<string>();

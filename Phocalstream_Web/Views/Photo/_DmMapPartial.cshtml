@@ -7,7 +7,18 @@
         center: new google.maps.LatLng(38, -95),
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
+
     map = new google.maps.Map(document.getElementById('droughtMap'), mapOptions);
+
+    var myLatlng = new google.maps.LatLng(@Html.DisplayFor(model => Model.Lat), @Html.DisplayFor(model => Model.Lon));
+
+    var marker = new google.maps.Marker({
+        position: myLatlng,
+        map: map,
+        title: '@Html.DisplayFor(model => Model.SiteName) Camera Site'
+    });
+
+
     var kmzAddress = 'http://torka.unl.edu:8080/dm/data/kml/usdm' + '@Html.DisplayFor(model => model.DataWeek)' + '.kmz';
 	var dmLayer = new google.maps.KmlLayer(kmzAddress, { preserveViewport: true });
 	dmLayer.setMap(map);
