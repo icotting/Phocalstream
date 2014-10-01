@@ -133,7 +133,12 @@
             <div class="search-row text-center">
                 <div class="row">
                     <div class="">
-                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo(s)</button>
+                        <!-- ko if: queryResults() == 1 -->
+                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo</button>
+                        <!-- /ko -->
+                        <!-- ko ifnot: queryResults() == 1 -->
+                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photos</button>
+                        <!-- /ko -->
                     </div>
                 </div>
             </div>
@@ -271,10 +276,10 @@
                 var siteSplit = self.siteNames().split(',');
 
                 if (siteSplit.length == 1) {
-                    q += "from " + siteSplit[0] + " ";
+                    q += "from " + siteSplit[0] + "";
                 }
                 else if (siteSplit.length == 2) {
-                    q += "from " + siteSplit[0] + " or " + siteSplit[1] + " ";
+                    q += "from " + siteSplit[0] + " or " + siteSplit[1] + "";
                 }
                 else {
                     q += "from ";
@@ -282,23 +287,23 @@
                     {
                         q += siteSplit[i] + ", ";
                     }
-                    q += " or " + siteSplit[siteSplit.length - 1] + " ";
+                    q += " or " + siteSplit[siteSplit.length - 1] + "";
                 }
                 found = true;
             }
 
             if (self.tagNames() != null && self.tagNames().length != 0) {
                 if (found) {
-                    q += "and "
+                    q += ", and "
                 }
                 
                 var tagSplit = self.tagNames().split(',');
 
                 if (tagSplit.length == 1) {
-                    q += "tagged with " + tagSplit[0] + " ";
+                    q += "tagged with " + tagSplit[0] + "";
                 }
                 else if (tagSplit.length == 2) {
-                    q += "tagged with " + tagSplit[0] + " or " + tagSplit[1] + " ";
+                    q += "tagged with " + tagSplit[0] + " or " + tagSplit[1] + "";
                 }
                 else {
                     q += "tagged with ";
@@ -306,23 +311,23 @@
                     {
                         q += tagSplit[i] + ", ";
                     }
-                    q += " or " + tagSplit[tagSplit.length - 1] + " ";
+                    q += " or " + tagSplit[tagSplit.length - 1] + "";
                 }
                 found = true;
             }
 
             if (self.dates() != null && self.dates().length != 0) {
                 if (found) {
-                    q += "and "
+                    q += ", and "
                 }
 
                 var dateSplit = self.dates().split(',');
 
                 if (dateSplit.length == 1) {
-                    q += "taken on " + dateSplit[0] + " ";
+                    q += "taken on " + dateSplit[0] + "";
                 }
                 else if (dateSplit.length == 2) {
-                    q += "taken on " + dateSplit[0] + " or " + dateSplit[1] + " ";
+                    q += "taken on " + dateSplit[0] + " or " + dateSplit[1] + "";
                 }
                 else {
                     q += "taken on ";
@@ -330,23 +335,23 @@
                     {
                         q += dateSplit[i] + ", ";
                     }
-                    q += " or " + dateSplit[dateSplit.length - 1] + " ";
+                    q += " or " + dateSplit[dateSplit.length - 1] + "";
                 }
                 found = true;
             }
 
             if (self.selectedMonths().length != 0) {
                 if (found) {
-                    q += "and "
+                    q += ", and "
                 }
 
                 var monthSplit = self.monthText().split(',');
 
                 if (monthSplit.length == 1) {
-                    q += "taken during the month of " + monthSplit[0] + " ";
+                    q += "taken during the month of " + monthSplit[0] + "";
                 }
                 else if (monthSplit.length == 2) {
-                    q += "taken during the months of " + monthSplit[0] + " or " + monthSplit[1] + " ";
+                    q += "taken during the months of " + monthSplit[0] + " or " + monthSplit[1] + "";
                 }
                 else {
                     q += "taken during the months of ";
@@ -354,23 +359,23 @@
                     {
                         q += monthSplit[i] + ", ";
                     }
-                    q += " or " + monthSplit[monthSplit.length - 1] + " ";
+                    q += " or " + monthSplit[monthSplit.length - 1] + "";
                 }
                 found = true;
             }
 
             if (self.selectedHours().length != 0) {
                 if (found) {
-                    q += "and "
+                    q += ", and "
                 }
 
                 var hourSplit = self.hourText().split(',');
 
                 if (hourSplit.length == 1) {
-                    q += "taken during the hour of " + hourSplit[0] + " ";
+                    q += "taken during the hour of " + hourSplit[0] + "";
                 }
                 else if (hourSplit.length == 2) {
-                    q += "taken during the hours of " + hourSplit[0] + " or " + hourSplit[1] + " ";
+                    q += "taken during the hours of " + hourSplit[0] + " or " + hourSplit[1] + "";
                 }
                 else {
                     q += "taken during the hours of ";
@@ -378,7 +383,7 @@
                     {
                         q += hourSplit[i] + ", ";
                     }
-                    q += " or " + hourSplit[hourSplit.length - 1] + " ";
+                    q += " or " + hourSplit[hourSplit.length - 1] + "";
                 }
                 found = true;
             }
