@@ -291,7 +291,23 @@
                 if (found) {
                     q += "and "
                 }
-                q += "tagged with " + self.tagNames() + " ";
+                
+                var tagSplit = self.tagNames().split(',');
+
+                if (tagSplit.length == 1) {
+                    q += "tagged with " + tagSplit[0] + " ";
+                }
+                else if (tagSplit.length == 2) {
+                    q += "tagged with " + tagSplit[0] + " or " + tagSplit[1] + " ";
+                }
+                else {
+                    q += "tagged with ";
+                    for (var i = 0; i < tagSplit.length - 1; i++)
+                    {
+                        q += tagSplit[i] + ", ";
+                    }
+                    q += " or " + tagSplit[tagSplit.length - 1] + " ";
+                }
                 found = true;
             }
 
@@ -299,7 +315,23 @@
                 if (found) {
                     q += "and "
                 }
-                q += "taken on " + self.dates() + " ";
+
+                var dateSplit = self.dates().split(',');
+
+                if (dateSplit.length == 1) {
+                    q += "taken on " + dateSplit[0] + " ";
+                }
+                else if (dateSplit.length == 2) {
+                    q += "taken on " + dateSplit[0] + " or " + dateSplit[1] + " ";
+                }
+                else {
+                    q += "taken on ";
+                    for (var i = 0; i < dateSplit.length - 1; i++)
+                    {
+                        q += dateSplit[i] + ", ";
+                    }
+                    q += " or " + dateSplit[dateSplit.length - 1] + " ";
+                }
                 found = true;
             }
 
@@ -307,7 +339,23 @@
                 if (found) {
                     q += "and "
                 }
-                q += "taken during the months of " + self.monthText() + " ";
+
+                var monthSplit = self.monthText().split(',');
+
+                if (monthSplit.length == 1) {
+                    q += "taken during the month of " + monthSplit[0] + " ";
+                }
+                else if (monthSplit.length == 2) {
+                    q += "taken during the months of " + monthSplit[0] + " or " + monthSplit[1] + " ";
+                }
+                else {
+                    q += "taken during the months of ";
+                    for (var i = 0; i < monthSplit.length - 1; i++)
+                    {
+                        q += monthSplit[i] + ", ";
+                    }
+                    q += " or " + monthSplit[monthSplit.length - 1] + " ";
+                }
                 found = true;
             }
 
@@ -315,7 +363,23 @@
                 if (found) {
                     q += "and "
                 }
-                q += "taken during the hours of " + self.hourText() + " ";
+
+                var hourSplit = self.hourText().split(',');
+
+                if (hourSplit.length == 1) {
+                    q += "taken during the hour of " + hourSplit[0] + " ";
+                }
+                else if (hourSplit.length == 2) {
+                    q += "taken during the hours of " + hourSplit[0] + " or " + hourSplit[1] + " ";
+                }
+                else {
+                    q += "taken during the hours of ";
+                    for (var i = 0; i < hourSplit.length - 1; i++)
+                    {
+                        q += hourSplit[i] + ", ";
+                    }
+                    q += " or " + hourSplit[hourSplit.length - 1] + " ";
+                }
                 found = true;
             }
 
