@@ -147,7 +147,6 @@ ul {
     top: 0px; 
     left: 0px; 
     height:500px; 
-    margin-bottom: 20px;
 }
 
 /* WaterChart Partial */
@@ -175,3 +174,50 @@ ul {
 .collection-row {
     margin-bottom: 5px;
 }
+
+/* SiteDashboard */
+.siteImage {
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.siteCaption {
+    bottom: 0px;
+    left: 0px;
+    right: 15px;
+    position: absolute;
+    
+    margin-left: 15px;
+
+    background: rgba(0, 0, 0, .5);
+    color: white;
+}
+
+.siteColumn {
+    margin-bottom: 30px !important;
+}
+
+.dashboardRow {
+    padding-bottom: 30px !important;
+}
+
+.siteCollection {
+    margin-top: 25px;
+}
+
+.dashboardData {
+    background-color: white;
+    border: 1px solid lightgray;
+}
+
+.relative {
+    position: relative;
+}
+
+.view-all {
+    top: 3px;
+    right: 0px;
+    position: absolute;
+}
+

@@ -1,9 +1,15 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.WaterFlowData
 
-    <div id="waterContainer"></div>
+<div id="waterContainer"></div>
 
-    <script type="text/javascript">
+<script type="text/javascript">
     $(function () {
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+
         $('#waterContainer').highcharts({
             colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
             chart: {

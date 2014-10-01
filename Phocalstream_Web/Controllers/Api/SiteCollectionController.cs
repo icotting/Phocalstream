@@ -20,6 +20,7 @@ using Phocalstream_Service.Service;
 using Ionic.Zip;
 using System.Diagnostics;
 using Phocalstream_Shared.Service;
+using Phocalstream_Shared.Data.Model.View;
 
 namespace Phocalstream_Web.Controllers.Api
 {
@@ -56,6 +57,30 @@ namespace Phocalstream_Web.Controllers.Api
             col.CoverPhoto = photo;
             CollectionRepository.Update(col);
             Unit.Commit();
+        }
+
+        [HttpGet]
+        [ActionName("list")]
+        public IEnumerable<Object> GetSites()
+        {
+            List<Object> details = new List<Object>();
+
+            ICollection<Collection> collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
+
+            foreach ( Collection c in collections) 
+            {
+                details.Add(new { Details = GetDetailsForCollection(c), Latitude = c.Site.Latitude, Longitude = c.Site.Longitude });
+            }
+
+            return details;
+        }
+
+        private SiteDetails GetDetailsForCollection(Collection collection)
+        {
+            SiteDetails details = PhotoRepository.GetSiteDetails(collection.Site);
+            details.CoverPhotoID = collection.CoverPhoto == null ? details.LastPhotoID : collection.CoverPhoto.ID;
+
+            return details;
         }
 
         [HttpGet]

@@ -308,16 +308,31 @@ namespace Phocalstream_Service.Service
             bool tagFirst = true;
             foreach (var tag in tags)
             {
-                if (tagNames.Contains(tag))
+                if (!tag.Equals("undefined"))
                 {
-                    if(tagFirst)
+                    if (tagNames.Contains(tag))
                     {
-                        tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
-                        tagFirst = false;
+                        if (tagFirst)
+                        {
+                            tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
+                            tagFirst = false;
+                        }
+                        else
+                        {
+                            tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", tag));
+                        }
                     }
                     else
                     {
-                        tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", tag));
+                        if (tagFirst)
+                        {
+                            tagBuilder.Append(string.Format("Tags.Name = '{0}'", "null"));
+                            tagFirst = false;
+                        }
+                        else
+                        {
+                            tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", "null"));
+                        }
                     }
                 }
             }

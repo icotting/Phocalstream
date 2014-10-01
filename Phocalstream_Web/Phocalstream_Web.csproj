@@ -284,6 +284,7 @@
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
     <Compile Include="Models\ViewModels\SettingsViewModel.cs" />
+    <Compile Include="Models\ViewModels\SiteDashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\TagViewModel.cs" />
     <Compile Include="Models\ViewModels\TimelapseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -408,6 +409,8 @@
     <Content Include="Views\Account\UserDefinedCollection.cshtml" />
     <Content Include="Views\Account\EditUserCollection.cshtml" />
     <Content Include="Views\Account\UploadPhotos.cshtml" />
+    <Content Include="Views\Photo\SiteDashboard.cshtml" />
+    <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
