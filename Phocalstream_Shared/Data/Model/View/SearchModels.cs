@@ -45,8 +45,24 @@ namespace Phocalstream_Shared.Data.Model.View
 
             if(!String.IsNullOrWhiteSpace(Sites) && !Sites.Equals("undefined"))
             {
-
-                name.Append("from " + String.Join(", ", Sites.Split(',')) + " ");
+                string[] siteSplit = Sites.Split(',');
+                if (siteSplit.Length == 1)
+                {
+                    name.Append("from " + siteSplit[0] + " ");
+                }
+                else if (siteSplit.Length == 2)
+                {
+                    name.Append("from " + siteSplit[0] + " or " + siteSplit[1] + " ");
+                }
+                else
+                {
+                    name.Append("from ");
+                    for (int i = 0; i < siteSplit.Length - 1; i++)
+                    {
+                        name.Append(siteSplit[i] + ", ");
+                    }
+                    name.Append(" or " + siteSplit[siteSplit.Length - 1] + " ");
+                }
             }
 
             if (!String.IsNullOrWhiteSpace(Tags) && !Tags.Equals("undefined"))

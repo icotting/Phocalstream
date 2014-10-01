@@ -268,7 +268,22 @@
             var q = "Searching for photos ";
 
             if (self.siteNames() != null && self.siteNames().length != 0) {
-                q += "from " + self.siteNames() + " ";
+                var siteSplit = self.siteNames().split(',');
+
+                if (siteSplit.length == 1) {
+                    q += "from " + siteSplit[0] + " ";
+                }
+                else if (siteSplit.length == 2) {
+                    q += "from " + siteSplit[0] + " or " + siteSplit[1] + " ";
+                }
+                else {
+                    q += "from ";
+                    for (var i = 0; i < siteSplit.length - 1; i++)
+                    {
+                        q += siteSplit[i] + ", ";
+                    }
+                    q += " or " + siteSplit[siteSplit.length - 1] + " ";
+                }
                 found = true;
             }
 
