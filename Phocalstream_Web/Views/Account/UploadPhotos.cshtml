@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Phocalstream_Shared.Data.Model.View.UserPhotoUpload
+@{
     ViewBag.Title = "UploadPhotos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -23,6 +24,21 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+                    Select A Camera Site To Upload Pictures From
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
+                </ul>
+            </div>
+        </div>
 
         <form action="/api/upload/upload" enctype="multipart/form-data">
             <div class="row fileupload-buttonbar">
@@ -64,7 +80,6 @@
                 limitConcurrentUploads: 1,
                 sequentialUploads: true,
                 progressInterval: 100,
-                maxChunkSize: 10000,
                 add: function (e, data) {
                     $('#filelistholder').removeClass('hide');
                     data.context = $('<div />').text(data.files[0].name).appendTo('#filelistholder');

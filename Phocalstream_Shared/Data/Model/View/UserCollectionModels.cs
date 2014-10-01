@@ -30,4 +30,9 @@ namespace Phocalstream_Shared.Data.Model.View
         public IEnumerable<Collection> Collections { get; set; }
     }
 
+    public class UserPhotoUpload
+    {
+        public List<CameraSite> UserCameraSites { get; set; }
+    }
+
 }
