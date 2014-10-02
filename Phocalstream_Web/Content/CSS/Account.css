@@ -79,3 +79,9 @@
     right: 0px;
     position: absolute;
 }
+
+/* User Camera Site */
+.map-canvas {
+    height: 300px; 
+    width: 100%;
+}

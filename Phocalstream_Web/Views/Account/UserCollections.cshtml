@@ -29,8 +29,15 @@
                 @foreach (var col in Model.Collections)
                 {
                     <div class="col-md-6 siteColumn">
-                        <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
-
+                        @if (@col.CoverPhoto != null)
+                        { 
+                            <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
+                        }
+                        else
+                        {
+                            <img class="siteImage" src="/api/photo/medium/0" alt="@col.Name" />
+                        }
+                        
                         <div class="siteEdit">
                             <a class="btn text-white no-underline" href="@Url.Action("EditUserCollection", "Account", new { collectionID = col.ID })"><span class="glyphicon glyphicon-edit"></span> Edit</a>
                         </div>

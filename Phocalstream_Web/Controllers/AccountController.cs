@@ -32,6 +32,9 @@ namespace Phocalstream_Web.Controllers
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
+        public IDroughtMonitorRepository DroughtMonitorRepository { get; set; }
+
+        [Dependency]
         public IUnitOfWork Unit { get; set; }
 
         [Dependency]
@@ -178,7 +181,7 @@ namespace Phocalstream_Web.Controllers
 
             foreach (var col in model.Collections)
             {
-                col.CoverPhoto = col.Photos.Last(); 
+                col.CoverPhoto = col.Photos.LastOrDefault(); 
             }
 
 
@@ -187,7 +190,53 @@ namespace Phocalstream_Web.Controllers
         
         public ActionResult UploadPhotos()
         {
+            UserPhotoUpload model = new UserPhotoUpload();
+
+            model.UserSiteCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Site != null, c => c.Site).ToList();
+
+            if (model.UserSiteCollections.Count == 0)
+            {
+                return new RedirectResult("CreateUserSite");
+            }
+
             return View();
+        }
+
+        public ActionResult CreateUserSite()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult CreateUserSite(AddUserCameraSite site)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            string guid = Guid.NewGuid().ToString();
+
+            CameraSite newCameraSite = new CameraSite()
+            {
+                Name = site.CameraSiteName,
+                Latitude = site.Latitude,
+                Longitude = site.Longitude,
+                //Get the actual FIPS Code
+                CountyFips = DroughtMonitorRepository.GetFipsForCountyAndState(site.County, site.State),
+                ContainerID = guid,
+                DirectoryName = guid
+            };
+
+            Collection newCollection = new Collection()
+            {
+                Name = site.CameraSiteName,
+                Site = newCameraSite,
+                Owner = user,
+                ContainerID = guid,
+                Type = CollectionType.USER
+            };
+
+            CollectionRepository.Insert(newCollection);
+            Unit.Commit();
+
+            return new RedirectResult("UserCollections");
         }
 
         public ActionResult DeleteUserCollection(long collectionID)

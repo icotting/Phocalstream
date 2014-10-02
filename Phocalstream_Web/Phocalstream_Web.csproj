@@ -411,6 +411,7 @@
     <Content Include="Views\Account\UploadPhotos.cshtml" />
     <Content Include="Views\Photo\SiteDashboard.cshtml" />
     <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
+    <Content Include="Views\Account\CreateUserSite.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
