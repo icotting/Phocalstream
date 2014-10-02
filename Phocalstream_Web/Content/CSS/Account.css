@@ -80,6 +80,16 @@
     position: absolute;
 }
 
+/* User Photo Upload */
+.progress {
+    margin-bottom: 0px !important;
+    margin-top: 7px !important;
+}
+
+#fileupload {
+    display: none;
+}
+
 /* User Camera Site */
 .map-canvas {
     height: 300px; 

@@ -20,58 +20,67 @@
         <div class="text-center relative">
             <h1 class="page-header">Upload Photos</h1>
             <div class="save-changes">
-                @Html.ActionLink("Upload Photos", "UploadPhotos", "Account", null, new { @class = "btn btn-info" })
+            </div>
+        </div>
+
+        <!-- Site Selection and Choose Files Button -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle full-width" type="button" id="dropdownTitle" data-toggle="dropdown">
+                        Select A Camera Site
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu full-width" role="menu">
+                        @foreach (var site in Model.UserSiteCollections)
+                        {
+                            <li><a role="menuitem" tabindex="-1" href="#">@site.Name</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <form action="/api/upload/upload" enctype="multipart/form-data">
+                        <a class="btn btn-default full-width" onclick="$('input[id=fileupload]').click();">Choose Files</a>
+                        <input type="file" class="btn btn-success" id="fileupload" name="fileupload" accept="image/*" multiple="multiple">
+                </form>
+            </div>
+        </div>
+
+        <!-- Overall Progress Bar -->
+        <div class="row">
+            <div class="col-md-11">
+                <div class="progress">
+                    <div class="progress-bar" id="overallbar" style="width: 0%">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button id="btnUploadAll" class="btn btn-success pull-right" type="button">Upload</button>
             </div>
         </div>
 
         <div class="row">
-            <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
-                    Select A Camera Site To Upload Pictures From
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
-                </ul>
+            <div class="col-md-12">
+                <div class="well hide" id="filelistholder">
+                </div>
             </div>
         </div>
-
-        <form action="/api/upload/upload" enctype="multipart/form-data">
-            <div class="row fileupload-buttonbar">
-                <div class="span7">
-                    <div class="well">
-                        <i class="icon-plus"></i><span>&nbsp;&nbsp;Add files...</span>
-                        <input type="file" id="fileupload" name="fileupload" accept="image/*" multiple="multiple">
-                        <button id="btnUploadAll" class="btn btn-success pull-right" type="button">
-                            Upload All
-                        </button>
-                        <div class="clearfix">
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar" id="overallbar" style="width: 0%">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="span7">
-                    <div class="well hide" id="filelistholder">
-                    </div>
-                </div>
-                <div class="span7">
-                </div>
-            </div>
-        </form>
-
     </div>
 </div>
 
 
 @section Scripts
 {
+    <script type="text/javascript">
+        $(function () {
+            $(".dropdown-menu").on('click', 'li a', function () {
+                $("#dropdownTitle").text($(this).text());
+                $("#dropdownTitle").val($(this).text());
+            });
+        });
+    </script>
+
     <script type="text/javascript">
         $(function () {
             $('#fileupload').fileupload({

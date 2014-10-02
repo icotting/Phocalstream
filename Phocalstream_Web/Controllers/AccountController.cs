@@ -199,7 +199,7 @@ namespace Phocalstream_Web.Controllers
                 return new RedirectResult("CreateUserSite");
             }
 
-            return View();
+            return View(model);
         }
 
         public ActionResult CreateUserSite()
