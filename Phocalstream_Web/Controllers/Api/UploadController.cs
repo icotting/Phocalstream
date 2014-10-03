@@ -27,17 +27,22 @@ namespace Phocalstream_Web.Controllers.Api
 
         [HttpGet]
         [HttpPost]
-        public HttpResponseMessage Upload()
+        public HttpResponseMessage Upload(long selectedCollectionID)
         {
             // Get a reference to the file that our jQuery sent.  Even with multiple files, they will all be their own request and be the 0 index
             HttpPostedFile file = HttpContext.Current.Request.Files[0];
 
-            var fileName = Path.GetFileName(file.FileName);
-            var path = Path.Combine(PathManager.GetUserCollectionPath(), "Temp", fileName);
+            var temp = Path.Combine(PathManager.GetUserCollectionPath(), "Temp");
+            if (!Directory.Exists(temp))
+            {
+                Directory.CreateDirectory(temp);
+            }
+
+            var path = Path.Combine(PathManager.GetUserCollectionPath(), "Temp", Path.GetFileName(file.FileName));
             file.SaveAs(path);
 
             User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
-            PhotoService.ProcessUserPhoto(path, user);
+            PhotoService.ProcessUserPhoto(path, user, selectedCollectionID);
 
             // Now we need to wire up a response so that the calling script understands what happened
             HttpContext.Current.Response.ContentType = "text/plain";

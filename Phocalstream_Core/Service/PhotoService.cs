@@ -144,9 +144,11 @@ namespace Phocalstream_Service.Service
                 throw new Exception(string.Format("Exception processing photo {0}. Message: {1}", fileName, e.Message));
             }
         }
-        
-        public Photo ProcessUserPhoto(string filePath, User user)
+
+        public Photo ProcessUserPhoto(string filePath, User user, long collectionID)
         {
+            Collection collection = CollectionRepository.Find(c => c.ID == collectionID && c.Type == CollectionType.USER, c => c.Site, c => c.Photos).FirstOrDefault();
+
             string userFolder = Path.Combine(PathManager.GetUserCollectionPath(), Convert.ToString(user.ID));
             if (!Directory.Exists(userFolder))
             {
@@ -158,7 +160,7 @@ namespace Phocalstream_Service.Service
             try
             {
                 // create the directory for the image and its components
-                string basePath = Path.Combine(userFolder, string.Format("{0}.phocalstream", fileName));
+                string basePath = Path.Combine(userFolder, collection.ContainerID, string.Format("{0}.phocalstream", fileName));
                 if (!Directory.Exists(basePath))
                 {
                     Directory.CreateDirectory(basePath);
@@ -169,8 +171,13 @@ namespace Phocalstream_Service.Service
                 {
                     Photo photo = CreatePhotoWithProperties(img, info);
                     photo.FileName = fileName;
-
+                    photo.Site = collection.Site;
+                    
                     PhotoRepository.Insert(photo);
+
+                    collection.Photos.Add(photo);
+                    collection.Status = CollectionStatus.INVALID;
+
                     Unit.Commit();
 
                     // only generate the phocalstream image if it has not already been generated
@@ -183,9 +190,9 @@ namespace Phocalstream_Service.Service
                             photo.Height = img.Width;
                         }
 
-                        ResizeImageTo(fileName, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
-                        ResizeImageTo(fileName, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
-                        ResizeImageTo(fileName, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
+                        ResizeImageTo(filePath, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
+                        ResizeImageTo(filePath, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
+                        ResizeImageTo(filePath, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
 
                         // create a DeepZoom image creater to generate the tile set for each raw image
                         ImageCreator creator = new ImageCreator();
@@ -196,13 +203,15 @@ namespace Phocalstream_Service.Service
                         string dziPath = Path.Combine(basePath, "Tiles.dzi");
                         try
                         {
-                            creator.Create(fileName, dziPath); // create the DeepZoom tileset
+                            creator.Create(filePath, dziPath); // create the DeepZoom tileset
                         }
                         catch (Exception e)
                         {
                             throw new Exception(String.Format("Error creating deep zoom tiles for file {0}: {1}", fileName, e.Message));
                         }
                     }
+
+
 
                     return photo;
                 }
@@ -481,9 +490,18 @@ namespace Phocalstream_Service.Service
             
             foreach (Photo photo in photos)
             {
-                fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
-                    string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+                Collection collection = CollectionRepository.Find(c => c.Site.ID == photo.Site.ID, c => c.Owner).FirstOrDefault();
 
+                if (collection.Type == CollectionType.SITE)
+                {
+                    fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
+                        string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+                }
+                else if (collection.Type == CollectionType.USER)
+                {
+                    fileNames.Add(Path.Combine(PathManager.GetUserCollectionPath(), Convert.ToString(collection.Owner.ID), photo.Site.DirectoryName,
+                        string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+                }
             }
 
             return fileNames;

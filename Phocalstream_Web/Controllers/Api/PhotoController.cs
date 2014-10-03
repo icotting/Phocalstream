@@ -25,6 +25,9 @@ namespace Phocalstream_Web.Controllers.Api
     {
         [Dependency]
         public IEntityRepository<Photo> PhotoRepository { get; set; }
+        
+        [Dependency]
+        public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [HttpGet]
         [ActionName("high")]
@@ -50,14 +53,29 @@ namespace Phocalstream_Web.Controllers.Api
         private HttpResponseMessage loadPhoto(long id, string res)
         {
             Photo photo = PhotoRepository.Single(p => p.ID == id, p => p.Site);
+         
             if (photo == null)
             {
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
             else
             {
-                string basePath = PathManager.GetPhotoPath();
-                string photoPath = string.Format("{0}/{1}/{2}.phocalstream/{3}.jpg", basePath, photo.Site.DirectoryName, photo.BlobID, res);
+                Collection collection = CollectionRepository.Find(c => c.Site.ID == photo.Site.ID, c => c.Owner).FirstOrDefault();
+                
+                string photoPath = "";
+                if (collection.Type == CollectionType.SITE)
+                {
+                    photoPath = string.Format("{0}/{1}/{2}.phocalstream/{3}.jpg", PathManager.GetPhotoPath(), photo.Site.DirectoryName, photo.BlobID, res);
+                }
+                else if (collection.Type == CollectionType.USER)
+                {
+                    photoPath = string.Format("{0}/{1}/{2}/{3}.phocalstream/{4}.jpg", PathManager.GetUserCollectionPath(), collection.Owner.ID, 
+                        collection.ContainerID, photo.BlobID, res);
+                }
+                else 
+                {
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                }
 
                 MemoryStream imageData = new MemoryStream();
                 using (FileStream stream = File.OpenRead(photoPath))

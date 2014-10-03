@@ -218,7 +218,6 @@ namespace Phocalstream_Web.Controllers
                 Name = site.CameraSiteName,
                 Latitude = site.Latitude,
                 Longitude = site.Longitude,
-                //Get the actual FIPS Code
                 CountyFips = DroughtMonitorRepository.GetFipsForCountyAndState(site.County, site.State),
                 ContainerID = guid,
                 DirectoryName = guid

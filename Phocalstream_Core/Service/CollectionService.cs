@@ -108,7 +108,7 @@ namespace Phocalstream_Service.Service
         public void NewUserCollection(User user, string collectionName, string photoIds)
         {
             long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
-            List<Photo> photos = PhotoRepository.Find(p => ids.Contains(p.ID)).ToList();
+            List<Photo> photos = PhotoRepository.Find(p => ids.Contains(p.ID), p => p.Site).ToList();
 
             Guid containerID = Guid.NewGuid();
 
