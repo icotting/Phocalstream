@@ -38,11 +38,8 @@ namespace Phocalstream_Web.Controllers.Api
                 Directory.CreateDirectory(temp);
             }
 
-            var path = Path.Combine(PathManager.GetUserCollectionPath(), "Temp", Path.GetFileName(file.FileName));
-            file.SaveAs(path);
-
             User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
-            PhotoService.ProcessUserPhoto(path, user, selectedCollectionID);
+            PhotoService.ProcessUserPhoto(file.InputStream, file.FileName, user, selectedCollectionID);
 
             // Now we need to wire up a response so that the calling script understands what happened
             HttpContext.Current.Response.ContentType = "text/plain";

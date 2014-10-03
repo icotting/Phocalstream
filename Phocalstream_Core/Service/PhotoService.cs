@@ -98,7 +98,7 @@ namespace Phocalstream_Service.Service
                 // open a Bitmap for the image to parse the meta data from
                 using (System.Drawing.Image img = System.Drawing.Image.FromFile(fileName))
                 {
-                    Photo photo = CreatePhotoWithProperties(img, info);
+                    Photo photo = CreatePhotoWithProperties(img, info.Name);
                     photo.Site = site;
                     photo.FileName = relativeName;
 
@@ -145,7 +145,7 @@ namespace Phocalstream_Service.Service
             }
         }
 
-        public Photo ProcessUserPhoto(string filePath, User user, long collectionID)
+        public Photo ProcessUserPhoto(Stream stream, string fileName, User user, long collectionID)
         {
             Collection collection = CollectionRepository.Find(c => c.ID == collectionID && c.Type == CollectionType.USER, c => c.Site, c => c.Photos).FirstOrDefault();
 
@@ -155,8 +155,6 @@ namespace Phocalstream_Service.Service
                 Directory.CreateDirectory(userFolder);
             }
 
-            FileInfo info = new FileInfo(filePath);
-            string fileName = info.Name;
             try
             {
                 // create the directory for the image and its components
@@ -167,9 +165,12 @@ namespace Phocalstream_Service.Service
                 }
 
                 // open a Bitmap for the image to parse the meta data from
-                using (System.Drawing.Image img = System.Drawing.Image.FromFile(filePath))
+                using (System.Drawing.Image img = System.Drawing.Image.FromStream(stream))
                 {
-                    Photo photo = CreatePhotoWithProperties(img, info);
+                    string savePath = Path.Combine(basePath, fileName);
+                    img.Save(savePath);
+
+                    Photo photo = CreatePhotoWithProperties(img, fileName);
                     photo.FileName = fileName;
                     photo.Site = collection.Site;
                     
@@ -190,9 +191,9 @@ namespace Phocalstream_Service.Service
                             photo.Height = img.Width;
                         }
 
-                        ResizeImageTo(filePath, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
-                        ResizeImageTo(filePath, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
-                        ResizeImageTo(filePath, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
+                        ResizeImageTo(savePath, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
+                        ResizeImageTo(savePath, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
+                        ResizeImageTo(savePath, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
 
                         // create a DeepZoom image creater to generate the tile set for each raw image
                         ImageCreator creator = new ImageCreator();
@@ -203,7 +204,7 @@ namespace Phocalstream_Service.Service
                         string dziPath = Path.Combine(basePath, "Tiles.dzi");
                         try
                         {
-                            creator.Create(filePath, dziPath); // create the DeepZoom tileset
+                            creator.Create(savePath, dziPath); // create the DeepZoom tileset
                         }
                         catch (Exception e)
                         {
@@ -296,15 +297,15 @@ namespace Phocalstream_Service.Service
                 }
             }
         }
-
-        private Photo CreatePhotoWithProperties(System.Drawing.Image img, FileInfo info)
+   
+        private Photo CreatePhotoWithProperties(System.Drawing.Image img, string name)
         {
             // get image mea data
             PropertyItem[] propItems = img.PropertyItems;
 
             // create a new photo with a GUID id for the cloud blob
             Photo photo = new Photo();
-            photo.BlobID = info.Name;
+            photo.BlobID = name;
             photo.Width = img.Width;
             photo.Height = img.Height;
             photo.AdditionalExifProperties = new List<MetaDatum>();
