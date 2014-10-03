@@ -184,7 +184,6 @@ namespace Phocalstream_Web.Controllers
                 col.CoverPhoto = col.Photos.LastOrDefault(); 
             }
 
-
             return View(model);
         }
         
@@ -235,7 +234,7 @@ namespace Phocalstream_Web.Controllers
             CollectionRepository.Insert(newCollection);
             Unit.Commit();
 
-            return new RedirectResult("UserCollections");
+            return new RedirectResult("UploadPhotos");
         }
 
         public ActionResult DeleteUserCollection(long collectionID)
