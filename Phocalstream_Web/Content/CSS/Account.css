@@ -110,3 +110,7 @@
     height: 300px; 
     width: 100%;
 }
+
+.create-or-label {
+    margin-top: 8px;
+}
