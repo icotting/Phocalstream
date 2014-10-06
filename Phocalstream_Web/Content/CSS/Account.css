@@ -81,13 +81,28 @@
 }
 
 /* User Photo Upload */
-.progress {
+.total-progress {
     margin-bottom: 0px !important;
     margin-top: 7px !important;
 }
 
 #fileupload {
     display: none;
+}
+
+.upload-view {
+    min-height: 177px;
+    margin-bottom: 30px;
+}
+
+.upload-progress {
+    margin-top: 78.5px !important;
+}
+
+.progress-label {
+    text-align: center;
+    color: black !important;
+    margin-right: 5px;
 }
 
 /* User Camera Site */

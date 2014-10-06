@@ -14,6 +14,7 @@
                 "~/Content/file-upload/jquery.iframe-transport.js",
                 "~/Content/file-upload/jquery.fileupload-ui.js")
 
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
 
 <div class="container">
     <div class="content">
@@ -50,7 +51,7 @@
         <!-- Overall Progress Bar -->
         <div class="row">
             <div class="col-md-11">
-                <div class="progress">
+                <div class="progress total-progress">
                     <div class="progress-bar" id="overallbar" style="width: 0%">
                     </div>
                 </div>
@@ -71,6 +72,7 @@
     <script type="text/javascript">
 
         var selectedCollectionID;
+        var done;
 
         $(function () {
             $(".dropdown-menu").on('click', 'li a', function () {
@@ -90,9 +92,9 @@
                 progressInterval: 100,
                 add: function (e, data) {
                     $('#filelistholder').removeClass('hide');
-                    
-                    data.context = $('<div class="col-md-3">').text(data.files[0].name).appendTo('#filelistholder');
-                    $('</div><div class="progress"><div class="progress-bar" style="width:0%"></div></div>').appendTo(data.context);
+
+                    data.context = $('<div class="col-md-3 upload-view">').appendTo('#filelistholder');
+                    $('</div><div class="progress upload-progress text-center"><div class="progress-bar progress-bar-striped active" style="width:0%"><span class="progress-label full-width">' + data.files[0].name + '</span></div></div>').appendTo(data.context);
                     $('#btnUploadAll').click(function () {
                         data.submit();
                     });
@@ -102,12 +104,20 @@
                     return true;
                 },
                 done: function (e, data) {
-                    data.context.text(data.files[0].name + '... Completed');
-                    $('</div><div class="progress"><div class="progress-bar" style="width:100%"></div></div>').appendTo(data.context);
+                    data.context.text('');
+                    $('</div><img class="siteImage" src="/api/photo/low/' + data.result.id + '" alt="" />').appendTo(data.context);
+                    if (done) {
+                        bootbox.confirm("Images successfully uploaded. View them now?", function (result) {
+                            if (result) {
+                                showCollection();
+                            }
+                        });
+                    }
                 },
                 progressall: function (e, data) {
                     var progress = parseInt(data.loaded / data.total * 100, 10);
                     $('#overallbar').css('width', progress + '%');
+                    done = progress == 100;
                 },
                 progress: function (e, data) {
                     var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -115,6 +125,10 @@
                 }
             });
         });
+
+        function showCollection() {
+            location.href = '@Url.Action("UserDefinedCollection", "Account")' + '?collectionID=' + selectedCollectionID;
+        }
     </script>
 }
 

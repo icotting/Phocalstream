@@ -39,12 +39,12 @@ namespace Phocalstream_Web.Controllers.Api
             }
 
             User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
-            PhotoService.ProcessUserPhoto(file.InputStream, file.FileName, user, selectedCollectionID);
+            Photo photo = PhotoService.ProcessUserPhoto(file.InputStream, file.FileName, user, selectedCollectionID);
 
             // Now we need to wire up a response so that the calling script understands what happened
             HttpContext.Current.Response.ContentType = "text/plain";
             var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            var result = new { name = file.FileName };
+            var result = new { name = file.FileName, id = photo.ID };
 
             HttpContext.Current.Response.Write(serializer.Serialize(result));
             HttpContext.Current.Response.StatusCode = 200;
