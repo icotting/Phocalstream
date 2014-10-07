@@ -83,7 +83,7 @@ namespace Phocalstream_Web.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
-            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback", new { ReturnUrl = returnUrl }));
+            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback"));
         }
 
 
@@ -92,7 +92,7 @@ namespace Phocalstream_Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login()
         {
-            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback", new { ReturnUrl = "~/" }));
+            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback"));
         }
 
         [AllowAnonymous]
