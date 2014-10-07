@@ -12,9 +12,6 @@ namespace Phocalstream_Web.Models.ViewModels
         public ICollection<long> Ids { get; set; }
 
         public int FramesPerSecond { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-
-        public string EncodedFrames { get; set; }
+        public int BufferCount { get; set; }
     }
 }

@@ -5,43 +5,136 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>TimeLapse</h2>
-    <form id="form1" runat="server" style="width: 800px; height: 600px">
-        <div id="silverlightControlHost">
-        <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
-		  <param name="source" value="/ClientBin/Phocalstream_TimeLapse.xap"/>
-		  <param name="onError" value="onSilverlightError" />
-		  <param name="background" value="white" />
-		  <param name="minRuntimeVersion" value="4.0.60310.0" />
-		  <param name="autoUpgrade" value="true" />
-          <param name="initParams" value="encodedVideo=@Html.DisplayFor(m => m.EncodedFrames)" />
-		  <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0">
- 			  <img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight"/>
-		  </a>
-	    </object><iframe id="_sl_historyFrame"></iframe></div>
-    </form>
-
-@*
-<div style="position: relative; top: 0px; left: 0px;">
-@foreach (Phocalstream_Web.Models.TimelapseFrame frame in Model.Frames)
+@section Scripts
 {
-    <div id="photo:@Html.Raw(frame.photo.ID)" style="width: 800px; height: 600px; position: absolute; top: 0px; left: 0px; display: block;">
-        <script type="text/javascript">
-            viewer = new Seadragon.Viewer('photo:@Html.Raw(frame.photo.ID)');
-            viewer.clearControls();
-            viewer.tracker.clickHandler = function (tracker, position, quick, shift) {
-                return;
-            };
-            viewer.addEventListener("open", function() { 
-                readyCount++;
-            });
-            viewer.openDzi("@Html.DisplayFor(model => frame.Url)");
-            containers.push(viewer);
-        </script>
-    </div>
-    }
-    <div  style="position: absolute; top: 0px; right: 0px;">
-        <input id="speed" type="text" value="100" onchange="speed = this.value;" />
-    </div>
+    <script type="text/javascript">
 
-</div> *@
+    var frameset = @Html.Raw(Json.Encode(Model.Ids));
+    var frames;
+
+    var pos = 0;
+    var bufferPos = 0;
+    var bufferLen = @Html.Raw(Json.Encode(Model.BufferCount));
+    var len = 0;
+
+    var last;
+    var current;
+
+    var running;
+    @*/
+
+            <img id="photo"
+     onload='loaded(this.id)'
+     src="a_really_big_file.jpg"
+     alt="this is some alt text"
+     title="this is some title text" />
+
+            *@
+
+    $(document).ready(function () {
+        frames = $('#frames').children('div');
+        len = frameset.length;
+        buffer();
+    });
+
+    function buffer() { 
+        var img = new Image();
+        $(img).width("800px");
+        $(frames[bufferPos]).append(img);
+        $(img).one('load', function() {
+            if ( bufferPos++ < bufferLen-1) {
+                buffer();
+            } else { 
+                $("#bufferlabel").hide();
+                running = true;
+                nextImage();
+            }
+        });
+        img.src = "/api/photo/medium/"+frameset[bufferPos];
+    }
+
+    /*
+    function buffer() {
+        while (bufferPos < bufferLen-1) {
+            $(frames[bufferPos]).append("<img style=\"width: 800px;\" src=\"/api/photo/medium/"+frameset[bufferPos++]+"\"/>");
+        }
+    }
+    */
+
+    function nextImage() {
+        current = $(frames[pos % bufferLen]);
+        current.show();
+
+        if (last) {
+            last.hide();
+            //last.style.display = 'none';
+        }
+        last = current;
+
+        bufferFrame = $(frames[bufferPos % bufferLen]);
+        bufferFrame.empty();
+        bufferFrame.append("<img style=\"800px\" src=\"/api/photo/medium/"+frameset[bufferPos % len]+"\"/>");
+
+        bufferPos++;
+        //frames[bufferPos % bufferLen].innerHTML = "<img style=\"800px\" src=\"/api/photo/medium/"+frameset[bufferPos++ % len]+"\"/>";
+        if ( running == true) {
+            setTimeout(function () { nextImage(); }, 200);
+        }
+
+        //current.style.display = '';
+        $("#photoId").empty();
+        $("#photoId").append(frameset[pos++ % len]);
+    }
+
+    function startStop() { 
+        if ( running == true ) { 
+            running = false;
+        } else { 
+            running = true; 
+            nextImage();
+        }
+    }
+    </script>
+}
+
+<div class="container">
+    <div class="content">
+        <h2>TimeLapse</h2>
+
+        <h1 id="bufferlabel">Buffering ....</h1>
+        <h3 id="photoId"></h3>
+        <a href="javascript:startStop()">Start / Stop</a>
+
+        <div id="frames" style="position: relative">
+        @for (var i = 0; i < Model.BufferCount; i++)
+        {
+            <div style="background-color: rgba(255, 255, 255, 0); z-index: @(Model.BufferCount -i); display: block; position: absolute; top: 0px; height: 800px;"></div>
+        }
+        </div>
+    </div>
+</div>
+
+    @*
+            <div style="position: relative; top: 0px; left: 0px;">
+            @foreach (Phocalstream_Web.Models.TimelapseFrame frame in Model.Frames)
+            {
+                <div id="photo:@Html.Raw(frame.photo.ID)" style="width: 800px; height: 600px; position: absolute; top: 0px; left: 0px; display: block;">
+                    <script type="text/javascript">
+                        viewer = new Seadragon.Viewer('photo:@Html.Raw(frame.photo.ID)');
+                        viewer.clearControls();
+                        viewer.tracker.clickHandler = function (tracker, position, quick, shift) {
+                            return;
+                        };
+                        viewer.addEventListener("open", function() {
+                            readyCount++;
+                        });
+                        viewer.openDzi("@Html.DisplayFor(model => frame.Url)");
+                        containers.push(viewer);
+                    </script>
+                </div>
+                }
+                <div  style="position: absolute; top: 0px; right: 0px;">
+                    <input id="speed" type="text" value="100" onchange="speed = this.value;" />
+                </div>
+
+            </div> *@

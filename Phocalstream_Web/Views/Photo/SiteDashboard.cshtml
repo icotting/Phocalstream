@@ -22,15 +22,14 @@
 <script type="text/javascript">
 
     function viewAll() {
-        bootbox.confirm("Are you sure you want to view all " + @Html.DisplayFor(model => Model.CollectionViewModel.SiteDetails.PhotoCount) + " images? \n" + 
-                "This may take some time to load. Please be patient.", function (result) {
-                    if (result) {
-                        location.href = '@Url.Action("CameraCollection", "Photo", new { @siteID = @Model.CollectionViewModel.Collection.Site.ID })';
-                    }
-                    else {
-                    }
+        var msg = "Are you sure you want to view all @Html.DisplayFor(model => Model.CollectionViewModel.SiteDetails.PhotoCount) images? \n" +
+                "This may take some time to load. Please be patient."
+        bootbox.confirm(msg, function (result) {
+            if (result) {
+                location.href = '@Url.Action("CameraCollection", "Photo", new { @siteID = @Model.CollectionViewModel.Collection.Site.ID })';
+            }
         });
-    }
+            }
 
 </script>
 
