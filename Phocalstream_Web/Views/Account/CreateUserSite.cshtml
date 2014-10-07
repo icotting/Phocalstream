@@ -16,6 +16,15 @@
     <div class="text-center relative">
         <h1 class="page-header">Create Collection Site</h1>
     </div>
+
+    @if (@ViewBag.Message != null)
+    {
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            @Html.Raw(ViewBag.Message)
+        </div>
+    }
+
     @using (Html.BeginForm("CreateUserSite", "Account", FormMethod.Post))
         {
         <div class="row">
@@ -30,7 +39,7 @@
         
         <hr class="featurette-divider" />
 
-        <div id="alert-row" class="row">
+        <div id="alert-row">
             <div class="alert alert-info alert-dismissible text-center" role="alert">
                 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <p id="currentPosition">Currently showing point at <strong></strong></p>

@@ -226,14 +226,19 @@ namespace Phocalstream_Web.Controllers
 
             if (model.UserSiteCollections.Count == 0)
             {
-                return new RedirectResult("CreateUserSite");
+                return RedirectToAction("CreateUserSite", new { e = 1 });
             }
 
             return View(model);
         }
 
-        public ActionResult CreateUserSite()
+        public ActionResult CreateUserSite(int e = 0)
         {
+            if (e == 1)
+            {
+                ViewBag.Message = "You must create a photo site before you can upload photos. <strong>Where were these photos taken?</strong>";
+            }
+
             return View();
         }
 
