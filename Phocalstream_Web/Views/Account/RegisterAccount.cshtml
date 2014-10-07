@@ -5,7 +5,7 @@
 
 @Styles.Render(
         "~/Content/CSS/Account.css"
-    );
+    )
 
 <div class="container content">
     <h1>User Registration</h1>
@@ -15,7 +15,7 @@
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true)
         <p>
-            You've successfully authenticated with your Google ID.  You will need to complete
+            You've successfully connected your Facebook account.  You will need to complete
             form below to create a new Phocalstream profile and click the Register button to finish
             logging in.
         </p>

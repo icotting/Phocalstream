@@ -114,3 +114,9 @@
 .create-or-label {
     margin-top: 8px;
 }
+
+/* Login Fail */
+.login-fail-label {
+    cursor: pointer;
+    margin-bottom: 0px !important;
+}
