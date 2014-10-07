@@ -182,6 +182,9 @@ namespace Phocalstream_Web.Controllers
                         Roles.AddUserToRole(model.ProviderUserName, "Admin");
                     }
 
+                    //Create a favorites collect for the new user
+                    CollectionService.NewUserCollection(model.User, "Favorites", "");
+
                     //Take the new user to their collections page
                     return RedirectToAction("UserCollections");
                 }
@@ -194,7 +197,7 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
-        public ActionResult UserCollections()
+        public ActionResult UserCollections(int e = 0)
         {
             UserCollectionList model = new UserCollectionList();
 
@@ -205,6 +208,11 @@ namespace Phocalstream_Web.Controllers
             foreach (var col in model.Collections)
             {
                 col.CoverPhoto = col.Photos.LastOrDefault(); 
+            }
+
+            if (e == 1)
+            {
+                ViewBag.Message = "That collection doesn't contain any photos.";
             }
 
             return View(model);
@@ -285,6 +293,11 @@ namespace Phocalstream_Web.Controllers
             
             Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
             model.CollectionName = collection.Name;
+
+            if (collection.Photos.Count == 0)
+            {
+                return RedirectToAction("UserCollections", new { e = 1 });
+            }
 
             model.First = collection.Photos.First().Captured;
             model.Last = collection.Photos.Last().Captured;

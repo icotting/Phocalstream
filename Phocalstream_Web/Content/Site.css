@@ -30,7 +30,19 @@ a {
 }
 
 a:visited {
-    color: #fff;
+    color: #1560d7;
+}
+
+a.btn-default:visited {
+    color: #333;
+}
+
+a.btn-primary:visited,
+a.btn-success:visited,
+a.btn-info:visited,
+a.btn-warning:visited,
+a.btn-danger:visited {
+    color: white;
 }
 
 img {

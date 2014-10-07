@@ -16,6 +16,14 @@
             </div>
         </div>
 
+        @if (@ViewBag.Message != null)
+        {
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                @ViewBag.Message
+            </div>
+        }
+
 
         @if (Model.Collections.Count() == 0)
         {
@@ -54,7 +62,10 @@
                                     <p>@Html.DisplayFor(model => col.Photos.Count) photos </p>
                                 </div>
                                 <div class="col-md-4 text-right">
-                                    <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
+                                    @if (col.Photos.Count != 0)
+                                    {
+                                        <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
+                                    }
                                 </div>
                             </div>
                         </div>

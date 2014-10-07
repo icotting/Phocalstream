@@ -107,8 +107,18 @@ namespace Phocalstream_Service.Service
 
         public void NewUserCollection(User user, string collectionName, string photoIds)
         {
-            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
-            List<Photo> photos = PhotoRepository.Find(p => ids.Contains(p.ID), p => p.Site).ToList();
+            List<Photo> photos;
+            long[] ids;
+            if (!String.IsNullOrWhiteSpace(photoIds))
+            {
+                ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
+                photos = PhotoRepository.Find(p => ids.Contains(p.ID), p => p.Site).ToList();
+            }
+            else
+            {
+                ids = new long[0];
+                photos = new List<Photo>();   
+            }
 
             Guid containerID = Guid.NewGuid();
 
@@ -125,7 +135,11 @@ namespace Phocalstream_Service.Service
             CollectionRepository.Insert(c);
             Unit.Commit();
 
-            GenerateManifests(containerID.ToString(), ids, photos);
+            //only generate the manifest if there are photos in the collection
+            if (photos.Count > 0)
+            {
+                GenerateManifests(containerID.ToString(), ids, photos);
+            }
         }
 
         public void AddToExistingUserCollection(User user, string collectionIds, string photoIds)
