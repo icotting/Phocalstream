@@ -123,7 +123,7 @@ namespace Phocalstream_Web.Controllers
 
                 string email = "";
                 string name = "";
-                result.ExtraData.TryGetValue("email", out email);
+                result.ExtraData.TryGetValue("username", out email);
                 result.ExtraData.TryGetValue("name", out name);
 
                 User tempUser = new User();
