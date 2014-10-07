@@ -1,5 +1,6 @@
 ﻿@model Phocalstream_Web.Models.RegisterUserModel
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Register with Phocalstream";
 }
 
@@ -7,66 +8,44 @@
         "~/Content/CSS/Account.css"
     )
 
-<div class="container content">
-    <h1>User Registration</h1>
+<div class="container">
+    <div class="content">
+        @using (@Html.BeginForm("RegisterAccount", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div class="alert alert-info">
+                Facebook account successfully connected. <strong>Complete the form below to create a Phocalstream profile.</strong>
+            </div>
 
-    @using (@Html.BeginForm("RegisterAccount", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
-    {
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true)
-        <p>
-            You've successfully connected your Facebook account.  You will need to complete
-            form below to create a new Phocalstream profile and click the Register button to finish
-            logging in.
-        </p>
-        <table class="profile">
-            <tr>
-                <td>
-                    @Html.LabelFor(m => m.User.FirstName)
-                </td>
-                <td>
-                    @Html.TextBoxFor(m => m.User.FirstName)
-                </td>
-                <td>
-                    @Html.ValidationMessageFor(m => m.User.FirstName)
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @Html.LabelFor(m => m.User.LastName)
-                </td>
-                <td>
-                    @Html.TextBoxFor(m => m.User.LastName)
-                </td>
-                <td>
-                    @Html.ValidationMessageFor(m => m.User.LastName)
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @Html.LabelFor(m => m.User.EmailAddress)
-                </td>
-                <td>
-                    @Html.TextBoxFor(m => m.User.EmailAddress)
-                </td>
-                <td>
-                    @Html.ValidationMessageFor(m => m.User.EmailAddress)
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @Html.LabelFor(m => m.User.Organization)
-                </td>
-                <td>
-                    @Html.TextBoxFor(m => m.User.Organization)
-                </td>
-                <td>
-                    @Html.ValidationMessageFor(m => m.User.Organization)
-                </td>
-            </tr>
-        </table>
-        @Html.HiddenFor(m => m.ProviderUserName)
-        @Html.HiddenFor(m => m.ProviderData)
-        <input type="submit" value="Register" />
-    }
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.FirstName)
+                @Html.TextBoxFor(m => m.User.FirstName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.FirstName)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.LastName)
+                @Html.TextBoxFor(m => m.User.LastName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.LastName)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.EmailAddress)
+                @Html.TextBoxFor(m => m.User.EmailAddress, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.EmailAddress)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.Organization)
+                @Html.TextBoxFor(m => m.User.Organization, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.Organization)
+            </div>
+
+            @Html.HiddenFor(m => m.ProviderUserName)
+            @Html.HiddenFor(m => m.ProviderData)
+
+            <input type="submit" class="btn btn-success pull-right" value="Create Phocalstream Account" />
+        }
+    </div>
 </div>

@@ -9,42 +9,44 @@
         "~/Content/CSS/Account.css"
     );
 
-<div class="container content">
-    <h2>User Profile Management</h2>
+<div class="container">
+    <div class="content">
+        <h2>User Profile Management</h2>
 
-    @if (Model.Status != null)
-    { 
-        <div class="alert alert-success" role="alert">
-            @Html.DisplayFor(model => model.Status)
-        </div>
-    }
-    
-    @using (Html.BeginForm("UserProfile", "Account"))
-    {
-        <div class="form-group">
-            @Html.LabelFor(m => m.User.FirstName)
-            @Html.TextBoxFor(m => m.User.FirstName, new { @class = "form-control"})
-            @Html.ValidationMessageFor(m => m.User.FirstName)
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.User.LastName)
-            @Html.TextBoxFor(m => m.User.LastName, new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.User.LastName)
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.User.EmailAddress)
-            @Html.TextBoxFor(m => m.User.EmailAddress, new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.User.EmailAddress)
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.User.Organization)
-            @Html.TextBoxFor(m => m.User.Organization, new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.User.Organization)
-        </div>
-        @Html.HiddenFor(m => m.User.ID)
-        @Html.HiddenFor(m => m.User.GoogleID)
+        @if (Model.Status != null)
+        {
+            <div class="alert alert-success" role="alert">
+                @Html.DisplayFor(model => model.Status)
+            </div>
+        }
 
-        <button type="submit" class="btn btn-success">Update Profile</button>
-    }
-    @Html.ActionLink("Logoff", "Logoff")
+        @using (Html.BeginForm("UserProfile", "Account"))
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.FirstName)
+                @Html.TextBoxFor(m => m.User.FirstName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.FirstName)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.LastName)
+                @Html.TextBoxFor(m => m.User.LastName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.LastName)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.EmailAddress)
+                @Html.TextBoxFor(m => m.User.EmailAddress, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.EmailAddress)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.User.Organization)
+                @Html.TextBoxFor(m => m.User.Organization, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User.Organization)
+            </div>
+            @Html.HiddenFor(m => m.User.ID)
+            @Html.HiddenFor(m => m.User.ProviderID)
+
+            <button type="submit" class="btn btn-success pull-right">Update Profile</button>
+        }
+        @Html.ActionLink("Logoff", "Logoff")
+    </div>
 </div>

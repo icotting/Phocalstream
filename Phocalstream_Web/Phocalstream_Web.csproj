@@ -322,6 +322,7 @@
     <Content Include="Content\Images\Collections.png" />
     <Content Include="Content\Images\ds.jpg" />
     <Content Include="Content\Images\FacebookButton.png" />
+    <Content Include="Content\Images\image_not_found.jpg" />
     <Content Include="Content\Images\Like.png" />
     <Content Include="Content\Images\Login.png" />
     <Content Include="Content\Images\map.jpg" />

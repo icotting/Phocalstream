@@ -120,7 +120,26 @@ namespace Phocalstream_Web.Controllers
                 // User is new, ask for their desired membership name
                 string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
                 ViewBag.ReturnUrl = returnUrl;
-                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = new Phocalstream_Shared.Data.Model.Photo.User()});
+
+                string email = "";
+                string name = "";
+                result.ExtraData.TryGetValue("email", out email);
+                result.ExtraData.TryGetValue("name", out name);
+
+                User tempUser = new User();
+                tempUser.EmailAddress = email;
+                
+                string[] names = name.Split(' ');
+                if (names.Count() > 0)
+                {
+                    tempUser.FirstName = names[0];
+                }
+                if (names.Count() > 1)
+                {
+                    tempUser.LastName = names[1];
+                }
+
+                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = tempUser});
             }
         }
 
@@ -156,11 +175,15 @@ namespace Phocalstream_Web.Controllers
 
                     if (UserRepository.AsQueryable().Count() == 1)
                     {
-                        Roles.CreateRole("Admin");
+                        if (!Roles.RoleExists("Admin"))
+                        {
+                            Roles.CreateRole("Admin");
+                        }
                         Roles.AddUserToRole(model.ProviderUserName, "Admin");
                     }
 
-                    return RedirectToLocal(returnUrl);
+                    //Take the new user to their collections page
+                    return RedirectToAction("UserCollections");
                 }
                 else
                 {
