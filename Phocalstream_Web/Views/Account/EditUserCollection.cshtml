@@ -9,6 +9,12 @@
 <div class="container">
     <div class="content">
         <div class="text-center relative">
+            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <div class="publish">
+                    <button onclick="javascript:publish()" id="publishButton" class="btn btn-info">Publish</button>
+                </div>
+            }
             <h1 class="page-header">@Model.Name</h1>
             <div class="save-changes invisible">
                 <button onclick="javascript:cancel()" class="btn btn-warning">Discard</button>
@@ -52,11 +58,13 @@
                 var index = toRemove.indexOf(id);
                 toRemove.splice(index, 1);
             }
-            
+
             if (toRemove.length == 0) {
                 $(".save-changes").addClass("invisible");
+                $(".publish").show();
             } else if (toRemove.length == 1) {
                 $(".save-changes").removeClass("invisible");
+                $(".publish").hide();
             } else {
 
             }
@@ -66,13 +74,25 @@
 
     function save() {
         $.ajax({
-            url: '/api/usercollection/RemoveFromCollection?collectionId=' + @Model.ID.ToString() + '&photoIds=' + toRemove.join(','),
+            url: '/api/usercollection/RemoveFromCollection?collectionId=' + '@Model.ID.ToString()' + '&photoIds=' + toRemove.join(','),
             type: 'POST'
         });
     }
 
     function cancel() {
         location.reload();
+    }
+
+    function publish() {
+        $.ajax({
+            url: '/api/usercollection/PublishUserCollection?collectionId=' + '@Model.ID.ToString()',
+            type: 'POST',
+            success: function (data) {
+                $("#publishButton").removeClass("btn-info");
+                $("#publishButton").addClass("btn-success");
+                $("#publishButton").text('<span class="glyphicon glyphicon-ok"></span> Published!');
+            }
+        });
     }
 </script>
 
