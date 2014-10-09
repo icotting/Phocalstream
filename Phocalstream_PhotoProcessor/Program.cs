@@ -29,6 +29,7 @@ namespace Phocalstream_PhotoProcessor
 
         private static string _path;
         private static bool _break;
+        private static bool reprocessCollection = true;
 
         private static IPhotoService _service;
         private static IUnitOfWork _unit;
@@ -116,13 +117,18 @@ namespace Phocalstream_PhotoProcessor
                     _service.ProcessCollection(collection);
                     _unit.Commit();
 
-                    Console.WriteLine(string.Format("Building pivot viewer manifest for site {0}", site.Name));
-                    _service.GeneratePivotManifest(site);
-
                     if (_break)
                     {
                         break;
                     }
+               } 
+               else if (reprocessCollection == true)
+               {
+                   Collection collection = _service.GetCollectionForProcessing(siteNode);
+                   CameraSite site = collection.Site;
+
+                   Console.WriteLine(string.Format("Building deep zoom site collection for site {0}", site.Name));
+                   _service.ProcessCollection(collection);
                }
             }
             Console.WriteLine("Import process complete");

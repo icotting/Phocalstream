@@ -236,24 +236,37 @@ namespace Phocalstream_Service.Service
 
             string rootDeepZoomPath = Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName);
 
-            List<string> files = new List<string>();
+            List<Tuple<String, DateTime, long>> files = new List<Tuple<String, DateTime, long>>();
             using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 conn.Open();
-                using (SqlCommand command = new SqlCommand("select BlobID from Photos inner join CameraSites on CameraSites.ID = Photos.Site_ID where CameraSites.Name = @name", conn))
+                using (SqlCommand command = new SqlCommand("select BlobID, Captured, Photos.ID from Photos inner join CameraSites on CameraSites.ID = Photos.Site_ID where CameraSites.Name = @name", conn))
                 {
                     command.Parameters.AddWithValue("@name", site.DirectoryName);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            files.Add(reader.GetString(0));
+                            files.Add(new Tuple<String, DateTime, long>(reader.GetString(0), reader.GetDateTime(1), reader.GetInt64(2)));
                         }
                     }
                 }
             }
-            files = files.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p), "Tiles.dzi"))).ToList<string>();
-            creator.Create(files, Path.Combine(rootDeepZoomPath, "collection.dzc"));
+            
+            List<string> filenames = files.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p.Item1), "Tiles.dzi"))).ToList<string>();
+            creator.Create(filenames, Path.Combine(rootDeepZoomPath, "collection.dzc"));
+            GeneratePivotManifest(site);
+
+            var groups = files.GroupBy(f => f.Item2.Year);
+            foreach (var group in groups)
+            {
+                var photos = group.Select(v => v.Item1).ToList();
+
+                photos = photos.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p), "Tiles.dzi"))).ToList<string>();
+                creator.Create(photos, Path.Combine(rootDeepZoomPath, string.Format("{0}_collection.dzc", group.Key)));
+
+                this.GenerateSubSetManifest(site, group.Select(v => v.Item2.Year).First().ToString(), string.Join(",", group.Select(v => v.Item3).ToArray<long>()));
+            }
 
             collection.Status = CollectionStatus.COMPLETE;
             CollectionRepository.Update(collection);
@@ -306,6 +319,14 @@ namespace Phocalstream_Service.Service
             XmlDocument doc = PhotoRepo.CreatePivotCollectionForSite(site.ID);
 
             doc.Save(Path.Combine(rootDeepZoomPath, "site.cxml"));
+        }
+
+        public void GenerateSubSetManifest(CameraSite site, string subsetName, string photoList)
+        {
+            string rootPath = Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName);
+            XmlDocument doc = PhotoRepo.CreatePivotCollectionForList(site.Name, photoList, CollectionType.SUBSET, subsetName);
+
+            doc.Save(Path.Combine(rootPath, string.Format("{0}_site.cxml", subsetName)));
         }
 
         public void GeneratePivotManifest(string basePath, string collectionID, string photoList, CollectionType type)
