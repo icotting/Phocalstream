@@ -131,7 +131,7 @@ namespace Phocalstream_Service.Service
                         }
                         catch (Exception e)
                         {
-                            throw new Exception(String.Format("Error creating deep zoom tiles for file {0}: {1}", fileName, e.Message));
+                            throw new Exception(String.Format("Error of tyep {0} creating deep zoom tiles for file {1}: {2}", e.GetType(), fileName, e.Message));
                         }
                     }
                     
