@@ -166,6 +166,34 @@ namespace Phocalstream_Web.Application.Data
             return siteName;
         }
 
+        public List<string> GetPhotoTags(long photoID)
+        {
+            List<string> tags = new List<string>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand command = new SqlCommand("select Tags.Name from Tags " + 
+                    "INNER JOIN PhotoTags ON Tags.ID = PhotoTags.Tag_ID " +
+                    "INNER JOIN Photos ON PhotoTags.Photo_ID = Photos.ID " +
+                    "WHERE Photos.ID = @id", conn))
+                {
+                    command.Prepare();
+                    command.Parameters.AddWithValue("@id", photoID);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            tags.Add((string)reader["Name"]);
+                        }
+                    }
+                }
+            }
+
+            return tags;
+        }
+
         public ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort)
         {
             List<TimelapseFrame> frames = new List<TimelapseFrame>();
@@ -285,6 +313,11 @@ namespace Phocalstream_Web.Application.Data
                 facet.SetAttribute("Type", "String");
                 facets.AppendChild(facet);
             }
+
+            facet = doc.CreateElement("FacetCategory");
+            facet.SetAttribute("Name", "Tags");
+            facet.SetAttribute("Type", "String");
+            facets.AppendChild(facet);
 
             root.AppendChild(facets);
 
@@ -421,6 +454,20 @@ namespace Phocalstream_Web.Application.Data
                 facet.AppendChild(facetValue);
                 facets.AppendChild(facet);
             }
+
+            facet = doc.CreateElement("Facet");
+            facet.SetAttribute("Name", "Tags");
+
+            List<string> tags = GetPhotoTags((long)photo["ID"]);
+
+            foreach (var t in tags)
+            {
+                facetValue = doc.CreateElement("String");
+                facetValue.SetAttribute("Value", t);
+                facet.AppendChild(facetValue);
+            }
+
+            facets.AppendChild(facet);
 
             item.AppendChild(facets);
             return item;
