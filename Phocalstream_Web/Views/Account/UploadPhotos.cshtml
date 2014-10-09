@@ -1,0 +1,137 @@
+﻿@model Phocalstream_Shared.Data.Model.View.UserPhotoUpload
+@{
+    ViewBag.Title = "UploadPhotos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/CSS/Account.css",
+               "~/Content/bootstrap/css/bootstrap-responsive.css",
+               "~/Content/file-upload/jquery.fileupload-ui-noscript.css",
+               "~/Content/file-upload/jquery.fileupload-ui.css")
+
+@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js", 
+                "~/Content/file-upload/jquery.fileupload.js",
+                "~/Content/file-upload/jquery.iframe-transport.js",
+                "~/Content/file-upload/jquery.fileupload-ui.js")
+
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+
+<div class="container">
+    <div class="content">
+        <div class="text-center relative">
+            <h1 class="page-header">Upload Photos</h1>
+            <div class="save-changes">
+            </div>
+        </div>
+
+        <!-- Site Selection and Choose Files Button -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle full-width" type="button" id="dropdownTitle" data-toggle="dropdown">
+                        Select A Camera Site
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu full-width" role="menu">
+                        @foreach (var site in Model.UserSiteCollections)
+                        {
+                            <li><a id="@site.ID" role="menuitem" tabindex="-1" href="#">@site.Name</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <form action="/api/upload/upload" enctype="multipart/form-data">
+                        <a class="btn btn-default full-width" onclick="$('input[id=fileupload]').click();">Choose Files</a>
+                        <input type="file" class="btn btn-success" id="fileupload" name="fileupload" accept="image/*" multiple="multiple">
+                </form>
+            </div>
+        </div>
+
+        <!-- Overall Progress Bar -->
+        <div class="row">
+            <div class="col-md-11">
+                <div class="progress total-progress">
+                    <div class="progress-bar" id="overallbar" style="width: 0%">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button id="btnUploadAll" class="btn btn-success pull-right" type="button">Upload</button>
+            </div>
+        </div>
+
+        <div class="row" id="filelistholder">
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+
+        var selectedCollectionID;
+        var done;
+
+        $(function () {
+            $(".dropdown-menu").on('click', 'li a', function () {
+                $("#dropdownTitle").text($(this).text());
+                $("#dropdownTitle").val($(this).text());
+
+                selectedCollectionID = $(this).attr('id');
+            });
+        });
+
+        $(function () {
+            $('#fileupload').fileupload({
+                dataType: "json",
+                url: "/api/upload/upload?selectedCollectionID=",
+                limitConcurrentUploads: 1,
+                sequentialUploads: true,
+                progressInterval: 100,
+                add: function (e, data) {
+                    $('#filelistholder').removeClass('hide');
+
+                    data.context = $('<div class="col-md-3 upload-view">').appendTo('#filelistholder');
+                    $('</div><div class="progress upload-progress text-center"><div class="progress-bar progress-bar-striped active" style="width:0%"><span class="progress-label full-width">' + data.files[0].name + '</span></div></div>').appendTo(data.context);
+                    $('#btnUploadAll').click(function () {
+                        data.submit();
+                    });
+                },
+                send: function (e, data) {
+                    data.url += selectedCollectionID;
+                    return true;
+                },
+                done: function (e, data) {
+                    data.context.text('');
+                    $('</div><img class="siteImage" src="/api/photo/low/' + data.result.id + '" alt="" />').appendTo(data.context);
+                    if (done) {
+                        bootbox.confirm("Images successfully uploaded. View them now?", function (result) {
+                            if (result) {
+                                showCollection();
+                            }
+                        });
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#overallbar').css('width', progress + '%');
+                    done = progress == 100;
+                },
+                progress: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    data.context.find('.progress-bar').css('width', progress + '%');
+                }
+            });
+        });
+
+        function showCollection() {
+            location.href = '@Url.Action("UserDefinedCollection", "Account")' + '?collectionID=' + selectedCollectionID;
+        }
+    </script>
+}
+
+
+
+

@@ -83,7 +83,13 @@ namespace Phocalstream_Service.Service
 
         public List<string> GetSiteNames()
         {
-            return SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
+            //get the site ids that are actual camera sites
+            List<long> ids = CollectionRepository.Find(c => c.Type == CollectionType.SITE, c => c.Site).Select(c => c.Site.ID).ToList<long>();
+
+            //Get list of all site names to match to query
+            List<string> siteNames = SiteRepository.Find(s => ids.Contains(s.ID)).Select(s => s.Name).ToList<string>();
+
+            return siteNames;
         }
 
         public int SearchResultCount(SearchModel model)
@@ -179,7 +185,7 @@ namespace Phocalstream_Service.Service
                         }
                     }
                 }
-                result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID)).ToList<Photo>();
+                result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID), p => p.Site).ToList<Photo>();
             }
             
             return result;
@@ -190,11 +196,16 @@ namespace Phocalstream_Service.Service
             StringBuilder select = new StringBuilder();
             StringBuilder parameters = new StringBuilder();
 
+            StringBuilder publicPhotosBuilder = new StringBuilder();
+
             StringBuilder sitesBuilder = new StringBuilder();
             StringBuilder tagBuilder = new StringBuilder();
             StringBuilder monthBuilder = new StringBuilder();
             StringBuilder dateBuilder = new StringBuilder();
             StringBuilder hourBuilder = new StringBuilder();
+
+            publicPhotosBuilder = PublicPhotosQuery();
+
 
             //Sites
             if (!String.IsNullOrWhiteSpace(model.Sites))
@@ -230,52 +241,57 @@ namespace Phocalstream_Service.Service
             //merge the builders
             select.Append("select Photos.ID from Photos ");
 
+            parameters.Append("(" + publicPhotosBuilder + ")");
+
             if (sitesBuilder.Length != 0)
             {
                 select.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
-                parameters.Append("(" + sitesBuilder + ")" + " AND ");
+                parameters.Append(" AND " + "(" + sitesBuilder + ")");
             }
 
             if (monthBuilder.Length != 0)
             {
-                parameters.Append("(" + monthBuilder + ")" + " AND ");
+                parameters.Append(" AND " + "(" + monthBuilder + ")");
             }
 
             if (dateBuilder.Length != 0)
             {
-                parameters.Append("(" + dateBuilder + ")" + " AND ");
+                parameters.Append(" AND " + "(" + dateBuilder + ")");
             }
 
             if (hourBuilder.Length != 0)
             {
-                parameters.Append("(" + hourBuilder + ")" + " AND ");
+                parameters.Append(" AND " + "(" + hourBuilder + ")");
             }
 
             if (tagBuilder.Length != 0)
             {
                 select.Append("INNER JOIN PhotoTags ON Photos.ID = PhotoTags.Photo_ID " +
                     "INNER JOIN Tags ON PhotoTags.Tag_ID = Tags.ID ");
-                parameters.Append("(" + tagBuilder + ")");
-            }   
-
-            //remove final AND if present
-            if (parameters.Length > 0)
-            {
-                if (parameters.ToString().EndsWith("AND "))
-                {
-                    parameters.Remove(parameters.Length - 4, 4);
-                }
-                select.Append("WHERE " + parameters);
+                parameters.Append(" AND " + "(" + tagBuilder + ")");
             }
 
+           select.Append("WHERE " + parameters);
+ 
            return select.ToString();
+        }
+
+        private StringBuilder PublicPhotosQuery()
+        {
+            StringBuilder publicQuery = new StringBuilder();
+
+            publicQuery.Append("Photos.Site_ID IN " +
+                "(SELECT Site_ID from Collections WHERE Collections.Type = 0)");
+
+            return publicQuery;
         }
 
         private StringBuilder SiteQuery(string query)
         {
             StringBuilder sitesBuilder = new StringBuilder();
+
             //Get list of all site names to match to query
-            List<string> siteNames = SiteRepository.GetAll().Select(s => s.Name).ToList<string>();
+            List<string> siteNames = GetSiteNames();
             string[] sites = query.Split(',');
 
             bool first = true;

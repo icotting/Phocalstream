@@ -98,106 +98,25 @@ namespace Phocalstream_Service.Service
                 // open a Bitmap for the image to parse the meta data from
                 using (System.Drawing.Image img = System.Drawing.Image.FromFile(fileName))
                 {
-                    // get image mea data
-                    PropertyItem[] propItems = img.PropertyItems;
-
-                    // create a new photo with a GUID id for the cloud blob
-                    Photo photo = new Photo();
-                    photo.BlobID = info.Name;
+                    Photo photo = CreatePhotoWithProperties(img, info.Name);
                     photo.Site = site;
-                    photo.Width = img.Width;
-                    photo.Height = img.Height;
                     photo.FileName = relativeName;
-                    photo.AdditionalExifProperties = new List<MetaDatum>();
 
                     PhotoRepository.Insert(photo);
-                    bool portrait = false;
-
-                    // walk the image properties and set the appropriate fields on the image for the various meta data types (EXIF)
-                    int len = propItems.Length;
-                    for (var i = 0; i < len; i++)
-                    {
-                        PropertyItem propItem = propItems[i];
-
-                        switch (propItem.Id)
-                        {
-                            case 0x112:
-                                portrait = BitConverter.ToUInt16(propItem.Value, 0) == 6 ? true : false;
-                                
-                                break;
-                            case 0x829A: // Exposure Time
-                                photo.ExposureTime = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
-                                photo.ShutterSpeed = String.Format("{0}/{1}", BitConverter.ToUInt32(propItem.Value, 0), BitConverter.ToUInt32(propItem.Value, 4));
-                                break;
-                            case 0x0132: // Date
-                                string[] parts = System.Text.Encoding.ASCII.GetString(propItem.Value).Split(':', ' ');
-                                int year = int.Parse(parts[0]);
-                                int month = int.Parse(parts[1]);
-                                int day = int.Parse(parts[2]);
-                                int hour = int.Parse(parts[3]);
-                                int minute = int.Parse(parts[4]);
-                                int second = int.Parse(parts[5]);
-
-                                photo.Captured = new DateTime(year, month, day, hour, minute, second);
-                                break;
-                            case 0x010F: // Manufacturer
-                                photo.AdditionalExifProperties.Add(new MetaDatum()
-                                {
-                                    Photo = photo,
-                                    Name = "Manufacturer",
-                                    Type = "EXIF",
-                                    Value = System.Text.Encoding.ASCII.GetString(propItem.Value)
-                                });
-                                break;
-                            case 0x5090: // Luminance
-                                photo.AdditionalExifProperties.Add(new MetaDatum()
-                                {
-                                    Photo = photo,
-                                    Name = "White Balance",
-                                    Type = "EXIF",
-                                    Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))
-                                });
-                                break;
-                            case 0x5091: // Chrominance
-                                photo.AdditionalExifProperties.Add(new MetaDatum()
-                                {
-                                    Photo = photo,
-                                    Name = "Color Space",
-                                    Type = "EXIF",
-                                    Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))
-                                });
-                                break;
-                            case 0x9205: // Max Aperture
-                                photo.MaxAperture = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
-                                break;
-                            case 0x920A: // Focal Length
-                                photo.FocalLength = BitConverter.ToInt32(propItem.Value, 0) / BitConverter.ToInt32(propItem.Value, 4);
-                                break;
-                            case 0x9209: // Flash
-                                photo.Flash = Convert.ToBoolean(BitConverter.ToUInt16(propItem.Value, 0));
-                                break;
-                            case 0x9286: // Comment
-                                photo.UserComments = System.Text.Encoding.ASCII.GetString(propItem.Value);
-                                break;
-                            case 0x8827: // ISO Speed
-                                photo.ISO = BitConverter.ToUInt16(propItem.Value, 0);
-                                break;
-                        }
-                    }
 
                     // only generate the phocalstream image if it has not already been generated
                     if (File.Exists(Path.Combine(basePath, @"High.jpg")) == false)
                     {
                         // this is a dirty hack, figure out why the image isn't opening with the correct width and height
-                        if (portrait)
+                        if (photo.Portrait)
                         {
                             photo.Width = img.Height;
                             photo.Height = img.Width;
                         }
 
-                        ResizeImageTo(fileName, 1200, 800, Path.Combine(basePath, @"High.jpg"), portrait);
-                        ResizeImageTo(fileName, 800, 533, Path.Combine(basePath, @"Medium.jpg"), portrait);
-                        ResizeImageTo(fileName, 400, 266, Path.Combine(basePath, @"Low.jpg"), portrait);
+                        ResizeImageTo(fileName, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
+                        ResizeImageTo(fileName, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
+                        ResizeImageTo(fileName, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
 
                         // create a DeepZoom image creater to generate the tile set for each raw image
                         ImageCreator creator = new ImageCreator();
@@ -216,6 +135,85 @@ namespace Phocalstream_Service.Service
                         }
                     }
                     
+                    return photo;
+                }
+            }
+            catch (Exception e)
+            {
+                // this should be logged
+                throw new Exception(string.Format("Exception processing photo {0}. Message: {1}", fileName, e.Message));
+            }
+        }
+
+        public Photo ProcessUserPhoto(Stream stream, string fileName, User user, long collectionID)
+        {
+            Collection collection = CollectionRepository.Find(c => c.ID == collectionID && c.Type == CollectionType.USER, c => c.Site, c => c.Photos).FirstOrDefault();
+
+            string userFolder = Path.Combine(PathManager.GetUserCollectionPath(), Convert.ToString(user.ID));
+            if (!Directory.Exists(userFolder))
+            {
+                Directory.CreateDirectory(userFolder);
+            }
+
+            try
+            {
+                // create the directory for the image and its components
+                string basePath = Path.Combine(userFolder, collection.ContainerID, string.Format("{0}.phocalstream", fileName));
+                if (!Directory.Exists(basePath))
+                {
+                    Directory.CreateDirectory(basePath);
+                }
+
+                // open a Bitmap for the image to parse the meta data from
+                using (System.Drawing.Image img = System.Drawing.Image.FromStream(stream))
+                {
+                    string savePath = Path.Combine(basePath, fileName);
+                    img.Save(savePath);
+
+                    Photo photo = CreatePhotoWithProperties(img, fileName);
+                    photo.FileName = fileName;
+                    photo.Site = collection.Site;
+                    
+                    PhotoRepository.Insert(photo);
+
+                    collection.Photos.Add(photo);
+                    collection.Status = CollectionStatus.INVALID;
+
+                    Unit.Commit();
+
+                    // only generate the phocalstream image if it has not already been generated
+                    if (File.Exists(Path.Combine(basePath, @"High.jpg")) == false)
+                    {
+                        // this is a dirty hack, figure out why the image isn't opening with the correct width and height
+                        if (photo.Portrait)
+                        {
+                            photo.Width = img.Height;
+                            photo.Height = img.Width;
+                        }
+
+                        ResizeImageTo(savePath, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
+                        ResizeImageTo(savePath, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
+                        ResizeImageTo(savePath, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
+
+                        // create a DeepZoom image creater to generate the tile set for each raw image
+                        ImageCreator creator = new ImageCreator();
+                        creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
+                        creator.TileOverlap = 1;
+                        creator.TileSize = 256;
+
+                        string dziPath = Path.Combine(basePath, "Tiles.dzi");
+                        try
+                        {
+                            creator.Create(savePath, dziPath); // create the DeepZoom tileset
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception(String.Format("Error creating deep zoom tiles for file {0}: {1}", fileName, e.Message));
+                        }
+                    }
+
+
+
                     return photo;
                 }
             }
@@ -298,6 +296,95 @@ namespace Phocalstream_Service.Service
                     result.Save(destination);
                 }
             }
+        }
+   
+        private Photo CreatePhotoWithProperties(System.Drawing.Image img, string name)
+        {
+            // get image mea data
+            PropertyItem[] propItems = img.PropertyItems;
+
+            // create a new photo with a GUID id for the cloud blob
+            Photo photo = new Photo();
+            photo.BlobID = name;
+            photo.Width = img.Width;
+            photo.Height = img.Height;
+            photo.AdditionalExifProperties = new List<MetaDatum>();
+
+            photo.Portrait = false;
+
+            // walk the image properties and set the appropriate fields on the image for the various meta data types (EXIF)
+            int len = propItems.Length;
+            for (var i = 0; i < len; i++)
+            {
+                PropertyItem propItem = propItems[i];
+
+                switch (propItem.Id)
+                {
+                    case 0x112:
+                        photo.Portrait = BitConverter.ToUInt16(propItem.Value, 0) == 6 ? true : false;
+                                
+                        break;
+                    case 0x829A: // Exposure Time
+                        photo.ExposureTime = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
+                        photo.ShutterSpeed = String.Format("{0}/{1}", BitConverter.ToUInt32(propItem.Value, 0), BitConverter.ToUInt32(propItem.Value, 4));
+                        break;
+                    case 0x0132: // Date
+                        string[] parts = System.Text.Encoding.ASCII.GetString(propItem.Value).Split(':', ' ');
+                        int year = int.Parse(parts[0]);
+                        int month = int.Parse(parts[1]);
+                        int day = int.Parse(parts[2]);
+                        int hour = int.Parse(parts[3]);
+                        int minute = int.Parse(parts[4]);
+                        int second = int.Parse(parts[5]);
+
+                        photo.Captured = new DateTime(year, month, day, hour, minute, second);
+                        break;
+                    case 0x010F: // Manufacturer
+                        photo.AdditionalExifProperties.Add(new MetaDatum()
+                        {
+                            Photo = photo,
+                            Name = "Manufacturer",
+                            Type = "EXIF",
+                            Value = System.Text.Encoding.ASCII.GetString(propItem.Value)
+                        });
+                        break;
+                    case 0x5090: // Luminance
+                        photo.AdditionalExifProperties.Add(new MetaDatum()
+                        {
+                            Photo = photo,
+                            Name = "White Balance",
+                            Type = "EXIF",
+                            Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))
+                        });
+                        break;
+                    case 0x5091: // Chrominance
+                        photo.AdditionalExifProperties.Add(new MetaDatum()
+                        {
+                            Photo = photo,
+                            Name = "Color Space",
+                            Type = "EXIF",
+                            Value = Convert.ToString(BitConverter.ToUInt16(propItem.Value, 0))
+                        });
+                        break;
+                    case 0x9205: // Max Aperture
+                        photo.MaxAperture = Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 0)) / Convert.ToDouble(BitConverter.ToInt32(propItem.Value, 4));
+                        break;
+                    case 0x920A: // Focal Length
+                        photo.FocalLength = BitConverter.ToInt32(propItem.Value, 0) / BitConverter.ToInt32(propItem.Value, 4);
+                        break;
+                    case 0x9209: // Flash
+                        photo.Flash = Convert.ToBoolean(BitConverter.ToUInt16(propItem.Value, 0));
+                        break;
+                    case 0x9286: // Comment
+                        photo.UserComments = System.Text.Encoding.ASCII.GetString(propItem.Value);
+                        break;
+                    case 0x8827: // ISO Speed
+                        photo.ISO = BitConverter.ToUInt16(propItem.Value, 0);
+                        break;
+                }
+            }
+
+            return photo;
         }
 
         public void GeneratePivotManifest(CameraSite site)
@@ -404,9 +491,18 @@ namespace Phocalstream_Service.Service
             
             foreach (Photo photo in photos)
             {
-                fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
-                    string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+                Collection collection = CollectionRepository.Find(c => c.Site.ID == photo.Site.ID, c => c.Owner).FirstOrDefault();
 
+                if (collection.Type == CollectionType.SITE)
+                {
+                    fileNames.Add(Path.Combine(PathManager.GetPhotoPath(), photo.Site.DirectoryName,
+                        string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+                }
+                else if (collection.Type == CollectionType.USER)
+                {
+                    fileNames.Add(Path.Combine(PathManager.GetUserCollectionPath(), Convert.ToString(collection.Owner.ID), photo.Site.DirectoryName,
+                        string.Format("{0}.phocalstream", photo.BlobID), "Tiles.dzi"));
+                }
             }
 
             return fileNames;

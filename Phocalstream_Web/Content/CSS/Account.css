@@ -79,3 +79,44 @@
     right: 0px;
     position: absolute;
 }
+
+/* User Photo Upload */
+.total-progress {
+    margin-bottom: 0px !important;
+    margin-top: 7px !important;
+}
+
+#fileupload {
+    display: none;
+}
+
+.upload-view {
+    min-height: 177px;
+    margin-bottom: 30px;
+}
+
+.upload-progress {
+    margin-top: 78.5px !important;
+}
+
+.progress-label {
+    text-align: center;
+    color: black !important;
+    margin-right: 5px;
+}
+
+/* User Camera Site */
+.map-canvas {
+    height: 300px; 
+    width: 100%;
+}
+
+.create-or-label {
+    margin-top: 8px;
+}
+
+/* Login Fail */
+.login-fail-label {
+    cursor: pointer;
+    margin-bottom: 0px !important;
+}
