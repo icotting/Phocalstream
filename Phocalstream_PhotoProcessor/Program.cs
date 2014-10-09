@@ -15,7 +15,6 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -29,12 +28,18 @@ namespace Phocalstream_PhotoProcessor
 
         private static string _path;
         private static bool _break;
+        private static bool _buildCollections = false;
 
         private static IPhotoService _service;
         private static IUnitOfWork _unit;
 
-        static void Main()
+        static void Main(string[] args)
         {
+            if (args.Contains<string>(@"--buidcollections"))
+            {
+                _buildCollections = true;
+            }
+
             IUnityContainer container = BuildUnityContainer();
 
             _service = container.Resolve<IPhotoService>();
@@ -59,71 +64,80 @@ namespace Phocalstream_PhotoProcessor
 
             foreach (XmlNode siteNode in siteList)
             {
-                string dirName = siteNode["Folder"].InnerText;
-                string[] files = Directory.GetFiles(Path.Combine(_path, dirName), "*.JPG", SearchOption.AllDirectories);
-                files = files.Select(f => f.Replace(_path, "")).ToArray<string>();
-                files = files.Select(f => f.Replace(@"\\", @"\")).ToArray<string>();
 
-                List<string> siteFiles = new List<string>();
-                
-                using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
-                {
-                    conn.Open();
-                    using (SqlCommand command = new SqlCommand("select FileName from Photos inner join CameraSites on CameraSites.ID = Photos.Site_ID where CameraSites.Name = @name", conn))
-                    {
-                        command.Parameters.AddWithValue("@name", dirName);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                siteFiles.Add(reader.GetString(0));
-                            }
-                        }
-                    }
-                }
-
-                IEnumerable<string> toProcess = files.Except(siteFiles);
-                
-                siteFiles = new List<string>();
-                files = new string[0];
-
-                if ( toProcess.Count() != 0 )
+                if (_buildCollections == true)
                 {
                     Collection collection = _service.GetCollectionForProcessing(siteNode);
                     CameraSite site = collection.Site;
-                    _unit.Commit();
-
-                    int len = toProcess.Count();
-                    Console.WriteLine(string.Format("Processing {0} photos for site {1}", len, site.Name));
-
-                    int index = 0;
-                    foreach (string file in toProcess)
-                    {
-                        Console.Write("\rFile {0} of {1}", index++, len);
-                        _service.ProcessPhoto(file, site);
-                        if (index % 500 == 0)
-                        {
-                            _unit.Commit();
-                        }
-
-                        if ( _break)
-                            break;
-                    }
-                    Console.WriteLine("");
-                    _unit.Commit();
 
                     Console.WriteLine(string.Format("Building deep zoom site collection for site {0}", site.Name));
                     _service.ProcessCollection(collection);
-                    _unit.Commit();
+                }
+                else
+                {
+                    string dirName = siteNode["Folder"].InnerText;
+                    string[] files = Directory.GetFiles(Path.Combine(_path, dirName), "*.JPG", SearchOption.AllDirectories);
+                    files = files.Select(f => f.Replace(_path, "")).ToArray<string>();
+                    files = files.Select(f => f.Replace(@"\\", @"\")).ToArray<string>();
 
-                    Console.WriteLine(string.Format("Building pivot viewer manifest for site {0}", site.Name));
-                    _service.GeneratePivotManifest(site);
+                    List<string> siteFiles = new List<string>();
 
-                    if (_break)
+                    using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
                     {
-                        break;
+                        conn.Open();
+                        using (SqlCommand command = new SqlCommand("select FileName from Photos inner join CameraSites on CameraSites.ID = Photos.Site_ID where CameraSites.Name = @name", conn))
+                        {
+                            command.Parameters.AddWithValue("@name", dirName);
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    siteFiles.Add(reader.GetString(0));
+                                }
+                            }
+                        }
                     }
-               }
+
+                    IEnumerable<string> toProcess = files.Except(siteFiles);
+
+                    siteFiles = new List<string>();
+                    files = new string[0];
+
+                    if (toProcess.Count() != 0)
+                    {
+                        Collection collection = _service.GetCollectionForProcessing(siteNode);
+                        CameraSite site = collection.Site;
+                        _unit.Commit();
+
+                        int len = toProcess.Count();
+                        Console.WriteLine(string.Format("Processing {0} photos for site {1}", len, site.Name));
+
+                        int index = 0;
+                        foreach (string file in toProcess)
+                        {
+                            Console.Write("\rFile {0} of {1}", index++, len);
+                            _service.ProcessPhoto(file, site);
+                            if (index % 500 == 0)
+                            {
+                                _unit.Commit();
+                            }
+
+                            if (_break)
+                                break;
+                        }
+                        Console.WriteLine("");
+                        _unit.Commit();
+
+                        Console.WriteLine(string.Format("Building deep zoom site collection for site {0}", site.Name));
+                        _service.ProcessCollection(collection);
+                        _unit.Commit();
+
+                        if (_break)
+                        {
+                            break;
+                        }
+                    }
+                }
             }
             Console.WriteLine("Import process complete");
         }

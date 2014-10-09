@@ -268,6 +268,26 @@ namespace Phocalstream_Service.Data
             return weeks;
         }
 
+        public int GetFipsForCountyAndState(string county, string state)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand("select FIPS from Counties INNER JOIN States ON Counties.State_ID = States.ID " + 
+                                                           "WHERE Counties.Name = @CountyName AND States.Name = @StateName", conn))
+                {
+                    command.Parameters.AddWithValue("@CountyName", county);
+                    command.Parameters.AddWithValue("@StateName", state);
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        return reader.GetInt32(0);
+                    }
+                }
+            }
+            throw new ArgumentException(string.Format("County {0} is not recognized", county));
+        }
+
 
         public USState GetStateForName(string name)
         {

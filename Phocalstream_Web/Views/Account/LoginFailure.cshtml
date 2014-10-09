@@ -3,5 +3,18 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Invalid Login</h1>
-<p>Your user ID or password could not be verified by Google.</p>
+@Styles.Render("~/Content/CSS/Account.css")
+
+<div class="container">
+    <div class="content">
+        @using (@Html.BeginForm("Login", "Account", FormMethod.Post, new {@id = "form", @class = "", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="alert alert-danger">
+                <p>Your username or password could not be verified by Facebook. 
+                    <strong><label class="login-fail-label" onclick="document.getElementById('form').submit(); return false;">Please Try Again.</label></strong>
+                </p>
+            </div>
+        }
+    </div>
+</div>

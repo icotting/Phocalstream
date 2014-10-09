@@ -135,8 +135,7 @@
             });
         });
     
-        //Admin Functionality
-        function generateVideo() {
+        function generateTimelapse() {
             var form;
             form = $('<form />', {
                 action: '/photo/timelapse',
@@ -187,6 +186,7 @@
     {
         <li><a href="javascript:saveCollectionPrompt()">Save Collection</a></li>
     }
+    <li><a href="javascript:generateTimelapse()">View Time Lapse</a></li>
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
         <li><a href="javascript:downloadPrompt()">Download Images</a></li>

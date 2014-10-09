@@ -103,7 +103,7 @@ namespace Phocalstream_Web.Controllers
         {
             SiteDashboardViewModel model = new SiteDashboardViewModel();
 
-            model.CollectionViewModel = GetCollectionViewModel(siteID);
+            model.CollectionViewModel = GetCollectionViewModel(siteID, -1);
             model.Years = GetSiteYearSummary(siteID);
             model.Tags = PhotoService.GetPopularTagsForSite(siteID);
 
@@ -124,9 +124,9 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
-        public ActionResult CameraCollection(long siteID)
+        public ActionResult CameraCollection(long siteID, long year = -1)
         {
-            CollectionViewModel model = GetCollectionViewModel(siteID);
+            CollectionViewModel model = GetCollectionViewModel(siteID, year);
             return View(model);
         }
 
@@ -158,122 +158,6 @@ namespace Phocalstream_Web.Controllers
 
             return PartialView("_DmPartial", model);
         } //End DroughtMonitorData
-
-        private DmData LoadDMData(DMDataType type, DateTime date, int CountyFIPS)
-        {
-            DmData data = new DmData();
-            data.DMValues = LoadDMDataValues(type, date, CountyFIPS);
-            data.PreviousWeekValues = LoadDMDataValues(type, date.AddDays(-7), CountyFIPS);
-            data.PreviousMonthValues = LoadDMDataValues(type, date.AddDays(-30), CountyFIPS);
-
-            //data.DMValues.Type = type.ToString().ToLower();
-            data.DisplayDate = data.DMValues.Week.ToString("MM-dd-yyyy");
-            data.DataWeek = data.DMValues.Week.ToString("yyMMdd");
-
-            return data;
-        } //End Load DM Data
-
-        private WaterFlowData LoadWaterData(double siteLat, double siteLong, DateTime date)
-        {
-            WaterFlowData data = new WaterFlowData();
-            data.DataTypes = WaterRepository.FetchBestDataTypesForStationDate(WaterRepository.GetClosestStations(siteLat, siteLong, 1), date).ElementAt(0);
-            data.WaterDataValues = WaterRepository.FetchByDateRange(data.DataTypes.StationID, data.DataTypes.DataID, date.AddDays(-42), date);
-            data.ParameterInfo = WaterRepository.GetParameterCodeInfoFromDataType(data.DataTypes.DataID);
-            data.ClosestStation = WaterRepository.GetStationInfo(data.DataTypes.StationID);
-            
-            data.chartDataValues = "";
-            foreach (WaterDataValue value in data.WaterDataValues)
-            {
-                if (value.Value == -999999)
-                {
-                    data.chartDataValues += "null, ";
-                }
-                else
-                {
-                    data.chartDataValues += value.Value + ", ";
-                }
-
-            }
-            data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
-
-            return data;
-        } //End Load DM Data
-
-        private DroughtMonitorWeek LoadDMDataValues (DMDataType type, DateTime date, int CountyFIPS)
-        {
-            DroughtMonitorWeek week = null;
-            switch (type)
-            {
-                case DMDataType.COUNTY:
-                    week = DmRepository.FindBy(DmRepository.GetCountyForFips(CountyFIPS), date).FirstOrDefault();
-                    break;
-                case DMDataType.STATE:
-                    week = DmRepository.FindBy(DmRepository.GetCountyForFips(CountyFIPS).State, date).FirstOrDefault();
-                    break;
-                case DMDataType.US:
-                    week = DmRepository.FindUS(date).FirstOrDefault();
-                    break;
-            }
-
-            if (week == null)
-            {
-                USCounty county = DmRepository.GetCountyForFips(CountyFIPS);
-                week = new DroughtMonitorWeek() { 
-                    D0 = 0, 
-                    D1 = 0, 
-                    D2 = 0, 
-                    D3 = 0, 
-                    D4 = 0, 
-                    NonDrought = 0, 
-                    Week = date, 
-                    Type = type, 
-                    County = county, 
-                    State = county.State };
-            }
-            else
-            {
-                week.Type = type;
-                // Normalize data to be out of 100%
-                week.D0 = (float)Math.Round((week.D0 - week.D1), 2);
-                week.D1 = (float)Math.Round((week.D1 - week.D2), 2);
-                week.D2 = (float)Math.Round((week.D2 - week.D3), 2);
-                week.D3 = (float)Math.Round((week.D3 - week.D4), 2);
-            }
-
-            return week;
-        } //End LoadDMDataValues
-
-        private UserCollectionData LoadUserCollections(long photoID)
-        {
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
-            if (User != null)
-            {
-                UserCollectionData model = new UserCollectionData();
-                model.PhotoID = photoID;
-
-                List<UserCollection> userCollections = new List<UserCollection>();
-                IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
-
-                foreach (var col in collections)
-                {
-                    UserCollection userCollection = new UserCollection();
-                    
-                    userCollection.CollectionID = col.ID;
-                    userCollection.CollectionName = col.Name;
-
-                    userCollection.Added = col.Photos.Select(p => p.ID).Contains(photoID);
-
-                    userCollections.Add(userCollection);
-                }
-
-                model.Collections = userCollections;
-                return model;
-            }
-            else
-            {
-                return null;
-            }
-        }
 
         [HttpPost]
         public ActionResult TimeLapse(string photoIds)
@@ -420,19 +304,35 @@ namespace Phocalstream_Web.Controllers
             }
         }
     
-        private CollectionViewModel GetCollectionViewModel(long siteID)
+        private CollectionViewModel GetCollectionViewModel(long siteID, long year)
         {
             CollectionViewModel model = new CollectionViewModel();
 
             model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
 
-            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
-                Request.Url.Host,
-                Request.Url.Port,
-                model.Collection.ID);
+            if (year == -1)
+            {
+                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
+                    Request.Url.Host,
+                    Request.Url.Port,
+                    model.Collection.ID);
+            }
+            else
+            {
+                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}&year={4}", Request.Url.Scheme,
+                    Request.Url.Host,
+                    Request.Url.Port,
+                    model.Collection.ID, year);
+            }
+
             model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
 
             List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();
+            if (year != -1) 
+            {
+                photos = photos.Where(p => p.Captured.Year == year).ToList<Photo>();
+            }
+
             model.SiteDetails = new SiteDetails() { PhotoCount = photos.Count(), First = photos.Select(p => p.Captured).First(), Last = photos.Select(p => p.Captured).Last() };
 
             return model;
@@ -482,6 +382,124 @@ namespace Phocalstream_Web.Controllers
             model.FrequencyDataValues = model.FrequencyDataValues.Substring(0, model.FrequencyDataValues.Length - 2);
 
             return model;
+        }
+
+        private DmData LoadDMData(DMDataType type, DateTime date, int CountyFIPS)
+        {
+            DmData data = new DmData();
+            data.DMValues = LoadDMDataValues(type, date, CountyFIPS);
+            data.PreviousWeekValues = LoadDMDataValues(type, date.AddDays(-7), CountyFIPS);
+            data.PreviousMonthValues = LoadDMDataValues(type, date.AddDays(-30), CountyFIPS);
+
+            //data.DMValues.Type = type.ToString().ToLower();
+            data.DisplayDate = data.DMValues.Week.ToString("MM-dd-yyyy");
+            data.DataWeek = data.DMValues.Week.ToString("yyMMdd");
+
+            return data;
+        } //End Load DM Data
+
+        private WaterFlowData LoadWaterData(double siteLat, double siteLong, DateTime date)
+        {
+            WaterFlowData data = new WaterFlowData();
+            data.DataTypes = WaterRepository.FetchBestDataTypesForStationDate(WaterRepository.GetClosestStations(siteLat, siteLong, 1), date).ElementAt(0);
+            data.WaterDataValues = WaterRepository.FetchByDateRange(data.DataTypes.StationID, data.DataTypes.DataID, date.AddDays(-42), date);
+            data.ParameterInfo = WaterRepository.GetParameterCodeInfoFromDataType(data.DataTypes.DataID);
+            data.ClosestStation = WaterRepository.GetStationInfo(data.DataTypes.StationID);
+
+            data.chartDataValues = "";
+            foreach (WaterDataValue value in data.WaterDataValues)
+            {
+                if (value.Value == -999999)
+                {
+                    data.chartDataValues += "null, ";
+                }
+                else
+                {
+                    data.chartDataValues += value.Value + ", ";
+                }
+
+            }
+            data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+
+            return data;
+        } //End Load DM Data
+
+        private DroughtMonitorWeek LoadDMDataValues(DMDataType type, DateTime date, int CountyFIPS)
+        {
+            DroughtMonitorWeek week = null;
+            switch (type)
+            {
+                case DMDataType.COUNTY:
+                    week = DmRepository.FindBy(DmRepository.GetCountyForFips(CountyFIPS), date).FirstOrDefault();
+                    break;
+                case DMDataType.STATE:
+                    week = DmRepository.FindBy(DmRepository.GetCountyForFips(CountyFIPS).State, date).FirstOrDefault();
+                    break;
+                case DMDataType.US:
+                    week = DmRepository.FindUS(date).FirstOrDefault();
+                    break;
+            }
+
+            if (week == null)
+            {
+                USCounty county = DmRepository.GetCountyForFips(CountyFIPS);
+                week = new DroughtMonitorWeek()
+                {
+                    D0 = 0,
+                    D1 = 0,
+                    D2 = 0,
+                    D3 = 0,
+                    D4 = 0,
+                    NonDrought = 0,
+                    Week = date,
+                    Type = type,
+                    County = county,
+                    State = county.State
+                };
+            }
+            else
+            {
+                week.Type = type;
+                // Normalize data to be out of 100%
+                week.D0 = (float)Math.Round((week.D0 - week.D1), 2);
+                week.D1 = (float)Math.Round((week.D1 - week.D2), 2);
+                week.D2 = (float)Math.Round((week.D2 - week.D3), 2);
+                week.D3 = (float)Math.Round((week.D3 - week.D4), 2);
+            }
+
+            return week;
+        } //End LoadDMDataValues
+
+        private UserCollectionData LoadUserCollections(long photoID)
+        {
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionData model = new UserCollectionData();
+                model.PhotoID = photoID;
+
+                List<UserCollection> userCollections = new List<UserCollection>();
+                IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
+
+                foreach (var col in collections)
+                {
+                    UserCollection userCollection = new UserCollection();
+
+                    userCollection.CollectionID = col.ID;
+                    userCollection.CollectionName = col.Name;
+
+                    userCollection.Added = col.Photos.Select(p => p.ID).Contains(photoID);
+
+                    userCollections.Add(userCollection);
+                }
+
+                model.Collections = userCollections;
+                return model;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

@@ -115,7 +115,7 @@ namespace Phocalstream_Web.Controllers.Api
         }
   
         [HttpGet, ActionName("PivotCollectionFor")]
-        public HttpResponseMessage PivotCollectionFor(int id)
+        public HttpResponseMessage PivotCollectionFor(int id, long year = -1)
         {
             // this should be moved into a service method
             Collection col = CollectionRepository.Single(c => c.ID == id, c => c.Site);
@@ -125,7 +125,14 @@ namespace Phocalstream_Web.Controllers.Api
             {
                 string rootDeepZoomPath = Path.Combine(PathManager.GetPhotoPath(), col.Site.DirectoryName);
                 doc = new XmlDocument();
-                doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
+                if (year == -1)
+                {
+                    doc.Load(Path.Combine(rootDeepZoomPath, "site.cxml"));
+                } 
+                else
+                {
+                    doc.Load(Path.Combine(rootDeepZoomPath, string.Format("{0}_site.cxml", year)));
+                }
             }
             else if (col.Type == CollectionType.SEARCH)
             {

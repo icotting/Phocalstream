@@ -32,6 +32,9 @@ namespace Phocalstream_Web.Controllers
         public IEntityRepository<Collection> CollectionRepository { get; set; }
 
         [Dependency]
+        public IDroughtMonitorRepository DroughtMonitorRepository { get; set; }
+
+        [Dependency]
         public IUnitOfWork Unit { get; set; }
 
         [Dependency]
@@ -80,7 +83,7 @@ namespace Phocalstream_Web.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
-            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback", new { ReturnUrl = returnUrl }));
+            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback"));
         }
 
 
@@ -89,7 +92,7 @@ namespace Phocalstream_Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login()
         {
-            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback", new { ReturnUrl = "~/" }));
+            return new ExternalLoginResult("Facebook", Url.Action("LoginCallback"));
         }
 
         [AllowAnonymous]
@@ -117,7 +120,26 @@ namespace Phocalstream_Web.Controllers
                 // User is new, ask for their desired membership name
                 string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
                 ViewBag.ReturnUrl = returnUrl;
-                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = new Phocalstream_Shared.Data.Model.Photo.User()});
+
+                string email = "";
+                string name = "";
+                result.ExtraData.TryGetValue("username", out email);
+                result.ExtraData.TryGetValue("name", out name);
+
+                User tempUser = new User();
+                tempUser.EmailAddress = email;
+                
+                string[] names = name.Split(' ');
+                if (names.Count() > 0)
+                {
+                    tempUser.FirstName = names[0];
+                }
+                if (names.Count() > 1)
+                {
+                    tempUser.LastName = names[1];
+                }
+
+                return View("RegisterAccount", new RegisterUserModel { ProviderUserName = result.UserName, ProviderData = loginData, User = tempUser});
             }
         }
 
@@ -153,11 +175,18 @@ namespace Phocalstream_Web.Controllers
 
                     if (UserRepository.AsQueryable().Count() == 1)
                     {
-                        Roles.CreateRole("Admin");
+                        if (!Roles.RoleExists("Admin"))
+                        {
+                            Roles.CreateRole("Admin");
+                        }
                         Roles.AddUserToRole(model.ProviderUserName, "Admin");
                     }
 
-                    return RedirectToLocal(returnUrl);
+                    //Create a favorites collect for the new user
+                    CollectionService.NewUserCollection(model.User, "Favorites", "");
+
+                    //Take the new user to their collections page
+                    return RedirectToAction("UserCollections");
                 }
                 else
                 {
@@ -168,7 +197,7 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
-        public ActionResult UserCollections()
+        public ActionResult UserCollections(int e = 0)
         {
             UserCollectionList model = new UserCollectionList();
 
@@ -178,11 +207,70 @@ namespace Phocalstream_Web.Controllers
 
             foreach (var col in model.Collections)
             {
-                col.CoverPhoto = col.Photos.Last(); 
+                col.CoverPhoto = col.Photos.LastOrDefault(); 
             }
 
+            if (e == 1)
+            {
+                ViewBag.Message = "That collection doesn't contain any photos.";
+            }
 
             return View(model);
+        }
+        
+        public ActionResult UploadPhotos()
+        {
+            UserPhotoUpload model = new UserPhotoUpload();
+
+            model.UserSiteCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Site != null, c => c.Site).ToList();
+
+            if (model.UserSiteCollections.Count == 0)
+            {
+                return RedirectToAction("CreateUserSite", new { e = 1 });
+            }
+
+            return View(model);
+        }
+
+        public ActionResult CreateUserSite(int e = 0)
+        {
+            if (e == 1)
+            {
+                ViewBag.Message = "You must create a photo site before you can upload photos. <strong>Where were these photos taken?</strong>";
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult CreateUserSite(AddUserCameraSite site)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            string guid = Guid.NewGuid().ToString();
+
+            CameraSite newCameraSite = new CameraSite()
+            {
+                Name = site.CameraSiteName,
+                Latitude = site.Latitude,
+                Longitude = site.Longitude,
+                CountyFips = DroughtMonitorRepository.GetFipsForCountyAndState(site.County, site.State),
+                ContainerID = guid,
+                DirectoryName = guid
+            };
+
+            Collection newCollection = new Collection()
+            {
+                Name = site.CameraSiteName,
+                Site = newCameraSite,
+                Owner = user,
+                ContainerID = guid,
+                Type = CollectionType.USER
+            };
+
+            CollectionRepository.Insert(newCollection);
+            Unit.Commit();
+
+            return new RedirectResult("UploadPhotos");
         }
 
         public ActionResult DeleteUserCollection(long collectionID)
@@ -210,6 +298,11 @@ namespace Phocalstream_Web.Controllers
             
             Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
             model.CollectionName = collection.Name;
+
+            if (collection.Photos.Count == 0)
+            {
+                return RedirectToAction("UserCollections", new { e = 1 });
+            }
 
             model.First = collection.Photos.First().Captured;
             model.Last = collection.Photos.Last().Captured;
@@ -267,5 +360,7 @@ namespace Phocalstream_Web.Controllers
                 OAuthWebSecurity.RequestAuthentication(Provider, ReturnUrl);
             }
         }
+
+      
     }
 }
