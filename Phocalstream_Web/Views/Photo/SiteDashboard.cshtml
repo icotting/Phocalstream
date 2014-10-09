@@ -22,7 +22,7 @@
 <script type="text/javascript">
 
     function viewAll() {
-        bootbox.confirm("Are you sure you want to view all " + @Html.DisplayFor(model => Model.CollectionViewModel.SiteDetails.PhotoCount) + " images? \n" + 
+        bootbox.confirm("Are you sure you want to view all @Html.DisplayFor(model => Model.CollectionViewModel.SiteDetails.PhotoCount) images? \n" + 
                 "This may take some time to load. Please be patient.", function (result) {
                     if (result) {
                         location.href = '@Url.Action("CameraCollection", "Photo", new { @siteID = @Model.CollectionViewModel.Collection.Site.ID })';
@@ -57,9 +57,7 @@
                                 <h4>@y.PhotoCount photos</h4>
                             </div>
                             <div class="col-md-4 text-right">
-                                @Html.ActionLink("View " + Html.DisplayFor(model => y.Year), "KnockoutAdvancedSearch", "Search", new {
-                                    @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = "", @dates = y.Year
-                                } , new { @class = "siteCollection btn btn-default" })
+                                @Html.ActionLink(string.Format("View {0}", y.Year), "CameraCollection", "Photo", new { siteID = Model.CollectionViewModel.Collection.Site.ID, year = y.Year }, new { @class = "siteCollection btn btn-default" })
                             </div>
                         </div>
                     </div>

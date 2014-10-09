@@ -128,7 +128,7 @@ namespace Phocalstream_Web.Application.Data
             }
         }
 
-        public XmlDocument CreatePivotCollectionForList(string collectionName, string photoList, CollectionType type)
+        public XmlDocument CreatePivotCollectionForList(string collectionName, string photoList, CollectionType type, string subsetName = null)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -136,7 +136,7 @@ namespace Phocalstream_Web.Application.Data
 
                 using (SqlCommand command = new SqlCommand(string.Format("select ID, Captured, Site_ID from Photos where Photos.ID IN ({0})", photoList), conn))
                 {
-                    return CreatePivotDocument(collectionName, command, null, type);
+                    return CreatePivotDocument(collectionName, command, null, type, subsetName);
                 }
             }
         }
@@ -272,7 +272,7 @@ namespace Phocalstream_Web.Application.Data
             return doc;
         }
 
-        private XmlDocument CreatePivotDocument(string collectionName, SqlCommand command, Uri uri, CollectionType type)
+        private XmlDocument CreatePivotDocument(string collectionName, SqlCommand command, Uri uri, CollectionType type, string subsetName = null)
         {
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("Collection");
@@ -281,7 +281,15 @@ namespace Phocalstream_Web.Application.Data
             root.SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
             root.SetAttribute("xmlns:p", "http://schemas.microsoft.com/livelabs/pivot/collection/2009");
             root.SetAttribute("SchemaVersion", "1.0");
-            root.SetAttribute("Name", string.Format("{0} Photo Collection", collectionName));
+
+            if (subsetName == null)
+            {
+                root.SetAttribute("Name", string.Format("{0} Photo Collection", collectionName));
+            }
+            else
+            {
+                root.SetAttribute("Name", string.Format("{0} {1} Photo Collection", subsetName, collectionName));
+            }
 
             root.SetAttribute("xmlns", "http://schemas.microsoft.com/collection/metadata/2009");
             doc.AppendChild(root);
@@ -306,7 +314,7 @@ namespace Phocalstream_Web.Application.Data
             facet.SetAttribute("Type", "String");
             facets.AppendChild(facet);
 
-            if (type != CollectionType.SITE)
+            if (type != CollectionType.SITE && type != CollectionType.SUBSET)
             {
                 facet = doc.CreateElement("FacetCategory");
                 facet.SetAttribute("Name", "Site");
@@ -322,31 +330,46 @@ namespace Phocalstream_Web.Application.Data
             root.AppendChild(facets);
 
             string dzCollection = "";
-            if (type == CollectionType.SEARCH)
+            switch(type)
             {
-                dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.SearchPath, collectionName)
-                    : string.Format("{0}://{1}:{2}/dzc/{3}{4}/collection.dzc", uri.Scheme,
-                    uri.Host,
-                    uri.Port,
-                    PathManager.SearchPath,
-                    collectionName);
-            }
-            else if (type == CollectionType.USER)
-            {
-                dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.UserCollectionPath, collectionName)
-                    : string.Format("{0}://{1}:{2}/dzc/{3}{4}/collection.dzc", uri.Scheme,
-                    uri.Host,
-                    uri.Port,
-                    PathManager.UserCollectionPath,
-                    collectionName);
-            }
-            else
-            {
-                dzCollection = (uri == null) ? string.Format("/dzc/{0}/collection.dzc", collectionName)
-                    : string.Format("{0}://{1}:{2}/dzc/{3}/collection.dzc", uri.Scheme,
-                    uri.Host,
-                    uri.Port,
-                    collectionName);
+                case CollectionType.SEARCH:
+                    {
+                        dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.SearchPath, collectionName)
+                            : string.Format("{0}://{1}:{2}/dzc/{3}{4}/collection.dzc", uri.Scheme,
+                            uri.Host,
+                            uri.Port,
+                            PathManager.SearchPath,
+                            collectionName);
+                        break;
+                    }
+                case CollectionType.USER:
+                    {
+                        dzCollection = (uri == null) ? string.Format("/dzc/{0}{1}/collection.dzc", PathManager.UserCollectionPath, collectionName)
+                            : string.Format("{0}://{1}:{2}/dzc/{3}{4}/collection.dzc", uri.Scheme,
+                            uri.Host,
+                            uri.Port,
+                            PathManager.UserCollectionPath,
+                            collectionName);
+                        break;
+                    }
+                case CollectionType.SITE:
+                    {
+                        dzCollection = (uri == null) ? string.Format("/dzc/{0}/collection.dzc", collectionName)
+                            : string.Format("{0}://{1}:{2}/dzc/{3}/collection.dzc", uri.Scheme,
+                            uri.Host,
+                            uri.Port,
+                            collectionName);
+                        break;
+                    }
+                case CollectionType.SUBSET:
+                    {
+                        dzCollection = (uri == null) ? string.Format("/dzc/{0}/{1}_collection.dzc", collectionName, subsetName)
+                            : string.Format("{0}://{1}:{2}/dzc/{3}/{4}_collection.dzc", uri.Scheme,
+                            uri.Host,
+                            uri.Port,
+                            collectionName, subsetName);
+                        break;
+                    }
             }
 
             XmlElement items = doc.CreateElement("Items");
@@ -357,7 +380,7 @@ namespace Phocalstream_Web.Application.Data
                 int position = 0;
                 while (reader.Read())
                 {
-                    items.AppendChild(ItemFor(doc, reader, collectionName, (type != CollectionType.SITE), position++));
+                    items.AppendChild(ItemFor(doc, reader, collectionName, (type != CollectionType.SITE && type != CollectionType.SUBSET), position++));
                 }
             }
 

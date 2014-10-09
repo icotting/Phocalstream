@@ -10,6 +10,7 @@ namespace Phocalstream_Shared.Data.Model.Photo
     {
         SITE,
         USER, 
+        SUBSET,
         SEARCH
     }
 }
