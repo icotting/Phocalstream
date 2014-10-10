@@ -39,6 +39,14 @@
     color: white !important;
 }
 
+.siteCoverPhoto {
+    top: 0px;
+    left: 15px;
+    position: absolute;
+
+    color: white !important;
+}
+
 .siteToDelete {
     top: 0px;
     left: 15px;

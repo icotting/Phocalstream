@@ -55,5 +55,12 @@ namespace Phocalstream_Web.Controllers.Api
             User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             CollectionService.RemoveFromExistingUserCollection(user, collectionID, photoIds);
         }
+
+        [HttpPost, ActionName("SetCoverPhoto")]
+        public void SetUserCollectionCoverPhoto(long collectionID, long photoId)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            CollectionService.SetUserCollectionCoverPhoto(user, collectionID, photoId);
+        }
     }
 }

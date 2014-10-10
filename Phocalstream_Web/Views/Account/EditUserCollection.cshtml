@@ -1,4 +1,4 @@
-﻿@model Phocalstream_Shared.Data.Model.Photo.Collection
+﻿@model Phocalstream_Shared.Data.Model.View.EditUserCollection
 @{
     ViewBag.Title = "EditUserCollection";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,7 +9,7 @@
 <div class="container">
     <div class="content">
         <div class="text-center relative">
-            <h1 class="page-header">@Model.Name</h1>
+            <h1 class="page-header">@Model.Collection.Name</h1>
             <div class="save-changes invisible">
                 <button onclick="javascript:cancel()" class="btn btn-warning">Discard</button>
                 <button onclick="javascript:save()" class="btn btn-success">Save Changes</button>
@@ -17,7 +17,7 @@
         </div>
 
         <div class="row">
-            @foreach (var p in Model.Photos)
+            @foreach (var p in Model.Collection.Photos)
             {
                 <div class="col-md-3 siteColumn" id="@p.ID">
                     <img class="siteImage" id="@p.ID" src="/api/photo/low/@p.ID" alt="@p.FileName" />
@@ -25,7 +25,14 @@
                     <div class="siteToDelete invisible"></div>
 
                     <div class="siteDelete">
-                        <a class="btn btn-sm text-white no-underline remove" id="@p.ID" href="javascript:remove()"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a class="btn btn-sm text-white no-underline remove" id="@p.ID"><span class="glyphicon glyphicon-remove"></span></a>
+                    </div>
+
+                    <div id="@p.ID" class="siteCoverPhoto">
+                        <a class="btn btn-sm btn-success text-white no-underline" id="@p.ID"><span class="glyphicon glyphicon-ok"></span> Cover Photo</a>
+                    </div>
+                    <div id="@p.ID" class="siteEdit">
+                        <a class="btn btn-sm text-white no-underline coverPhoto" id="@p.ID">Set Cover Photo</a>
                     </div>
                 </div>
             }
@@ -36,8 +43,26 @@
 <script type="text/javascript">
 
     var toRemove = [];
+    var coverPhotoId; 
 
     $(document).ready(function () {
+
+        //hide all site cover photo icons
+        $(document).find(".siteCoverPhoto").hide();
+
+        //if there is currently a cover photo, then show icon for it
+        coverPhotoId = @Model.CoverPhotoId;
+        if (coverPhotoId != 0) {
+            $(document).find("#" + coverPhotoId + " .siteCoverPhoto").show();
+            $(document).find("#" + coverPhotoId + " .siteEdit").hide();
+        }
+
+        $('.coverPhoto').click(function () {
+            var id = $(this).attr('id');
+            setCoverPhoto(id);
+        })
+
+
         $('.remove').click(function () {
             var id = $(this).attr('id');
             var object = $(document).find('#' + id + ">.siteToDelete");
@@ -52,7 +77,7 @@
                 var index = toRemove.indexOf(id);
                 toRemove.splice(index, 1);
             }
-            
+
             if (toRemove.length == 0) {
                 $(".save-changes").addClass("invisible");
             } else if (toRemove.length == 1) {
@@ -62,11 +87,12 @@
             }
         });
 
+
     });
 
     function save() {
         $.ajax({
-            url: '/api/usercollection/RemoveFromCollection?collectionId=' + @Model.ID.ToString() + '&photoIds=' + toRemove.join(','),
+            url: '/api/usercollection/RemoveFromCollection?collectionId=' + @Model.Collection.ID.ToString() + '&photoIds=' + toRemove.join(','),
             type: 'POST',
             success: function (data) {
                 location.reload();
@@ -77,5 +103,23 @@
     function cancel() {
         location.reload();
     }
+
+    function setCoverPhoto(id) {
+        $.ajax({
+            url: '/api/usercollection/SetCoverPhoto?collectionId=' + @Model.Collection.ID.ToString() + '&photoId=' + id,
+            type: 'POST',
+            success: function (data) {
+                //change the views for the previous cover photo selection
+                $(document).find("#" + coverPhotoId + " .siteCoverPhoto").hide();
+                $(document).find("#" + coverPhotoId + " .siteEdit").show();
+
+                //update the cover photo index and show the correct labels
+                coverPhotoId = id;
+                $(document).find("#" + coverPhotoId + " .siteCoverPhoto").show();
+                $(document).find("#" + coverPhotoId + " .siteEdit").hide();
+            },
+        });
+    }
+
 </script>
 
