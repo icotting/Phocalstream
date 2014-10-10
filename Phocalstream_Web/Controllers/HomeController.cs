@@ -47,11 +47,13 @@ namespace Phocalstream_Web.Controllers
             HomeViewModel model = new HomeViewModel();
             ICollection<Collection> collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
             model.Sites = collections.Select(c => GetDetailsForCollection(c));
+
+            model.PublicCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Public).ToList();
             model.Tags = PhotoService.GetTagNames();
 
             if (e == 2)
             {
-                ViewBag.Message = "Please enter at least one (1) search parameter.";
+                ViewBag.Message = "Please enter at lease one search parameter.";
             }
 
             return View(model);

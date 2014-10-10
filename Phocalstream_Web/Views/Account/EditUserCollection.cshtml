@@ -11,7 +11,10 @@
         <div class="text-center relative">
             @if (Request.IsAuthenticated && User.IsInRole("Admin"))
             {
-                <div class="publish">
+                <div id="published" class="publish">
+                    <button onclick="javascript:unpublish()" id="publishButton" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Published</button>
+                </div>
+                <div id="publish" class="publish">
                     <button onclick="javascript:publish()" id="publishButton" class="btn btn-info">Publish</button>
                 </div>
             }
@@ -44,6 +47,16 @@
     var toRemove = [];
 
     $(document).ready(function () {
+        var published = '@Model.Public';
+
+        if (published) {
+            $("#publish").hide();
+        }
+        else {
+            $("#published").hide();
+        }
+
+
         $('.remove').click(function () {
             var id = $(this).attr('id');
             var object = $(document).find('#' + id + ">.siteToDelete");
@@ -88,9 +101,19 @@
             url: '/api/usercollection/PublishUserCollection?collectionId=' + '@Model.ID.ToString()',
             type: 'POST',
             success: function (data) {
-                $("#publishButton").removeClass("btn-info");
-                $("#publishButton").addClass("btn-success");
-                $("#publishButton").text('<span class="glyphicon glyphicon-ok"></span> Published!');
+                $("#publish").hide();
+                $("#published").show();
+            }
+        });
+    }
+
+    function unpublish() {
+        $.ajax({
+            url: '/api/usercollection/UnpublishUserCollection?collectionId=' + '@Model.ID.ToString()',
+            type: 'POST',
+            success: function (data) {
+                $("#published").hide();
+                $("#publish").show();
             }
         });
     }
