@@ -47,9 +47,13 @@ namespace Phocalstream_Web.Controllers
             HomeViewModel model = new HomeViewModel();
             ICollection<Collection> collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
             model.Sites = collections.Select(c => GetDetailsForCollection(c));
-
-            model.PublicCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Public).ToList();
             model.Tags = PhotoService.GetTagNames();
+
+            model.PublicCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Public, c => c.Photos).ToList();
+            foreach (var col in model.PublicCollections)
+            {
+                col.CoverPhoto = col.Photos.Last();
+            }
 
             if (e == 2)
             {
