@@ -10,6 +10,16 @@
     <div class="content">
         <div class="text-center relative">
             <h1 class="page-header">@Model.Collection.Name</h1>
+            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <div id="published" class="publish">
+                    <button onclick="javascript:unpublish()" id="publishButton" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Published</button>
+                </div>
+                <div id="publish" class="publish">
+                    <button onclick="javascript:publish()" id="publishButton" class="btn btn-info">Publish</button>
+                </div>
+            }
+
             <div class="save-changes invisible">
                 <button onclick="javascript:cancel()" class="btn btn-warning">Discard</button>
                 <button onclick="javascript:save()" class="btn btn-success">Save Changes</button>
@@ -46,7 +56,8 @@
     var coverPhotoId; 
 
     $(document).ready(function () {
-
+        
+        /* COVER PHOTO STUFF */
         //hide all site cover photo icons
         $(document).find(".siteCoverPhoto").hide();
 
@@ -62,7 +73,17 @@
             setCoverPhoto(id);
         })
 
+        /* ADMIN PUBLISHING STUFF */
+        //if an admin, set the publish button to the correct state
+        var published = '@Model.Collection.Public' == 'True' ? true : false;
+        if (published) {
+            $("#publish").hide();
+        }
+        else {
+            $("#published").hide();
+        }
 
+        /* EDIT COLLECTION STUFF */
         $('.remove').click(function () {
             var id = $(this).attr('id');
             var object = $(document).find('#' + id + ">.siteToDelete");
@@ -80,8 +101,10 @@
 
             if (toRemove.length == 0) {
                 $(".save-changes").addClass("invisible");
+                $(".publish").show();
             } else if (toRemove.length == 1) {
                 $(".save-changes").removeClass("invisible");
+                $(".publish").hide();
             } else {
 
             }
@@ -121,5 +144,26 @@
         });
     }
 
+    function publish() {
+        $.ajax({
+            url: '/api/usercollection/PublishUserCollection?collectionId=' + '@Model.Collection.ID.ToString()',
+            type: 'POST',
+            success: function (data) {
+                $("#publish").hide();
+                $("#published").show();
+            }
+        });
+    }
+
+    function unpublish() {
+        $.ajax({
+            url: '/api/usercollection/UnpublishUserCollection?collectionId=' + '@Model.Collection.ID.ToString()',
+            type: 'POST',
+            success: function (data) {
+                $("#published").hide();
+                $("#publish").show();
+            }
+        });
+    }
 </script>
 

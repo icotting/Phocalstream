@@ -88,6 +88,12 @@
     position: absolute;
 }
 
+.publish {
+    top: 3px;
+    left: 0px;
+    position: absolute;
+}
+
 /* User Photo Upload */
 .total-progress {
     margin-bottom: 0px !important;

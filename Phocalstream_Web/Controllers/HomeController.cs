@@ -49,9 +49,18 @@ namespace Phocalstream_Web.Controllers
             model.Sites = collections.Select(c => GetDetailsForCollection(c));
             model.Tags = PhotoService.GetTagNames();
 
+            model.PublicCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Public, c => c.Photos).ToList();
+            foreach (var col in model.PublicCollections)
+            {
+                if (col.CoverPhoto == null)
+                {
+                    col.CoverPhoto = col.Photos.LastOrDefault();
+                }
+            }
+
             if (e == 2)
             {
-                ViewBag.Message = "Please enter at least one (1) search parameter.";
+                ViewBag.Message = "Please enter at lease one search parameter.";
             }
 
             return View(model);

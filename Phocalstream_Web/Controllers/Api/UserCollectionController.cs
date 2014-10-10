@@ -62,5 +62,19 @@ namespace Phocalstream_Web.Controllers.Api
             User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             CollectionService.SetUserCollectionCoverPhoto(user, collectionID, photoId);
         }
+         
+        [HttpPost, ActionName("PublishUserCollection")]
+        public void PublishUserCollection(long collectionID)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            CollectionService.SetUserCollectionPublic(user, collectionID, true);
+        }
+
+        [HttpPost, ActionName("UnpublishUserCollection")]
+        public void UnpublishUserCollection(long collectionID)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            CollectionService.SetUserCollectionPublic(user, collectionID, false);
+        }
     }
 }

@@ -158,52 +158,85 @@
 
     <div class="container marketing">
 
-        <div class="search">
-            @if (@ViewBag.Message != null)
-            {
-                <div class="alert alert-info alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    @ViewBag.Message
-                </div>
-            }
-
-            <div class="row text-center">
-                <h2>Phocalsteam Image Search</h2>
-                <h3>Quickly find images matching a descriptive tag.</h3>
-            </div>
-            @using (@Html.BeginForm("TagSearch", "Search"))
-            { 
-                <div class="row">
-                    <div class="col-lg-9">
-                        <input type="text" id="tag-field" name="tag" placeholder="river, sunset, cows, etc." />
-                    </div>
-                    <div class="col-lg-3">
-                        <button class="btn btn-lg btn-success full-width" type="submit">Search</button>
-                    </div>
-                </div>
-            }
-            <div class="row">
-                @if (Model.Tags.Count > 2)
+        @if (Model.PublicCollections.Count == 0)
+        { 
+            <div class="search">
+                @if (@ViewBag.Message != null)
                 {
-                    for (int i = 0; i < 3; i++)
-                    {
+                    <div class="alert alert-info alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        @ViewBag.Message
+                    </div>
+                }
+
+                <div class="row text-center">
+                    <h2>Phocalsteam Image Search</h2>
+                    <h3>Quickly find images matching a descriptive tag.</h3>
+                </div>
+                @using (@Html.BeginForm("TagSearch", "Search"))
+                { 
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <input type="text" id="tag-field" name="tag" placeholder="river, sunset, cows, etc." />
+                        </div>
                         <div class="col-lg-3">
-                            @Html.ActionLink("View the " + @Model.Tags[i] + " collection", "TagSearch", "Search", new { @tag = @Model.Tags[i] }, new { @class = "btn btn-primary full-width" })
+                            <button class="btn btn-lg btn-success full-width" type="submit">Search</button>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    @if (Model.Tags.Count > 2)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            <div class="col-lg-3">
+                                @Html.ActionLink("View the " + @Model.Tags[i] + " collection", "TagSearch", "Search", new { @tag = @Model.Tags[i] }, new { @class = "btn btn-primary full-width" })
+                            </div>
+                        }
+                    <div class="col-lg-3">
+                        <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="col-lg-4 col-lg-offset-4">
+                        <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
+                    </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="publicCollections">
+                <div class="row text-center">
+                    <h2>Browse Phocalsteam Photo Collections</h2>
+                    <h3>Experience a watershed through photos</h3>
+                </div>
+
+                <div class="row">
+                    @foreach (var col in Model.PublicCollections)
+                    {
+                        <div class="col-md-4 siteColumn">
+                            <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
+
+                            <div class="row">
+                                <div class="siteCaption">
+                                    <div class="col-md-8">
+                                        <h3>@col.Name</h3>
+                                        <p>@Html.DisplayFor(model => col.Photos.Count) photos </p>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     }
-                <div class="col-lg-3">
-                    <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
                 </div>
-                }
-                else
-                {
-                <div class="col-lg-4 col-lg-offset-4">
-                    <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
-                </div>
-                }
             </div>
-        </div>
-
+        }
+        
         <hr class="featurette-divider">
 
         <!-- Three columns of text below the carousel -->

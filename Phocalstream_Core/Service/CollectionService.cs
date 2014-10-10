@@ -235,5 +235,11 @@ namespace Phocalstream_Service.Service
             Unit.Commit();
         }
 
+        public void SetUserCollectionPublic(User user, long collectionID, bool publish)
+        {
+            Collection collection = CollectionRepository.First(c => c.ID == collectionID && c.Owner.ID == user.ID);
+            collection.Public = publish;
+            Unit.Commit();
+        }
     }
 }
