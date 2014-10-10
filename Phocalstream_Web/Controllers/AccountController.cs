@@ -207,7 +207,10 @@ namespace Phocalstream_Web.Controllers
 
             foreach (var col in model.Collections)
             {
-                col.CoverPhoto = col.Photos.LastOrDefault(); 
+                if (col.CoverPhoto == null)
+                {
+                    col.CoverPhoto = col.Photos.LastOrDefault();
+                }
             }
 
             if (e == 1)
