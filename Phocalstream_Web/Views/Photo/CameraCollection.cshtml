@@ -233,7 +233,7 @@
             <param name="background" value="white" />
             <param name="minRuntimeVersion" value="4.0.60310.0" />
             <param name="autoUpgrade" value="true" />
-            <param name="initParams" value="collection=@Html.DisplayFor(model => model.CollectionUrl)" />
+            <param name="initParams" value="collection=@Html.Raw(Model.CollectionUrl)" />
             <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" >
                 <img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" />
             </a>

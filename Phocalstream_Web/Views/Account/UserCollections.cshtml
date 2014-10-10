@@ -8,9 +8,22 @@
 
 <div class="container">
     <div class="content">
-        <div class="text-center">
-            <h1 class="page-header">@Model.User.FirstName's Collections</h1>
+        <div class="text-center relative">
+            <h1 class="page-header">@Model.User.FirstName 's Collections</h1>
+            <div class="save-changes">
+                @Html.ActionLink("Create Site", "CreateUserSite", "Account", null, new { @class = "btn btn-info" })
+                @Html.ActionLink("Upload Photos", "UploadPhotos", "Account", null, new { @class = "btn btn-info"})
+            </div>
         </div>
+
+        @if (@ViewBag.Message != null)
+        {
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                @ViewBag.Message
+            </div>
+        }
+
 
         @if (Model.Collections.Count() == 0)
         {
@@ -25,8 +38,15 @@
                 @foreach (var col in Model.Collections)
                 {
                     <div class="col-md-6 siteColumn">
-                        <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
-
+                        @if (@col.CoverPhoto != null)
+                        { 
+                            <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
+                        }
+                        else
+                        {
+                            <img class="siteImage" src="/api/photo/medium/0" alt="@col.Name" />
+                        }
+                        
                         <div class="siteEdit">
                             <a class="btn text-white no-underline" href="@Url.Action("EditUserCollection", "Account", new { collectionID = col.ID })"><span class="glyphicon glyphicon-edit"></span> Edit</a>
                         </div>
@@ -42,7 +62,10 @@
                                     <p>@Html.DisplayFor(model => col.Photos.Count) photos </p>
                                 </div>
                                 <div class="col-md-4 text-right">
-                                    <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
+                                    @if (col.Photos.Count != 0)
+                                    {
+                                        <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
+                                    }
                                 </div>
                             </div>
                         </div>

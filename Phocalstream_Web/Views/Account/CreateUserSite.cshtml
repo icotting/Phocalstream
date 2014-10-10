@@ -1,0 +1,209 @@
+﻿@model Phocalstream_Shared.Data.Model.View.AddUserCameraSite
+@{
+    ViewBag.Title = "CreateUserSite";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/CSS/Account.css")
+
+@Scripts.Render("~/Content/Scripts/jquery.validate.unobtrusive.min.js")
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+
+<div class="container">
+    <div class="content">
+    <div class="text-center relative">
+        <h1 class="page-header">Create Collection Site</h1>
+    </div>
+
+    @if (@ViewBag.Message != null)
+    {
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            @Html.Raw(ViewBag.Message)
+        </div>
+    }
+
+    @using (Html.BeginForm("CreateUserSite", "Account", FormMethod.Post))
+        {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="cameraSiteName">Camera Site Name</label>
+                    @Html.TextBoxFor(m => m.CameraSiteName, new { @placeholder = "Camera Site Name", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.CameraSiteName)
+                </div>
+            </div>
+        </div>
+        
+        <hr class="featurette-divider" />
+
+        <div id="alert-row">
+            <div class="alert alert-info alert-dismissible text-center" role="alert">
+                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <p id="currentPosition">Currently showing point at <strong></strong></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="cameraAddress">Camera Address</label>
+                    <input type="text" class="form-control" id="cameraAddress" placeholder="Camera Address">
+                </div>
+                <div class="form-group text-center">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <hr class="featurette-divider" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="create-or-label"> or </label>
+                        </div>
+                        <div class="col-md-5">
+                            <hr class="featurette-divider" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="latitude">Latitude</label>
+                    @Html.TextBox("lat", "", new { @type = "decimal", @placeholder = "Latitude", @class = "form-control", @id = "temp-lat" })
+                    @Html.ValidationMessageFor(m => m.Latitude)
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude</label>
+                    @Html.TextBox("long", "", new { @type = "decimal", @placeholder = "Longitude", @class = "form-control", @id = "temp-lon" })
+                    @Html.ValidationMessageFor(m => m.Longitude)
+                </div>
+                <div class="form-group pull-right">
+                    <a id="plot" onclick="javascript:plot()" class="btn btn-info">Plot on Map</a>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="map-canvas" id="map-canvas"></div>
+            </div>
+        </div>
+
+        <hr class="featurette-divider" />
+        
+        @Html.HiddenFor(m => m.Latitude, new { @id = "latitude"})
+        @Html.HiddenFor(m => m.Longitude, new { @id = "longitude" })
+        @Html.HiddenFor(m => m.County, new { @id = "county" })
+        @Html.HiddenFor(m => m.State, new { @id = "state" })
+
+        <div class="row">
+            <div class="col-md-4 col-md-offset-8">
+                <button type="submit" class="btn btn-success pull-right">Create New Collection</button>
+            </div>
+        </div>
+        }
+
+
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var map;
+    var geocoder;
+    var marker;
+
+    $(document).ready(function () {
+        loadMap();
+    });
+
+    function loadMap() {
+        $('#alert-row').hide();
+
+        var mapOptions = {
+            zoom: 4,
+            center: new google.maps.LatLng(38, -95),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        geocoder = new google.maps.Geocoder();
+    }
+
+    function plot() {
+        var address = $('#cameraAddress').val();
+        var lat = $('#temp-lat').val();
+        var lon = $('#temp-lon').val();
+
+        //remove the existing marker from the map
+        if (marker != null) {
+            marker.setMap(null);
+            marker = null;
+        }
+
+        if (address != "") {
+            geocoder.geocode({ 'address': address }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    handleGeocodeResult(results[0], true);
+                } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+        else if (lat != "" && lon != "") {
+            geocoder.geocode({ 'latLng': new google.maps.LatLng(lat, lon) }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    handleGeocodeResult(results[0], true);
+                } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+        else {
+            $('#alert-row').hide();
+        }
+    }
+
+    function handleGeocodeResult(result, redraw) {
+        if (redraw) {
+            map.setCenter(result.geometry.location);
+            map.setZoom(17);
+            marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                title: 'Camera Site',
+                position: result.geometry.location
+            });
+
+            google.maps.event.addListener(marker, "dragend", function (event) {
+                var point = marker.getPosition();
+                map.panTo(point);
+
+                geocoder.geocode({ 'latLng': new google.maps.LatLng(point.lat(), point.lng()) }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        handleGeocodeResult(results[0], false);
+                    } else {
+                        alert("Geocode was not successful for the following reason: " + status);
+                    }
+                });
+            });
+        }
+
+        setViews(result);
+    }
+
+    function setViews(result) {
+        $('#currentPosition').html('Currently showing point at <strong>' + result.geometry.location.lat() + ', ' + result.geometry.location.lng() + '</strong>');
+        $('#alert-row').show();
+
+        $('#latitude').val(result.geometry.location.lat());
+        $('#longitude').val(result.geometry.location.lng());
+
+        var addressComponents = result.address_components;
+        for (var i = 0; i < addressComponents.length; i++) {
+            if (addressComponents[i].types.indexOf("administrative_area_level_2") != -1) {
+                $('#county').val(addressComponents[i].short_name)
+            }
+            else if (addressComponents[i].types.indexOf("administrative_area_level_1") != -1) {
+                $('#state').val(addressComponents[i].short_name)
+            }
+        }
+    }
+    </script>

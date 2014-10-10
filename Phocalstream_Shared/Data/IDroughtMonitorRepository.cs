@@ -15,6 +15,8 @@ namespace Phocalstream_Shared.Data
         ICollection<DroughtMonitorWeek> FindBy(USState state, DateTime? week = null, int weeksPrevious = 0);
         ICollection<DroughtMonitorWeek> FindUS(DateTime? week = null, int weeksPrevious = 0);
 
+        int GetFipsForCountyAndState(string county, string state);
+
         USState GetStateForName(string name);
         USState GetState(long id);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,9 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public int Width { get; set; }
         public int Height { get; set; }
         public string FileName { get; set; }
+
+        [NotMapped]
+        public bool Portrait { get; set; }
 
         public ICollection<Tag> Tags { get; set; }
 

@@ -76,9 +76,15 @@
     <Compile Include="Migrations\201409181824156_RemoveGoogleID.Designer.cs">
       <DependentUpon>201409181824156_RemoveGoogleID.cs</DependentUpon>
     </Compile>
+<<<<<<< HEAD
     <Compile Include="Migrations\201410082011288_AddedPublicBooleanToCollection.cs" />
     <Compile Include="Migrations\201410082011288_AddedPublicBooleanToCollection.Designer.cs">
       <DependentUpon>201410082011288_AddedPublicBooleanToCollection.cs</DependentUpon>
+=======
+    <Compile Include="Migrations\201410011847179_DBFix.cs" />
+    <Compile Include="Migrations\201410011847179_DBFix.Designer.cs">
+      <DependentUpon>201410011847179_DBFix.cs</DependentUpon>
+>>>>>>> master
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,8 +111,13 @@
     <EmbeddedResource Include="Migrations\201409181824156_RemoveGoogleID.resx">
       <DependentUpon>201409181824156_RemoveGoogleID.cs</DependentUpon>
     </EmbeddedResource>
+<<<<<<< HEAD
     <EmbeddedResource Include="Migrations\201410082011288_AddedPublicBooleanToCollection.resx">
       <DependentUpon>201410082011288_AddedPublicBooleanToCollection.cs</DependentUpon>
+=======
+    <EmbeddedResource Include="Migrations\201410011847179_DBFix.resx">
+      <DependentUpon>201410011847179_DBFix.cs</DependentUpon>
+>>>>>>> master
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
