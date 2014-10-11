@@ -14,73 +14,47 @@
 
     var pos = 0;
     var bufferPos = 0;
-    var bufferLen = @Html.Raw(Json.Encode(Model.BufferCount));
     var len = 0;
-
-    var last;
-    var current;
 
     var running;
 
     $(document).ready(function () {
-        //frames = $('#frames').children('canvas');
         len = frameset.length;
         frames = new Array();
         buffer();
     });
 
-        /*
-    function buffer() { 
-        var img = new Image();
-        $(img).width("800px");
-        $(frames[bufferPos]).append(img);
-        $(img).one('load', function() {
-            if ( bufferPos++ < bufferLen-1) {
-                buffer();
-            } else { 
-                $("#bufferlabel").hide();
-                running = true;
-                nextImage();
-            }
-        });
-        img.src = "/api/photo/medium/"+frameset[bufferPos];
-    }
-    */
-
 
         function buffer() {
-                //var canvas = frames[bufferPos];
-                //var context = canvas.getContext('2d');
+            var imageObj = new Image();
+            imageObj.onload = function() {
+                var complete = parseInt(((bufferPos / len)*100));
 
-                var imageObj = new Image();
-                imageObj.onload = function() {
-                    //canvas.width = this.width;
-                    //canvas.height = this.height;
-                    //context.drawImage(this, 0, 0);
-                    var complete = parseInt(((bufferPos / len)*100));
+                $("#progressLabel").empty();
+                $("#progressLabel").append(complete+"%");
 
-                    $("#progressLabel").empty();
-                    $("#progressLabel").append(complete+"%");
+                $("#progress").css("width", complete+"%").attr('aria-valuenow', complete);  
+                if (bufferPos < len) {
+                    buffer();
+                } else {
+                    var canvas = document.getElementById("stage");
+                    canvas.width = 400;
+                    canvas.height = 400 * (this.width/this.height);
 
-                    $("#progress").css("width", complete+"%").attr('aria-valuenow', complete);  
-                    if (bufferPos < len) {
-                        buffer();
-                    } else {
-                        $("#loadDiv").hide();
-                        running = true;
-                        nextImage();
-                    }
-                };
+                    $("#loadDiv").hide();
+                    $("#video").show();
+                    running = true;
+                    nextImage();
+                }
+            };
 
-                imageObj.src = "/api/photo/medium/"+frameset[bufferPos++];
-                frames.push(imageObj);
+            imageObj.src = "/api/photo/low/"+frameset[bufferPos++];
+            frames.push(imageObj);
         }
 
         function nextImage() { 
             var image = frames[pos % len];
             var canvas = document.getElementById("stage");
-            canvas.width = image.width;
-            canvas.height = image.height;
 
             var context = canvas.getContext('2d');
             context.drawImage(image, 0, 0);
@@ -92,55 +66,15 @@
             $("#photoId").empty();
             $("#photoId").append(frameset[pos++ % len]);
         }
-        /*
-        function nextImage() {
-            current = $(frames[pos % len]);
-            current.show();
-
-            if (last) {
-                last.hide();
-            }
-            last = current;
-
-            if ( running == true) {
-                setTimeout(function () { nextImage(); }, 200);
-            }
-
-            $("#photoId").empty();
-            $("#photoId").append(frameset[pos++ % len]);
-        }
-        */
-
-
-        /*
-    function nextImage() {
-        current = $(frames[pos % bufferLen]);
-        current.show();
-
-        if (last) {
-            last.hide();
-        }
-        last = current;
-
-        bufferFrame = $(frames[bufferPos % bufferLen]);
-        bufferFrame.empty();
-        bufferFrame.append("<img style=\"800px\" src=\"/api/photo/medium/"+frameset[bufferPos % len]+"\"/>");
-        bufferPos++;
-
-        if ( running == true) {
-            setTimeout(function () { nextImage(); }, 200);
-        }
-
-        //current.style.display = '';
-        $("#photoId").empty();
-        $("#photoId").append(frameset[pos++ % len]);
-    }
-    */
-
+  
     function startStop() { 
         if ( running == true ) { 
+            $("#controls").removeClass("glyphicon-pause");
+            $("#controls").addClass("glyphicon-play");
             running = false;
         } else { 
+            $("#controls").removeClass("glyphicon-play");
+            $("#controls").addClass("glyphicon-pause");
             running = true; 
             nextImage();
         }
@@ -151,28 +85,26 @@
 <div class="container">
     <div class="content">
         <div id="loadDiv">
-        <h1 id="bufferlabel">Creating Video</h1>
-            <div class="progress">
-                <div class="progress-bar progress-bar-striped active" id="progress" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
-                    <span class="sr-only">45% Complete</span>
+            <h1 id="bufferlabel">Creating Video</h1>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped active" id="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+                Progress: <span id="progressLabel"></span>
+            </div>
+        <div id="video" style="display: none;">
+            <div class="col-md-8">
+                <div id="frames" style="position: relative">
+                    <canvas id="stage"></canvas>
                 </div>
             </div>
-            Progress: <span id="progressLabel"></span>
-        </div>
-        <h3 id="photoId"></h3>
-        <a href="javascript:startStop()">Start / Stop</a>
-
-        <div id="frames" style="position: relative">
-        <canvas id="stage"></canvas>
-
-
-            @*
-            @for (var i = 0; i < Model.Ids.Count; i++)
-        {
-            <canvas style="display: none; position: absolute; top: 0px; height: 400px;"></canvas>
-        }
-        *@
-
+            <div class="col-md-4">
+                <h3 id="photoId"></h3>
+                <button class="btn btn-default" onclick="startStop()">
+                    <span id="controls" class="glyphicon glyphicon-pause"></span>
+                </button>
             </div>
         </div>
     </div>
+</div>
