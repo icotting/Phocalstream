@@ -7,13 +7,13 @@ namespace Phocalstream_Service.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
-    public sealed partial class DBFix : IMigrationMetadata
+    public sealed partial class AddedPublicBooleanToCollection : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(DBFix));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedPublicBooleanToCollection));
         
         string IMigrationMetadata.Id
         {
-            get { return "201410011847179_DBFix"; }
+            get { return "201410101542390_AddedPublicBooleanToCollection"; }
         }
         
         string IMigrationMetadata.Source

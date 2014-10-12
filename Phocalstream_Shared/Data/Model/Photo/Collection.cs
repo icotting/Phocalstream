@@ -17,6 +17,7 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public ICollection<Photo> Photos { get; set; }
         public Photo CoverPhoto { get; set; }
         public string ContainerID { get; set; }
+        public bool Public { get; set; }
 
         // if the type is SITE then the Photos collection will be empty
         public CollectionType Type { get; set; }

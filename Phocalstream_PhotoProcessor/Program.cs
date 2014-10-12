@@ -35,7 +35,7 @@ namespace Phocalstream_PhotoProcessor
 
         static void Main(string[] args)
         {
-            if (args.Contains<string>(@"--buidcollections"))
+            if (args.Contains<string>(@"--buildcollections"))
             {
                 _buildCollections = true;
             }

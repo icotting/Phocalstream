@@ -30,6 +30,12 @@ namespace Phocalstream_Shared.Data.Model.View
         public IEnumerable<Collection> Collections { get; set; }
     }
 
+    public class EditUserCollection
+    {
+        public Collection Collection { get; set; }
+        public long CoverPhotoId { get; set; }
+    }
+
     public class UserPhotoUpload
     {
         public List<Collection> UserSiteCollections { get; set; }

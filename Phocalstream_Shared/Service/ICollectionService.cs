@@ -19,6 +19,7 @@ namespace Phocalstream_Shared.Service
         void RemoveFromExistingUserCollection(User user, long collectionID, string photoIDs);
         void TogglePhotoInUserCollection(long photoID, long collectionID);
         void UpdateUserCollection(Collection collection);
-        
+        void SetUserCollectionCoverPhoto(User user, long collectionID, long photoID);
+        void SetUserCollectionPublic(User user, long collectionID, bool publish);        
     }
 }
