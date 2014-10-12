@@ -76,7 +76,6 @@
     <Compile Include="Data\Model\Photo\Tag.cs" />
     <Compile Include="Data\Model\Photo\User.cs" />
     <Compile Include="Data\Model\Photo\UserRole.cs" />
-    <Compile Include="Data\Model\Photo\TimelapseFrame.cs" />
     <Compile Include="Data\Model\View\SearchModels.cs" />
     <Compile Include="Data\Model\View\SiteDetails.cs" />
     <Compile Include="Data\Model\View\TagDetails.cs" />

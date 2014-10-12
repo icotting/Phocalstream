@@ -173,7 +173,7 @@ namespace Phocalstream_Web.Application.Data
             {
                 conn.Open();
 
-                using (SqlCommand command = new SqlCommand("select Tags.Name from Tags " + 
+                using (SqlCommand command = new SqlCommand("select Tags.Name from Tags " +
                     "INNER JOIN PhotoTags ON Tags.ID = PhotoTags.Tag_ID " +
                     "INNER JOIN Photos ON PhotoTags.Photo_ID = Photos.ID " +
                     "WHERE Photos.ID = @id", conn))
@@ -193,39 +193,7 @@ namespace Phocalstream_Web.Application.Data
 
             return tags;
         }
-
-        public ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort)
-        {
-            List<TimelapseFrame> frames = new List<TimelapseFrame>();
-
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                conn.Open();
-
-                using (SqlCommand command = new SqlCommand(string.Format("select BlobID, ContainerID, Captured, Photos.ID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in ({0})", photoList), conn))
-                {
-
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            TimelapseFrame frame = new TimelapseFrame();
-                            frame.Time = reader.GetDateTime(2);
-                            frame.PhotoId = reader.GetInt64(3);
-                            frame.Url = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", urlScheme,
-                                urlHost,
-                                Convert.ToString(urlPort),
-                                reader.GetString(1),
-                                reader.GetString(0));
-                            frames.Add(frame);
-                        }
-                    }
-                }
-            }
-            
-            return frames;
-        }
-
+   
         private XmlDocument CreateDeepZoomDocument(SqlCommand command, Uri uri)
         {
             XmlDocument doc = new XmlDocument();

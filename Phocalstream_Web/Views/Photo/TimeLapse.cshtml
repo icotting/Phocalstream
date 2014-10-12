@@ -3,79 +3,126 @@
 @{
     ViewBag.Title = "";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    double WIDTH = 700.0;
+    string RESOLUTION = "medium";
+    bool DEBUG = false;
 }
 
 @section Scripts
 {
     <script type="text/javascript">
 
+    var MAX_BUFFER = 500;
+
     var frameset = @Html.Raw(Json.Encode(Model.Ids));
-    var frames;
+        var frames;
 
-    var pos = 0;
-    var bufferPos = 0;
-    var len = 0;
+        var pos = 0;
+        var bufferPos = 0;
 
-    var running;
+        var len = 0;
+        var bufferLen = 0;
 
-    $(document).ready(function () {
-        len = frameset.length;
-        frames = new Array();
-        buffer();
-    });
+        var running;
 
+        var width = @WIDTH;
+        var height = @(WIDTH * ((float)Model.Height / (float)Model.Width));
+
+        var progLen;
+
+        $(document).ready(function () {
+            len = frameset.length;
+            if (len > MAX_BUFFER) {
+                progLen = MAX_BUFFER;
+            } else {
+                progLen = len;
+            }
+            frames = new Array();
+            buffer();
+        });
 
         function buffer() {
             var imageObj = new Image();
             imageObj.onload = function() {
-                var complete = parseInt(((bufferPos / len)*100));
+                var complete = parseInt(((bufferPos++ / progLen)*100));
 
-                $("#progressLabel").empty();
-                $("#progressLabel").append(complete+"%");
+                $("#progress").css("width", complete+"%").attr('aria-valuenow', complete);
 
-                $("#progress").css("width", complete+"%").attr('aria-valuenow', complete);  
-                if (bufferPos < len) {
+                if (bufferPos < len && bufferPos < MAX_BUFFER) {
                     buffer();
                 } else {
-                    var canvas = document.getElementById("stage");
-                    canvas.width = 400;
-                    canvas.height = 400 * (this.width/this.height);
+                    bufferLen = bufferPos;
+                    $("#blen").append(bufferLen);
+                    $("#flen").append(len);
 
-                    $("#loadDiv").hide();
-                    $("#video").show();
-                    running = true;
-                    nextImage();
-                }
-            };
+                    var canvas = document.getElementById("vscreen");
 
-            imageObj.src = "/api/photo/low/"+frameset[bufferPos++];
-            frames.push(imageObj);
-        }
+                    canvas.style.width = width+"px";
+                    canvas.style.height = height+"px";
 
-        function nextImage() { 
-            var image = frames[pos % len];
-            var canvas = document.getElementById("stage");
+                    canvas.width = width;
+                    canvas.height = height;
 
-            var context = canvas.getContext('2d');
-            context.drawImage(image, 0, 0);
-
-            if ( running == true) {
-                setTimeout(function () { nextImage(); }, 200);
+                $("#loadDiv").hide();
+                $("#video").show();
+                running = true;
+                nextImage();
             }
+        };
 
-            $("#photoId").empty();
-            $("#photoId").append(frameset[pos++ % len]);
+        imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos];
+        frames.push(imageObj);
+    }
+
+    function nextImage() {
+        @{ 
+            if (DEBUG) {
+                <texT>
+                    $("#pid").empty();
+                    $("#pid").append(frameset[pos % len]);
+                </text>
+            }   
         }
-  
-    function startStop() { 
-        if ( running == true ) { 
+
+        var image = frames[pos++ % bufferLen];
+        var canvas = document.getElementById("vscreen");
+
+        var context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0, width, height);
+
+        if (bufferLen < len) {
+            var imageObj = new Image();
+
+            imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos % len];
+            frames[bufferPos++ % bufferLen] = imageObj;
+        }
+
+        @{ 
+            if (DEBUG) {
+                <texT>
+                    $("#pos").empty();
+                    $("#bufPos").empty();
+
+                    $("#pos").append(pos % len);
+                    $("#bufPos").append(bufferPos % bufferLen);
+                </text>
+            }   
+        }
+
+        if ( running == true) {
+            setTimeout(function () { nextImage(); }, 200);
+        }
+    }
+
+    function startStop() {
+        if ( running == true ) {
             $("#controls").removeClass("glyphicon-pause");
             $("#controls").addClass("glyphicon-play");
             running = false;
-        } else { 
+        } else {
             $("#controls").removeClass("glyphicon-play");
             $("#controls").addClass("glyphicon-pause");
-            running = true; 
+            running = true;
             nextImage();
         }
     }
@@ -85,25 +132,31 @@
 <div class="container">
     <div class="content">
         <div id="loadDiv">
-            <h1 id="bufferlabel">Creating Video</h1>
+            <h1 id="bufferlabel">Buffering Frames ...</h1>
                 <div class="progress">
                     <div class="progress-bar progress-bar-striped active" id="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
                         <span class="sr-only"></span>
                     </div>
                 </div>
-                Progress: <span id="progressLabel"></span>
             </div>
         <div id="video" style="display: none;">
             <div class="col-md-8">
-                <div id="frames" style="position: relative">
-                    <canvas id="stage"></canvas>
+                <div id="frames">
+                    <canvas id="vscreen"></canvas>
+                    <button class="btn btn-default" onclick="startStop()">
+                        <span id="controls" class="glyphicon glyphicon-pause"></span>
+                    </button>
                 </div>
             </div>
             <div class="col-md-4">
-                <h3 id="photoId"></h3>
-                <button class="btn btn-default" onclick="startStop()">
-                    <span id="controls" class="glyphicon glyphicon-pause"></span>
-                </button>
+                @if (DEBUG) { 
+                <p>
+                    Photo <span id="pid"></span> at position <span id="pos"></span> and buffer position of <span id="bufPos"></span>
+                </p>
+                <p>
+                    Frameset Length: <span id="flen"></span> with buffer length <span id="blen"></span>
+                </p>
+                }
             </div>
         </div>
     </div>

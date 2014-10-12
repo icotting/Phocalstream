@@ -164,14 +164,16 @@ namespace Phocalstream_Web.Controllers
         {
             TimelapseModel model = new TimelapseModel();
 
-            List<TimelapseFrame> frames = DZPhotoRepository.CreateFrameSet(photoIds, Request.Url.Scheme, Request.Url.Host, Request.Url.Port).ToList<TimelapseFrame>();
-            frames.OrderBy(f => f.Time);
-            
+            List<long> ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToList<long>();
+            Photo first = PhotoRepository.Find(ids[0]);
+
+            model.Width = first.Width;
+            model.Height = first.Height;
+
             // this is redundant and should either replace the video model or be removed
-            model.Ids = frames.Select(f => f.PhotoId).ToList<long>();
-            model.Video = new TimelapseVideo() { Frames = frames };
-            model.BufferCount = Convert.ToInt16(frames.Count * 0.10); // buffer 10% of the frames
-            model.FramesPerSecond = Convert.ToInt16(frames.Count / 60); // limit movie size to 1 minute by default
+            model.Ids = ids;
+            model.BufferCount = Convert.ToInt16(ids.Count * 0.10); // buffer 10% of the frames
+            model.FramesPerSecond = Convert.ToInt16(ids.Count / 60); // limit movie size to 1 minute by default
 
             return View(model);
         }
