@@ -207,7 +207,10 @@ namespace Phocalstream_Web.Controllers
 
             foreach (var col in model.Collections)
             {
-                col.CoverPhoto = col.Photos.LastOrDefault(); 
+                if (col.CoverPhoto == null)
+                {
+                    col.CoverPhoto = col.Photos.LastOrDefault();
+                }
             }
 
             if (e == 1)
@@ -287,9 +290,11 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult EditUserCollection(long collectionID)
         {
-            Collection collection = CollectionRepository.First(c => c.ID == collectionID, c => c.Photos);
+            EditUserCollection model = new EditUserCollection();
+            model.Collection = CollectionRepository.First(c => c.ID == collectionID, c => c.Photos);
+            model.CoverPhotoId = model.Collection.CoverPhoto != null ? model.Collection.CoverPhoto.ID : 0;
 
-            return View(collection);
+            return View(model);
         }
 
         public ActionResult UserDefinedCollection(long collectionID)

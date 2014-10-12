@@ -39,6 +39,14 @@
     color: white !important;
 }
 
+.siteCoverPhoto {
+    top: 0px;
+    left: 15px;
+    position: absolute;
+
+    color: white !important;
+}
+
 .siteToDelete {
     top: 0px;
     left: 15px;
@@ -77,6 +85,12 @@
 .save-changes {
     top: 3px;
     right: 0px;
+    position: absolute;
+}
+
+.publish {
+    top: 3px;
+    left: 0px;
     position: absolute;
 }
 

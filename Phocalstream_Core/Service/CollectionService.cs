@@ -225,5 +225,21 @@ namespace Phocalstream_Service.Service
                 Path.Combine(collectionPath, containerID, "collection.dzc"));
             PhotoService.GeneratePivotManifest(collectionPath, containerID, String.Join(",", ids), CollectionType.USER);
         }
+
+        public void SetUserCollectionCoverPhoto(User user, long collectionID, long photoID)
+        {
+            Collection collection = CollectionRepository.First(c => c.ID == collectionID && c.Owner.ID == user.ID);
+            Photo photo = PhotoRepository.First(p => p.ID == photoID);
+
+            collection.CoverPhoto = photo;
+            Unit.Commit();
+        }
+
+        public void SetUserCollectionPublic(User user, long collectionID, bool publish)
+        {
+            Collection collection = CollectionRepository.First(c => c.ID == collectionID && c.Owner.ID == user.ID);
+            collection.Public = publish;
+            Unit.Commit();
+        }
     }
 }
