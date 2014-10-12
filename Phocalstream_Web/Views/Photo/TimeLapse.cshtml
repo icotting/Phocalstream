@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    
     double WIDTH = 700.0;
     string RESOLUTION = "medium";
     bool DEBUG = false;
@@ -12,49 +13,68 @@
 {
     <script type="text/javascript">
 
-    var MAX_BUFFER = 500;
+        var MAX_BUFFER = 500; // buffer size
 
-    var frameset = @Html.Raw(Json.Encode(Model.Ids));
-        var frames;
+        var frameset = @Html.Raw(Json.Encode(Model.Ids)); // the full set of frames represented by photo IDs
+        var buffer; // the actual Image objects with data for a photo 
 
-        var pos = 0;
-        var bufferPos = 0;
+        var pos = 0; // current position for display
+        var bufferPos = 0; // current position of image to buffer
 
-        var len = 0;
-        var bufferLen = 0;
+        var len = 0; // length of the image set
+        var bufferLen = 0; // length of the buffer (could be less than MAX)
 
-        var running;
+        var running; 
 
-        var width = @WIDTH;
-        var height = @(WIDTH * ((float)Model.Height / (float)Model.Width));
+        var width = @WIDTH; // frame width
+        var height = @(WIDTH * ((float)Model.Height / (float)Model.Width)); // frame height
 
-        var progLen;
+        var progLen; // length of the progress bar
 
         $(document).ready(function () {
+
+            // set the total length
             len = frameset.length;
+
+            // set the progress bar length conditionally based on the image set size
             if (len > MAX_BUFFER) {
                 progLen = MAX_BUFFER;
             } else {
                 progLen = len;
             }
-            frames = new Array();
-            buffer();
+
+            // create the array to hold the buffered image data
+            buffer = new Array();
+            bufferData();
         });
 
-        function buffer() {
+        function bufferData() {
+            // for each image up to MAX, load the data into the buffer 
             var imageObj = new Image();
-            imageObj.onload = function() {
-                var complete = parseInt(((bufferPos++ / progLen)*100));
 
+            // event handler to invoke the call to buffer the next image after the current one has been bufferd
+            imageObj.onload = function() {
+
+                // update the progress bar
+                var complete = parseInt(((bufferPos++ / progLen)*100));
                 $("#progress").css("width", complete+"%").attr('aria-valuenow', complete);
 
-                if (bufferPos < len && bufferPos < MAX_BUFFER) {
-                    buffer();
-                } else {
-                    bufferLen = bufferPos;
-                    $("#blen").append(bufferLen);
-                    $("#flen").append(len);
 
+                // if there is more to buffer, do that
+                if (bufferPos < len && bufferPos < MAX_BUFFER) {
+                    bufferData();
+                } else {
+                    // if not, set the length of the buffer
+                    bufferLen = bufferPos;
+
+                    @if(DEBUG) {
+                        <text>
+                           $("#blen").append(bufferLen);
+                           $("#flen").append(len);
+                        </text>
+                    }
+                    
+                    // get the display canvas and set the size
                     var canvas = document.getElementById("vscreen");
 
                     canvas.style.width = width+"px";
@@ -63,15 +83,17 @@
                     canvas.width = width;
                     canvas.height = height;
 
+                // get rid of the buffering display and begin the movie
                 $("#loadDiv").hide();
                 $("#video").show();
                 running = true;
-                nextImage();
+                nextImage(); // invokes the call to update the display canvas with the next image
             }
         };
 
+        // set the source of the image being buffered which will cause the event handler to be invoked when the image has loaded
         imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos];
-        frames.push(imageObj);
+        buffer.push(imageObj); // store the image object in the buffer
     }
 
     function nextImage() {
@@ -84,17 +106,27 @@
             }   
         }
 
-        var image = frames[pos++ % bufferLen];
-        var canvas = document.getElementById("vscreen");
+        // load the image data to display from the buffer
+        var image = buffer[pos++ % bufferLen];
 
+        // get the display canvas drawing context
+        var canvas = document.getElementById("vscreen");
         var context = canvas.getContext('2d');
+
+        // draw the buffered image data
         context.drawImage(image, 0, 0, width, height);
 
+        // if the buffer is smaller than the total frameset, buffer the next image
         if (bufferLen < len) {
             var imageObj = new Image();
 
+            /* Load the next image based on the buffer position into the buffer. 
+             * NOTE: this will place the next image to buffer into the position 
+             * of the image data that was just displayed. In MAX cycles, this 
+             * data will be pulled from the buffer and displayed. This gives
+             * sufficient time for the data to load before it is needed. */
             imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos % len];
-            frames[bufferPos++ % bufferLen] = imageObj;
+            buffer[bufferPos++ % bufferLen] = imageObj;
         }
 
         @{ 
@@ -109,6 +141,7 @@
             }   
         }
 
+        // set the time to invoke the next image display call
         if ( running == true) {
             setTimeout(function () { nextImage(); }, 200);
         }
