@@ -59,6 +59,16 @@ namespace Phocalstream_Web.Controllers
             model.AvailableTags = PhotoService.GetTagNames();
             model.SiteNames = SearchService.GetSiteNames();
 
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionList userCollectionModel = new UserCollectionList();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
+            }
+
+
             if (e == 1)
             {
                 ViewBag.Message = "Zero photos matched those parameters, please try again.";
