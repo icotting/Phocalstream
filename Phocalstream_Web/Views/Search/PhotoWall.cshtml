@@ -17,6 +17,13 @@
         effect: "fadeIn"
     });
 
+    function setText(value) {
+        var width = getImgWidth(value);
+        var height = getImgHeight(width);
+
+        $("#img-size").html(width + " x " + Math.round(height) + " Pixels");
+    }
+
     function setImageAndText(value) {
         var width = getImgWidth(value);
         var height = getImgHeight(width);
@@ -62,6 +69,7 @@
         }
     }
 
+    var totalPhotoCount = @Model.PhotoCount;
     function computeHolderMargin(value) {
         var width = getImgWidth(value);
 
@@ -71,11 +79,21 @@
         var totalWidth = $(".holder").width();
 
         var numberOfPhotosAcross = Math.floor(totalWidth / imgWidth);
-        var usedWidth = numberOfPhotosAcross * imgWidth;
+
+        // corrects for when there are less photos than can fit on screen
+        var usedWidth = Math.min(numberOfPhotosAcross, totalPhotoCount) * imgWidth;
         var remainder = totalWidth - usedWidth;
 
         $(".ul-holder").css("margin-left", (remainder / 2) + "px");
     }
+
+    $(function () {
+        $("img.photo").dblclick(function () {
+            var id = this.id;
+            var url = "@Url.Action("Index", "Photo", null)?photoId=" + id;
+            window.open(url, '_blank');
+        });
+    });
 
     $(function () {
         var initialSliderValue = 400;
@@ -87,6 +105,9 @@
             max: 1000,
             value: initialSliderValue,
             slide: function (event, ui) {
+                setText(ui.value);
+            },
+            stop: function (event, ui) {
                 setImageAndText(ui.value);
                 scaleOrHideLabel(ui.value);
                 computeHolderMargin(ui.value);
@@ -132,7 +153,7 @@
                 {
                     <li class="search-photo">
                         <p class="img-date">@p.Captured.ToString()</p>
-                        <img class="photo" src="/api/photo/medium/@p.ID" width="400" height="267" />
+                        <img id="@p.ID" class="photo" src="/api/photo/medium/@p.ID" width="400" height="267" />
                     </li>
                 }
             </ul>
