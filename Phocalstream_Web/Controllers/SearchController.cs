@@ -125,11 +125,13 @@ namespace Phocalstream_Web.Controllers
                 if (result.Ids.Count > 0)
                 {
                     //save the collection
-                    Collection c = new Collection();
-                    c.Name = collectionName;
-                    c.ContainerID = containerID;
-                    c.Type = CollectionType.SEARCH;
-                    c.Photos = result.Matches;
+                    Collection c = new Collection() {
+                        Name = collectionName,
+                        ContainerID = containerID,
+                        Type = CollectionType.SEARCH,
+                        Status = CollectionStatus.PROCESSING,
+                        Photos = result.Matches
+                    };
                     CollectionRepository.Insert(c);
                     Unit.Commit();
 
@@ -175,6 +177,12 @@ namespace Phocalstream_Web.Controllers
             }
 
             return View(model);
+        }
+
+        public ActionResult PhotoWall(int collectionID)
+        {
+            Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            return View(collection.Photos);
         }
 
         public ActionResult List()

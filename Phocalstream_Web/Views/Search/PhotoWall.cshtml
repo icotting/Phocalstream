@@ -1,0 +1,18 @@
+﻿@model IEnumerable<Phocalstream_Shared.Data.Model.Photo.Photo>
+@{
+    ViewBag.Title = "PhotoWall";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/CSS/Search.css")
+
+<h2>PhotoWall</h2>
+
+<div class="holder">
+    @foreach (var p in Model)
+    {
+        <ul class="search-photo">
+            <li><img src="/api/photo/low/@p.ID" /></li>
+        </ul>
+    }
+</div>
