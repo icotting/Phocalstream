@@ -307,6 +307,8 @@
     <Content Include="Content\bootstrap\css\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap\css\bootstrap.css" />
     <Content Include="Content\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Content\CSS\bootstrap-slider.css" />
+    <Content Include="Content\CSS\jquery-ui-slider.css" />
     <Content Include="Content\file-upload\jquery.fileupload-ui-noscript.css" />
     <Content Include="Content\file-upload\jquery.fileupload-ui.css" />
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.svg" />
@@ -357,6 +359,7 @@
     <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\bootbox.min.js" />
     <Content Include="Content\Scripts\ClientBin.js" />
+    <Content Include="Content\Scripts\jquery-lazyload.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
     <Content Include="Content\Scripts\jquery-2.1.1.js" />
     <Content Include="Content\Scripts\jquery-2.1.1.min.js" />
@@ -415,6 +418,7 @@
     <Content Include="Views\Photo\SiteDashboard.cshtml" />
     <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
     <Content Include="Views\Account\CreateUserSite.cshtml" />
+    <Content Include="Views\Search\PhotoWall.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

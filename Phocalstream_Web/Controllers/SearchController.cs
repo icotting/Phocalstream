@@ -59,6 +59,16 @@ namespace Phocalstream_Web.Controllers
             model.AvailableTags = PhotoService.GetTagNames();
             model.SiteNames = SearchService.GetSiteNames();
 
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionList userCollectionModel = new UserCollectionList();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
+            }
+
+
             if (e == 1)
             {
                 ViewBag.Message = "Zero photos matched those parameters, please try again.";
@@ -125,19 +135,25 @@ namespace Phocalstream_Web.Controllers
                 if (result.Ids.Count > 0)
                 {
                     //save the collection
-                    Collection c = new Collection();
-                    c.Name = collectionName;
-                    c.ContainerID = containerID;
-                    c.Type = CollectionType.SEARCH;
-                    c.Photos = result.Matches;
+                    Collection c = new Collection() {
+                        Name = collectionName,
+                        ContainerID = containerID,
+                        Type = CollectionType.SEARCH,
+                        Status = CollectionStatus.PROCESSING,
+                        Photos = result.Matches
+                    };
                     CollectionRepository.Insert(c);
                     Unit.Commit();
 
-                    //generate xml manifests
+                    /*
+                     * Since we are currently not showing a pivotview of search results, 
+                     * these manifests do not need to be generated.
+                     * 
                     string searchPath = SearchService.ValidateAndGetSearchPath();
                     CollectionService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches), 
                         Path.Combine(searchPath, containerID.ToString(), "collection.dzc"));
                     PhotoService.GeneratePivotManifest(searchPath, containerID.ToString(), String.Join(",", result.Ids.ToArray()), CollectionType.SEARCH);
+                    */
 
                     return RedirectToAction("SearchResult", new { collectionID = c.ID });
                 }
@@ -153,17 +169,43 @@ namespace Phocalstream_Web.Controllers
         {
             SearchResults model = new SearchResults();
 
-            Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
-            model.CollectionName = collection.Name;
+            model.Collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
 
-            model.First = collection.Photos.First().Captured;
-            model.Last = collection.Photos.Last().Captured;
-            model.PhotoCount = collection.Photos.Count;
+            model.First = model.Collection.Photos.First().Captured;
+            model.Last = model.Collection.Photos.Last().Captured;
+            model.PhotoCount = model.Collection.Photos.Count;
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,
-                collection.ID);
+                model.Collection.ID);
+
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                UserCollectionList userCollectionModel = new UserCollectionList();
+                userCollectionModel.User = User;
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                model.UserCollections = userCollectionModel;
+            }
+
+            return View("PhotoWall", model);
+        }
+
+        public ActionResult PhotoWall(int collectionID)
+        {
+            SearchResults model = new SearchResults();
+
+            model.Collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+
+            model.First = model.Collection.Photos.First().Captured;
+            model.Last = model.Collection.Photos.Last().Captured;
+            model.PhotoCount = model.Collection.Photos.Count;
+
+            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
+                Request.Url.Host,
+                Request.Url.Port,
+                model.Collection.ID);
 
             Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             if (User != null)

@@ -26,6 +26,7 @@ namespace Phocalstream_Shared.Data.Model.View
 
         public ICollection<string> SiteNames { get; set; }
         public ICollection<string> AvailableTags { get; set; }
+        public UserCollectionList UserCollections { get; set; }
 
         public long BackgroundImageID { get; set; }
         
@@ -207,7 +208,7 @@ namespace Phocalstream_Shared.Data.Model.View
 
     public class SearchResults
     {
-        public string CollectionName { get; set; }
+        public Collection Collection { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MMM dd, yyyy}")]
         public DateTime First { get; set; }
