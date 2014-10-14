@@ -356,7 +356,7 @@ namespace Phocalstream_Web.Controllers
                                                             .Select(p => p.ID)
                                                             .OrderBy(p => new Guid());
                 model.PhotoCount = photoIds.Count();
-                model.CoverPhotoID = PhotoRepository.Find(p => p.Site.ID == siteID && p.Captured.Year == y && p.Captured.Hour > 8 && p.Captured.Hour < 20)
+                model.CoverPhotoID = PhotoRepository.Find(p => p.Site.ID == siteID && p.Captured.Year == y && p.Captured.Hour > 12 && p.Captured.Hour < 16)
                                                     .Select(p => p.ID)
                                                     .OrderBy(p => new Guid()).First();
 
