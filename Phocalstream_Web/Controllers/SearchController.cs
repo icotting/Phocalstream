@@ -145,11 +145,15 @@ namespace Phocalstream_Web.Controllers
                     CollectionRepository.Insert(c);
                     Unit.Commit();
 
-                    //generate xml manifests
+                    /*
+                     * Since we are currently not showing a pivotview of search results, 
+                     * these manifests do not need to be generated.
+                     * 
                     string searchPath = SearchService.ValidateAndGetSearchPath();
                     CollectionService.GenerateCollectionManifest(PhotoService.GetFileNames(result.Matches), 
                         Path.Combine(searchPath, containerID.ToString(), "collection.dzc"));
                     PhotoService.GeneratePivotManifest(searchPath, containerID.ToString(), String.Join(",", result.Ids.ToArray()), CollectionType.SEARCH);
+                    */
 
                     return RedirectToAction("SearchResult", new { collectionID = c.ID });
                 }
@@ -185,7 +189,7 @@ namespace Phocalstream_Web.Controllers
                 model.UserCollections = userCollectionModel;
             }
 
-            return View(model);
+            return View("PhotoWall", model);
         }
 
         public ActionResult PhotoWall(int collectionID)
