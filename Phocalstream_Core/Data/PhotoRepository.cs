@@ -483,11 +483,20 @@ namespace Phocalstream_Web.Application.Data
 
             List<string> tags = GetPhotoTags((long)photo["ID"]);
 
-            foreach (var t in tags)
+            if (tags.Count == 0)
             {
                 facetValue = doc.CreateElement("String");
-                facetValue.SetAttribute("Value", t);
+                facetValue.SetAttribute("Value", "");
                 facet.AppendChild(facetValue);
+            }
+            else
+            {
+                foreach (var t in tags)
+                {
+                    facetValue = doc.CreateElement("String");
+                    facetValue.SetAttribute("Value", t);
+                    facet.AppendChild(facetValue);
+                }
             }
 
             facets.AppendChild(facet);
