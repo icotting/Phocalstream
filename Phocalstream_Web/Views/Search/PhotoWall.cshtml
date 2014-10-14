@@ -95,7 +95,14 @@
 
         setImageAndText(initialSliderValue);
         computeHolderMargin(initialSliderValue);
-  });
+    });
+
+    //If the User resizes the window, readjust the margins
+    $(window).bind("resize", resizeWindow);
+
+    function resizeWindow(e) {
+        computeHolderMargin($("img.photo").width());
+    }
 </script>
 
 <div class="text-center">
