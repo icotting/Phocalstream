@@ -88,8 +88,13 @@ input[type=checkbox] {
     margin-top: 75px;
 }
 
-/* Search Photo Wall */
+.search-image-save {
+    position: absolute;
+    bottom: 5px;
+    right: 0px;
+}
 
+/* Search Photo Wall */
 .fit-width {
     margin: auto;
     max-width: 960px;
