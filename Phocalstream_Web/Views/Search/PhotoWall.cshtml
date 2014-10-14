@@ -1,0 +1,162 @@
+﻿@model Phocalstream_Shared.Data.Model.View.SearchResults
+@{
+    ViewBag.Title = "PhotoWall";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/CSS/Search.css",
+               "~/Content/CSS/jquery-ui-slider.css",
+               "~/Content/CSS/bootstrap-slider.css")
+@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js",
+                "~/Content/Scripts/jquery-lazyload.js")
+
+<script>
+
+    $("img.photo").lazyload({
+        threshold: 400,
+        effect: "fadeIn"
+    });
+
+    function setText(value) {
+        var width = getImgWidth(value);
+        var height = getImgHeight(width);
+
+        $("#img-size").html(width + " x " + Math.round(height) + " Pixels");
+    }
+
+    function setImageAndText(value) {
+        var width = getImgWidth(value);
+        var height = getImgHeight(width);
+        $(".photo").width(width);
+        $(".photo").height(height);
+
+        $("#img-size").html(width + " x " + Math.round(height) + " Pixels");
+    }
+
+    function getImgWidth(value) {
+        var width = value * 1;
+        return width;
+    }
+
+    function getImgHeight(width) {
+        var scalar = 267 / 400; // (height / width) of placeholder
+        return scalar * width;
+    }
+
+    var imgDateHidden = false;
+    var imgDateSmall = false;
+    function scaleOrHideLabel(value) {
+        var width = getImgWidth(value);
+
+        if (width <= 200) {
+            $(".img-date").css("font-size", "10px");
+            imgDateSmall = true;
+
+            if (width <= 75) {
+                $(".img-date").hide();
+                imgDateHidden = true;
+            }
+        }
+
+        if (imgDateHidden && width > 75) {
+            $(".img-date").show();
+            imgDateHidden = false;
+        }
+
+        if (imgDateSmall && width > 200) {
+            $(".img-date").css("font-size", "14px");
+            imgDateSmall = false;
+        }
+    }
+
+    var totalPhotoCount = @Model.PhotoCount;
+    function computeHolderMargin(value) {
+        var width = getImgWidth(value);
+
+        var margin = 3;
+        var imgWidth = width + (2 * margin);
+
+        var totalWidth = $(".holder").width();
+
+        var numberOfPhotosAcross = Math.floor(totalWidth / imgWidth);
+
+        // corrects for when there are less photos than can fit on screen
+        var usedWidth = Math.min(numberOfPhotosAcross, totalPhotoCount) * imgWidth;
+        var remainder = totalWidth - usedWidth;
+
+        $(".ul-holder").css("margin-left", (remainder / 2) + "px");
+    }
+
+    $(function () {
+        $("img.photo").dblclick(function () {
+            var id = this.id;
+            var url = "@Url.Action("Index", "Photo", null)?photoId=" + id;
+            window.open(url, '_blank');
+        });
+    });
+
+    $(function () {
+        var initialSliderValue = 400;
+
+        $("#slider").slider({
+            orientation: "horizontal",
+            range: "min",
+            min: 25,
+            max: 1000,
+            value: initialSliderValue,
+            slide: function (event, ui) {
+                setText(ui.value);
+            },
+            stop: function (event, ui) {
+                setImageAndText(ui.value);
+                scaleOrHideLabel(ui.value);
+                computeHolderMargin(ui.value);
+            }
+        });
+
+        setImageAndText(initialSliderValue);
+        computeHolderMargin(initialSliderValue);
+    });
+
+    //If the User resizes the window, readjust the margins
+    $(window).bind("resize", resizeWindow);
+
+    function resizeWindow(e) {
+        computeHolderMargin($("img.photo").width());
+    }
+</script>
+
+<div class="text-center">
+    <div class="content">
+        
+        <div class="fit-width">
+            <h1 class="page-header title">@Model.Collection.Name</h1>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <span id="" class="label label-info">@Model.PhotoCount Photos</span>
+                </div>
+                <div class="col-md-8">
+                    <div id="slider"></div>
+                </div>
+                <div class="col-md-2">
+                    <span id="img-size" class="label label-info"></span>
+                </div>
+            </div>
+            
+            <hr class="featurette-divider" />
+        </div>
+        
+        <div class="holder">
+            <ul class="ul-holder">
+                @foreach (var p in Model.Collection.Photos)
+                {
+                    <li class="search-photo">
+                        <p class="img-date">@p.Captured.ToString()</p>
+                        <img id="@p.ID" class="photo" src="/api/photo/medium/@p.ID" width="400" height="267" />
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
