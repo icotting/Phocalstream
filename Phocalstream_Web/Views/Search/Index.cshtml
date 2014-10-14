@@ -140,6 +140,14 @@
                         <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photos</button>
                         <!-- /ko -->
                     </div>
+                    @if (Request.IsAuthenticated)
+                    { 
+                        <!-- ko if: queryResults() > 0-->
+                        <div class="search-image-save">
+                            <a class="save-button btn btn-info" href="javascript:saveCollectionPrompt()" data-bind="attr{ id: imagePath}">Save This Image</a>
+                        </div>
+                        <!-- /ko -->
+                    }
                 </div>
             </div>
         </div>
@@ -521,4 +529,110 @@
             this.tagsinput('input').typeahead('val', '');
         }, $('#site-field')));
     });
+
+
+    //User Defined Collection
+    var imageID;
+    function saveCollectionPrompt() {
+        var id = $(".save-button").attr('id');
+        var split = id.split('/');
+        imageID = split[split.length - 1];
+
+        $('#userCollectionModal').modal({
+            show: true,
+            backdrop: 'static',
+            closeOnEscape: true
+        });
+    }
+
+    var collectionIds = [];
+    function registerCollectionSelection(collectionId) {
+        if (jQuery.inArray(collectionId, collectionIds) == -1) {
+            collectionIds.push(collectionId);
+        }
+        else {
+            var index = collectionIds.indexOf(collectionId);
+            collectionIds.splice(index, 1);
+        }
+    }
+
+    function saveCollectionModalButton() {
+        var newName = $('#newCollectionName').val();
+        if (newName != "") {
+            saveCollection(newName);
+        }
+
+        if (collectionIds.length > 0) {
+            addToCollection(collectionIds);
+        }
+    }
+
+    function cancelCollectionModalButton() {
+    }
+
+    function addToCollection(collectionIds) {
+        $.ajax({
+            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+imageID,
+            type : 'POST'
+        });
+    }
+
+    function saveCollection(collectionName) {
+        $.ajax({
+            url : '/api/usercollection/SaveUserCollection?photoIds='+imageID+'&collectionName='+collectionName,
+            type : "POST"
+        });
+    }
+    
+    $(document).ready(function() { 
+        $('.list-group-item').click(function () {
+            $(this).toggleClass('list-group-item-success');
+
+            registerCollectionSelection($(this).attr('id'));
+        });
+    });
+
 </script>
+
+<!-- Save User Collection Modal -->
+<div id="userCollectionModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">User Collections</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label class="col-md-12" for="newCollectionName">New Collection Name</label>
+                    <div class="col-md-12">
+                        <input id="newCollectionName" name="newCollectionName" type="text" placeholder="New Collection Name" class="form-control input-md">
+                    </div>
+                </div>
+
+                @if (@Model.UserCollections != null)
+                {
+                    <hr class="featurette-divider" />
+
+                    <div class="row">
+                        <label class="col-md-12">Or, Add To Existing</label>
+                        <div class="col-md-12">
+                            <ul class="list-group user-collection-list">
+                                @foreach (var col in Model.UserCollections.Collections)
+                                {
+                                    <li id="@col.ID" class="list-group-item">
+                                        <span class="badge">@col.Photos.Count</span>@col.Name
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="javascript:cancelCollectionModalButton()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="javascript:saveCollectionModalButton()">Add To Collections</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

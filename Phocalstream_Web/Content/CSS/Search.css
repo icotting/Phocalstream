@@ -87,3 +87,9 @@ input[type=checkbox] {
 .search-results-box {
     margin-top: 75px;
 }
+
+.search-image-save {
+    position: absolute;
+    bottom: 5px;
+    right: 0px;
+}
