@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Phocalstream_Shared.Data.Model.Photo.Photo>
+﻿@model Phocalstream_Shared.Data.Model.View.SearchResults
 @{
     ViewBag.Title = "PhotoWall";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -7,19 +7,63 @@
 @Styles.Render("~/Content/CSS/Search.css",
                "~/Content/CSS/jquery-ui-slider.css",
                "~/Content/CSS/bootstrap-slider.css")
-@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js")
+@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js",
+                "~/Content/Scripts/jquery-lazyload.js")
 
 <script>
 
-    function getImgDimensions(value) {
+    $("img.photo").lazyload({
+        threshold: 400,
+        effect: "fadeIn"
+    });
+
+    function setImageAndText(value) {
+        var width = getImgWidth(value);
+        var height = getImgHeight(width);
+        $(".photo").width(width);
+        $(".photo").height(height);
+
+        $("#img-size").html(width + " x " + Math.round(height) + " Pixels");
+    }
+
+    function getImgWidth(value) {
         var width = value * 1;
         return width;
     }
 
+    function getImgHeight(width) {
+        var scalar = 267 / 400; // (height / width) of placeholder
+        return scalar * width;
+    }
+
+    var imgDateHidden = false;
+    var imgDateSmall = false;
+    function scaleOrHideLabel(value) {
+        var width = getImgWidth(value);
+
+        if (width <= 200) {
+            $(".img-date").css("font-size", "10px");
+            imgDateSmall = true;
+
+            if (width <= 75) {
+                $(".img-date").hide();
+                imgDateHidden = true;
+            }
+        }
+
+        if (imgDateHidden && width > 75) {
+            $(".img-date").show();
+            imgDateHidden = false;
+        }
+
+        if (imgDateSmall && width > 200) {
+            $(".img-date").css("font-size", "14px");
+            imgDateSmall = false;
+        }
+    }
+
     $(function () {
         var initialSliderValue = 400;
-        var imgDateHidden = false;
-        var imgDateSmall = false;
 
         $("#slider").slider({
             orientation: "horizontal",
@@ -28,35 +72,12 @@
             max: 1000,
             value: initialSliderValue,
             slide: function (event, ui) {
-                var width = getImgDimensions(ui.value);
-                $(".photo").width(width);
-
-                $("#img-size").html(width + " Pixels Wide");
-
-                if (width <= 200) {
-                    $(".img-date").css("font-size", "10px");
-                    imgDateSmall = true;
-
-                    if (width <= 75) {
-                        $(".img-date").hide();
-                        imgDateHidden = true;
-                    }
-                }
-                
-                if (imgDateHidden && width > 75) {
-                    $(".img-date").show();
-                    imgDateHidden = false;
-                }
-
-                if (imgDateSmall && width > 200) {
-                    $(".img-date").css("font-size", "14px");
-                    imgDateSmall = false;
-                }
+                setImageAndText(ui.value);
+                scaleOrHideLabel(ui.value);
             }
         });
 
-        $(".photo").width(getImgDimensions(initialSliderValue));
-        $("#img-size").html(getImgDimensions(initialSliderValue) + " Pixels Wide")
+        setImageAndText(initialSliderValue);        
   });
 </script>
 
@@ -64,7 +85,7 @@
     <div class="content">
         
         <div class="fit-width">
-            <h1 class="page-header title">Search Parameters.....</h1>
+            <h1 class="page-header title">@Model.Collection.Name</h1>
 
             <div class="row">
                 <div class="col-md-10">
@@ -79,12 +100,12 @@
         </div>
         
         <div class="holder">
-            @foreach (var p in Model)
+            @foreach (var p in Model.Collection.Photos)
             {
                 <ul class="search-photo">
                     <li>
                         <p class="img-date">@p.Captured.ToString()</p>
-                        <img class="photo" src="/api/photo/medium/@p.ID" />
+                        <img class="photo" src="/api/photo/medium/@p.ID" width="400" height="267"/>
                     </li>
                 </ul>
             }
