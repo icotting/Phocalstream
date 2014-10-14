@@ -352,13 +352,14 @@ namespace Phocalstream_Web.Controllers
 
                 model.Year = Convert.ToString(y);
 
-                IEnumerable<long> photoIds = PhotoRepository.Find(p => p.Site.ID == siteID && p.Captured.Year == y)
-                                                            .Select(p => p.ID)
-                                                            .OrderBy(p => new Guid());
-                model.PhotoCount = photoIds.Count();
-                model.CoverPhotoID = PhotoRepository.Find(p => p.Site.ID == siteID && p.Captured.Year == y && p.Captured.Hour > 12 && p.Captured.Hour < 16)
-                                                    .Select(p => p.ID)
-                                                    .OrderBy(p => new Guid()).First();
+                Photo[] photos = PhotoRepository.Find(p => p.Site.ID == siteID && p.Captured.Year == y)
+                                                            .ToArray();
+                model.PhotoCount = photos.Count();
+
+                photos = photos.Where(p => p.Captured.Hour > 12 && p.Captured.Hour < 16).ToArray();
+
+                Random rand = new Random();
+                model.CoverPhotoID = photos[rand.Next(photos.Length)].ID;
 
                 Years.Add(model);
             }
