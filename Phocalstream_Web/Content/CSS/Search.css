@@ -100,17 +100,17 @@ input[type=checkbox] {
     max-width: 960px;
 }
 
+.ul-holder {
+    padding: 0px;
+    overflow: auto;
+}
+
 .search-photo {
     float: left;
     list-style-type: none;
     padding: 0px !important;
     margin: 3px;
     position: relative;
-}
-
-.holder {
-    display: inline;
-    margin: auto;
 }
 
 .img-date {

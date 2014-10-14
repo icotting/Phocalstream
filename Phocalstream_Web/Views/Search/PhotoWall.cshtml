@@ -62,6 +62,21 @@
         }
     }
 
+    function computeHolderMargin(value) {
+        var width = getImgWidth(value);
+
+        var margin = 3;
+        var imgWidth = width + (2 * margin);
+
+        var totalWidth = $(".holder").width();
+
+        var numberOfPhotosAcross = Math.floor(totalWidth / imgWidth);
+        var usedWidth = numberOfPhotosAcross * imgWidth;
+        var remainder = totalWidth - usedWidth;
+
+        $(".ul-holder").css("margin-left", (remainder / 2) + "px");
+    }
+
     $(function () {
         var initialSliderValue = 400;
 
@@ -74,10 +89,12 @@
             slide: function (event, ui) {
                 setImageAndText(ui.value);
                 scaleOrHideLabel(ui.value);
+                computeHolderMargin(ui.value);
             }
         });
 
-        setImageAndText(initialSliderValue);        
+        setImageAndText(initialSliderValue);
+        computeHolderMargin(initialSliderValue);
   });
 </script>
 
@@ -100,15 +117,15 @@
         </div>
         
         <div class="holder">
-            @foreach (var p in Model.Collection.Photos)
-            {
-                <ul class="search-photo">
-                    <li>
+            <ul class="ul-holder">
+                @foreach (var p in Model.Collection.Photos)
+                {
+                    <li class="search-photo">
                         <p class="img-date">@p.Captured.ToString()</p>
-                        <img class="photo" src="/api/photo/medium/@p.ID" width="400" height="267"/>
+                        <img class="photo" src="/api/photo/medium/@p.ID" width="400" height="267" />
                     </li>
-                </ul>
-            }
+                }
+            </ul>
         </div>
     </div>
 </div>
