@@ -26,5 +26,6 @@ namespace Phocalstream_Shared.Service
         Photo AddTag(long photoID, string tags);
         List<Tuple<string, int>> GetPopularTagsForSite(long siteID);
         List<string> GetFileNames(List<Photo> photos);
+        ICollection<TimeLapseFrame> CreateTimeLapseFramesFromIDs(string photoIDs);
     }
 }

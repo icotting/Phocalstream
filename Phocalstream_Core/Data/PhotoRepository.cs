@@ -54,6 +54,46 @@ namespace Phocalstream_Web.Application.Data
             return details;
         }
 
+        public IEnumerable<DateTime> FindDmDatesForPhotos(long[] ids)
+        {
+            HashSet<DateTime> dates = new HashSet<DateTime>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand(string.Format("select Captured from Photos where ID in ({0})", ids.Select(i => i.ToString()).Aggregate((s1, s2) => s1 + "," + s2)), conn))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dates.Add(RoundDmDate((DateTime)reader["Captured"]));
+                        }
+                    }
+                }
+            }
+
+            return dates;
+        }
+
+        private DateTime RoundDmDate(DateTime date)
+        {
+            DateTime rounded;
+            if (date.DayOfWeek < DayOfWeek.Tuesday)
+            {
+                rounded = date.AddDays(0 - (5 + date.DayOfWeek)); // last Tuesday
+            }
+            else if (date.DayOfWeek > DayOfWeek.Tuesday)
+            {
+                rounded = date.AddDays(0 - (date.DayOfWeek - 2)); // this Tuesday
+            }
+            else
+            {
+                rounded = date; // date is Tuesday
+            }
+
+            return new DateTime(rounded.Year, rounded.Month, rounded.Day, 0, 0, 0); // set to midnight
+        }
+
         public TagDetails GetTagDetails(Tag tag)
         {
             TagDetails details = new TagDetails();
@@ -192,6 +232,34 @@ namespace Phocalstream_Web.Application.Data
             }
 
             return tags;
+        }
+
+        public IEnumerable<IDictionary<string, object>> GetPhotoProperties(long[] ids, params string[] fields)
+        {
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand(string.Format("select {0} from Photos where ID in ({1})",
+                    fields.Select(f => f).Aggregate((s1, s2) => s1 + "," + s2), ids.Select(i => i.ToString()).Aggregate((s1, s2) => s1 + "," + s2)), conn))
+                {
+                    List<IDictionary<string, object>> properties = new List<IDictionary<string, object>>();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Dictionary<string, object> dict = new Dictionary<string, object>();    
+                            for (var i = 0; i < fields.Count(); i++ )
+                            {
+                                dict.Add(fields[i], reader.GetValue(i));
+                            }
+                            properties.Add(dict);
+                        }
+
+                    }
+                    return properties;
+                }
+            }
         }
    
         private XmlDocument CreateDeepZoomDocument(SqlCommand command, Uri uri)

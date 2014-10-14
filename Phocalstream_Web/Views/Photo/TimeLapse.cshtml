@@ -15,7 +15,8 @@
 
         var MAX_BUFFER = 500; // buffer size
 
-        var frameset = @Html.Raw(Json.Encode(Model.Ids)); // the full set of frames represented by photo IDs
+        var frameset = @Html.Raw(Json.Encode(Model.Frames)); // the full set of frames represented by a list of frame models
+
         var buffer; // the actual Image objects with data for a photo 
 
         var pos = 0; // current position for display
@@ -30,6 +31,8 @@
         var height = @(WIDTH * ((float)Model.Height / (float)Model.Width)); // frame height
 
         var progLen; // length of the progress bar
+
+        var DATE_PATTERN = /\/Date\((.*)\)\//;
 
         $(document).ready(function () {
 
@@ -46,6 +49,15 @@
             // create the array to hold the buffered image data
             buffer = new Array();
             bufferData();
+
+            $.ajax(
+                {
+                    url: "/api/data/timelapsedm",
+                    type: "POST",
+                    data: { IdList: "@Model.IDList", CountyFips: @Model.CountyFips },
+                    success: function (result) {
+                        console.log(result);
+                    }});
         });
 
         function bufferData() {
@@ -92,7 +104,7 @@
         };
 
         // set the source of the image being buffered which will cause the event handler to be invoked when the image has loaded
-        imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos];
+        imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos].PhotoID;
         buffer.push(imageObj); // store the image object in the buffer
     }
 
@@ -101,10 +113,15 @@
             if (DEBUG) {
                 <texT>
                     $("#pid").empty();
-                    $("#pid").append(frameset[pos % len]);
+                    $("#pid").append(frameset[pos % len].PhotoID);
                 </text>
             }   
         }
+
+        var imageTime = new Date(Number(DATE_PATTERN.exec(frameset[pos % len].FrameTime)[1]));
+
+        $("#frameDate").empty();
+        $("#frameDate").append(imageTime);
 
         // load the image data to display from the buffer
         var image = buffer[pos++ % bufferLen];
@@ -125,7 +142,7 @@
              * of the image data that was just displayed. In MAX cycles, this 
              * data will be pulled from the buffer and displayed. This gives
              * sufficient time for the data to load before it is needed. */
-            imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos % len];
+            imageObj.src = "/api/photo/@RESOLUTION/"+frameset[bufferPos % len].PhotoID;
             buffer[bufferPos++ % bufferLen] = imageObj;
         }
 
@@ -165,7 +182,7 @@
 <div class="container">
     <div class="content">
         <div id="loadDiv">
-            <h1 id="bufferlabel">Buffering Frames ...</h1>
+            <h3 id="bufferlabel">Hang tight, we're buffering the photos for smooth playback</h3>
                 <div class="progress">
                     <div class="progress-bar progress-bar-striped active" id="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
                         <span class="sr-only"></span>
@@ -179,6 +196,7 @@
                     <button class="btn btn-default" onclick="startStop()">
                         <span id="controls" class="glyphicon glyphicon-pause"></span>
                     </button>
+                    <span id="frameDate"></span>
                 </div>
             </div>
             <div class="col-md-4">

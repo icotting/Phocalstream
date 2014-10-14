@@ -74,6 +74,7 @@
     <Compile Include="Data\Model\Photo\Photo.cs" />
     <Compile Include="Data\Model\Photo\PhotoAnnotation.cs" />
     <Compile Include="Data\Model\Photo\Tag.cs" />
+    <Compile Include="Data\Model\Photo\TimeLapseFrame.cs" />
     <Compile Include="Data\Model\Photo\User.cs" />
     <Compile Include="Data\Model\Photo\UserRole.cs" />
     <Compile Include="Data\Model\View\SearchModels.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Data\Model\View\UserCollectionModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\ICollectionService.cs" />
+    <Compile Include="Service\IDroughtMonitorService.cs" />
     <Compile Include="Service\IPhotoService.cs" />
     <Compile Include="Service\ISearchService.cs" />
   </ItemGroup>

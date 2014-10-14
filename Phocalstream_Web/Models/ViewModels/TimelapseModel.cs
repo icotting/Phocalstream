@@ -8,9 +8,10 @@ namespace Phocalstream_Web.Models.ViewModels
 {
     public class TimelapseModel
     {
-        public ICollection<long> Ids { get; set; }
-        public int FramesPerSecond { get; set; }
-        public int BufferCount { get; set; }
+        public ICollection<TimeLapseFrame> Frames { get; set; }
+        public string IDList { get; set; }
+        public int CountyFips { get; set; }
+
         public int Width { get; set; }
         public int Height { get; set; }
     }

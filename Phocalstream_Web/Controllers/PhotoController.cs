@@ -163,17 +163,16 @@ namespace Phocalstream_Web.Controllers
         public ActionResult TimeLapse(string photoIds)
         {
             TimelapseModel model = new TimelapseModel();
+            model.IDList = photoIds;
+            model.Frames = PhotoService.CreateTimeLapseFramesFromIDs(photoIds);
 
-            List<long> ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToList<long>();
-            Photo first = PhotoRepository.Find(ids[0]);
+            long id = model.Frames.FirstOrDefault().PhotoID;
+
+            Photo first = PhotoRepository.Find(p => p.ID == id, p => p.Site).FirstOrDefault();
+            model.CountyFips = first.Site.CountyFips;
 
             model.Width = first.Width;
             model.Height = first.Height;
-
-            // this is redundant and should either replace the video model or be removed
-            model.Ids = ids;
-            model.BufferCount = Convert.ToInt16(ids.Count * 0.10); // buffer 10% of the frames
-            model.FramesPerSecond = Convert.ToInt16(ids.Count / 60); // limit movie size to 1 minute by default
 
             return View(model);
         }
