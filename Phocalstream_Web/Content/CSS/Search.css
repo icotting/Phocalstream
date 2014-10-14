@@ -88,11 +88,31 @@ input[type=checkbox] {
     margin-top: 75px;
 }
 
+/* Search Photo Wall */
+
+.fit-width {
+    margin: auto;
+    max-width: 960px;
+}
+
 .search-photo {
     float: left;
     list-style-type: none;
+    padding: 0px !important;
+    margin: 3px;
+    position: relative;
 }
 
 .holder {
     display: inline;
+    margin: auto;
+}
+
+.img-date {
+    top: 0px;
+    left: 0px;
+    position: absolute;
+
+    background: rgba(0, 0, 0, .5);
+    color: white !important;
 }

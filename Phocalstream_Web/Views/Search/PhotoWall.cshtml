@@ -4,15 +4,90 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Styles.Render("~/Content/CSS/Search.css")
+@Styles.Render("~/Content/CSS/Search.css",
+               "~/Content/CSS/jquery-ui-slider.css",
+               "~/Content/CSS/bootstrap-slider.css")
+@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js")
 
-<h2>PhotoWall</h2>
+<script>
 
-<div class="holder">
-    @foreach (var p in Model)
-    {
-        <ul class="search-photo">
-            <li><img src="/api/photo/low/@p.ID" /></li>
-        </ul>
+    function getImgDimensions(value) {
+        var width = value * 1;
+        return width;
     }
+
+    $(function () {
+        var initialSliderValue = 400;
+        var imgDateHidden = false;
+        var imgDateSmall = false;
+
+        $("#slider").slider({
+            orientation: "horizontal",
+            range: "min",
+            min: 25,
+            max: 1000,
+            value: initialSliderValue,
+            slide: function (event, ui) {
+                var width = getImgDimensions(ui.value);
+                $(".photo").width(width);
+
+                $("#img-size").html(width + " Pixels Wide");
+
+                if (width <= 200) {
+                    $(".img-date").css("font-size", "10px");
+                    imgDateSmall = true;
+
+                    if (width <= 75) {
+                        $(".img-date").hide();
+                        imgDateHidden = true;
+                    }
+                }
+                
+                if (imgDateHidden && width > 75) {
+                    $(".img-date").show();
+                    imgDateHidden = false;
+                }
+
+                if (imgDateSmall && width > 200) {
+                    $(".img-date").css("font-size", "14px");
+                    imgDateSmall = false;
+                }
+            }
+        });
+
+        $(".photo").width(getImgDimensions(initialSliderValue));
+        $("#img-size").html(getImgDimensions(initialSliderValue) + " Pixels Wide")
+  });
+</script>
+
+<div class="text-center">
+    <div class="content">
+        
+        <div class="fit-width">
+            <h1 class="page-header title">Search Parameters.....</h1>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <div id="slider"></div>
+                </div>
+                <div class="col-md-2">
+                    <span id="img-size" class="label label-info"></span>
+                </div>
+            </div>
+            
+            <hr class="featurette-divider" />
+        </div>
+        
+        <div class="holder">
+            @foreach (var p in Model)
+            {
+                <ul class="search-photo">
+                    <li>
+                        <p class="img-date">@p.Captured.ToString()</p>
+                        <img class="photo" src="/api/photo/medium/@p.ID" />
+                    </li>
+                </ul>
+            }
+        </div>
+    </div>
 </div>
