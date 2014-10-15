@@ -533,16 +533,15 @@ namespace Phocalstream_Service.Service
             return fileNames;
         }
 
-        public ICollection<TimeLapseFrame> CreateTimeLapseFramesFromIDs(string photoIDs)
+        public ICollection<TimeLapseFrame> CreateTimeLapseFramesFromIDs(long[] photoIDs)
         {
             List<TimeLapseFrame> frames = new List<TimeLapseFrame>();
-            long[] ids = photoIDs.Split(',').Select(i => Convert.ToInt64(i)).ToArray<long>();
-            long firstID = ids[0]; // stupid LINQ
+            long firstID = photoIDs[0]; // stupid LINQ
 
             USCounty county = DMRepository.GetCountyForFips(PhotoRepository.Find(p => p.ID == firstID, p => p.Site)
                 .FirstOrDefault().Site.CountyFips);
 
-            var properties = PhotoRepo.GetPhotoProperties(ids, new string[] { "ID", "Captured" });
+            var properties = PhotoRepo.GetPhotoProperties(photoIDs, new string[] { "ID", "Captured" });
             foreach (var property in properties)
             {
                 var frame = new TimeLapseFrame() { FrameTime = (DateTime)property["Captured"], PhotoID = (long)property["ID"] };

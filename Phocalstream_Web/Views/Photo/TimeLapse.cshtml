@@ -12,7 +12,7 @@
 @section Scripts
 {
     <script type="text/javascript">
-
+        var FRAME_RATE = 125;
         var MAX_BUFFER = 500; // buffer size
 
         var frameset = @Html.Raw(Json.Encode(Model.Frames)); // the full set of frames represented by a list of frame models
@@ -50,6 +50,7 @@
             buffer = new Array();
             bufferData();
 
+            @*
             $.ajax(
                 {
                     url: "/api/data/timelapsedm",
@@ -57,9 +58,9 @@
                     data: { IdList: "@Model.IDList", CountyFips: @Model.CountyFips },
                     success: function (result) {
                         console.log(result);
-                    }});
+                    }});*@
         });
-
+                
         function bufferData() {
             // for each image up to MAX, load the data into the buffer 
             var imageObj = new Image();
@@ -160,7 +161,7 @@
 
         // set the time to invoke the next image display call
         if ( running == true) {
-            setTimeout(function () { nextImage(); }, 200);
+            setTimeout(function () { nextImage(); }, FRAME_RATE);
         }
     }
 

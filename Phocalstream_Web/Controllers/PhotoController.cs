@@ -163,8 +163,10 @@ namespace Phocalstream_Web.Controllers
         public ActionResult TimeLapse(string photoIds)
         {
             TimelapseModel model = new TimelapseModel();
-            model.IDList = photoIds;
-            model.Frames = PhotoService.CreateTimeLapseFramesFromIDs(photoIds);
+            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray<long>();
+
+            model.DmWeeks = DZPhotoRepository.FindDmDatesForPhotos(ids);
+            model.Frames = PhotoService.CreateTimeLapseFramesFromIDs(ids);
 
             long id = model.Frames.FirstOrDefault().PhotoID;
 
