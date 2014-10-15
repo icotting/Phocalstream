@@ -210,6 +210,8 @@ namespace Phocalstream_Shared.Data.Model.View
     {
         public Collection Collection { get; set; }
 
+        public SearchResultPartial PartialModel { get; set; }
+
         [DisplayFormat(DataFormatString = "{0:MMM dd, yyyy}")]
         public DateTime First { get; set; }
 
@@ -220,6 +222,16 @@ namespace Phocalstream_Shared.Data.Model.View
         public int PhotoCount { get; set; }
         public string CollectionUrl { get; set; }
         public UserCollectionList UserCollections { get; set; }
+    }
+
+    public class SearchResultPartial
+    {
+        public long CollectionID { get; set; }
+        public int Index { get; set; }
+        public int TotalPages { get; set; }
+        public string Description { get; set; }
+        public IEnumerable<Photo.Photo> Photos { get; set; }
+        public int PhotosPerPage { get; set; }
     }
 
     public class SearchList

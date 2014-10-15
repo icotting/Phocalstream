@@ -216,7 +216,48 @@ namespace Phocalstream_Web.Controllers
                 model.UserCollections = userCollectionModel;
             }
 
+            int photosPerPage = 150;
+            model.PartialModel = GetPartialModel(model.Collection.Photos, 0, photosPerPage);
+            model.PartialModel.CollectionID = collectionID;
+
             return View(model);
+        }
+
+        public ActionResult SearchResultPartial(long collectionID, int index, int photosPerPage)
+        {
+            IEnumerable<Photo> photos = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos).Photos;
+            SearchResultPartial model = GetPartialModel(photos, index, photosPerPage);
+            model.CollectionID = collectionID;
+            return PartialView("_SearchGridPartial", model);
+        }
+
+        private SearchResultPartial GetPartialModel(IEnumerable<Photo> photos, int index, int photosPerPage)
+        {
+            int photoCount = photos.Count();
+            var pages = Math.Ceiling((Double) photoCount / (Double) photosPerPage);
+
+            SearchResultPartial partial = new SearchResultPartial();
+            partial.Index = index;
+            partial.TotalPages = Convert.ToInt32(pages);
+            partial.PhotosPerPage = photosPerPage;
+
+            var startIndex = index * photosPerPage;
+            var endIndex = (index + 1) * photosPerPage;
+
+            // there are more photos than this is asking for, so create a partial with PhotosPerPage images
+            if (photoCount > endIndex)
+            {
+                partial.Photos = photos.ToList().GetRange(startIndex, photosPerPage);
+                partial.Description = "Showing photos " + (startIndex + 1).ToString() + " to " + (startIndex + photosPerPage).ToString();
+            }
+            else
+            {
+                var remainingCount = photoCount - startIndex;
+                partial.Photos = photos.ToList().GetRange(startIndex, remainingCount);
+                partial.Description = "Showing photos " + (startIndex + 1).ToString() + " to " + (startIndex + remainingCount).ToString();
+            }
+
+            return partial;
         }
 
         public ActionResult List()

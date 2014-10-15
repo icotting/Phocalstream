@@ -416,6 +416,7 @@
     <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
     <Content Include="Views\Account\CreateUserSite.cshtml" />
     <Content Include="Views\Search\PhotoWall.cshtml" />
+    <Content Include="Views\Search\_SearchGridPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
