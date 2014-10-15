@@ -280,7 +280,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\Api\TimeLapseDataRequest.cs" />
+    <Compile Include="Models\Api\DroughtMonitorRequest.cs" />
     <Compile Include="Models\ViewModels\CollectionViewModel.cs" />
     <Compile Include="Models\ViewModels\DownloadViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />

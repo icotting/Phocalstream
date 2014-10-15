@@ -16,20 +16,19 @@ namespace Phocalstream_Web.Controllers.Api
     {
 
         [Dependency]
-        public IDroughtMonitorService DmService { get; set; }
+        public IDroughtMonitorRepository DmRepo { get; set; }
 
         [HttpPost]
-        [ActionName("test")]
-        public string testMethod(string test)
+        [ActionName("dmcountyweek")]
+        public IDictionary<string, DroughtMonitorWeek> GetWeekDMData(DroughtMonitorRequest DmRequest)
         {
-            return "hello " + test;
-        }
+            USCounty county = DmRepo.GetCountyForFips(DmRequest.CountyFips);
+            Dictionary<string, DroughtMonitorWeek> results = new Dictionary<string, DroughtMonitorWeek>();
+            results.Add("COUNTY", DmRepo.FindBy(county, DmRequest.DmWeek).FirstOrDefault());
+            results.Add("STATE", DmRepo.FindBy(county.State, DmRequest.DmWeek).First());
+            results.Add("US", DmRepo.FindUS(DmRequest.DmWeek).FirstOrDefault());
 
-        [HttpPost] // has to be post to support large parameter lists
-        [ActionName("timelapsedm")]
-        public IEnumerable<DroughtMonitorWeek> GetDmDataForIdList(TimeLapseDataRequest model)
-        {
-            return DmService.FindForSequence(model.IdList.Split(',').Select(i => Convert.ToInt64(i)).ToArray<long>(), model.CountyFips);
+            return results;
         }
     }
 }

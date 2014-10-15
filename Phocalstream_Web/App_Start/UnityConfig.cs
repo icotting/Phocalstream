@@ -28,7 +28,6 @@ namespace Phocalstream_Web
             container.RegisterType(typeof(IPhotoRepository), typeof(PhotoRepository),
                 new InjectionConstructor(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString));
 
-            container.RegisterType(typeof(IDroughtMonitorService), typeof(DroughtMonitorService));
             container.RegisterType(typeof(IPhotoService), typeof(PhotoService));
             container.RegisterType(typeof(ISearchService), typeof(SearchService));
             container.RegisterType(typeof(ICollectionService), typeof(CollectionService));

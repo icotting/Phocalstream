@@ -5,9 +5,9 @@ using System.Web;
 
 namespace Phocalstream_Web.Models.Api
 {
-    public class TimeLapseDataRequest
+    public class DroughtMonitorRequest
     {
-        public string IdList { get; set; }
         public int CountyFips { get; set; }
+        public DateTime DmWeek { get; set; }
     }
 }

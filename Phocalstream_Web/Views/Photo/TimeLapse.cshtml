@@ -16,6 +16,7 @@
         var MAX_BUFFER = 500; // buffer size
 
         var frameset = @Html.Raw(Json.Encode(Model.Frames)); // the full set of frames represented by a list of frame models
+        var dmWeeks = new Array();
 
         var buffer; // the actual Image objects with data for a photo 
 
@@ -35,6 +36,14 @@
         var DATE_PATTERN = /\/Date\((.*)\)\//;
 
         $(document).ready(function () {
+            var weeks = @Html.Raw(Json.Encode(Model.DmWeeks));
+
+            for (var w in weeks) {
+                var time = DATE_PATTERN.exec(weeks[w])[1];
+                var week = new Date(Number(time));
+                dmWeeks.push(weeks[1]);
+            }
+
 
             // set the total length
             len = frameset.length;
@@ -49,18 +58,21 @@
             // create the array to hold the buffered image data
             buffer = new Array();
             bufferData();
-
-            @*
+            //loadDmData();
+        });
+           
+        function loadDmData() {
             $.ajax(
                 {
-                    url: "/api/data/timelapsedm",
+                    url: "/api/data/dmcountyweek", 
                     type: "POST",
-                    data: { IdList: "@Model.IDList", CountyFips: @Model.CountyFips },
-                    success: function (result) {
+                    data: { CountyFips: @Model.CountyFips, DmWeek: "\""+dmWeeks[0]+"\"" }, 
+                    succesS: function(result) { 
                         console.log(result);
-                    }});*@
-        });
-                
+                    }
+                });
+        }
+
         function bufferData() {
             // for each image up to MAX, load the data into the buffer 
             var imageObj = new Image();
