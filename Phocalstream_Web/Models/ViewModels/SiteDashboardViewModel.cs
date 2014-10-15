@@ -9,7 +9,7 @@ namespace Phocalstream_Web.Models.ViewModels
     {
         public CollectionViewModel CollectionViewModel { get; set; }
         public List<SiteYearModel> Years { get; set; }
-        public List<Tuple<string, int>> Tags { get; set; }
+        public List<Tuple<string, int, long>> Tags { get; set; }
         public PhotoFrequencyData PhotoFrequency { get; set; }
         public DmData DroughtMonitorData { get; set; }
         public WaterFlowData WaterData { get; set; }

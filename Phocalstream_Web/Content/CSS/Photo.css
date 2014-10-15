@@ -94,7 +94,7 @@ li {
 }
 
 ul {
-    margin-top: 20pt;
+    margin-top: 20px;
     list-style: none;
     margin-left: 0px;
     padding-left: 0px;
@@ -221,3 +221,25 @@ ul {
     position: absolute;
 }
 
+.media-object {
+    width: 50px;
+    height: 50px;
+}
+
+#popularTags li {
+    height: 72px;
+}
+
+#popularTags li .tag, 
+#popularTags li .badge {
+    margin-top: 16px;
+}
+
+#popularTags ul {
+}
+
+/* Partial Views */
+.partial-title {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
