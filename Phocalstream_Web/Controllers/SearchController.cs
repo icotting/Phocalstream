@@ -19,6 +19,7 @@ using System.Web.Mvc;
 using System.Xml;
 using System.Data.Entity;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_Web.Models.ViewModels;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -189,6 +190,10 @@ namespace Phocalstream_Web.Controllers
                 model.UserCollections = userCollectionModel;
             }
 
+            int photosPerPage = 150;
+            model.Partial = GetPartialModel(model.Collection.Photos, 0, photosPerPage);
+            model.Partial.CollectionID = collectionID;
+
             return View("PhotoWall", model);
         }
 
@@ -217,8 +222,8 @@ namespace Phocalstream_Web.Controllers
             }
 
             int photosPerPage = 150;
-            model.PartialModel = GetPartialModel(model.Collection.Photos, 0, photosPerPage);
-            model.PartialModel.CollectionID = collectionID;
+            model.Partial = GetPartialModel(model.Collection.Photos, 0, photosPerPage);
+            model.Partial.CollectionID = collectionID;
 
             return View(model);
         }
