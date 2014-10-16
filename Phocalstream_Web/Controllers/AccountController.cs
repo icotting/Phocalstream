@@ -221,7 +221,7 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
         
-        public ActionResult UploadPhotos()
+        public ActionResult UploadPhotos(long collectionID = 0)
         {
             UserPhotoUpload model = new UserPhotoUpload();
 
@@ -231,6 +231,8 @@ namespace Phocalstream_Web.Controllers
             {
                 return RedirectToAction("CreateUserSite", new { e = 1 });
             }
+
+            ViewBag.CollectionID = collectionID;
 
             return View(model);
         }
@@ -273,7 +275,7 @@ namespace Phocalstream_Web.Controllers
             CollectionRepository.Insert(newCollection);
             Unit.Commit();
 
-            return new RedirectResult("UploadPhotos");
+            return RedirectToAction("UploadPhotos", new { @collectionID = newCollection.ID });
         }
 
         public ActionResult DeleteUserCollection(long collectionID)
