@@ -31,7 +31,7 @@
             @foreach (var p in Model.Collection.Photos)
             {
                 <div class="col-md-3 siteColumn" id="@p.ID">
-                    <img class="siteImage" id="@p.ID" data-original="/api/photo/low/@p.ID" alt="@p.FileName" width="262" height="175"/>
+                    <img class="siteImage edit-siteImage" id="@p.ID" data-original="/api/photo/low/@p.ID" alt="@p.FileName" height="175" />
 
                     <div class="siteToDelete invisible"></div>
 
