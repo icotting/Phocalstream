@@ -11,10 +11,49 @@
     <script type="text/javascript">
         setTimeout(function () { reloadWaterPartial(); }, 10000);
     </script>
-} 
-else 
-{
-    @Ajax.ActionLink("Update Water Data to Current", "StartWaterImport", new { type = "current"}, new AjaxOptions { UpdateTargetId = "waterPartial" })
-    <text> | </text> 
-    @Ajax.ActionLink("Reset All Water Data", "StartWaterImport", new { type = "full"}, new AjaxOptions { UpdateTargetId = "waterPartial" })
 }
+else
+{
+    <a id="waterImportCurrent" class="btn btn-default">Update Current Data</a>
+    <a id="waterImportFull" class="btn btn-default">Reset All Data</a>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#waterImportCurrent').click(function () {
+            $.ajax({
+                url: '@Url.Action("StartWaterImport", "Settings")',
+                type: 'GET',
+                cache: false,
+                data: {
+                    type: 'current'
+                },
+                success: function (data) {
+                    $('#waterPartial').html(data);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        });
+
+        $('#waterImportFull').click(function () {
+            $.ajax({
+                url: '@Url.Action("StartWaterImport", "Settings")',
+                type: 'GET',
+                cache: false,
+                data: {
+                    type: 'full'
+                },
+                success: function (data) {
+                    $('#waterPartial').html(data);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        });
+
+    });
+</script>
