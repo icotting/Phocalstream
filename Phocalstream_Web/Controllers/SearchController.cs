@@ -170,11 +170,13 @@ namespace Phocalstream_Web.Controllers
         {
             SearchResults model = new SearchResults();
 
-            model.Collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            model.Collection = CollectionRepository.First(col => col.ID == collectionID);
 
-            model.First = model.Collection.Photos.First().Captured;
-            model.Last = model.Collection.Photos.Last().Captured;
-            model.PhotoCount = model.Collection.Photos.Count;
+//            model.First = model.Collection.Photos.First().Captured;
+//            model.Last = model.Collection.Photos.Last().Captured;
+//            model.PhotoCount = model.Collection.Photos.Count;
+
+            model.PhotoCount = PhotoRepo.GetPhotoCountForCollection(collectionID);
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
@@ -191,9 +193,8 @@ namespace Phocalstream_Web.Controllers
             }
 
             int photosPerPage = 150;
-            model.Partial = GetPartialModel(model.Collection.Photos, 0, photosPerPage);
-            model.Partial.CollectionID = collectionID;
-
+            model.Partial = GetPartialModel(collectionID, 0, photosPerPage);
+            
             return View("PhotoWall", model);
         }
 
@@ -201,11 +202,13 @@ namespace Phocalstream_Web.Controllers
         {
             SearchResults model = new SearchResults();
 
-            model.Collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
+            model.Collection = CollectionRepository.First(col => col.ID == collectionID);
 
-            model.First = model.Collection.Photos.First().Captured;
-            model.Last = model.Collection.Photos.Last().Captured;
-            model.PhotoCount = model.Collection.Photos.Count;
+            //            model.First = model.Collection.Photos.First().Captured;
+            //            model.Last = model.Collection.Photos.Last().Captured;
+            //            model.PhotoCount = model.Collection.Photos.Count;
+
+            model.PhotoCount = PhotoRepo.GetPhotoCountForCollection(collectionID);
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
                 Request.Url.Host,
@@ -222,26 +225,25 @@ namespace Phocalstream_Web.Controllers
             }
 
             int photosPerPage = 150;
-            model.Partial = GetPartialModel(model.Collection.Photos, 0, photosPerPage);
-            model.Partial.CollectionID = collectionID;
+            model.Partial = GetPartialModel(collectionID, 0, photosPerPage);
 
             return View(model);
         }
 
         public ActionResult SearchResultPartial(long collectionID, int index, int photosPerPage)
         {
-            IEnumerable<Photo> photos = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos).Photos;
-            SearchResultPartial model = GetPartialModel(photos, index, photosPerPage);
+            SearchResultPartial model = GetPartialModel(collectionID, index, photosPerPage);
             model.CollectionID = collectionID;
             return PartialView("_SearchGridPartial", model);
         }
 
-        private SearchResultPartial GetPartialModel(IEnumerable<Photo> photos, int index, int photosPerPage)
+        private SearchResultPartial GetPartialModel(long collectionID, int index, int photosPerPage)
         {
-            int photoCount = photos.Count();
+            int photoCount = PhotoRepo.GetPhotoCountForCollection(collectionID);
             var pages = Math.Ceiling((Double) photoCount / (Double) photosPerPage);
 
             SearchResultPartial partial = new SearchResultPartial();
+            partial.CollectionID = collectionID;
             partial.Index = index;
             partial.TotalPages = Convert.ToInt32(pages);
             partial.PhotosPerPage = photosPerPage;
@@ -252,13 +254,13 @@ namespace Phocalstream_Web.Controllers
             // there are more photos than this is asking for, so create a partial with PhotosPerPage images
             if (photoCount > endIndex)
             {
-                partial.Photos = photos.ToList().GetRange(startIndex, photosPerPage);
+                partial.Photos = PhotoRepo.GetPhotoRangeForCollection(collectionID, (startIndex), photosPerPage);
                 partial.Description = "Showing photos " + (startIndex + 1).ToString() + " to " + (startIndex + photosPerPage).ToString();
             }
             else
             {
                 var remainingCount = photoCount - startIndex;
-                partial.Photos = photos.ToList().GetRange(startIndex, remainingCount);
+                partial.Photos = PhotoRepo.GetPhotoRangeForCollection(collectionID, (startIndex), remainingCount);
                 partial.Description = "Showing photos " + (startIndex + 1).ToString() + " to " + (startIndex + remainingCount).ToString();
             }
 
