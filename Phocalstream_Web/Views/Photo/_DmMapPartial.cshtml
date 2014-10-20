@@ -18,8 +18,7 @@
         title: '@Html.DisplayFor(model => Model.SiteName) Camera Site'
     });
 
-
-    var kmzAddress = 'http://torka.unl.edu:8080/dm/data/kml/usdm' + '@Html.DisplayFor(model => model.DataWeek)' + '.kmz';
-	var dmLayer = new google.maps.KmlLayer(kmzAddress, { preserveViewport: true });
+    var kmzAddress = 'http://droughtmonitor.unl.edu/data/kmz/usdm_20' + '@Html.DisplayFor(model => model.DataWeek)' + '.kmz';
+    var dmLayer = new google.maps.KmlLayer(kmzAddress, { preserveViewport: true });
 	dmLayer.setMap(map);
 </script>
