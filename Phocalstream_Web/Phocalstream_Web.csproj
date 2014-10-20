@@ -374,6 +374,7 @@
     <Content Include="Content\Scripts\knockout-3.2.0.js" />
     <Content Include="Content\Scripts\modernizr-2.5.3.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
+    <Content Include="Content\Scripts\TimeLapse.js" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\typeahead\typeahead.bundle.js" />
     <Content Include="Global.asax" />
