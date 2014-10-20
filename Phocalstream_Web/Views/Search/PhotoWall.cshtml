@@ -1,4 +1,4 @@
-﻿@model Phocalstream_Shared.Data.Model.View.SearchResults
+﻿@model Phocalstream_Web.Models.ViewModels.SearchResults
 @{
     ViewBag.Title = "PhotoWall";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -16,6 +16,13 @@
         threshold: 400,
         effect: "fadeIn"
     });
+
+    var initialSliderValue = 400;
+
+    function initialize() {
+        setImageAndText(initialSliderValue);
+        computeHolderMargin(initialSliderValue);
+    }
 
     function setText(value) {
         var width = getImgWidth(value);
@@ -96,26 +103,25 @@
     });
 
     $(function () {
-        var initialSliderValue = 400;
-
         $("#slider").slider({
             orientation: "horizontal",
             range: "min",
             min: 25,
-            max: 1000,
+            max: 800,
             value: initialSliderValue,
             slide: function (event, ui) {
                 setText(ui.value);
             },
             stop: function (event, ui) {
+                initialSliderValue = ui.value;
+
                 setImageAndText(ui.value);
                 scaleOrHideLabel(ui.value);
                 computeHolderMargin(ui.value);
             }
         });
 
-        setImageAndText(initialSliderValue);
-        computeHolderMargin(initialSliderValue);
+        initialize();
     });
 
     //If the User resizes the window, readjust the margins
@@ -147,16 +153,7 @@
             <hr class="featurette-divider" />
         </div>
         
-        <div class="holder">
-            <ul class="ul-holder">
-                @foreach (var p in Model.Collection.Photos)
-                {
-                    <li class="search-photo">
-                        <p class="img-date">@p.Captured.ToString()</p>
-                        <img id="@p.ID" class="photo" src="/api/photo/medium/@p.ID" width="400" height="267" />
-                    </li>
-                }
-            </ul>
-        </div>
+        @Html.Partial("_SearchGridPartial", Model.Partial)
+        
     </div>
 </div>
