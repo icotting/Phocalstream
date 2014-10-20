@@ -14,7 +14,46 @@
 } 
 else 
 {
-    @Ajax.ActionLink("Run Current Week", "StartDmImport", new { type = "current"}, new AjaxOptions { UpdateTargetId = "dmPartial" })
-    <text> | </text> 
-    @Ajax.ActionLink("Run Full", "StartDmImport", new { type = "full"}, new AjaxOptions { UpdateTargetId = "dmPartial" })
+    <a id="dmImportCurrent" class="btn btn-default">Run Current Week</a>
+    <a id="dmImportFull" class="btn btn-default">Run Full</a>
 }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#dmImportCurrent').click(function () {
+            $.ajax({
+                url: '@Url.Action("StartDmImport", "Settings")',
+                type: 'GET',
+                cache: false,
+                data: {
+                    type: 'current'
+                },
+                success: function (data) {
+                    $('#dmPartial').html(data);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        });
+
+        $('#dmImportFull').click(function () {
+            $.ajax({
+                url: '@Url.Action("StartDmImport", "Settings")',
+                type: 'GET',
+                cache: false,
+                data: {
+                    type: 'full'
+                },
+                success: function (data) {
+                    $('#dmPartial').html(data);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        });
+
+    });
+</script>
