@@ -126,38 +126,49 @@
 
         </div>
     </div>
+    
     <!-- Carousel
     ================================================== -->
-    <div id="myCarousel" class="carousel slide" data-ride="carousel">
-        <!-- Indicators -->
-        <ol class="carousel-indicators">
-            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-        </ol>
-        <div class="carousel-inner">
-            @{ int pos = 0; }
-            @foreach (var site in Model.Sites)
-            {
-                <div class="item @((pos++ == 0) ? "active" : "")">
-                <img src="/api/photo/high/@site.CoverPhotoID" alt="@site.SiteName">
-                <div class="container">
-                    <div class="carousel-caption">
-                        <h1>@site.SiteName</h1>
-                        <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
-                        <p><a class="btn btn-lg btn-primary button-override" href="/photo/sitedashboard?siteId=@site.SiteID" role="button">View the Collection</a></p>
+    <div class="background">
+        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            </ol>
+            <div class="carousel-inner">
+                @{ int pos = 0; }
+                @foreach (var site in Model.Sites)
+                {
+                    <div class="item @((pos++ == 0) ? "active" : "")">
+                        <img src="/api/photo/high/@site.CoverPhotoID" alt="@site.SiteName">
+                        <div class="carousel-caption">
+                            <div class="carousel-info container">
+                                <h1>@site.SiteName</h1>
+                                <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
+                                <p><a class="btn btn-lg carousel-info button-override" href="/photo/sitedashboard?siteId=@site.SiteID" role="button">View the Collection</a></p>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
-            }
-        </div>
-        <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
-        <a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-    </div><!-- /.carousel -->
+        </div><!-- /.carousel -->
+    </div>
+    
     <!-- Marketing messaging and featurettes
     ================================================== -->
     <!-- Wrap the rest of the page in another container to center all the content. -->
 
-    <div class="container marketing">
+    <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+    <a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
 
+    <div class="scroll">
+        <p>Scroll Down<p>
+            <span class="glyphicon glyphicon-chevron-down"></span>
+    </div>
+
+
+    <div class="back">
+    <div class="container marketing">
         @if (Model.PublicCollections.Count == 0)
         { 
             <div class="search">
@@ -284,6 +295,7 @@
         </footer>
 
     </div><!-- /.container -->
+    </div>
 </body>
 </html>
 
