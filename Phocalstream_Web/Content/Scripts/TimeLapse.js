@@ -1,4 +1,4 @@
-﻿var FRAME_RATE = 125;
+﻿var FRAME_RATE = 200;
 var MAX_BUFFER = 500; // buffer size
 
 var dmWeeks = new Array();
@@ -38,6 +38,71 @@ $(document).ready(function () {
         progLen = len;
     }
 
+    var series = [
+        {
+            name: 'None',
+            data: []
+        },
+        {
+            name: 'D0',
+            data: []
+        },
+        {
+            name: 'D1',
+            data: []
+        },
+        {
+            name: 'D2',
+            data: []
+        },
+        {
+            name: 'D3',
+            data: []
+        },
+        {
+            name: 'D4',
+            data: []
+        }
+    ];
+
+    dmChart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'open_container',
+            type: 'bar'
+        },
+        title: {
+            text: 'Drought Monitor Data'
+        },
+        subtitle: {
+            text: 'Source: droughtmonitor.unl.edu'
+        },
+        legend: true,
+        xAxis: {
+            categories: [
+                'US',
+                'State',
+                'County'
+            ]
+        },
+        yAxis: {
+            min: 0,
+            max: 100,
+            title: false
+        },
+        tooltip: {
+            formatter: function () {
+                return '' + this.series.name +
+                    ': ' + this.y + '%';
+            }
+        },
+        plotOptions: {
+            series: {
+                stacking: 'normal'
+            }
+        },
+        series: series
+    });
+
     // create the array to hold the buffered image data
     buffer = new Array();
     bufferData();
@@ -46,74 +111,19 @@ $(document).ready(function () {
 function loadDmData() {
     $.ajax(
         {
-            url: "/api/data/dmcountyweek",
+            url: "/api/data/timelapseweek",
             type: "POST",
-            data: { CountyFips: fips, DmWeek: dmWeeks[dmPointer++ % weekCount].toJSON() },
+            data: { CountyFips: fips, Latitude: lat, Longitude: lon, DmWeek: dmWeeks[dmPointer++ % weekCount].toJSON() },
             success: function (results) {
-                var series = [
-                    {
-                        name: 'None',
-                        data: [results.US.NonDrought, results.STATE.NonDrought, results.COUNTY.NonDrought]
-                    },
-                    {
-                        name: 'D0',
-                        data: [results.US.D0, results.STATE.D0, results.COUNTY.D0]
-                    },
-                    {
-                        name: 'D1',
-                        data: [results.US.D1, results.STATE.D1, results.COUNTY.D1]
-                    },
-                    {
-                        name: 'D2',
-                        data: [results.US.D2, results.STATE.D2, results.COUNTY.D2]
-                    },
-                    {
-                        name: 'D3',
-                        data: [results.US.D3, results.STATE.D3, results.COUNTY.D3]
-                    },
-                    {
-                        name: 'D4',
-                        data: [results.US.D4, results.STATE.D4, results.COUNTY.D4]
-                    }
-                ];
+                dmChart.series[0].setData([results.DMData.US.NonDrought, results.DMData.STATE.NonDrought, results.DMData.COUNTY.NonDrought], true);
+                dmChart.series[1].setData([results.DMData.US.D0, results.DMData.STATE.D0, results.DMData.COUNTY.DO], true);
+                dmChart.series[2].setData([results.DMData.US.D1, results.DMData.STATE.D1, results.DMData.COUNTY.D1], true);
+                dmChart.series[3].setData([results.DMData.US.D2, results.DMData.STATE.D2, results.DMData.COUNTY.D2], true);
+                dmChart.series[4].setData([results.DMData.US.D3, results.DMData.STATE.D3, results.DMData.COUNTY.D3], true);
+                dmChart.series[5].setData([results.DMData.US.D4, results.DMData.STATE.D4, results.DMData.COUNTY.D4], true);
 
-                dmChart = new Highcharts.Chart({
-                    chart: {
-                        renderTo: 'open_container',
-                        type: 'bar'
-                    },
-                    title: {
-                        text: 'Drought Monitor Data'
-                    },
-                    subtitle: {
-                        text: 'Source: droughtmonitor.unl.edu'
-                    },
-                    legend: true,
-                    xAxis: {
-                        categories: [
-                            'US',
-                            'State',
-                            'County'
-                        ]
-                    },
-                    yAxis: {
-                        min: 0,
-                        max: 100,
-                        title: false
-                    },
-                    tooltip: {
-                        formatter: function () {
-                            return '' + this.series.name +
-                                ': ' + this.y + '%';
-                        }
-                    },
-                    plotOptions: {
-                        series: {
-                            stacking: 'normal'
-                        }
-                    },
-                    series: series
-                });
+                $("#discharge").empty();
+                $("#discharge").append(results.AverageDischarge);
             }
         });
 }
@@ -156,8 +166,8 @@ function bufferData() {
             $("#loadDiv").hide();
             $("#controls").show();
             running = true;
-            nextImage(); // invokes the call to update the display canvas with the next image
             loadDmData();
+            nextImage(); // invokes the call to update the display canvas with the next image
         }
     };
 
@@ -168,10 +178,6 @@ function bufferData() {
 
 function nextImage() {
     var imageTime = new Date(Number(DATE_PATTERN.exec(frameset[pos % len].FrameTime)[1]));
-
-    if (imageTime.getTime() >= dmWeeks[dmPointer % weekCount].getTime()) {
-        loadDmData();
-    }
 
     $("#frameDate").empty();
     $("#frameDate").append(imageTime);
@@ -185,6 +191,10 @@ function nextImage() {
 
     // draw the buffered image data
     context.drawImage(image, 0, 0, width, height);
+
+    if (dmWeeks.length > 1 && imageTime.getTime() >= dmWeeks[dmPointer % weekCount].getTime()) {
+        loadDmData();
+    }
 
     // if the buffer is smaller than the total frameset, buffer the next image
     if (bufferLen < len) {
@@ -205,14 +215,18 @@ function nextImage() {
     }
 }
 
+function setFrameRate(rate) {
+    FRAME_RATE = rate;
+}
+
 function startStop() {
     if (running == true) {
-        $("#controls").removeClass("glyphicon-pause");
-        $("#controls").addClass("glyphicon-play");
+        $("#playbtn").removeClass("glyphicon-pause");
+        $("#playbtn").addClass("glyphicon-play");
         running = false;
     } else {
-        $("#controls").removeClass("glyphicon-play");
-        $("#controls").addClass("glyphicon-pause");
+        $("#playbtn").removeClass("glyphicon-play");
+        $("#playbtn").addClass("glyphicon-pause");
         running = true;
         nextImage();
     }

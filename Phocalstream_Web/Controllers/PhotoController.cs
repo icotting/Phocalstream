@@ -172,6 +172,8 @@ namespace Phocalstream_Web.Controllers
 
             Photo first = PhotoRepository.Find(p => p.ID == id, p => p.Site).FirstOrDefault();
             model.CountyFips = first.Site.CountyFips;
+            model.Latitude = first.Site.Latitude;
+            model.Longitude = first.Site.Longitude;
 
             model.Width = first.Width;
             model.Height = first.Height;

@@ -271,6 +271,7 @@
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
     <Compile Include="Controllers\Api\UploadController.cs" />
     <Compile Include="Controllers\Api\UserCollectionController.cs" />
+    <Compile Include="Controllers\Api\WaterDataType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -280,7 +281,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\Api\DroughtMonitorRequest.cs" />
+    <Compile Include="Models\Api\TimelapseDataRequest.cs" />
+    <Compile Include="Models\Api\TimelapseDataWeek.cs" />
     <Compile Include="Models\ViewModels\CollectionViewModel.cs" />
     <Compile Include="Models\ViewModels\DownloadViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
@@ -310,6 +312,7 @@
     <Content Include="Content\bootstrap\css\bootstrap.min.css" />
     <Content Include="Content\CSS\bootstrap-slider.css" />
     <Content Include="Content\CSS\jquery-ui-slider.css" />
+    <Content Include="Content\CSS\Timelapse.css" />
     <Content Include="Content\file-upload\jquery.fileupload-ui-noscript.css" />
     <Content Include="Content\file-upload\jquery.fileupload-ui.css" />
     <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.svg" />

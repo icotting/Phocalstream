@@ -14,5 +14,9 @@ namespace Phocalstream_Web.Models.ViewModels
 
         public int Width { get; set; }
         public int Height { get; set; }
+
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
     }
 }

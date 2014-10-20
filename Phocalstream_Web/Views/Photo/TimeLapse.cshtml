@@ -10,7 +10,11 @@
     string FRAME_HEIGHT = (WIDTH * ((float)Model.Height / (float)Model.Width)) + "px";
     
     string RESOLUTION = "medium";
-    bool DEBUG = false;
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="~/Content/CSS/Timelapse.css"/>
 }
 
 @section Scripts
@@ -36,18 +40,22 @@
         var frameset = @Html.Raw(Json.Encode(Model.Frames)); // the full set of frames represented by a list of frame models
         var weeks = @Html.Raw(Json.Encode(Model.DmWeeks));
         var fips = @Model.CountyFips;
+        
+        var lat = @Model.Latitude;
+        var lon = @Model.Longitude;
+
         var imageRes = "@RESOLUTION";
     </script>
 }   <script src="~/Content/Scripts/TimeLapse.js" type="text/javascript"></script>
 
 <div class="container">
     <div class="content">
-        <div id="video" style="position: relative;">
+        <div id="video">
             <div class="col-md-8">
-                <div id="loadDiv" style="color: white; text-align: center; padding: 20px; background-color: rgba(0, 0, 0, 0.7); z-index: 2; position: absolute; top: 0px; width: @FRAME_WIDTH; height: @FRAME_HEIGHT">
+                <div id="loadDiv" style="width: @FRAME_WIDTH; height: @FRAME_HEIGHT">
                     Buffering: <span id="bufferlabel"></span>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped active" id="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                        <div class="progress-bar progress-bar-striped active" id="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                             <span class="sr-only"></span>
                         </div>
                     </div>
@@ -55,25 +63,28 @@
 
                 <div id="frames" style="position: absolute; top: 0px; z-index: 1">
                     <canvas id="vscreen"></canvas>
-                    <div id="controls" style="display: none; margin-top: 10px;">
-                    <button class="btn btn-default" onclick="startStop()">
-                        <span id="controls" class="glyphicon glyphicon-pause"></span>
-                    </button>
-                    &nbsp;<span id="frameDate"></span>
+                    <div id="controls">
+                        <div id="frameDate"></div>
+                        <button class="btn btn-default" onclick="startStop()">
+                            <span id="playbtn" class="glyphicon glyphicon-pause"></span>
+                        </button>&nbsp;
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary">
+                                <input type="radio" name="framerate" id="slow" onchange="setFrameRate(300)"> Slow
+                            </label>
+                            <label class="btn btn-primary active">
+                                <input type="radio" name="framerate" id="normal" checked onchange="setFrameRate(140)"> Normal
+                            </label>
+                            <label class="btn btn-primary">
+                                <input type="radio" name="framerate" id="fast" onchange="setFrameRate(50)"> Fast
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div id="open_container" class="dm_container"></div>
-
-                @if (DEBUG) { 
-                <p>
-                    Photo <span id="pid"></span> at position <span id="pos"></span> and buffer position of <span id="bufPos"></span>
-                </p>
-                <p>
-                    Frameset Length: <span id="flen"></span> with buffer length <span id="blen"></span>
-                </p>
-                }
+                Average Weekly Stream Discharge: <span id="discharge">-</span>
             </div>
         </div>
     </div>
