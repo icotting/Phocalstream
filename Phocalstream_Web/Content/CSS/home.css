@@ -39,6 +39,7 @@
 .siteImage {
     height: 100%;
     width: 100%;
+    min-height: 250px;
     z-index: -1;
 }
 
