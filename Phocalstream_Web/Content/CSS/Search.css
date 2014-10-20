@@ -108,6 +108,11 @@ input[type=checkbox] {
     padding-top: 0.3em !important;
 }
 
+.btn-disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .fit-width {
     margin: auto;
     max-width: 960px;

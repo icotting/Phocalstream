@@ -13,6 +13,9 @@ namespace Phocalstream_Shared.Data
     {
         SiteDetails GetSiteDetails(CameraSite site);
         TagDetails GetTagDetails(Tag Tag);
+
+        int GetPhotoCountForCollection(long collectionID);
+        List<Photo> GetPhotoRangeForCollection(long collectionID, int startIndex, int length);
         
         /* These methods should be split off into a service */
         XmlDocument CreateDeepZoomForSite(long siteID);

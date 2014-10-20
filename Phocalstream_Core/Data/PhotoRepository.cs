@@ -125,6 +125,63 @@ namespace Phocalstream_Web.Application.Data
             return details;
         }
 
+        public int GetPhotoCountForCollection(long collectionID)
+        {
+            int count = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string command_string = "select count(*) FROM CollectionPhotos WHERE CollectionPhotos.CollectionId = @collectionID";
+                using (SqlCommand command = new SqlCommand(command_string, conn))
+                {
+                    command.Parameters.AddWithValue("@collectionID", collectionID);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            count = reader.GetInt32(0);
+                        }
+                    }
+                }
+            }
+            return count;
+        }
+
+        public List<Photo> GetPhotoRangeForCollection(long collectionID, int startIndex, int length)
+        {
+            List<Photo> photos = new List<Photo>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string command_string = "select Photos.ID, Photos.Captured FROM Photos " +
+                    "INNER JOIN CollectionPhotos ON Photos.ID = CollectionPhotos.PhotoId " +
+                    "WHERE CollectionPhotos.CollectionId = @collectionID " +
+                    "ORDER BY Photos.ID " + 
+                    "OFFSET @offset ROWS FETCH NEXT @length ROWS ONLY";
+
+                using (SqlCommand command = new SqlCommand(command_string, conn))
+                {
+                    command.Parameters.AddWithValue("@collectionID", collectionID);
+                    command.Parameters.AddWithValue("@offset", startIndex);
+                    command.Parameters.AddWithValue("@length", length);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Photo photo = new Photo()
+                            {
+                                ID = reader.GetInt64(0),
+                                Captured = reader.GetDateTime(1)
+                            };
+                            photos.Add(photo);
+                        }
+                    }
+                }
+            }
+            return photos;
+        }
+        
+
         public System.Xml.XmlDocument CreateDeepZoomForSite(long siteID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

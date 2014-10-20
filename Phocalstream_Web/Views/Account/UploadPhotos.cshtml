@@ -71,13 +71,25 @@
 {
     <script type="text/javascript">
 
-        var selectedCollectionID;
+        var selectedCollectionID = @ViewBag.CollectionID;
         var done;
+
+        $(function () {
+            var dropdown = document.getElementById(selectedCollectionID);
+          
+            if (dropdown != null) {
+                $("#dropdownTitle").text($(dropdown).text());
+                $("#dropdownTitle").val($(dropdown).text());
+            }
+        });
 
         $(function () {
             $(".dropdown-menu").on('click', 'li a', function () {
                 $("#dropdownTitle").text($(this).text());
                 $("#dropdownTitle").val($(this).text());
+
+                $("#dropdownTitle").removeClass("btn-danger");
+                $("#dropdownTitle").addClass("btn-default");
 
                 selectedCollectionID = $(this).attr('id');
             });
@@ -100,8 +112,16 @@
                     });
                 },
                 send: function (e, data) {
-                    data.url += selectedCollectionID;
-                    return true;
+                    if (selectedCollectionID == 0) {
+                        bootbox.alert("Please select a valid Camera Site from the dropdown.");
+                        $("#dropdownTitle").removeClass("btn-default");
+                        $("#dropdownTitle").addClass("btn-danger");
+                        return false;
+                    }
+                    else {
+                        data.url += selectedCollectionID;
+                        return true;
+                    }
                 },
                 done: function (e, data) {
                     data.context.text('');
