@@ -22,11 +22,14 @@ namespace Phocalstream_Web.Controllers.Api
         [ActionName("dmcountyweek")]
         public IDictionary<string, DroughtMonitorWeek> GetWeekDMData(DroughtMonitorRequest DmRequest)
         {
-            USCounty county = DmRepo.GetCountyForFips(DmRequest.CountyFips);
+           USCounty county = DmRepo.GetCountyForFips(DmRequest.CountyFips);
             Dictionary<string, DroughtMonitorWeek> results = new Dictionary<string, DroughtMonitorWeek>();
-            results.Add("COUNTY", DmRepo.FindBy(county, DmRequest.DmWeek).FirstOrDefault());
-            results.Add("STATE", DmRepo.FindBy(county.State, DmRequest.DmWeek).First());
-            results.Add("US", DmRepo.FindUS(DmRequest.DmWeek).FirstOrDefault());
+
+            DateTime date = Convert.ToDateTime(DmRequest.DmWeek);
+
+            results.Add("COUNTY", DmRepo.FindBy(county, date).FirstOrDefault());
+            results.Add("STATE", DmRepo.FindBy(county.State, date).First());
+            results.Add("US", DmRepo.FindUS(date).FirstOrDefault());
 
             return results;
         }
