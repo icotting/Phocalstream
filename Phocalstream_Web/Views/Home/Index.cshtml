@@ -283,6 +283,17 @@
 </html>
 
 <script type="text/javascript">
+    $(function() {
+        $(window).scroll( function(){
+            //$('.carousel-caption').each( function(i){
+                var scroll = $(document).scrollTop()
+                var opacity = (300 - scroll) / 300;
+                $('.carousel-caption').fadeTo(0, opacity);
+                $('.carousel-control').fadeTo(0, opacity);
+            //});     
+        });
+    });
+    
     $(document).ready(function() {
 
         var availableTags = @Html.Raw(Json.Encode(Model.Tags));

@@ -73,7 +73,6 @@
 /* Since positioning the image, we need to help out the caption */
 .carousel-caption {
   z-index: 10;
-  position: fixed;
   top: 50%;
   padding: 0px;
 }
@@ -81,8 +80,8 @@
 .carousel-info {
     border: white 1px solid;
     border-radius: 4px;
-    width: 60%;
-    height: 160px; 
+    width: 50%;
+    min-height: 160px; 
     margin-top: -80px;
 }
 
