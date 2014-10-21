@@ -1,16 +1,19 @@
 ﻿var FRAME_RATE = 75;
-var MAX_BUFFER = 500; // buffer size
+var MAX_BUFFER = 350; // buffer size
 
 var dmWeeks = new Array();
 var weekCount = 0;
 
 var buffer; // the actual Image objects with data for a photo
+var dataBuffer;
 
 var pos = 0; // current position for display
 var bufferPos = 0; // current position of image to buffer
 
 var len = 0; // length of the image set
 var bufferLen = 0; // length of the buffer (could be less than MAX)
+var dataBufferLen = 0;
+var dataBufferPos = 0;
 
 var running;
 
@@ -27,6 +30,7 @@ $(document).ready(function () {
         dmWeeks.push(week);
     }
     weekCount = dmWeeks.length;
+    dataBuffer = new Array();
 
     // set the total length
     len = frameset.length;
@@ -105,6 +109,8 @@ $(document).ready(function () {
 
     // create the array to hold the buffered image data
     buffer = new Array();
+    dataBuffer = new Array();
+
     bufferData();
 });
 
