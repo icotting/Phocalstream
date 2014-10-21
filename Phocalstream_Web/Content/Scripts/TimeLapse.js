@@ -1,4 +1,4 @@
-﻿var FRAME_RATE = 200;
+﻿var FRAME_RATE = 75;
 var MAX_BUFFER = 500; // buffer size
 
 var dmWeeks = new Array();
@@ -192,10 +192,6 @@ function nextImage() {
     // draw the buffered image data
     context.drawImage(image, 0, 0, width, height);
 
-    if (dmWeeks.length > 1 && imageTime.getTime() >= dmWeeks[dmPointer % weekCount].getTime()) {
-        loadDmData();
-    }
-
     // if the buffer is smaller than the total frameset, buffer the next image
     if (bufferLen < len) {
         var imageObj = new Image();
@@ -212,6 +208,10 @@ function nextImage() {
     // set the time to invoke the next image display call
     if (running == true) {
         setTimeout(function () { nextImage(); }, FRAME_RATE);
+    }
+
+    if (dmWeeks.length > 1 && imageTime.getTime() >= dmWeeks[dmPointer % weekCount].getTime()) {
+        loadDmData();
     }
 }
 
