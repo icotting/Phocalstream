@@ -170,7 +170,9 @@ ul {
 }
 
 /* Tag Partial */
-
+#tagPartial {
+    padding: 5px;
+}
 
 /* User Collection Partial */
 .collection-button {
