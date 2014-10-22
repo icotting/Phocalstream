@@ -55,10 +55,6 @@ label {
     margin-bottom: 25px;
 }
 
-.title {
-    color: #5bc0de;
-}
-
 input[type=checkbox] {
     visibility: hidden;
 }
@@ -92,6 +88,11 @@ input[type=checkbox] {
     position: absolute;
     bottom: 5px;
     right: 0px;
+}
+
+/* Search Navbar Fix */
+.navbar {
+    position: fixed;
 }
 
 /* Search Photo Wall */
