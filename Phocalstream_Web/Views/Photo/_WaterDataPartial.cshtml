@@ -1,12 +1,12 @@
 ﻿@model Phocalstream_Web.Models.ViewModels.WaterFlowData
 
-<h2>Water Data</h2>
+<h4 class="partial-title">Water Data</h4>
 
 <div id="WaterInfo">
-    <ul>
-        <li>Closest Water Station Number: <span class="value">@Html.DisplayFor(model => model.ClosestStation.StationNumber)</span></li>
-        <li>Closest Water Station Name: <span class="value">@Html.DisplayFor(model => model.ClosestStation.StationName)</span></li>
-        <li>Water Station Location: <span class="value">@Html.DisplayFor(model => model.ClosestStation.Latitude)</span>,  <span class="value">@Html.DisplayFor(model => model.ClosestStation.Longitude)</span></li>
-        <li>Value on <span class="value">@Html.DisplayFor(model => model.WaterDataValues.Last().DateOf)</span>: <span class="value">@Html.DisplayFor(model => model.WaterDataValues.Last().Value)</span></li>
+    <ul class="list-group">
+        <li class="list-group-item">Closest Water Station Number: <span class="value">@Html.DisplayFor(model => model.ClosestStation.StationNumber)</span></li>
+        <li class="list-group-item">Closest Water Station Name: <span class="value">@Html.DisplayFor(model => model.ClosestStation.StationName)</span></li>
+        <li class="list-group-item">Water Station Location: <span class="value">@Html.DisplayFor(model => model.ClosestStation.Latitude)</span>,  <span class="value">@Html.DisplayFor(model => model.ClosestStation.Longitude)</span></li>
+        <li class="list-group-item">Value on <span class="value">@Html.DisplayFor(model => model.WaterDataValues.Last().DateOf)</span>: <span class="value">@Html.DisplayFor(model => model.WaterDataValues.Last().Value)</span></li>
     </ul>
 </div>

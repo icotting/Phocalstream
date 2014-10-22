@@ -477,13 +477,13 @@ namespace Phocalstream_Service.Service
             return photo;
         }
 
-        public List<Tuple<string, int>> GetPopularTagsForSite(long siteID)
+        public List<Tuple<string, int, long>> GetPopularTagsForSite(long siteID)
         {
-            List<Tuple<string, int>> PopularTags = new List<Tuple<string, int>>();
+            List<Tuple<string, int, long>> PopularTags = new List<Tuple<string, int, long>>();
             using (SqlConnection conn = new SqlConnection(PathManager.DbConnection))
             {
                 conn.Open();
-                string commandString = "select Tags.Name, Count(*) from Tags " + 
+                string commandString = "select Tags.Name, MAX(Photos.ID), Count(*) from Tags " + 
                         "INNER JOIN PhotoTags ON Tags.ID = PhotoTags.Tag_ID " +
                         "INNER JOIN Photos ON PhotoTags.Photo_ID = Photos.ID " +
                         "WHERE Photos.Site_ID = @siteID " +
@@ -496,9 +496,10 @@ namespace Phocalstream_Service.Service
                     {
                         while (reader.Read())
                         {
-                            Tuple<string, int> tuple = new Tuple<string, int>(
+                            Tuple<string, int, long> tuple = new Tuple<string, int, long>(
                                 reader.GetString(0),
-                                reader.GetInt32(1)
+                                reader.GetInt32(2),
+                                reader.GetInt64(1)
                             );
 
                             PopularTags.Add(tuple);
