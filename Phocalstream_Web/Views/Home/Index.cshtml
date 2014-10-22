@@ -128,13 +128,13 @@
     </div>
     
     <div class="background">
-        <img class="background-img" src="/api/photo/high/@Model.Sites.First().SiteID" alt="@Model.Sites.First().SiteName">
+        <img class="background-img" src="/api/photo/high/@Model.Sites.ElementAt(Model.SiteIndex).CoverPhotoID" alt="@Model.Sites.ElementAt(Model.SiteIndex).SiteName">
     </div>
 
     <div class="background-info">
-        <h1>@Model.Sites.First().SiteName</h1>
-        <p>@Html.DisplayFor(model => Model.Sites.First().PhotoCount) photos from @Html.DisplayFor(model => Model.Sites.First().First) to @Html.DisplayFor(model => Model.Sites.First().Last)</p>
-        <p><a class="btn btn-lg btn-bordered button-override" href="/photo/sitedashboard?siteId=@Model.Sites.First().SiteID" role="button">View the Collection</a></p>
+        <h1>@Model.Sites.ElementAt(Model.SiteIndex).SiteName</h1>
+        <p>@Html.DisplayFor(model => Model.Sites.ElementAt(Model.SiteIndex).PhotoCount) photos from @Html.DisplayFor(model => Model.Sites.ElementAt(Model.SiteIndex).First) to @Html.DisplayFor(model => Model.Sites.ElementAt(Model.SiteIndex).Last)</p>
+        <p><a class="btn btn-lg btn-bordered button-override" href="/photo/sitedashboard?siteId=@Model.Sites.ElementAt(Model.SiteIndex).SiteID" role="button">View the Collection</a></p>
     </div>
  
     <div class="scroll">
@@ -226,6 +226,33 @@
             }
         
             <hr class="featurette-divider">
+               
+            <!-- Sites Section -->
+            <div id="sites">
+                <div class="row text-center">
+                    <h2>Phocalsteam Camera Sites</h2>
+                </div>
+                <div class="row">
+                    @foreach (var site in Model.Sites)
+                    {
+                        <div class="col-md-6 siteColumn">
+                            <img class="siteImage" src="/api/photo/medium/@site.CoverPhotoID" alt="@site.SiteName">
+
+                            <div class="row">
+                                <div class="siteCaption">
+                                    <div class="col-md-8">
+                                        <h1>@site.SiteName</h1>
+                                        <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <a class="siteCollection btn btn-default" href="/photo/sitedashboard?siteId=@site.SiteID">View Collection</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
 
             <!-- Marketing Section -->
             <div class="row">
