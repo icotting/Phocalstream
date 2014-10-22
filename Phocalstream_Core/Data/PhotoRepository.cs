@@ -54,6 +54,46 @@ namespace Phocalstream_Web.Application.Data
             return details;
         }
 
+        public IEnumerable<DateTime> FindDmDatesForPhotos(long[] ids)
+        {
+            HashSet<DateTime> dates = new HashSet<DateTime>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand(string.Format("select Captured from Photos where ID in ({0})", ids.Select(i => i.ToString()).Aggregate((s1, s2) => s1 + "," + s2)), conn))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dates.Add(RoundDmDate((DateTime)reader["Captured"]));
+                        }
+                    }
+                }
+            }
+
+            return dates;
+        }
+
+        private DateTime RoundDmDate(DateTime date)
+        {
+            DateTime rounded;
+            if (date.DayOfWeek < DayOfWeek.Tuesday)
+            {
+                rounded = date.AddDays(0 - (5 + date.DayOfWeek)); // last Tuesday
+            }
+            else if (date.DayOfWeek > DayOfWeek.Tuesday)
+            {
+                rounded = date.AddDays(0 - (date.DayOfWeek - 2)); // this Tuesday
+            }
+            else
+            {
+                rounded = date; // date is Tuesday
+            }
+
+            return new DateTime(rounded.Year, rounded.Month, rounded.Day, 0, 0, 0); // set to midnight
+        }
+
         public TagDetails GetTagDetails(Tag tag)
         {
             TagDetails details = new TagDetails();
@@ -230,7 +270,7 @@ namespace Phocalstream_Web.Application.Data
             {
                 conn.Open();
 
-                using (SqlCommand command = new SqlCommand("select Tags.Name from Tags " + 
+                using (SqlCommand command = new SqlCommand("select Tags.Name from Tags " +
                     "INNER JOIN PhotoTags ON Tags.ID = PhotoTags.Tag_ID " +
                     "INNER JOIN Photos ON PhotoTags.Photo_ID = Photos.ID " +
                     "WHERE Photos.ID = @id", conn))
@@ -251,38 +291,34 @@ namespace Phocalstream_Web.Application.Data
             return tags;
         }
 
-        public ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort)
+        public IEnumerable<IDictionary<string, object>> GetPhotoProperties(long[] ids, params string[] fields)
         {
-            List<TimelapseFrame> frames = new List<TimelapseFrame>();
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-
-                using (SqlCommand command = new SqlCommand(string.Format("select BlobID, ContainerID, Captured, Photos.ID from Photos inner join CameraSites on Photos.Site_ID = CameraSites.ID where Photos.ID in ({0})", photoList), conn))
+                using (SqlCommand command = new SqlCommand(string.Format("select {0} from Photos where ID in ({1})",
+                    fields.Select(f => f).Aggregate((s1, s2) => s1 + "," + s2), ids.Select(i => i.ToString()).Aggregate((s1, s2) => s1 + "," + s2)), conn))
                 {
-
+                    List<IDictionary<string, object>> properties = new List<IDictionary<string, object>>();
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            TimelapseFrame frame = new TimelapseFrame();
-                            frame.Time = reader.GetDateTime(2);
-                            frame.PhotoId = reader.GetInt64(3);
-                            frame.Url = string.Format("{0}://{1}:{2}/dzc/{3}/DZ/{4}.dzi", urlScheme,
-                                urlHost,
-                                Convert.ToString(urlPort),
-                                reader.GetString(1),
-                                reader.GetString(0));
-                            frames.Add(frame);
+                            Dictionary<string, object> dict = new Dictionary<string, object>();    
+                            for (var i = 0; i < fields.Count(); i++ )
+                            {
+                                dict.Add(fields[i], reader.GetValue(i));
+                            }
+                            properties.Add(dict);
                         }
+
                     }
+                    return properties;
                 }
             }
-            
-            return frames;
         }
-
+   
         private XmlDocument CreateDeepZoomDocument(SqlCommand command, Uri uri)
         {
             XmlDocument doc = new XmlDocument();

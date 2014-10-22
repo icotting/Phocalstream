@@ -163,17 +163,20 @@ namespace Phocalstream_Web.Controllers
         public ActionResult TimeLapse(string photoIds)
         {
             TimelapseModel model = new TimelapseModel();
+            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray<long>();
 
-            List<TimelapseFrame> frames = DZPhotoRepository.CreateFrameSet(photoIds, Request.Url.Scheme, Request.Url.Host, Request.Url.Port).ToList<TimelapseFrame>();
-            frames.OrderBy(f => f.Time);
-            model.Ids = frames.Select(f => f.PhotoId).ToList<long>();
-            model.Video = new TimelapseVideo() { Frames = frames };
+            model.DmWeeks = DZPhotoRepository.FindDmDatesForPhotos(ids);
+            model.Frames = PhotoService.CreateTimeLapseFramesFromIDs(ids);
 
-            XmlSerializer serializer = new XmlSerializer(typeof(TimelapseVideo));
-            MemoryStream stream = new MemoryStream();
-            serializer.Serialize(stream, model.Video);
-            stream.Seek(0, SeekOrigin.Begin);
-            model.EncodedFrames = Convert.ToBase64String(stream.ToArray());
+            long id = model.Frames.FirstOrDefault().PhotoID;
+
+            Photo first = PhotoRepository.Find(p => p.ID == id, p => p.Site).FirstOrDefault();
+            model.CountyFips = first.Site.CountyFips;
+            model.Latitude = first.Site.Latitude;
+            model.Longitude = first.Site.Longitude;
+
+            model.Width = first.Width;
+            model.Height = first.Height;
 
             return View(model);
         }

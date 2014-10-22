@@ -26,5 +26,6 @@ namespace Phocalstream_Shared.Data
         DateTime GetDmDate(int type);
 
         void Add(DroughtMonitorWeek week);
+
     }
 }

@@ -74,6 +74,10 @@
             })
         }
 
+        function generateTimelapse() {
+            window.document.location.href = '/photo/timelapse?photoIds='+visibleItems;
+        }
+
         //User Defined Collection
         function saveCollectionPrompt() {
             $("#silverlightControlHost").hide();
@@ -135,23 +139,6 @@
             });
         });
 
-        //Admin Functionality
-        function generateVideo() {
-            var form;
-            form = $('<form />', {
-                action: '/photo/timelapse',
-                method: 'POST',
-                style: 'display: none;'
-            });
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'photoIds',
-                value: visibleItems
-            }));
-            form.appendTo('body').submit();
-        }
-
         function setCover() {
             var form;
             form = $('<form />', {
@@ -172,6 +159,22 @@
                 value: @Model.Collection.ID
             }));
 
+            form.appendTo('body').submit();
+        }
+
+        function generateTimelapse() {
+            var form;
+            form = $('<form />', {
+                action: '/photo/timelapse',
+                method: 'POST',
+                style: 'display: none;'
+            });
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'photoIds',
+                value: visibleItems
+            }));
             form.appendTo('body').submit();
         }
     </script>
@@ -210,6 +213,8 @@
     {
         <li><a href="javascript:saveCollectionPrompt()">Save Collection</a></li>
     }
+    
+<li><a href="javascript:generateTimelapse()">View Time Lapse</a></li>
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
         <li><a href="javascript:setCover()">Set Cover</a></li>

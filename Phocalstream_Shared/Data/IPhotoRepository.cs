@@ -22,7 +22,8 @@ namespace Phocalstream_Shared.Data
         XmlDocument CreateDeepZomForList(string photoList);
         XmlDocument CreatePivotCollectionForSite(long siteID);
         XmlDocument CreatePivotCollectionForList(string collectionName, string photoList, CollectionType type, string subsetName = null);
+        IEnumerable<IDictionary<string, object>> GetPhotoProperties(long[] ids, params string[] fields);
 
-        ICollection<TimelapseFrame> CreateFrameSet(string photoList, string urlScheme, string urlHost, int urlPort);
+        IEnumerable<DateTime> FindDmDatesForPhotos(long[] ids);
     }
 }

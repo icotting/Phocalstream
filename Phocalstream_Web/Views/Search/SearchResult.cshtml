@@ -127,16 +127,7 @@
             });
         }
 
-        $(document).ready(function () {
-            $('.list-group-item').click(function () {
-                $(this).toggleClass('list-group-item-success');
-
-                registerCollectionSelection($(this).attr('id'));
-            });
-        });
-    
-        //Admin Functionality
-        function generateVideo() {
+        function generateTimelapse() {
             var form;
             form = $('<form />', {
                 action: '/photo/timelapse',
@@ -151,6 +142,16 @@
             }));
             form.appendTo('body').submit();
         }
+
+
+        $(document).ready(function () {
+            $('.list-group-item').click(function () {
+                $(this).toggleClass('list-group-item-success');
+
+                registerCollectionSelection($(this).attr('id'));
+            });
+        });
+    
     </script>
 
     <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
@@ -186,7 +187,10 @@
     @if (Request.IsAuthenticated)
     {
         <li><a href="javascript:saveCollectionPrompt()">Save Collection</a></li>
+
     }
+<li><a href="javascript:generateTimelapse()">View Time Lapse</a></li>
+
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
         <li><a href="javascript:downloadPrompt()">Download Images</a></li>

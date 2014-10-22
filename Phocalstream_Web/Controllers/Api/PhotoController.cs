@@ -4,6 +4,7 @@ using Phocalstream_Service.Service;
 using Phocalstream_Shared;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Shared.Service;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
 using Phocalstream_Web.Models;
@@ -29,6 +30,9 @@ namespace Phocalstream_Web.Controllers.Api
         
         [Dependency]
         public IEntityRepository<Collection> CollectionRepository { get; set; }
+
+        [Dependency]
+        public IPhotoService PhotoService { get; set; }
 
         [HttpGet]
         [ActionName("high")]

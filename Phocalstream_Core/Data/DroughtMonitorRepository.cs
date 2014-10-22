@@ -111,6 +111,10 @@ namespace Phocalstream_Service.Data
                         command.Parameters.AddWithValue("@rangestart", week.Value.AddDays(7 * (0 - weeksPrevious)).ToString("yyyy/MM/dd"));
                         command.Parameters.AddWithValue("@rangeend", week.Value.ToString("yyyy/MM/dd"));
                     }
+                    else
+                    {
+                        throw new Exception("No command was specified");
+                    }
 
                     return ProcessQuery(command, DMDataType.COUNTY);
                 }
