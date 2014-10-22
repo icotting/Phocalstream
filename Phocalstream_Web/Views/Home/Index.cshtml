@@ -15,7 +15,7 @@
     @Styles.Render(
             "~/Content/bootstrap/css/bootstrap.min.css",
             "~/Content/Site.css",
-            "~/Content/carousel.css",
+            "~/Content/CSS/HomePage.css",
             "~/Content/CSS/Home.css"
     )
 
@@ -127,47 +127,24 @@
         </div>
     </div>
     
-    <!-- Carousel
-    ================================================== -->
     <div class="background">
-        <div id="myCarousel" class="carousel slide" data-ride="carousel">
-            <!-- Indicators -->
-            <ol class="carousel-indicators">
-                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-            </ol>
-            <div class="carousel-inner">
-                @{ int pos = 0; }
-                @foreach (var site in Model.Sites)
-                {
-                    <div class="item @((pos++ == 0) ? "active" : "")">
-                        <img src="/api/photo/high/@site.CoverPhotoID" alt="@site.SiteName">
-                        <div class="carousel-caption">
-                            <div class="carousel-info container">
-                                <h1>@site.SiteName</h1>
-                                <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
-                                <p><a class="btn btn-lg btn-bordered button-override" href="/photo/sitedashboard?siteId=@site.SiteID" role="button">View the Collection</a></p>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div><!-- /.carousel -->
+        <img class="background-img" src="/api/photo/high/@Model.Sites.First().SiteID" alt="@Model.Sites.First().SiteName">
     </div>
-    
-    <!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
 
-    <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
-    <a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-
+    <div class="background-info">
+        <h1>@Model.Sites.First().SiteName</h1>
+        <p>@Html.DisplayFor(model => Model.Sites.First().PhotoCount) photos from @Html.DisplayFor(model => Model.Sites.First().First) to @Html.DisplayFor(model => Model.Sites.First().Last)</p>
+        <p><a class="btn btn-lg btn-bordered button-override" href="/photo/sitedashboard?siteId=@Model.Sites.First().SiteID" role="button">View the Collection</a></p>
+    </div>
+ 
     <div class="scroll">
         <p>Scroll Down<p>
         <span class="glyphicon glyphicon-chevron-down"></span>
     </div>
 
     <div class="back">
-        <div class="container marketing">
+        <div class="container">
+            <!-- Search Section -->
             <div class="search">
                 @if (@ViewBag.Message != null)
                 {
@@ -216,6 +193,7 @@
         
             <hr class="featurette-divider">
     
+            <!-- Public Section -->
             @if (Model.PublicCollections.Count > 0)
             {
                 <div class="publicCollections">
@@ -249,6 +227,7 @@
         
             <hr class="featurette-divider">
 
+            <!-- Marketing Section -->
             <div class="row">
                 <div class="col-md-4">
                     <img class="imghead" src="/Content/Images/wff.jpg" alt="Platte Basin Time Lapse Project">
@@ -285,17 +264,14 @@
 <script type="text/javascript">
     $(function() {
         $(window).scroll( function(){
-            //$('.carousel-caption').each( function(i){
-                var scroll = $(document).scrollTop()
-                var opacity = (300 - scroll) / 300;
-                $('.carousel-caption').fadeTo(0, opacity);
-                $('.carousel-control').fadeTo(0, opacity);
-            //});     
+            var scroll = $(document).scrollTop()
+            var opacity = (300 - scroll) / 300;
+            $('.background-info').fadeTo(0, opacity);
+       //     $('.navbar-wrapper').fadeTo(0, opacity);
         });
     });
     
     $(document).ready(function() {
-
         var availableTags = @Html.Raw(Json.Encode(Model.Tags));
 
         var substringMatcher = function(strs) {
