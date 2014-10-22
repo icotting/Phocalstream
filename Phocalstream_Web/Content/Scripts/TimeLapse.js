@@ -1,4 +1,4 @@
-﻿var FRAME_RATE = 75;
+﻿var FRAME_RATE = 150;
 var MAX_BUFFER = 350; // buffer size
 
 var dmWeeks = new Array();
@@ -21,7 +21,7 @@ var progLen; // length of the progress bar
 
 var DATE_PATTERN = /\/Date\((.*)\)\//;
 var dmChart;
-var dmPointer = 0;
+var dataPos = 0;
 
 $(document).ready(function () {
     for (var w in weeks) {
@@ -114,32 +114,13 @@ $(document).ready(function () {
     bufferData();
 });
 
-function loadDmData() {
-    $.ajax(
-        {
-            url: "/api/data/timelapseweek",
-            type: "POST",
-            data: { CountyFips: fips, Latitude: lat, Longitude: lon, DmWeek: dmWeeks[dmPointer++ % weekCount].toJSON() },
-            success: function (results) {
-                dmChart.series[0].setData([results.DMData.US.NonDrought, results.DMData.STATE.NonDrought, results.DMData.COUNTY.NonDrought], true);
-                dmChart.series[1].setData([results.DMData.US.D0, results.DMData.STATE.D0, results.DMData.COUNTY.DO], true);
-                dmChart.series[2].setData([results.DMData.US.D1, results.DMData.STATE.D1, results.DMData.COUNTY.D1], true);
-                dmChart.series[3].setData([results.DMData.US.D2, results.DMData.STATE.D2, results.DMData.COUNTY.D2], true);
-                dmChart.series[4].setData([results.DMData.US.D3, results.DMData.STATE.D3, results.DMData.COUNTY.D3], true);
-                dmChart.series[5].setData([results.DMData.US.D4, results.DMData.STATE.D4, results.DMData.COUNTY.D4], true);
-
-                $("#discharge").empty();
-                $("#discharge").append(results.AverageDischarge);
-            }
-        });
-}
-
 function bufferData() {
     // for each image up to MAX, load the data into the buffer
     var imageObj = new Image();
 
     // event handler to invoke the call to buffer the next image after the current one has been bufferd
     imageObj.onload = function () {
+        var imageTime = new Date(Number(DATE_PATTERN.exec(frameset[bufferPos % len].FrameTime)[1]));
 
         // update the progress bar
         var complete = parseInt(((bufferPos++ / progLen) * 100));
@@ -162,24 +143,65 @@ function bufferData() {
         // draw the buffered image data
         context.drawImage(this, 0, 0, width, height);
 
-        // if there is more to buffer, do that
-        if (bufferPos < len && bufferPos < MAX_BUFFER) {
-            bufferData();
+
+        if (dataBufferPos < weekCount && imageTime.getTime() >= dmWeeks[dataBufferPos % weekCount].getTime()) {
+            $.ajax({
+                url: "/api/data/timelapseweek",
+                type: "POST",
+                data: { CountyFips: fips, Latitude: lat, Longitude: lon, DmWeek: dmWeeks[dataBufferPos++].toJSON() },
+                success: function (results) {
+                    dataBuffer.push(results);
+                    continueBuffer();
+                }
+            });
         } else {
-            // if not, set the length of the buffer
-            bufferLen = bufferPos;
-            // get rid of the buffering display and begin the movie
-            $("#loadDiv").hide();
-            $("#controls").show();
-            running = true;
-            loadDmData();
-            nextImage(); // invokes the call to update the display canvas with the next image
+            continueBuffer();
         }
     };
 
     // set the source of the image being buffered which will cause the event handler to be invoked when the image has loaded
     imageObj.src = "/api/photo/" + imageRes + "/" + frameset[bufferPos].PhotoID;
     buffer.push(imageObj); // store the image object in the buffer
+}
+
+function updateData() {
+    var results = dataBuffer[dataPos++ % dataBufferLen];
+    dmChart.series[0].setData([results.DMData.US.NonDrought, results.DMData.STATE.NonDrought, results.DMData.COUNTY.NonDrought], true);
+    dmChart.series[1].setData([results.DMData.US.D0, results.DMData.STATE.D0, results.DMData.COUNTY.DO], true);
+    dmChart.series[2].setData([results.DMData.US.D1, results.DMData.STATE.D1, results.DMData.COUNTY.D1], true);
+    dmChart.series[3].setData([results.DMData.US.D2, results.DMData.STATE.D2, results.DMData.COUNTY.D2], true);
+    dmChart.series[4].setData([results.DMData.US.D3, results.DMData.STATE.D3, results.DMData.COUNTY.D3], true);
+    dmChart.series[5].setData([results.DMData.US.D4, results.DMData.STATE.D4, results.DMData.COUNTY.D4], true);
+
+    $("#discharge").empty();
+    $("#discharge").append(results.AverageDischarge);
+
+    $.ajax({
+        url: "/api/data/timelapseweek",
+        type: "POST",
+        data: { CountyFips: fips, Latitude: lat, Longitude: lon, DmWeek: dmWeeks[dataBufferPos % weekCount].toJSON() },
+        success: function (results) {
+            dataBuffer[dataBufferPos++ % dataBufferLen] = results;
+        }
+    });
+}
+
+function continueBuffer() {
+    // if there is more to buffer, do that
+    if (bufferPos < len && bufferPos < MAX_BUFFER) {
+        bufferData();
+    } else {
+        // if not, set the length of the buffer
+        bufferLen = bufferPos;
+        dataBufferLen = dataBufferPos;
+
+        // get rid of the buffering display and begin the movie
+        $("#loadDiv").hide();
+        $("#controls").show();
+        running = true;
+        updateData();
+        nextImage(); // invokes the call to update the display canvas with the next image
+    }
 }
 
 function nextImage() {
@@ -216,9 +238,15 @@ function nextImage() {
         setTimeout(function () { nextImage(); }, FRAME_RATE);
     }
 
-    if (dmWeeks.length > 1 && imageTime.getTime() >= dmWeeks[dmPointer % weekCount].getTime()) {
-        loadDmData();
+    if (dataPos % weekCount == 0) { // if the data has wrapped back around, don't update until the image has as well
+        if (pos % bufferLen == 0) {
+            updateData();
+        }
+    } else if (imageTime.getTime() >= dmWeeks[dataPos % weekCount].getTime()) {
+        updateData();
     }
+
+
 }
 
 function setFrameRate(rate) {
