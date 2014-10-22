@@ -70,30 +70,35 @@
     <div id="siteInfo">
         <h1>@Html.DisplayFor(model => model.PhotoTime)</h1>
         <h3>@Html.DisplayFor(model => model.PhotoDate)</h3>
-        <ul>
-            <li>Camera Site: <span class="value">@Html.DisplayFor(model => model.Photo.Site.Name)</span></li>
-            <li>Exposure Time: <span class="value">@Html.DisplayFor(model => model.Photo.ExposureTime)</span></li>
-            <li>
-                @(Model.Photo.Flash ? "Flash" : "No Flash")
-
-            </li>
-            <li>Focal Length: <span class="value">@Html.DisplayFor(model => model.Photo.FocalLength)</span></li>
-            <li>ISO Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ISO)</span></li>
-            <li>Max Aperture: <span class="value">@Html.DisplayFor(model => model.Photo.MaxAperture)</span></li>
-            <li>Shutter Speed: <span class="value">@Html.DisplayFor(model => model.Photo.ShutterSpeed)</span></li>
+        <ul class="list-group">
+            <li class="list-group-item">Camera Site: <span class="badge">@Html.DisplayFor(model => model.Photo.Site.Name)</span></li>
+            <li class="list-group-item">Exposure Time: <span class="badge">@Html.DisplayFor(model => model.Photo.ExposureTime)</span></li>
+            <li class="list-group-item">Flash?: <span class="badge">@(Model.Photo.Flash ? "Flash" : "No Flash")</span></li>
+            <li class="list-group-item">Focal Length: <span class="badge">@Html.DisplayFor(model => model.Photo.FocalLength)</span></li>
+            <li class="list-group-item">ISO Speed: <span class="badge">@Html.DisplayFor(model => model.Photo.ISO)</span></li>
+            <li class="list-group-item">Max Aperture: <span class="badge">@Html.DisplayFor(model => model.Photo.MaxAperture)</span></li>
+            <li class="list-group-item">Shutter Speed: <span class="badge">@Html.DisplayFor(model => model.Photo.ShutterSpeed)</span></li>
         </ul>
-        <div class="data-partial" id="dmPartial">
+
+        <!-- Tags -->
+        <div class="dashboardData" id="tagPartial">
+            @{ Html.RenderPartial("_TagPartial", Model.Photo); }
+        </div>
+
+        <!-- Drought Monitor Charts-->
+        <div class="data-partial dashboardData" id="dmPartial">
             @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
         </div>
+
+        <!-- Water Data -->
         <div class="data-partial" id="wdPartial">
             @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
         </div>
-        <div style="margin-top: 20px;" id="tagPartial">
-            @{ Html.RenderPartial("_TagPartial", Model.Photo); }
-        </div>
+
+        <!-- User Collections -->
         @if (Request.IsAuthenticated)
-        { 
-            <div style="margin-top: 20px;" id="userCollectionPartial">
+        {
+            <div class="dashboardData" id="userCollectionPartial">
                 @{ Html.RenderPartial("_UserCollectionPartial", Model.UserCollections); }
             </div>
         }

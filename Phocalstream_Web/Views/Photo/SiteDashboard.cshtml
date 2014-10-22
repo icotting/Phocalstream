@@ -71,15 +71,18 @@
                 @{ Html.RenderPartial("_PhotoFrequencyPartial", Model.PhotoFrequency); }
             </div>
 
-            <div class="col-md-4 dashboardData" id="popularTags">
-                <h3>Popular Tags</h3>
-                <ul class="list-group user-collection-list">
+            <div class="col-md-4 text-center" id="popularTags">
+                <h4 class="partial-title">Popular Tags</h4>
+                <ul class="list-group">
                     @foreach (var t in Model.Tags)
-                    {
-                        <li id="@t.Item1" class="list-group-item">
-                            <span class="badge">@t.Item2</span>@Html.ActionLink(Html.DisplayFor(model => t.Item1).ToString(), "KnockoutAdvancedSearch", "Search", new {
-                                @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = @t.Item1, @dates = ""
-                            }, new { @class = "" })
+                    { 
+                        <li class="list-group-item">
+                            <a class="pull-left" href="@Url.Action("Index", "Photo", new { @photoId = t.Item3})">
+                                <img class="media-object" src="/api/photo/low/@t.Item3" alt="...">
+                            </a>
+                            <span class="badge">@t.Item2</span><p class="tag">@Html.ActionLink(Html.DisplayFor(model => t.Item1).ToString(), "KnockoutAdvancedSearch", "Search", new {
+                                    @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = @t.Item1, @dates = ""
+                                }, new { @class = "" })</p>
                         </li>
                     }
                 </ul>
@@ -91,7 +94,7 @@
             <div class="col-md-8">
                 @{ Html.RenderPartial("_WaterChartPartial", Model.WaterData); }
             </div>
-            <div class="col-md-4 dashboardData" id="wdPartial">
+            <div class="col-md-4" id="wdPartial">
                 @{ Html.RenderPartial("_WaterDataPartial", Model.WaterData); }
             </div>
         </div>

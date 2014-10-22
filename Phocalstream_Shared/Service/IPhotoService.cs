@@ -24,7 +24,7 @@ namespace Phocalstream_Shared.Service
         List<string> GetUnusedTagNames(long photoID);
         List<string> GetTagNames();
         Photo AddTag(long photoID, string tags);
-        List<Tuple<string, int>> GetPopularTagsForSite(long siteID);
+        List<Tuple<string, int, long>> GetPopularTagsForSite(long siteID);
         List<string> GetFileNames(List<Photo> photos);
     }
 }

@@ -1,0 +1,77 @@
+﻿.navbar-wrapper {
+  position: fixed;
+  top: 20px;
+  right: 0;
+  left: 0;
+  z-index: -20;
+}
+
+.navbar-wrapper .container {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.navbar-wrapper .navbar {
+  padding-right: 15px;
+  padding-left: 15px;
+  border-radius: 4px;
+}
+
+.background {
+    position: fixed; 
+    top: -50%; 
+    left: -50%; 
+    width: 200%; 
+    height: 200%;
+    z-index: -100;
+}
+
+.background-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+}
+
+.background-info {
+    position: fixed;
+    top: 50%;
+    left: 25%;
+    margin: 0 auto;
+    min-height: 160px; 
+    width: 50%;
+    margin-top: -80px;
+    border: white 1px solid;
+    border-radius: 4px;
+    text-align: center;
+    color:white;
+}
+
+.btn-bordered {
+    border: white 1px solid;
+    border-radius: 4px;
+}
+
+.scroll {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 90vh;
+    color: white;
+    text-align: center;
+    z-index: -20;
+}
+
+.back {
+    margin-top: 100vh;
+    background-color: #fff !important;
+    z-index: 10;
+}
+
+.marketing {
+  padding-right: 15px;
+  padding-left: 15px;
+  padding-top: 25px;
+}
