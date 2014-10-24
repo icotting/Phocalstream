@@ -228,7 +228,7 @@ namespace Phocalstream_Service.Service
             }
         }
 
-        public void ProcessCollection(Collection collection)
+        public void ProcessCollection(Collection collection, bool buildPivotOnly)
         {
             CameraSite site = collection.Site;
             CollectionCreator creator = new CollectionCreator();
@@ -254,19 +254,25 @@ namespace Phocalstream_Service.Service
                     }
                 }
             }
-            
-            List<string> filenames = files.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p.Item1), "Tiles.dzi"))).ToList<string>();
-            creator.Create(filenames, Path.Combine(rootDeepZoomPath, "collection.dzc"));
+
+            if (buildPivotOnly == false)
+            {
+                List<string> filenames = files.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p.Item1), "Tiles.dzi"))).ToList<string>();
+                creator.Create(filenames, Path.Combine(rootDeepZoomPath, "collection.dzc"));
+            }
+
             GeneratePivotManifest(site);
 
             var groups = files.GroupBy(f => f.Item2.Year);
             foreach (var group in groups)
             {
-                var photos = group.Select(v => v.Item1).ToList();
+                if (buildPivotOnly == false)
+                {
+                    var photos = group.Select(v => v.Item1).ToList();
 
-                photos = photos.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p), "Tiles.dzi"))).ToList<string>();
-                creator.Create(photos, Path.Combine(rootDeepZoomPath, string.Format("{0}_collection.dzc", group.Key)));
-
+                    photos = photos.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p), "Tiles.dzi"))).ToList<string>();
+                    creator.Create(photos, Path.Combine(rootDeepZoomPath, string.Format("{0}_collection.dzc", group.Key)));
+                }
                 this.GenerateSubSetManifest(site, group.Select(v => v.Item2.Year).First().ToString(), string.Join(",", group.Select(v => v.Item3).ToArray<long>()));
             }
 
