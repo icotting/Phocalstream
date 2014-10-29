@@ -33,11 +33,11 @@ namespace Phocalstream_TimeLapseService
 		}
 
 		public bool Complete { get { return progress >= 0.99f; } }
-		public string Destination { get { return ConfigurationManager.AppSettings["outputPath"] + "/Job" + Id + "/output.mpg"; } }
-		private string Directory { get { return ConfigurationManager.AppSettings["outputPath"] + "/Job" + Id + "/"; } }
-		private string TemporaryDirectory { get { return ConfigurationManager.AppSettings["outputPath"] + "/Job" + Id + "/temp/"; } }
 
-		private readonly bool Verbose = true;
+        private string TemporaryDirectory { get { return PathManager.GetTempDirectory(Id); } }
+        public string Destination { get { return PathManager.GetDestination(Id); } }
+
+        private readonly bool Verbose = true;
 		private readonly bool ProduceLog = true;
 
 		public float Progress
@@ -66,7 +66,7 @@ namespace Phocalstream_TimeLapseService
 		private void Log(string message, string title = "")
 		{
 			if (!ProduceLog) return;
-			using(StreamWriter logfile = File.AppendText(ConfigurationManager.AppSettings["outputPath"] + "/phlog.txt"))
+			using(StreamWriter logfile = File.AppendText(PathManager.GetOutputPath() + "/phlog.txt"))
 			{
 				logfile.Write("[");
 				logfile.Write(DateTime.Now.ToShortTimeString());
@@ -80,7 +80,7 @@ namespace Phocalstream_TimeLapseService
 		private void ProcessPhotos()
 		{
 			List<string> photoFilenames = PhotoFilenames();
-			new FileInfo(TemporaryDirectory).Directory.Create();
+            new FileInfo(TemporaryDirectory).Directory.Create();
 
 			Log("Creating blend frames for " + Id);
 			// Skip one file so that all files can be blended with the previous.
@@ -121,7 +121,7 @@ namespace Phocalstream_TimeLapseService
 			}
 			using (StreamWriter stream = new StreamWriter(File.OpenWrite(TemporaryDirectory + imageA.Split('\\', '/').Last() + imageB.Split('\\', '/').Last() + "exec.bat")))
 			{
-				stream.Write(ConfigurationManager.AppSettings["magickPath"] + "/composite.exe -blend 20 \"" + ExtractImagePath(imageA) + "\" -matte \"" + ExtractImagePath(imageB) + "\" \"" + TemporaryDirectory + destination + "\"");
+                stream.Write(PathManager.GetMagickPath() + "/composite.exe -blend 20 \"" + ExtractImagePath(imageA) + "\" -matte \"" + ExtractImagePath(imageB) + "\" \"" + TemporaryDirectory + destination + "\"");
 			}
 
 			Log("Submitting for job " + Id);
@@ -138,10 +138,10 @@ namespace Phocalstream_TimeLapseService
 
 		private void CreateMpeg(string path, int framerate, string destination)
 		{
-			string ffmpeg = ConfigurationManager.AppSettings["ffmpegPath"] + "\\ffmpeg";
+			string ffmpeg = PathManager.GetffmpegPath() + "\\ffmpeg";
 			string arguments = "-f image2 -r " + framerate + " -i " + path + " -vf scale=2000:-1 -qscale 2 -r 20 \"" + destination + "\"";
 
-			using (StreamWriter stream = new StreamWriter(File.OpenWrite(Directory + "condor.submit")))
+			using (StreamWriter stream = new StreamWriter(File.OpenWrite(PathManager.GetDirectory(Id) + "condor.submit")))
 			{
 				stream.WriteLine("Universe = vanilla");
 				stream.WriteLine("Executable = " + ffmpeg);
@@ -152,7 +152,7 @@ namespace Phocalstream_TimeLapseService
 			Log(ffmpeg + " " + arguments);
 			Process process = new Process();
 			process.StartInfo.FileName = "condor_submit";
-			process.StartInfo.Arguments = Directory + "condor.submit";
+            process.StartInfo.Arguments = PathManager.GetDirectory(Id) + "condor.submit";
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.RedirectStandardError = true;
 			process.StartInfo.UseShellExecute = false;
@@ -173,7 +173,7 @@ namespace Phocalstream_TimeLapseService
 			path = path.Substring(path.IndexOf('\\') + 1);
 			path = path.Substring(path.IndexOf('\\') + 1);
 			path = path.Substring(path.IndexOf('\\') + 1);
-			path = ConfigurationManager.AppSettings["rawPath"] + path;
+			path = PathManager.GetRawPath() + path;
 			return path;
 		}
 		
