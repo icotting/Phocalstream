@@ -32,6 +32,7 @@ namespace Phocalstream_TimeLapseService
 
 		public long StartJob(List<long> photoIds, int framerate)
 		{
+            Console.WriteLine("Start Job");
 			TimeLapseJob job;
 			if(UnusedIds.Count == 0)
 			{
@@ -44,6 +45,7 @@ namespace Phocalstream_TimeLapseService
 				job = new TimeLapseJob(id, photoIds, framerate);
 			}
 
+            Console.WriteLine("Begin processing: " + job.Id);
 			job.BeginProcessing();
 			Jobs.Add(job.Id, job);
 			return job.Id;

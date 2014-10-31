@@ -79,7 +79,11 @@ namespace Phocalstream_TimeLapseService
 
 		private void ProcessPhotos()
 		{
+            Console.Write("Process Photos");
+            Log("Process Photos...");
 			List<string> photoFilenames = PhotoFilenames();
+
+            Console.WriteLine("Temp: " + TemporaryDirectory);
             new FileInfo(TemporaryDirectory).Directory.Create();
 
 			Log("Creating blend frames for " + Id);
@@ -182,25 +186,33 @@ namespace Phocalstream_TimeLapseService
 		{
 			List<string> photoFiles = new List<string>();
 
-			using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
-			{
-				conn.Open();
-				foreach (var photoId in PhotoIds)
-				{
-					// Must be optimized
-					using (SqlCommand command = new SqlCommand("select FileName from Photos where ID = @id", conn))
-					{
-						command.Parameters.AddWithValue("@id", photoId);
-						using (SqlDataReader reader = command.ExecuteReader())
-						{
-							while (reader.Read())
-							{
-								photoFiles.Add(reader.GetString(0));
-							}
-						}
-					}
-				}
-			}
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                {
+                    conn.Open();
+                    foreach (var photoId in PhotoIds)
+                    {
+                        // Must be optimized
+                        using (SqlCommand command = new SqlCommand("select FileName from Photos where ID = @id", conn))
+                        {
+                            command.Parameters.AddWithValue("@id", photoId);
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    Console.WriteLine(string.Format("{0}{1}", PathManager.GetRawPath(), reader.GetString(0)));
+                                    photoFiles.Add(string.Format("{0}{1}", PathManager.GetRawPath(), reader.GetString(0)));
+                                }
+                            }
+                        }
+                    }
+                }
+            } 
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
 			return photoFiles;
 		}
