@@ -46,18 +46,46 @@ namespace Phocalstream_Web.Controllers
         {
             HomeViewModel model = new HomeViewModel();
             ICollection<Collection> collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
+
             model.Sites = collections.Select(c => GetDetailsForCollection(c)).ToArray();
+            model.SiteThumbnails = new List<ThumbnailModel>();
+            foreach (var s in model.Sites)
+            {
+                model.SiteThumbnails.Add(new ThumbnailModel()
+                {
+                    ID = s.SiteID,
+                    Name = s.SiteName,
+                    First = s.First,
+                    Last = s.Last,
+                    PhotoCount = s.PhotoCount,
+                    CoverPhotoID = s.CoverPhotoID,
+                    Link = "/photo/sitedashboard?siteId=" + s.SiteID.ToString()
+                });
+            }
+
             model.Tags = PhotoService.GetTagNames();
 
             model.SiteIndex = new Random().Next(model.Sites.Count());
 
-            model.PublicCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Public, c => c.Photos).ToList();
-            foreach (var col in model.PublicCollections)
+            model.PublicCollectionThumbnails = new List<ThumbnailModel>();
+            var publicCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Public, c => c.Photos).ToList();
+            foreach (var col in publicCollections)
             {
                 if (col.CoverPhoto == null)
                 {
                     col.CoverPhoto = col.Photos.LastOrDefault();
                 }
+
+                model.PublicCollectionThumbnails.Add(new ThumbnailModel()
+                {
+                    ID = col.ID,
+                    Name = col.Name,
+                    First = col.Photos.First().Captured,
+                    Last = col.Photos.Last().Captured,
+                    PhotoCount = col.Photos.Count,
+                    CoverPhotoID = col.CoverPhoto.ID,
+                    Link = "/account/userdefinedcollection?collectionId=" + col.ID.ToString()
+                });
             }
 
             if (e == 2)

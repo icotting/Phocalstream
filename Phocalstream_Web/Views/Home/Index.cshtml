@@ -193,7 +193,7 @@
             <hr class="featurette-divider">
     
             <!-- Public Section -->
-            @if (Model.PublicCollections.Count > 0)
+            @if (Model.PublicCollectionThumbnails.Count > 0)
             {
                 <div class="publicCollections">
                     <div class="row text-center">
@@ -202,23 +202,9 @@
                     </div>
 
                     <div class="row">
-                        @foreach (var col in Model.PublicCollections)
+                        @foreach (var col in Model.PublicCollectionThumbnails)
                         {
-                            <div class="col-md-6 siteColumn">
-                                <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
-
-                                <div class="row">
-                                    <div class="siteCaption">
-                                        <div class="col-md-8">
-                                            <h3>@col.Name</h3>
-                                            <p>@Html.DisplayFor(model => col.Photos.Count) photos </p>
-                                        </div>
-                                        <div class="col-md-4 text-right">
-                                            <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @Html.Partial("_CollectionThumbnail", col)
                         }
                     </div>
                 </div>
@@ -234,23 +220,9 @@
                     <h3>Jump to locations around the Platte River Basin</h3>
                 </div>
                 <div class="row">
-                    @foreach (var site in Model.Sites)
+                    @foreach (var site in Model.SiteThumbnails)
                     {
-                        <div class="col-md-4 siteColumn">
-                            <img class="siteImage" src="/api/photo/medium/@site.CoverPhotoID" alt="@site.SiteName">
-
-                            <div class="row">
-                                <div class="siteCaption">
-                                    <div class="col-md-8">
-                                        <h1>@site.SiteName</h1>
-                                        <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
-                                    </div>
-                                    <div class="col-md-4 text-right">
-                                        <a class="siteCollection btn btn-default" href="/photo/sitedashboard?siteId=@site.SiteID">View Collection</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @Html.Partial("_CollectionThumbnail", site)
                     }
                 </div>
             </div>
