@@ -101,6 +101,20 @@ namespace Phocalstream_Web.Controllers
             HomeViewModel model = new HomeViewModel();
             model.Collections = CollectionRepository.Find(c => c.Status == CollectionStatus.COMPLETE && c.Type == CollectionType.SITE, c => c.CoverPhoto, c => c.Site).ToList<Collection>();
             model.Sites = model.Collections.Select(c => GetDetailsForCollection(c)).ToArray();
+            model.SiteThumbnails = new List<ThumbnailModel>();
+            foreach (var s in model.Sites)
+            {
+                model.SiteThumbnails.Add(new ThumbnailModel()
+                {
+                    ID = s.SiteID,
+                    Name = s.SiteName,
+                    First = s.First,
+                    Last = s.Last,
+                    PhotoCount = s.PhotoCount,
+                    CoverPhotoID = s.CoverPhotoID,
+                    Link = "/photo/sitedashboard?siteId=" + s.SiteID.ToString()
+                });
+            }
             return View(model);
         }
 
@@ -123,7 +137,7 @@ namespace Phocalstream_Web.Controllers
         {
             TagViewModel model = new TagViewModel();
             model.Tags = TagRepository.Find(t => !t.Name.Equals(""));
-            model.TagDetails = model.Tags.Select(t => GetDetailsForTag(t));
+            model.TagThumbnails = model.Tags.Select(t => GetDetailsForTag(t));
             
             return View(model);
         }
@@ -155,14 +169,22 @@ namespace Phocalstream_Web.Controllers
             return details;
         }
 
-        private TagDetails GetDetailsForTag(Tag tag)
+        private ThumbnailModel GetDetailsForTag(Tag tag)
         {
             TagDetails details = PhotoRepository.GetTagDetails(tag);
             details.CoverPhotoID = details.LastPhotoID;
 
-            return details;
+            return new ThumbnailModel()
+                {
+                    ID = details.TagID,
+                    Name = details.TagName,
+                    First = details.First,
+                    Last = details.Last,
+                    PhotoCount = details.PhotoCount,
+                    CoverPhotoID = details.CoverPhotoID,
+                    Link = "/search/tagsearch?tag=" + details.TagName
+                };
         }
-
 
         //Utility method to convert FileSize to correct string
         private static string ToFileSize(long source)

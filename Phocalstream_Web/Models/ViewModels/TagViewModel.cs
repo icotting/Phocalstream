@@ -10,6 +10,6 @@ namespace Phocalstream_Web.Models.ViewModels
     public class TagViewModel
     {
         public IEnumerable<Tag> Tags { get; set; }
-        public IEnumerable<TagDetails> TagDetails { get; set; }
+        public IEnumerable<ThumbnailModel> TagThumbnails { get; set; }
     }
 }
