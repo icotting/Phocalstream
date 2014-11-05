@@ -35,7 +35,7 @@
         }
 
         <div class="text-center">
-            <h1 class="page-header title">Phocalstream Power Search</h1>
+            <h1 class="page-header title">Power Search</h1>
         </div>
 
         <!-- Sites -->
@@ -503,6 +503,7 @@
             };
         };
 
+        // tags tags input
         $('#tag-field').tagsinput();
         $('#tag-field').tagsinput('input').typeahead({
             minLength: 2,
@@ -516,6 +517,7 @@
             this.tagsinput('input').typeahead('val', '');
         }, $('#tag-field')));
 
+        // site tags input
         $('#site-field').tagsinput();
         $('#site-field').tagsinput('input').typeahead({
             minLength: 2,
@@ -528,6 +530,15 @@
             this.tagsinput('add', datum.value);
             this.tagsinput('input').typeahead('val', '');
         }, $('#site-field')));
+
+        //add a random site or tag
+        var bool = (Math.random() > 0.5);
+        if (bool) {
+            $('#site-field').tagsinput('add', sites[Math.floor(Math.random() * sites.length)]);
+        }
+        else {
+            $('#tag-field').tagsinput('add', availableTags[Math.floor(Math.random() * availableTags.length)]);
+        }
     });
 
 

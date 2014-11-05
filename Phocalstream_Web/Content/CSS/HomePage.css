@@ -37,20 +37,21 @@
 .background-info {
     position: fixed;
     top: 50%;
-    left: 25%;
+    left: 30%;
     margin: 0 auto;
     min-height: 160px; 
-    width: 50%;
+    width: 40%;
     margin-top: -80px;
-    border: white 1px solid;
-    border-radius: 4px;
     text-align: center;
-    color:white;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.2);
+    text-shadow: 4px 4px 4px #2e2e2e;
 }
 
 .btn-bordered {
     border: white 1px solid;
     border-radius: 4px;
+    text-shadow: 1px 1px 1px #000;
 }
 
 .scroll {

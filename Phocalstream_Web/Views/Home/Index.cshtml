@@ -155,16 +155,16 @@
                 }
 
                 <div class="row text-center">
-                    <h2>Phocalstream Image Search</h2>
-                    <h3>Quickly find images matching a descriptive tag.</h3>
+                    <h2>Image Search</h2>
+                    <h3>Quickly find images matching a descriptive tag</h3>
                 </div>
                 @using (@Html.BeginForm("TagSearch", "Search"))
                 { 
                     <div class="row">
-                        <div class="col-lg-9">
+                        <div class="col-sm-9">
                             <input type="text" id="tag-field" name="tag" placeholder="river, sunset, cows, etc." />
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-sm-3">
                             <button class="btn btn-lg btn-success full-width" type="submit">Search</button>
                         </div>
                     </div>
@@ -231,12 +231,13 @@
             <!-- Sites Section -->
             <div id="sites">
                 <div class="row text-center">
-                    <h2>Phocalsteam Camera Sites</h2>
+                    <h2>Image Locations</h2>
+                    <h3>Jump to locations around the Platte River Basin</h3>
                 </div>
                 <div class="row">
                     @foreach (var site in Model.Sites)
                     {
-                        <div class="col-md-6 siteColumn">
+                        <div class="col-md-4 siteColumn">
                             <img class="siteImage" src="/api/photo/medium/@site.CoverPhotoID" alt="@site.SiteName">
 
                             <div class="row">
