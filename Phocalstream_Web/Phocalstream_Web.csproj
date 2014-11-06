@@ -311,6 +311,7 @@
     <Content Include="Content\bootstrap\css\bootstrap.css" />
     <Content Include="Content\bootstrap\css\bootstrap.min.css" />
     <Content Include="Content\CSS\bootstrap-slider.css" />
+    <Content Include="Content\CSS\CollectionThumbnail.css" />
     <Content Include="Content\CSS\jquery-ui-slider.css" />
     <Content Include="Content\CSS\Timelapse.css" />
     <Content Include="Content\file-upload\jquery.fileupload-ui-noscript.css" />

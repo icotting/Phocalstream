@@ -30,47 +30,6 @@
     width: 140px;
 }
 
-/* Site and Tag List */
-
-.siteImage {
-    height: 100%;
-    width: 100%;
-    min-height: 250px;
-    z-index: -1;
-}
-
-.siteCaption {
-    bottom: 45px;
-    left: 0px;
-    right: 15px;
-    position: absolute;
-    
-    margin-left: 15px;
-
-    background: rgba(0, 0, 0, .5);
-    color: white;
-}
-
-.siteColumn {
-    padding-bottom: 30px !important;
-}
-
-.siteCollection {
-    margin-top: 33px;
-}
-
-.mapSiteCaption {
-    bottom: 15px;
-    left: 0px;
-    right: 15px;
-    position: absolute;
-    
-    margin-left: 15px;
-
-    background: rgba(0, 0, 0, .5);
-    color: white;
-}
-
 /* Search Section*/
 .bootstrap-tagsinput {
     line-height: 36px !important;
@@ -78,10 +37,6 @@
 
 .label {
     font-size: 100% !important;
-}
-
-.row {
-    margin-bottom: 15px;
 }
 
 a.btn:visited {
