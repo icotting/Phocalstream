@@ -80,6 +80,7 @@
     <Compile Include="Data\Model\View\SearchModels.cs" />
     <Compile Include="Data\Model\View\SiteDetails.cs" />
     <Compile Include="Data\Model\View\TagDetails.cs" />
+    <Compile Include="Data\Model\View\ThumbnailModel.cs" />
     <Compile Include="Data\Model\View\UserCollectionModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\ICollectionService.cs" />

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Policy;
 using System.Web;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_Shared.Model.View;
 
 namespace Phocalstream_Web.Models.ViewModels
 {

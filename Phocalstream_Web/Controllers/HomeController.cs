@@ -17,6 +17,7 @@ using Phocalstream_Shared.Data.Model.View;
 using System.IO;
 using Phocalstream_Service.Service;
 using Phocalstream_Shared.Service;
+using Phocalstream_Shared.Model.View;
 
 namespace Phocalstream_Web.Controllers
 {

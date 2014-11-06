@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace Phocalstream_Web.Models.ViewModels
+namespace Phocalstream_Shared.Model.View
 {
     public class ThumbnailModel
     {
@@ -24,5 +24,11 @@ namespace Phocalstream_Web.Models.ViewModels
         public long CoverPhotoID { get; set; }
 
         public string Link { get; set; }
+
+        public bool CanEdit { get; set; }
+        public string EditLink { get; set; }
+
+        public bool CanDelete { get; set; }
+        public string DeleteLink { get; set; }
    }
 }

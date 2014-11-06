@@ -1,5 +1,6 @@
 ﻿using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_Shared.Model.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
