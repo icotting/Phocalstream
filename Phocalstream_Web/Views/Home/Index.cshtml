@@ -204,7 +204,9 @@
                     <div class="row">
                         @foreach (var col in Model.PublicCollectionThumbnails)
                         {
-                            @Html.Partial("_CollectionThumbnail", col)
+                            <div class="col-md-6">
+                                @Html.Partial("_CollectionThumbnail", col)
+                            </div>
                         }
                     </div>
                 </div>
@@ -222,7 +224,9 @@
                 <div class="row">
                     @foreach (var site in Model.SiteThumbnails)
                     {
-                        @Html.Partial("_CollectionThumbnail", site)
+                        <div class="col-md-4">
+                            @Html.Partial("_CollectionThumbnail", site)
+                        </div>
                     }
                 </div>
             </div>

@@ -19,7 +19,9 @@
             <div class="row">
                 @foreach (var tag in Model.TagThumbnails)
                 {
-                    @Html.Partial("_CollectionThumbnail", tag)
+                    <div class="col-md-4">
+                        @Html.Partial("_CollectionThumbnail", tag)
+                    </div>
                 }
             </div>
         </div>
