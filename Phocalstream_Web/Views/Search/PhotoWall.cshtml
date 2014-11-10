@@ -10,6 +10,7 @@
 @Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js",
                 "~/Content/Scripts/jquery-lazyload.js")
 
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
 <script>
 
     $("img.photo").lazyload({
@@ -130,7 +131,57 @@
     function resizeWindow(e) {
         computeHolderMargin($("img.photo").width());
     }
+
+    var resultIds = "@Model.PhotoIdList";
+    //Image Download 
+    function downloadPrompt() {
+        $("#silverlightControlHost").hide();
+        bootbox.confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.", function(result) {
+            if(result) {
+                downloadImages();
+            }
+            else {
+            }
+        }); 
+    }
+   
+    function downloadImages() {
+        $.ajax({
+            url : '/api/sitecollection/RawDownload?photoIds='+resultIds,
+            type: "POST"
+        })
+    }
+
+    function generateTimelapse() {
+        var form;
+        form = $('<form />', {
+            action: '/photo/timelapse',
+            method: 'POST',
+            style: 'display: none;'
+        });
+
+        form.append($('<input/>', {
+            type: 'hidden',
+            name: 'photoIds',
+            value: resultIds
+        }));
+        form.appendTo('body').submit();
+    }
 </script>
+
+@section MenuItems
+{
+    @if (Request.IsAuthenticated)
+    {
+        <li><a href="javascript:saveCollectionPrompt()">Save Collection</a></li>
+    }
+
+    <li><a href="javascript:generateTimelapse()">View Time Lapse</a></li>
+    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li><a href="javascript:downloadPrompt()">Download Images</a></li>
+    }
+}
 
 <div class="text-center">
     <div class="content">

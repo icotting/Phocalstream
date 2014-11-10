@@ -208,6 +208,7 @@ namespace Phocalstream_Web.Controllers
             //            model.Last = model.Collection.Photos.Last().Captured;
             //            model.PhotoCount = model.Collection.Photos.Count;
 
+            model.PhotoIdList = PhotoRepo.GetPhotoIdsForCollection(collectionID);
             model.PhotoCount = PhotoRepo.GetPhotoCountForCollection(collectionID);
 
             model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,

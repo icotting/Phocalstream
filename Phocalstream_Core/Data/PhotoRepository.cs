@@ -125,6 +125,29 @@ namespace Phocalstream_Web.Application.Data
             return details;
         }
 
+        public string GetPhotoIdsForCollection(long collectionID)
+        {
+            List<long> ids = new List<long>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string command_string = "select PhotoId from CollectionPhotos WHERE CollectionPhotos.CollectionId = @collectionID";
+                using (SqlCommand command = new SqlCommand(command_string, conn))
+                {
+                    command.Parameters.AddWithValue("@collectionID", collectionID);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ids.Add(reader.GetInt64(0));
+                        }
+                    }
+                }
+            }
+
+            return string.Join(",", ids);
+        }
+
         public int GetPhotoCountForCollection(long collectionID)
         {
             int count = 0;

@@ -21,6 +21,8 @@ namespace Phocalstream_Web.Models.ViewModels
         [DisplayFormat(DataFormatString = "{0:MMM dd, yyyy}")]
         public DateTime Last { get; set; }
 
+        public string PhotoIdList { get; set; }
+
         [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int PhotoCount { get; set; }
         public string CollectionUrl { get; set; }
