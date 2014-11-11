@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Phocalstream_Shared.Model.View;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,7 +9,7 @@ namespace Phocalstream_Web.Models.ViewModels
     public class SiteDashboardViewModel
     {
         public CollectionViewModel CollectionViewModel { get; set; }
-        public List<SiteYearModel> Years { get; set; }
+        public List<ThumbnailModel> Years { get; set; }
         public List<Tuple<string, int, long>> Tags { get; set; }
         public PhotoFrequencyData PhotoFrequency { get; set; }
         public DmData DroughtMonitorData { get; set; }
