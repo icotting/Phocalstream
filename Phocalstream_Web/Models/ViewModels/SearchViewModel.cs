@@ -25,7 +25,6 @@ namespace Phocalstream_Web.Models.ViewModels
 
         [DisplayFormat(DataFormatString = "{0:#,#}")]
         public int PhotoCount { get; set; }
-        public string CollectionUrl { get; set; }
         public UserCollectionList UserCollections { get; set; }
     }
 
