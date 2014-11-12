@@ -16,7 +16,8 @@
             "~/Content/bootstrap/css/bootstrap.min.css",
             "~/Content/Site.css",
             "~/Content/CSS/HomePage.css",
-            "~/Content/CSS/Home.css"
+            "~/Content/CSS/Home.css",
+            "~/Content/CSS/CollectionThumbnail.css"
     )
 
     <!-- Bootstrap Tags Input CSS and JS Files-->
@@ -79,7 +80,6 @@
                                 </ul>
                             </li>
                             <li><a href="/Search/Index">Search</a></li>
-                            <li><a href="#about">About</a></li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right index-navbar-right">
                             @if (Request.IsAuthenticated)
@@ -155,16 +155,16 @@
                 }
 
                 <div class="row text-center">
-                    <h2>Phocalstream Image Search</h2>
-                    <h3>Quickly find images matching a descriptive tag.</h3>
+                    <h2>Image Search</h2>
+                    <h3>Quickly find images matching a descriptive tag</h3>
                 </div>
                 @using (@Html.BeginForm("TagSearch", "Search"))
                 { 
                     <div class="row">
-                        <div class="col-lg-9">
+                        <div class="col-sm-9">
                             <input type="text" id="tag-field" name="tag" placeholder="river, sunset, cows, etc." />
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-sm-3">
                             <button class="btn btn-lg btn-success full-width" type="submit">Search</button>
                         </div>
                     </div>
@@ -194,31 +194,18 @@
             <hr class="featurette-divider">
     
             <!-- Public Section -->
-            @if (Model.PublicCollections.Count > 0)
+            @if (Model.PublicCollectionThumbnails.Count > 0)
             {
                 <div class="publicCollections">
                     <div class="row text-center">
                         <h2>Browse Phocalsteam Photo Collections</h2>
                         <h3>Experience a watershed through photos</h3>
                     </div>
-
                     <div class="row">
-                        @foreach (var col in Model.PublicCollections)
+                        @foreach (var col in Model.PublicCollectionThumbnails)
                         {
-                            <div class="col-md-6 siteColumn">
-                                <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
-
-                                <div class="row">
-                                    <div class="siteCaption">
-                                        <div class="col-md-8">
-                                            <h3>@col.Name</h3>
-                                            <p>@Html.DisplayFor(model => col.Photos.Count) photos </p>
-                                        </div>
-                                        <div class="col-md-4 text-right">
-                                            <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="col-md-6">
+                                @Html.Partial("_CollectionThumbnail", col)
                             </div>
                         }
                     </div>
@@ -231,25 +218,14 @@
             <!-- Sites Section -->
             <div id="sites">
                 <div class="row text-center">
-                    <h2>Phocalsteam Camera Sites</h2>
+                    <h2>Image Locations</h2>
+                    <h3>Jump to locations around the Platte River Basin</h3>
                 </div>
                 <div class="row">
-                    @foreach (var site in Model.Sites)
+                    @foreach (var site in Model.SiteThumbnails)
                     {
-                        <div class="col-md-6 siteColumn">
-                            <img class="siteImage" src="/api/photo/medium/@site.CoverPhotoID" alt="@site.SiteName">
-
-                            <div class="row">
-                                <div class="siteCaption">
-                                    <div class="col-md-8">
-                                        <h1>@site.SiteName</h1>
-                                        <p>@Html.DisplayFor(model => site.PhotoCount) photos from @Html.DisplayFor(model => site.First) to @Html.DisplayFor(model => site.Last)</p>
-                                    </div>
-                                    <div class="col-md-4 text-right">
-                                        <a class="siteCollection btn btn-default" href="/photo/sitedashboard?siteId=@site.SiteID">View Collection</a>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="col-md-4">
+                            @Html.Partial("_CollectionThumbnail", site)
                         </div>
                     }
                 </div>

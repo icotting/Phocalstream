@@ -1,4 +1,7 @@
-﻿
+﻿.row {
+    margin-bottom: 15px;
+}
+
 #stage {
     width: 80%;
     min-width: 900px;
@@ -114,7 +117,7 @@ h2 {
 }
 
 .content {
-    margin-top: 100px;
+    padding-top: 50px;
     min-height: 800px;
 }
 

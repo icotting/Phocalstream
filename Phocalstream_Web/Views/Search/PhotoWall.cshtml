@@ -132,28 +132,26 @@
     }
 </script>
 
-<div class="text-center">
-    <div class="content">
-        
-        <div class="fit-width">
-            <h1 class="page-header title">@Model.Collection.Name</h1>
+<div class="content text-center">
 
-            <div class="row">
-                <div class="col-md-2">
-                    <span id="" class="label label-info">@Model.PhotoCount Photos</span>
-                </div>
-                <div class="col-md-8">
-                    <div id="slider"></div>
-                </div>
-                <div class="col-md-2">
-                    <span id="img-size" class="label label-info"></span>
-                </div>
+    <div class="fit-width">
+        <h1 class="page-header photowall-title">@Model.Collection.Name</h1>
+
+        <div class="row">
+            <div class="col-md-2">
+                <span id="" class="btn btn-info btn-disabled pull-left">@Model.PhotoCount Photos</span>
             </div>
-            
-            <hr class="featurette-divider" />
+            <div class="col-md-8">
+                <div id="slider"></div>
+            </div>
+            <div class="col-md-2">
+                <span id="img-size" class="btn btn-info btn-disabled pull-right"></span>
+            </div>
         </div>
-        
-        @Html.Partial("_SearchGridPartial", Model.Partial)
-        
+
+        <hr class="featurette-divider" />
     </div>
+
+    @Html.Partial("_SearchGridPartial", Model.Partial)
+
 </div>

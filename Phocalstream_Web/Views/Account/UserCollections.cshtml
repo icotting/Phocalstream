@@ -5,6 +5,7 @@
 }
 
 @Styles.Render("~/Content/CSS/Account.css")
+@Styles.Render("~/Content/CSS/CollectionThumbnail.css")
 
 <div class="container">
     <div class="content">
@@ -25,7 +26,7 @@
         }
 
 
-        @if (Model.Collections.Count() == 0)
+        @if (Model.Thumbnails.Count() == 0)
         {
             <div class="col-md-12 well text-center">
                 You haven't created any collections yet!
@@ -35,40 +36,10 @@
         {
             <!-- New Format -->
             <div class="row">
-                @foreach (var col in Model.Collections)
+                @foreach (var col in Model.Thumbnails)
                 {
-                    <div class="col-md-6 siteColumn">
-                        @if (@col.CoverPhoto != null)
-                        { 
-                            <img class="siteImage" src="/api/photo/medium/@col.CoverPhoto.ID" alt="@col.Name" />
-                        }
-                        else
-                        {
-                            <img class="siteImage" src="/api/photo/medium/0" alt="@col.Name" />
-                        }
-                        
-                        <div class="siteEdit">
-                            <a class="btn text-white no-underline" href="@Url.Action("EditUserCollection", "Account", new { collectionID = col.ID })"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-                        </div>
-
-                        <div class="siteDelete">
-                            <a class="btn text-white no-underline" href="@Url.Action("DeleteUserCollection", "Account", new { collectionID = col.ID })"><span class="glyphicon glyphicon-remove"></span> Delete</a>
-                        </div>
-
-                        <div class="row">
-                            <div class="siteCaption">
-                                <div class="col-md-8">
-                                    <h1>@col.Name</h1>
-                                    <p>@Html.DisplayFor(model => col.Photos.Count) photos </p>
-                                </div>
-                                <div class="col-md-4 text-right">
-                                    @if (col.Photos.Count != 0)
-                                    {
-                                        <a class="siteCollection btn btn-default" href="/account/userdefinedcollection?collectionId=@col.ID">View Images</a>
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        @Html.Partial("_CollectionThumbnail", col)
                     </div>
                 }
             </div>
