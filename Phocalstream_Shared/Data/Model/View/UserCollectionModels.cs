@@ -1,4 +1,5 @@
 ﻿using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Shared.Model.View;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -28,6 +29,7 @@ namespace Phocalstream_Shared.Data.Model.View
     {
         public User User { get; set; }
         public IEnumerable<Collection> Collections { get; set; }
+        public ICollection<ThumbnailModel> Thumbnails { get; set; }
     }
 
     public class EditUserCollection

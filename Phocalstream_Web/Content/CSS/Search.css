@@ -1,6 +1,10 @@
 ﻿body {
 }
 
+.photowall-title {
+    color: #333;
+}
+
 .background {
     position: fixed; 
     top: -50%; 

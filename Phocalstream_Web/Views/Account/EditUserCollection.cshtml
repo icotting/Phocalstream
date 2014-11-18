@@ -4,7 +4,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Styles.Render("~/Content/CSS/Account.css")
+@Styles.Render("~/Content/CSS/Account.css",
+               "~/Content/CSS/CollectionThumbnail.css")
+
 @Scripts.Render("~/Content/Scripts/jquery-lazyload.js")
 
 <div class="container">
@@ -30,8 +32,8 @@
         <div class="row">
             @foreach (var p in Model.Collection.Photos)
             {
-                <div class="col-md-3 siteColumn" id="@p.ID">
-                    <img class="siteImage edit-siteImage" id="@p.ID" data-original="/api/photo/low/@p.ID" alt="@p.FileName" height="175" />
+                <div class="col-md-3 thumbnail-column" id="@p.ID">
+                    <img class="thumbnail-image edit-siteImage" id="@p.ID" data-original="/api/photo/low/@p.ID" alt="@p.FileName" height="175" />
 
                     <div class="siteToDelete invisible"></div>
 
@@ -53,7 +55,7 @@
 
 <script type="text/javascript">
 
-    $("img.siteImage").lazyload({
+    $("img.thumbnail-image").lazyload({
         threshold: 400
     });
 

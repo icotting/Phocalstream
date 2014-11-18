@@ -6,6 +6,7 @@ using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_Shared.Model.View;
 using Phocalstream_Shared.Service;
 using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Data;
@@ -352,26 +353,31 @@ namespace Phocalstream_Web.Controllers
             return model;
         }
     
-        private List<SiteYearModel> GetSiteYearSummary(long siteID)
+        private List<ThumbnailModel> GetSiteYearSummary(long siteID)
         {
-            List<SiteYearModel> Years = new List<SiteYearModel>();
+            List<ThumbnailModel> Years = new List<ThumbnailModel>();
 
             List<int> yearStrings = PhotoRepository.Find(p => p.Site.ID == siteID).Select(p => p.Captured.Year).Distinct().ToList<int>();
 
             foreach (int y in yearStrings)
             {
-                SiteYearModel model = new SiteYearModel();
+                ThumbnailModel model = new ThumbnailModel();
 
-                model.Year = Convert.ToString(y);
+                model.Name = Convert.ToString(y);
 
                 Photo[] photos = PhotoRepository.Find(p => p.Site.ID == siteID && p.Captured.Year == y)
                                                             .ToArray();
                 model.PhotoCount = photos.Count();
+                model.First = photos[0].Captured;
+                model.Last = photos[photos.Count() - 1].Captured;
+
 
                 photos = photos.Where(p => p.Captured.Hour > 12 && p.Captured.Hour < 16).ToArray();
 
                 Random rand = new Random();
                 model.CoverPhotoID = photos[rand.Next(photos.Length)].ID;
+
+                model.Link = "/Photo/CameraCollection?siteID=" + siteID.ToString() + "&year=" + model.Name;
 
                 Years.Add(model);
             }

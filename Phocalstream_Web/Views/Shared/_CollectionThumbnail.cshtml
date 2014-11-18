@@ -1,0 +1,36 @@
+﻿@model Phocalstream_Shared.Model.View.ThumbnailModel
+
+<div class="thumbnail-column">
+    <img class="thumbnail-image" src="/api/photo/medium/@Model.CoverPhotoID" alt="@Model.Name" />
+
+    <!-- Centered info about collection -->
+    <div class="thumbnail-info">
+        <h3>@Model.Name</h3>
+        @if (Model.PhotoCount == 1)
+        {
+            <p>@Html.DisplayFor(model => Model.First)</p>
+            <a class="btn btn-bordered button-override" href="@Model.Link">View @Html.DisplayFor(model => Model.PhotoCount) Image</a>
+        }
+        else if (Model.PhotoCount > 0)
+        {
+            <p>@Html.DisplayFor(model => Model.First) to @Html.DisplayFor(model => Model.Last)</p>
+            <a class="btn btn-bordered button-override" href="@Model.Link">View @Html.DisplayFor(model => Model.PhotoCount) Images</a>
+        }
+    </div>
+
+
+    <!-- Used for UserCollections -->
+    @if (Model.CanEdit) 
+    { 
+        <div class="siteEdit">
+            <a class="btn text-white no-underline" href="@Model.EditLink"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+        </div>
+    }
+    
+    @if (Model.CanDelete)
+    { 
+        <div class="siteDelete">
+            <a class="btn text-white no-underline" href="@Model.DeleteLink"><span class="glyphicon glyphicon-remove"></span> Delete</a>
+        </div>
+    }
+</div>

@@ -19,6 +19,7 @@ using Phocalstream_Shared.Data;
 using Phocalstream_Web.Models.ViewModels;
 using Phocalstream_Shared.Service;
 using Phocalstream_Shared.Data.Model.View;
+using Phocalstream_Shared.Model.View;
 
 namespace Phocalstream_Web.Controllers
 {
@@ -203,14 +204,37 @@ namespace Phocalstream_Web.Controllers
 
             Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             model.User = User;
-            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
 
+            model.Thumbnails = new List<ThumbnailModel>();
+            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
             foreach (var col in model.Collections)
             {
                 if (col.CoverPhoto == null)
                 {
                     col.CoverPhoto = col.Photos.LastOrDefault();
                 }
+
+                var thumb = new ThumbnailModel()
+                {
+                    ID = col.ID,
+                    Name = col.Name,
+                    PhotoCount = col.Photos.Count,
+                    Link = "/account/userdefinedcollection?collectionId=" + col.ID.ToString(),
+
+                    CanEdit = true,
+                    EditLink = "/Account/EditUserCollection?collectionID=" + col.ID.ToString(),
+                    CanDelete = true,
+                    DeleteLink = "/Account/DeleteUserCollection?collectionID=" + col.ID.ToString()
+                };
+
+                if (thumb.PhotoCount > 0)
+                {
+                    thumb.First = col.Photos.First().Captured;
+                    thumb.Last = col.Photos.Last().Captured;
+                    thumb.CoverPhotoID = col.CoverPhoto.ID;
+                }
+
+                model.Thumbnails.Add(thumb);
             }
 
             if (e == 1)

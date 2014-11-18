@@ -4,7 +4,8 @@
         Layout = "~/Views/Shared/_Layout.cshtml";
     }
 
-@Styles.Render("~/Content/CSS/Photo.css")
+@Styles.Render("~/Content/CSS/Photo.css",
+               "~/Content/CSS/CollectionThumbnail.css")
 
 <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
@@ -46,20 +47,8 @@
         <div class="row">
             @foreach (var y in Model.Years)
             {
-                <div class="col-md-4 siteColumn">
-                    <img class="siteImage" src="/api/photo/medium/@y.CoverPhotoID" alt="@y.Year">
-
-                    <div class="row">
-                        <div class="siteCaption">
-                            <div class="col-md-8">
-                                <h3>@y.Year</h3>
-                                <h4>@y.PhotoCount photos</h4>
-                            </div>
-                            <div class="col-md-4 text-right">
-                                @Html.ActionLink(string.Format("View {0}", y.Year), "CameraCollection", "Photo", new { siteID = Model.CollectionViewModel.Collection.Site.ID, year = y.Year }, new { @class = "siteCollection btn btn-default" })
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-4">
+                    @Html.Partial("_CollectionThumbnail", y)
                 </div>
             }
         </div>
