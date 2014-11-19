@@ -125,7 +125,7 @@ namespace Phocalstream_Web.Controllers
             Collection existingCollection = CollectionRepository.Find(c => c.ContainerID == containerID).FirstOrDefault();
             if (existingCollection != null)
             {
-                return RedirectToAction("SearchResult", new { collectionID = existingCollection.ID });
+                return RedirectToAction("SearchResults", new { collectionID = existingCollection.ID });
             }
             //else, execute the search
             else

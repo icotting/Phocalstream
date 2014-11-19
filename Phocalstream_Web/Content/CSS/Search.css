@@ -1,7 +1,7 @@
 ﻿body {
 }
 
-.photowall-title {
+.title {
     color: #333;
 }
 
@@ -82,6 +82,7 @@ input[type=checkbox] {
 
 .search-results {
     margin: 0px !important;
+    color: white !important;
 }
 
 .search-results-box {
@@ -121,6 +122,7 @@ input[type=checkbox] {
 .fit-width {
     margin: auto;
     max-width: 960px;
+    padding-top: 50px;
 }
 
 .ul-holder {
