@@ -11,7 +11,10 @@
                 "~/Content/Scripts/jquery-lazyload.js")
 
 <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
 <script>
+
+    var visibleItems = "@Model.PhotoIdList";
 
     $("img.photo").lazyload({
         threshold: 400,
@@ -132,23 +135,6 @@
         computeHolderMargin($("img.photo").width());
     }
 
-
-    var visibleItems = "@Model.PhotoIdList";
-    //Image Download 
-    function downloadPrompt() {
-        bootbox.confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.", function(result) {
-            if(result) {
-                downloadImages();
-            }
-        }); 
-    }
-   
-    function downloadImages() {
-        $.ajax({
-            url : '/api/sitecollection/RawDownload?photoIds='+visibleItems,
-            type: "POST"
-        })
-    }
 
     //User Defined Collection
     function saveCollectionPrompt() {
