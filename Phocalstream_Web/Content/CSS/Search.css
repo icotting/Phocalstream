@@ -5,6 +5,10 @@
     color: #333;
 }
 
+.search-title {
+    color: white !important;
+}
+
 .background {
     position: fixed; 
     top: -50%; 
@@ -82,7 +86,6 @@ input[type=checkbox] {
 
 .search-results {
     margin: 0px !important;
-    color: white !important;
 }
 
 .search-results-box {

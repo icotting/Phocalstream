@@ -133,7 +133,7 @@
     }
 
 
-    var resultIds = "@Model.PhotoIdList";
+    var visibleItems = "@Model.PhotoIdList";
     //Image Download 
     function downloadPrompt() {
         bootbox.confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.", function(result) {
@@ -145,10 +145,72 @@
    
     function downloadImages() {
         $.ajax({
-            url : '/api/sitecollection/RawDownload?photoIds='+resultIds,
+            url : '/api/sitecollection/RawDownload?photoIds='+visibleItems,
             type: "POST"
         })
     }
+
+    //User Defined Collection
+    function saveCollectionPrompt() {
+        $("#silverlightControlHost").hide();
+
+        $('#userCollectionModal').modal({
+            show: true,
+            backdrop: 'static',
+            closeOnEscape: true
+        });
+    }
+
+    
+    var collectionIds = [];
+    function registerCollectionSelection(collectionId) {
+        if (jQuery.inArray(collectionId, collectionIds) == -1) {
+            collectionIds.push(collectionId);
+        }
+        else {
+            var index = collectionIds.indexOf(collectionId);
+            collectionIds.splice(index, 1);
+        }
+    }
+
+    function saveCollectionModalButton() {
+        var newName = $('#newCollectionName').val();
+        if (newName != "") {
+            saveCollection(newName);
+        }
+
+        if (collectionIds.length > 0) {
+            addToCollection(collectionIds);
+        }
+
+        $("#silverlightControlHost").show();
+    }
+
+    function cancelCollectionModalButton() {
+        $("#silverlightControlHost").show();
+    }
+
+    function addToCollection(collectionIds) {
+        $.ajax({
+            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+visibleItems,
+            type : 'POST'
+        });
+    }
+
+    function saveCollection(collectionName) {
+        $.ajax({
+            url : '/api/usercollection/SaveUserCollection?photoIds='+visibleItems+'&collectionName='+collectionName,
+            type : "POST"
+        });
+    }
+    
+    $(document).ready(function() { 
+        $('.list-group-item').click(function () {
+            $(this).toggleClass('list-group-item-success');
+
+            registerCollectionSelection($(this).attr('id'));
+        });
+    });
 
     function generateTimelapse() {
         var form;
@@ -161,7 +223,7 @@
         form.append($('<input/>', {
             type: 'hidden',
             name: 'photoIds',
-            value: resultIds
+            value: visibleItems
         }));
         form.appendTo('body').submit();
     }
@@ -202,3 +264,46 @@
     @Html.Partial("_SearchGridPartial", Model.Partial)
 
 </div>
+
+<!-- Save User Collection Modal -->
+<div id="userCollectionModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">User Collections</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label class="col-md-12" for="newCollectionName">New Collection Name</label>
+                    <div class="col-md-12">
+                        <input id="newCollectionName" name="newCollectionName" type="text" placeholder="New Collection Name" class="form-control input-md">
+                    </div>
+                </div>
+
+                @if (@Model.UserCollections != null)
+                {
+                    <hr class="featurette-divider" />
+
+                    <div class="row">
+                        <label class="col-md-12">Or, Add To Existing</label>
+                        <div class="col-md-12">
+                            <ul class="list-group user-collection-list">
+                                @foreach (var col in Model.UserCollections.Collections)
+                                {
+                                    <li id="@col.ID" class="list-group-item">
+                                        <span class="badge">@col.Photos.Count</span>@col.Name
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="javascript:cancelCollectionModalButton()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="javascript:saveCollectionModalButton()">Add To Collections</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
