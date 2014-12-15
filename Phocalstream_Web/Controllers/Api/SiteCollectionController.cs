@@ -182,7 +182,7 @@ namespace Phocalstream_Web.Controllers.Api
 
             string email = UserRepository.First(u => u.ProviderID == this.User.Identity.Name).EmailAddress;
 
-            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-h-mm") + ".zip");
+            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-hh-mm-ss") + ".zip");
 
             string downloadURL = string.Format("{0}://{1}{2}",
                                                 Request.RequestUri.Scheme,

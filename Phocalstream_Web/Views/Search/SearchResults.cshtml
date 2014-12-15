@@ -1,0 +1,62 @@
+﻿@model Phocalstream_Web.Models.ViewModels.SearchResults
+@{
+    ViewBag.Title = "PhotoWall";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/CSS/Search.css",
+               "~/Content/CSS/jquery-ui-slider.css",
+               "~/Content/CSS/bootstrap-slider.css")
+@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js",
+                "~/Content/Scripts/jquery-lazyload.js")
+
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoSaveCollection.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoTimelapse.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoSearchResults.js"></script>
+<script>
+    var visibleItems = "@Model.PhotoIdList";
+    
+    // dependency variables for PhotoSearchResults.js
+    var totalPhotoCount = @Model.PhotoCount;
+    var basePhotoUrl = "@Url.Action("Index", "Photo", null)?photoId=";
+</script>
+
+@section MenuItems
+{
+    @if (Request.IsAuthenticated)
+    {
+        <li><a href="javascript:saveCollectionPrompt()">Save Collection</a></li>
+    }
+
+    <li><a href="javascript:generateTimelapse()">View Time Lapse</a></li>
+    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li><a href="javascript:downloadPrompt()">Download Images</a></li>
+    }
+}
+
+<div class="text-center">
+    <div class="fit-width">
+        <h1 class="page-header title">@Model.Collection.Name</h1>
+
+        <div class="row">
+            <div class="col-md-2">
+                <span id="" class="label label-info">@Model.PhotoCount Photos</span>
+            </div>
+            <div class="col-md-8">
+                <div id="slider"></div>
+            </div>
+            <div class="col-md-2">
+                <span id="img-size" class="label label-info"></span>
+            </div>
+        </div>
+    </div>
+
+    <hr class="featurette-divider" />
+    @Html.Partial("_SearchGridPartial", Model.Partial)
+</div>
+
+<!-- Save User Collection Modal -->
+@Html.Partial("_SaveUserCollectionModal", Model.UserCollections);

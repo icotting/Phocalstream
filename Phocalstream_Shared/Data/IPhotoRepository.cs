@@ -14,6 +14,7 @@ namespace Phocalstream_Shared.Data
         SiteDetails GetSiteDetails(CameraSite site);
         TagDetails GetTagDetails(Tag Tag);
 
+        string GetPhotoIdsForCollection(long collectionID);
         int GetPhotoCountForCollection(long collectionID);
         List<Photo> GetPhotoRangeForCollection(long collectionID, int startIndex, int length);
         

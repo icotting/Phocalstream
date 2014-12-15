@@ -377,6 +377,10 @@
     <Content Include="Content\Scripts\knockout-2.1.0.js" />
     <Content Include="Content\Scripts\knockout-3.2.0.js" />
     <Content Include="Content\Scripts\modernizr-2.5.3.js" />
+    <Content Include="Content\Scripts\PhotoDownload.js" />
+    <Content Include="Content\Scripts\PhotoSaveCollection.js" />
+    <Content Include="Content\Scripts\PhotoSearchResults.js" />
+    <Content Include="Content\Scripts\PhotoTimelapse.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Scripts\TimeLapse.js" />
     <Content Include="Content\Site.css" />
@@ -412,7 +416,6 @@
     <Content Include="Views\Home\Downloads.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Search\List.cshtml" />
-    <Content Include="Views\Search\SearchResult.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Account\UserCollections.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
@@ -424,9 +427,10 @@
     <Content Include="Views\Photo\SiteDashboard.cshtml" />
     <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
     <Content Include="Views\Account\CreateUserSite.cshtml" />
-    <Content Include="Views\Search\PhotoWall.cshtml" />
+    <Content Include="Views\Search\SearchResults.cshtml" />
     <Content Include="Views\Search\_SearchGridPartial.cshtml" />
     <Content Include="Views\Shared\_CollectionThumbnail.cshtml" />
+    <Content Include="Views\Shared\_SaveUserCollectionModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
