@@ -210,6 +210,9 @@ function nextImage() {
     $("#frameDate").empty();
     $("#frameDate").append(imageTime);
 
+    $("#imageCount").empty();
+    $("#imageCount").append("Images " + ((pos % len) + 1) + " of " + len);
+
     // load the image data to display from the buffer
     var image = buffer[pos++ % bufferLen];
 

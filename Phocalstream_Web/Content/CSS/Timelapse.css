@@ -1,12 +1,23 @@
 ﻿#controls {
     display: none;
     margin-top: 10px;
+    position: absolute;
+    bottom: 19px;
+    right: 15px;
+}
+
+#imageCount {
+    color: white;
+    position: absolute;
+    bottom: 19px;
+    left: 15px;
 }
 
 #frameDate {
     font-size: 11pt;
     font-weight: 500;
     margin-bottom: 10px;
+    min-height: 21px;
 }
 
 #loadDiv {
@@ -21,6 +32,7 @@
 
 #video {
     position: relative;
+    margin-top: 20px;
 }
 
 #open_container {
