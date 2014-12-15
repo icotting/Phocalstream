@@ -12,6 +12,7 @@
 
 <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
 <script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoSaveCollection.js"></script>
 <script>
 
     var visibleItems = "@Model.PhotoIdList";
@@ -134,69 +135,6 @@
     function resizeWindow(e) {
         computeHolderMargin($("img.photo").width());
     }
-
-
-    //User Defined Collection
-    function saveCollectionPrompt() {
-        $("#silverlightControlHost").hide();
-
-        $('#userCollectionModal').modal({
-            show: true,
-            backdrop: 'static',
-            closeOnEscape: true
-        });
-    }
-
-    
-    var collectionIds = [];
-    function registerCollectionSelection(collectionId) {
-        if (jQuery.inArray(collectionId, collectionIds) == -1) {
-            collectionIds.push(collectionId);
-        }
-        else {
-            var index = collectionIds.indexOf(collectionId);
-            collectionIds.splice(index, 1);
-        }
-    }
-
-    function saveCollectionModalButton() {
-        var newName = $('#newCollectionName').val();
-        if (newName != "") {
-            saveCollection(newName);
-        }
-
-        if (collectionIds.length > 0) {
-            addToCollection(collectionIds);
-        }
-
-        $("#silverlightControlHost").show();
-    }
-
-    function cancelCollectionModalButton() {
-        $("#silverlightControlHost").show();
-    }
-
-    function addToCollection(collectionIds) {
-        $.ajax({
-            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+visibleItems,
-            type : 'POST'
-        });
-    }
-
-    function saveCollection(collectionName) {
-        $.ajax({
-            url : '/api/usercollection/SaveUserCollection?photoIds='+visibleItems+'&collectionName='+collectionName,
-            type : "POST"
-        });
-    }
-    
-    $(document).ready(function() { 
-        $('.list-group-item').click(function () {
-            $(this).toggleClass('list-group-item-success');
-
-            registerCollectionSelection($(this).attr('id'));
-        });
-    });
 
     function generateTimelapse() {
         var form;

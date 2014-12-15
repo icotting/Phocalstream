@@ -1,4 +1,4 @@
-﻿// Scripts to handle photo download functionality
+﻿// Script to handle photo download functionality
 
 // Dependencies:
 // ** visibleItems, a global variable containing a comma-separated list of photo Ids
@@ -6,7 +6,7 @@
 
 
 /* 
- * Hides the SilverLight Viewer, if applicable, and presents the user with a confirmation dialog
+ * Hides the SilverLight Viewer, if applicable, and presents the user with a confirmation dialog.
  */
 function downloadPrompt() {
     $("#silverlightControlHost").hide();
@@ -22,7 +22,7 @@ function downloadPrompt() {
 }
 
 /*
- * POST the photo ids to the download api
+ * POST the photo ids to the download api controller method.
  */
 function downloadImages() {
     $.ajax({
