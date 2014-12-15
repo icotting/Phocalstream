@@ -1,0 +1,43 @@
+﻿@model Phocalstream_Shared.Data.Model.View.UserCollectionList
+
+<div id="userCollectionModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">User Collections</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label class="col-md-12" for="newCollectionName">New Collection Name</label>
+                    <div class="col-md-12">
+                        <input id="newCollectionName" name="newCollectionName" type="text" placeholder="New Collection Name" class="form-control input-md">
+                    </div>
+                </div>
+
+                @if (@Model != null)
+                {
+                    <hr class="featurette-divider" />
+
+                    <div class="row">
+                        <label class="col-md-12">Or, Add To Existing</label>
+                        <div class="col-md-12">
+                            <ul class="list-group user-collection-list">
+                                @foreach (var col in Model.Collections)
+                                {
+                                    <li id="@col.ID" class="list-group-item">
+                                        <span class="badge">@col.Photos.Count</span>@col.Name
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="javascript:cancelCollectionModalButton()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="javascript:saveCollectionModalButton()">Add To Collections</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

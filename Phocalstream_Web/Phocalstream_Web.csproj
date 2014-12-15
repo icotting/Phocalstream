@@ -378,6 +378,9 @@
     <Content Include="Content\Scripts\knockout-3.2.0.js" />
     <Content Include="Content\Scripts\modernizr-2.5.3.js" />
     <Content Include="Content\Scripts\PhotoDownload.js" />
+    <Content Include="Content\Scripts\PhotoSaveCollection.js" />
+    <Content Include="Content\Scripts\PhotoSearchResults.js" />
+    <Content Include="Content\Scripts\PhotoTimelapse.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Scripts\TimeLapse.js" />
     <Content Include="Content\Site.css" />
@@ -427,6 +430,7 @@
     <Content Include="Views\Search\SearchResults.cshtml" />
     <Content Include="Views\Search\_SearchGridPartial.cshtml" />
     <Content Include="Views\Shared\_CollectionThumbnail.cshtml" />
+    <Content Include="Views\Shared\_SaveUserCollectionModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
