@@ -13,6 +13,8 @@
     <script type="text/javascript" src="~/Content/Scripts/Silverlight.js"></script>
     <script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
     <script type="text/javascript" src="~/Content/Scripts/PhotoSaveCollection.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/PhotoTimelapse.js"></script>
+
     <script type="text/javascript">
 
         var visibleItems;
@@ -55,13 +57,6 @@
             throw new Error(errMsg);
         }
         
-
-        function generateTimelapse() {
-            window.document.location.href = '/photo/timelapse?photoIds='+visibleItems;
-        }
-
-       
-
         function setCover() {
             var form;
             form = $('<form />', {
@@ -82,22 +77,6 @@
                 value: @Model.Collection.ID
             }));
 
-            form.appendTo('body').submit();
-        }
-
-        function generateTimelapse() {
-            var form;
-            form = $('<form />', {
-                action: '/photo/timelapse',
-                method: 'POST',
-                style: 'display: none;'
-            });
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'photoIds',
-                value: visibleItems
-            }));
             form.appendTo('body').submit();
         }
     </script>

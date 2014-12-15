@@ -13,6 +13,7 @@
 <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
 <script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
 <script type="text/javascript" src="~/Content/Scripts/PhotoSaveCollection.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoTimelapse.js"></script>
 <script>
 
     var visibleItems = "@Model.PhotoIdList";
@@ -136,21 +137,6 @@
         computeHolderMargin($("img.photo").width());
     }
 
-    function generateTimelapse() {
-        var form;
-        form = $('<form />', {
-            action: '/photo/timelapse',
-            method: 'POST',
-            style: 'display: none;'
-        });
-
-        form.append($('<input/>', {
-            type: 'hidden',
-            name: 'photoIds',
-            value: visibleItems
-        }));
-        form.appendTo('body').submit();
-    }
 </script>
 
 @section MenuItems
