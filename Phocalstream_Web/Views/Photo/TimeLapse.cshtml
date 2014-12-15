@@ -50,6 +50,12 @@
 
 <div class="container">
     <div class="content">
+
+        <div class="text-center page-header">
+            <h1 class="">Dynamic Timelapse</h1>
+            <div id="frameDate"></div>
+        </div>
+
         <div id="video">
             <div class="col-md-8">
                 <div id="loadDiv" style="width: @FRAME_WIDTH; height: @FRAME_HEIGHT">
@@ -64,7 +70,6 @@
                 <div id="frames" style="position: absolute; top: 0px; z-index: 1">
                     <canvas id="vscreen"></canvas>
                     <div id="controls">
-                        <div id="frameDate"></div>
                         <button class="btn btn-default" onclick="startStop()">
                             <span id="playbtn" class="glyphicon glyphicon-pause"></span>
                         </button>&nbsp;
@@ -84,7 +89,9 @@
             </div>
             <div class="col-md-4">
                 <div id="open_container" class="dm_container"></div>
-                Average Weekly Stream Discharge: <span id="discharge">-</span>
+                <div class="text-center">
+                    Average Weekly Stream Discharge: <span id="discharge">-</span>
+                </div>
             </div>
         </div>
     </div>
