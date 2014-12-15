@@ -59,4 +59,7 @@
 </div>
 
 <!-- Save User Collection Modal -->
-@Html.Partial("_SaveUserCollectionModal", Model.UserCollections);
+@if (Model.UserCollections != null)
+{
+    @Html.Partial("_SaveUserCollectionModal", Model.UserCollections);
+}
