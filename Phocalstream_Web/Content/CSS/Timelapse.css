@@ -6,6 +6,13 @@
     right: 15px;
 }
 
+#imageCount {
+    color: white;
+    position: absolute;
+    bottom: 19px;
+    left: 15px;
+}
+
 #frameDate {
     font-size: 11pt;
     font-weight: 500;
