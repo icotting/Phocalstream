@@ -3,12 +3,10 @@
     ViewBag.Title = Model.Collection.Site.Name;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@Styles.Render(
-            "~/Content/CSS/Photo.css"
-    )
+@Styles.Render("~/Content/CSS/Photo.css")
 
 @section Scripts
-    {
+{
     <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
     <script type="text/javascript" src="~/Content/Scripts/Silverlight.js"></script>
     <script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
