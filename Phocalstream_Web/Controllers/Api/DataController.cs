@@ -32,7 +32,7 @@ namespace Phocalstream_Web.Controllers.Api
             DateTime date = Convert.ToDateTime(request.DmWeek);
 
             results.Add("COUNTY", DmRepo.FindBy(county, date).FirstOrDefault());
-            results.Add("STATE", DmRepo.FindBy(county.State, date).First());
+            results.Add("STATE", DmRepo.FindBy(county.State, date).FirstOrDefault());
             results.Add("US", DmRepo.FindUS(date).FirstOrDefault());
 
             ICollection<AvailableWaterDataByStation> types = WaterRepo.FetchBestDataTypesForStationDate(WaterRepo.GetClosestStations(request.Latitude, request.Longitude,

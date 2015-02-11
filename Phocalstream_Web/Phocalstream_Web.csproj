@@ -381,6 +381,7 @@
     <Content Include="Content\Scripts\PhotoSaveCollection.js" />
     <Content Include="Content\Scripts\PhotoSearchResults.js" />
     <Content Include="Content\Scripts\PhotoTimelapse.js" />
+    <Content Include="Content\Scripts\seadragon-min.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Scripts\TimeLapse.js" />
     <Content Include="Content\Site.css" />
@@ -490,7 +491,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>1333</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:1173/</IISUrl>
+          <IISUrl>http://localhost:1174/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
