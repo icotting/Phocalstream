@@ -161,13 +161,18 @@ namespace Phocalstream_Web.Controllers.Api
             return message;
         }
 
+        public class DownloadModel
+        {
+            public string PhotoIds { get; set; }
+        }
+
         [HttpPost, ActionName("RawDownload")]
-        public void FullResolutionDownload(string photoIds)
+        public void FullResolutionDownload(DownloadModel model)
         {
             //need to access photos and names on main thread
             List<string> fileNames = new List<string>();
 
-            string[] ids = photoIds.Split(',');
+            string[] ids = model.PhotoIds.Split(',');
 
             foreach (var id in ids)
             {
@@ -184,7 +189,7 @@ namespace Phocalstream_Web.Controllers.Api
             List<string> downloadLinks = new List<string>();
 
             // For all groups of photosPerZip, save zip      
-            int photosPerZip = 100;
+            int photosPerZip = 500;
             int photoCount = fileNames.Count();
             var fileCount = Math.Ceiling((Double)photoCount / (Double)photosPerZip);
 
