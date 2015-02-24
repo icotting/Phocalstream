@@ -52,8 +52,6 @@ $(function () {
             computeHolderMargin(ui.value);
         }
     });
-
-    scaleOrHideLabel(initialSliderValue);
 });
 
 
@@ -151,8 +149,13 @@ $(function () {
  * Called to initialize the image, text, and margin size
  * based on initial size of window and photo count.
  */
-$(function () {
+function initialize() {
     setText(initialSliderValue);
     setImage(initialSliderValue);
     computeHolderMargin(initialSliderValue);
+    scaleOrHideLabel(initialSliderValue);
+}
+
+$(function () {
+    initialize()
 });
