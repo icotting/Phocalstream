@@ -299,14 +299,15 @@ namespace Phocalstream_Service.Service
             {
                 if (siteNames.Contains(site))
                 {
+                    string new_site = site.Replace("'", "''");
                     if (first)
                     {
-                        sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", site));
+                        sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", new_site));
                         first = false;
                     }
                     else
                     {
-                        sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", site));
+                        sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", new_site));
                     }
                 }
             }
@@ -328,14 +329,15 @@ namespace Phocalstream_Service.Service
                 {
                     if (tagNames.Contains(tag))
                     {
+                        string new_tag = tag.Replace("'", "''");
                         if (tagFirst)
                         {
-                            tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
+                            tagBuilder.Append(string.Format("Tags.Name = '{0}'", new_tag));
                             tagFirst = false;
                         }
                         else
                         {
-                            tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", tag));
+                            tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", new_tag));
                         }
                     }
                     else

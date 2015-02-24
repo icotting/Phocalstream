@@ -161,13 +161,18 @@ namespace Phocalstream_Web.Controllers.Api
             return message;
         }
 
+        public class DownloadModel
+        {
+            public string PhotoIds { get; set; }
+        }
+
         [HttpPost, ActionName("RawDownload")]
-        public void FullResolutionDownload(string photoIds)
+        public void FullResolutionDownload(DownloadModel model)
         {
             //need to access photos and names on main thread
             List<string> fileNames = new List<string>();
 
-            string[] ids = photoIds.Split(',');
+            string[] ids = model.PhotoIds.Split(',');
 
             foreach (var id in ids)
             {
@@ -181,18 +186,56 @@ namespace Phocalstream_Web.Controllers.Api
             }
 
             string email = UserRepository.First(u => u.ProviderID == this.User.Identity.Name).EmailAddress;
+            List<string> downloadLinks = new List<string>();
 
-            string FileName = (DateTime.Now.ToString("MM-dd-yyyy-hh-mm-ss") + ".zip");
+            // For all groups of photosPerZip, save zip      
+            int photosPerZip = 500;
+            int photoCount = fileNames.Count();
+            var fileCount = Math.Ceiling((Double)photoCount / (Double)photosPerZip);
 
-            string downloadURL = string.Format("{0}://{1}{2}",
-                                                Request.RequestUri.Scheme,
-                                                Request.RequestUri.Authority,
-                                                string.Format(@"/Photo/Download?fileName={0}", FileName));
+            for (int i = 0; i < fileCount; i++)
+            {
+                string FileName = string.Format("{0}.{1}.zip", (DateTime.Now.ToString("MM-dd-yyyy-hh-mm-ss")), Convert.ToString(i + 1));
 
-            DownloadImages(fileNames, FileName, email, downloadURL);
+                string downloadURL = string.Format("{0}://{1}{2}",
+                                                    Request.RequestUri.Scheme,
+                                                    Request.RequestUri.Authority,
+                                                    string.Format(@"/Photo/Download?fileName={0}", FileName));
+                downloadLinks.Add(downloadURL);
+
+                var startIndex = i * photosPerZip;
+                var endIndex = (i + 1) * photosPerZip;
+
+                List<string> subsetFileNames = new List<string>();
+                if (photoCount > endIndex)
+                {
+                    subsetFileNames = fileNames.GetRange(startIndex, photosPerZip);
+                }
+                else
+                {
+                    var remainingCount = photoCount - startIndex;
+                    subsetFileNames = fileNames.GetRange(startIndex, remainingCount);
+                }
+
+                DownloadImages(subsetFileNames, FileName);
+            }
+
+            var emailText = "";
+            if (fileCount > 1)
+            {
+                emailText = string.Format("The images you requested for download were saved to {0} zip files. Please visit the links below to download the zip files. <br>{1}", Convert.ToString(fileCount), String.Join("<br>", downloadLinks));
+            }
+            else
+            {
+                emailText = "Please visit " + downloadLinks[0] + " to download the images.";
+            }
+
+            //after all saved, send email
+            EmailService.SendMail(email, "Phocalstream Download", emailText);
+
         }
 
-        private void DownloadImages(List<string> fileNames, string FileName, string email, string downloadURL)
+        private void DownloadImages(List<string> fileNames, string FileName)
         {
             string path = PathManager.GetRawPath();
 
@@ -244,9 +287,6 @@ namespace Phocalstream_Web.Controllers.Api
 
                 zf.Save(Path.Combine(save_path, FileName));
             }
-
-            //after save, send email
-            EmailService.SendMail(email, "Phocalstream Download", "Please visit " + downloadURL + " to download the images.");
         }
     }
 }
