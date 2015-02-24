@@ -11,6 +11,7 @@ function generateTimelapse() {
     form = $('<form />', {
         action: '/photo/timelapse',
         method: 'POST',
+        target: '_blank',
         style: 'display: none;'
     });
 
