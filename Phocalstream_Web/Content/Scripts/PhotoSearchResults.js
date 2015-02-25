@@ -145,6 +145,16 @@ $(function () {
 });
 
 
+function resizeThumbnail(size) {
+    initialSliderValue = size;
+
+    setText(size);
+    setImage(size);
+    scaleOrHideLabel(size);
+    computeHolderMargin(size);
+
+}
+
 /*
  * Called to initialize the image, text, and margin size
  * based on initial size of window and photo count.
