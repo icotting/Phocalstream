@@ -56,11 +56,15 @@
 }
 
 label {
-    color: white;
+    color: slategray;
 }
 
 .search-row {
-    margin-bottom: 25px;
+    margin-bottom: 10px;
+}
+
+.row {
+    margin-bottom: 0px;
 }
 
 input[type=checkbox] {
@@ -156,6 +160,7 @@ input[type=checkbox] {
 .search-params {
     background-color: whitesmoke;
     padding-top: 10px;
+    margin-top: 25px;
     color: black;
 }
 

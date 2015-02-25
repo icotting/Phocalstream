@@ -25,133 +25,134 @@
 
 <div class="container">
     <div class="content">
-
-        @if (@ViewBag.Message != null)
-        {
-            <div class="alert alert-info alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                @ViewBag.Message
-            </div>
-        }
-
-        <div class="text-center">
-            <h1 class="page-header search-title">Power Search</h1>
-        </div>
-
-        <!-- Sites -->
-        <div class="search-row">
-            <div class="row">
-                <div class="col-md-4">
-                    Sites
+        <div class="col-md-3 search-params">
+            @if (@ViewBag.Message != null)
+            {
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    @ViewBag.Message
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <input id="site-field" data-bind="value: siteNames" />
-                </div>
-            </div>
-        </div>
+            }
 
-        <!-- Tags -->
-        <div class="search-row">
-            <div class="row">
-                <div class="col-md-4">
-                    Tags
-                </div>
+            <div class="text-center">
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <input id="tag-field" data-bind="value: tagNames" />
-                </div>
-            </div>
-        </div>
 
-        <!-- Dates -->
-        <div class="search-row">
-            <div class="row">
-                <div class="col-md-4">
-                    Dates
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <input class="form-control" data-bind="value: dates" />
-                </div>
-            </div>
-        </div>
-
-        <!-- Months -->
-        <div class="search-row">
-            <div class="page-header">
+            <!-- Sites -->
+            <div class="search-row">
                 <div class="row">
-                    <div class="col-md-4">
-                        <label>Months</label>
+                    <div class="col-md-12">
+                        Sites
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <input id="site-field" data-bind="value: siteNames" />
                     </div>
                 </div>
             </div>
-            <div class="row text-center" data-bind="foreach: months">
-                <div class="col-md-2">
-                    <label>
-                        <input type="checkbox" data-bind="value: month, checked: $root.selectedMonths, click: $root.toggleAssociation" />
-                        <span data-bind="css: { 'selected' : Selected }, text: name"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
 
-        <!-- Hours -->
-        <div class="search-row">
-            <div class="page-header">
+            <!-- Tags -->
+            <div class="search-row">
                 <div class="row">
-                    <div class="col-md-4">
-                        <label>Times Of Day</label>
+                    <div class="col-md-12">
+                        Tags
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <input id="tag-field" data-bind="value: tagNames" />
                     </div>
                 </div>
             </div>
-            <div class="row text-center" data-bind="foreach: hours">
-                <div class="col-md-2">
-                    <label>
-                        <input type="checkbox" data-bind="value: name, checked: $root.selectedHours, click: $root.toggleAssociation" />
-                        <span data-bind="css: { 'selected' : Selected }, text: name"></span>
-                    </label>
+
+            <!-- Dates -->
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-12">
+                        Dates
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <input class="form-control" data-bind="value: dates" />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Query and Results -->
-        <div class="search-results-box">
-            <div class="search-row text-center">
-                <div class="search-title page-header">
+            <!-- Months -->
+            <div class="search-row">
+                <div class="page-header">
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="search-results"><strong data-bind="text: query"></strong></h3>
+                            <label>Months</label>
                         </div>
+                    </div>
+                </div>
+                <div class="row text-center" data-bind="foreach: months">
+                    <div class="col-md-6">
+                        <label>
+                            <input type="checkbox" data-bind="value: month, checked: $root.selectedMonths, click: $root.toggleAssociation" />
+                            <span data-bind="css: { 'selected' : Selected }, text: name"></span>
+                        </label>
                     </div>
                 </div>
             </div>
 
-            <div class="search-row text-center">
-                <div class="row">
-                    <div class="">
-                        <!-- ko if: queryResults() == 1 -->
-                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo</button>
-                        <!-- /ko -->
-                        <!-- ko ifnot: queryResults() == 1 -->
-                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photos</button>
-                        <!-- /ko -->
-                    </div>
-                    @if (Request.IsAuthenticated)
-                    { 
-                        <!-- ko if: queryResults() > 0-->
-                        <div class="search-image-save">
-                            <a class="save-button btn btn-info" href="javascript:saveCollectionPrompt()" data-bind="attr{ id: imagePath}">Save This Image</a>
+            <!-- Hours -->
+            <div class="search-row">
+                <div class="page-header">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Times Of Day</label>
                         </div>
-                        <!-- /ko -->
-                    }
+                    </div>
+                </div>
+                <div class="row text-center" data-bind="foreach: hours">
+                    <div class="col-md-3">
+                        <label>
+                            <input type="checkbox" data-bind="value: name, checked: $root.selectedHours, click: $root.toggleAssociation" />
+                            <span data-bind="css: { 'selected' : Selected }, text: name"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Query and Results -->
+            <div class="search-results-box">
+                <div class="search-row text-center">
+                    <div class="search-title page-header">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="search-results"><strong data-bind="text: query"></strong></h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-row text-center">
+                    <div class="row">
+                        <div class="">
+                            <!-- ko if: queryResults() == 1 -->
+                            <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo</button>
+                            <!-- /ko -->
+                            <!-- ko ifnot: queryResults() == 1 -->
+                            <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photos</button>
+                            <!-- /ko -->
+                        </div>
+                        @if (Request.IsAuthenticated)
+                        { 
+                            <!-- ko if: queryResults() > 0-->
+                            <div class="search-image-save">
+                                <a class="save-button btn btn-info" href="javascript:saveCollectionPrompt()" data-bind="attr{ id: imagePath}">Save This Image</a>
+                            </div>
+                            <!-- /ko -->
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <script type="text/javascript">
