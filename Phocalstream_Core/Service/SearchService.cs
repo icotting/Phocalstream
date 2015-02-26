@@ -18,6 +18,9 @@ namespace Phocalstream_Service.Service
     public class SearchService : ISearchService
     {
         [Dependency]
+        public IPhotoRepository PhotoRepo { get; set; }
+
+        [Dependency]
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [Dependency]
@@ -114,6 +117,14 @@ namespace Phocalstream_Service.Service
             {
                 return 0;
             }
+        }
+
+        public List<long> SearchResultPhotoIds(SearchModel model)
+        {
+            string select = GetSearchQuery(model);
+            List<long> ids = QuickSearch(select);
+
+            return ids;
         }
 
 
