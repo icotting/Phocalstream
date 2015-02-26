@@ -59,16 +59,12 @@ label {
     color: gray;
 }
 
-.search-row {
-    margin-bottom: 10px;
-}
-
 .row {
     margin-bottom: 0px;
 }
 
 input[type=checkbox] {
-    visibility: hidden;
+    display: none;
 }
 
 .sel-header {
@@ -89,11 +85,12 @@ input[type=checkbox] {
 }
 
 .search-results {
+    color: black;
+    font-size: 12px;
     margin: 0px !important;
 }
 
 .search-results-box {
-    margin-top: 75px;
 }
 
 .search-image-save {
@@ -157,15 +154,33 @@ input[type=checkbox] {
     margin-bottom: 10px;
 }
 
+#ul-holder {
+    margin-top: 25px;
+}
+
 .search-params {
-    background-color: whitesmoke;
     padding-top: 10px;
     margin-top: 25px;
     color: black;
+    background-color: whitesmoke;
     border: 1px solid lightgray;
 }
 
 .section-header {
     font-weight: bold;
     margin-bottom: 0px !important;
+}
+
+.search-row {
+    margin-bottom: 10px;
+}
+
+.featurette-divider {
+    margin: 0px;
+    border-top: 1px solid darkgray;
+}
+
+label.btn > input[type='radio']
+{
+    display: none;
 }

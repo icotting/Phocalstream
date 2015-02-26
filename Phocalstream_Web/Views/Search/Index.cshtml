@@ -33,9 +33,38 @@
                     @ViewBag.Message
                 </div>
             }
-
-            <div class="text-center">
+            
+            <!-- Sort By -->
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-12">
+                        <strong>Results</strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group btn-group-justified">
+                            <label class="btn btn-default" data-bind="css: { 'active': group() === 'date' }">
+                                <input type="radio" name="sortoptions" id="date" data-bind="checked: group, checkedValue: 'date'">Sort By Date
+                            </label>
+                            <label class="btn btn-default" data-bind="css: { 'active': group() === 'site' }">
+                                <input type="radio" name="sortoptions" id="group" data-bind="checked: group, checkedValue: 'site'">Camera Site
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Filters -->
+            <div class="search-row">
+                <div class="row">
+                    <div class="col-md-12">
+                        <strong>Filters</strong>
+                    </div>
+                </div>
+                <hr class="featurette-divider" />
+            </div>
+
 
             <!-- Sites -->
             <div class="search-row">
@@ -46,7 +75,10 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <input id="site-field" data-bind="value: siteNames" />
+                        <div class="input-group">
+                            <span class="input-group-addon">Site</span>
+                            <input id="site-field" data-bind="value: siteNames" />
+                        </div><!-- /input-group -->
                     </div>
                 </div>
             </div>
@@ -81,16 +113,14 @@
 
             <!-- Months -->
             <div class="search-row">
-                <div class="page-header">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <label>Months</label>
-                        </div>
-                        <div class="col-md-4">
-                            <button id="clear-months" type="button" class="btn btn-danger btn-xs" data-bind="click: clearMonths, visible: selectedMonths().length > 0">
-                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
-                            </button>   
-                        </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        Months
+                    </div>
+                    <div class="col-md-4">
+                        <button id="clear-months" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearMonths, visible: selectedMonths().length > 0">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
+                        </button>   
                     </div>
                 </div>
                 <div class="row text-center" data-bind="foreach: months">
@@ -105,16 +135,14 @@
 
             <!-- Hours -->
             <div class="search-row">
-                <div class="page-header">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <label>Times of Day</label>
-                        </div>
-                        <div class="col-md-4">
-                            <button id="clear-times" type="button" class="btn btn-danger btn-xs" data-bind="click: clearTimes, visible: selectedHours().length > 0">
-                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
-                            </button>
-                        </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        Times of Day
+                    </div>
+                    <div class="col-md-4">
+                        <button id="clear-times" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearTimes, visible: selectedHours().length > 0">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
+                        </button>
                     </div>
                 </div>
                 <div class="row text-center" data-bind="foreach: hours">
@@ -127,37 +155,43 @@
                 </div>
             </div>
 
+            <hr class="featurette-divider" />
+
             <!-- Query and Results -->
-            <div class="search-results-box">
-                <div class="search-row text-center">
-                    <div class="search-title page-header">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h3 class="search-results"><strong data-bind="text: query"></strong></h3>
-                            </div>
-                        </div>
+            <div class="search-row text-center">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="search-results"><strong data-bind="text: query"></strong></p>
+                    </div>
+                    <div class="col-md-12">
+                        <!-- ko if: queryResults() == 1 -->
+                        <p class="search-results">Found <strong data-bind="text: queryResults"></strong> photo</p>
+                        <!-- /ko -->
+                        <!-- ko ifnot: queryResults() == 1 -->
+                        <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photos</p>
+                        <!-- /ko -->
                     </div>
                 </div>
+            </div>
 
-                <div class="search-row text-center">
-                    <div class="row">
-                        <div class="">
-                            <!-- ko if: queryResults() == 1 -->
-                            <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo</button>
-                            <!-- /ko -->
-                            <!-- ko ifnot: queryResults() == 1 -->
-                            <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photos</button>
-                            <!-- /ko -->
-                        </div>
-                        @if (Request.IsAuthenticated)
-                        { 
-                            <!-- ko if: queryResults() > 0-->
-                            <div class="search-image-save">
-                                <a class="save-button btn btn-info" href="javascript:saveCollectionPrompt()" data-bind="attr : { id: imagePath}">Save This Image</a>
-                            </div>
-                            <!-- /ko -->
-                        }
+            <div class="search-row text-center">
+                <div class="row">
+                    <div class="">
+                        <!-- ko if: queryResults() == 1 -->
+                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg"><strong data-bind="text: queryResults"></strong> photo</button>
+                        <!-- /ko -->
+                        <!-- ko ifnot: queryResults() == 1 -->
+                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg"><strong data-bind="text: queryResults"></strong> photos</button>
+                        <!-- /ko -->
                     </div>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <!-- ko if: queryResults() > 0-->
+                        <div class="search-image-save">
+                            <a class="save-button btn btn-info" href="javascript:saveCollectionPrompt()" data-bind="attr : { id: imagePath}">Save This Image</a>
+                        </div>
+                        <!-- /ko -->
+                    }
                 </div>
             </div>
         </div>
@@ -202,6 +236,8 @@
 
     function ViewModel() {
         var self = this;
+
+        self.group = ko.observable("site");
 
         self.siteNames = ko.observable();
         self.tagNames = ko.observable();
@@ -436,13 +472,16 @@
         });
 
         self.queryResults = asyncComputed(function () {
+            console.log(this.group());
+
             return $.ajax("/api/search/count", {
                 data: {
                     hours: this.hourQuery(),
                     months: this.selectedMonths().toString(),
                     sites: this.siteNames,
                     tags: this.tagNames,
-                    dates: this.dates
+                    dates: this.dates,
+                    group: this.group()
                 }
             });
         }, this);
@@ -456,7 +495,8 @@
                     months: this.selectedMonths().toString(),
                     sites: this.siteNames,
                     tags: this.tagNames,
-                    dates: this.dates
+                    dates: this.dates,
+                    group: this.group()
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     alert(textStatus + ': ' + errorThrown);

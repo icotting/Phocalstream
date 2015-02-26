@@ -283,6 +283,18 @@ namespace Phocalstream_Service.Service
             }
 
            select.Append("WHERE " + parameters);
+
+           if (!String.IsNullOrWhiteSpace(model.Group))
+           {
+               select.Append(" ORDER BY");
+
+               if (model.Group.Equals("site"))
+               {
+                   select.Append(" Photos.Site_ID,");
+               }
+
+               select.Append(" Photos.Captured");
+           }
  
            return select.ToString();
         }
