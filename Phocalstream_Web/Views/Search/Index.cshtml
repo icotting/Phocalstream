@@ -5,15 +5,26 @@
 }
 @Styles.Render("~/Content/CSS/Search.css")
 
+@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js",
+                "~/Content/Scripts/jquery-lazyload.js")
+
 <!-- Bootstrap Tags Input CSS and JS Files -->
 <link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
 <link href="~/Content/CSS/typeahead.css" rel="stylesheet">
 <script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
 <script src="~/Content/typeahead/typeahead.bundle.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoSearchResults.js"></script>
 
 <!-- Knockout.js -->
 <script src="~/Content/Scripts/knockout-3.2.0.js"></script>
 
+<script>
+    var visibleItems = "";
+
+    // dependency variables for PhotoSearchResults.js
+    var totalPhotoCount = 0;
+    var basePhotoUrl = "@Url.Action("Index", "Photo", null)?photoId=";
+</script>
 
 <div class="background">
 <!--    <img class="background-img" data-bind="attr:{src: imagePath}"/> -->
@@ -35,21 +46,46 @@
             }
             
             <!-- Sort By -->
-            <div class="search-row">
-                <div class="row">
+            <div class="">
+                <div class="search-row row">
                     <div class="col-md-12">
                         <strong>Results</strong>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
+                <div class="search-row row">
+                    <div class="col-md-4">
+                        <label class="filter-label">Sort By</label>
+                    </div>
+                    <div class="col-md-8">
                         <div class="btn-group btn-group-justified">
                             <label class="btn btn-default" data-bind="css: { 'active': group() === 'date' }">
-                                <input type="radio" name="sortoptions" id="date" data-bind="checked: group, checkedValue: 'date'">Sort By Date
+                                <input type="radio" name="sortoptions" id="date" data-bind="checked: group, checkedValue: 'date'">Date
                             </label>
                             <label class="btn btn-default" data-bind="css: { 'active': group() === 'site' }">
-                                <input type="radio" name="sortoptions" id="group" data-bind="checked: group, checkedValue: 'site'">Camera Site
+                                <input type="radio" name="sortoptions" id="group" data-bind="checked: group, checkedValue: 'site'">Site
                             </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-row row">
+                    <div class="col-md-4">
+                        <label class="filter-label">Thumbnails</label>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="btn-group full-width">
+                            <!-- Change button type based on status -->
+                            <button type="button" class="btn btn-default full-width dropdown-toggle" data-toggle="dropdown">
+                                <span data-bind="text: size().name"> </span> <span class="caret"></span>
+                            </button>
+
+                            <!-- Loop for status -->
+                            <ul class="dropdown-menu" role="menu" data-bind="foreach: sizes">
+                                <!-- Disable item if selected -->
+                                <li data-bind="css: {'active' : name == $parent.size().name}">
+                                    <!-- This is where I need to bind the click to change the value of the status -->
+                                    <a href="#" data-bind="click: $parent.size"><span data-bind="text: name"></span></a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -195,7 +231,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-9">
+        <div id="partial" class="col-md-9">
             <ul id="ul-holder">
 
             </ul>
@@ -238,6 +274,23 @@
         var self = this;
 
         self.group = ko.observable("site");
+
+        self.sizes = [{name: "Small"}, {name: "Medium"}, {name: "Large"}]; 
+        self.size = ko.observable(self.sizes[0]);
+
+        self.size.subscribe(function (newSize) {
+            switch (newSize.name) {
+                case 'Small' :
+                    resizeThumbnail(100);
+                    break;
+                case 'Medium':
+                    resizeThumbnail(200);
+                    break;
+                case 'Large':
+                    resizeThumbnail(400);
+                    break;
+            }
+        });
 
         self.siteNames = ko.observable();
         self.tagNames = ko.observable();
@@ -472,8 +525,6 @@
         });
 
         self.queryResults = asyncComputed(function () {
-            console.log(this.group());
-
             return $.ajax("/api/search/count", {
                 data: {
                     hours: this.hourQuery(),
@@ -504,12 +555,17 @@
                 success: function(data) {
                     var ids = data.split(',');
 
+                    visibleItems = data;
+                    totalPhotoCount = ids.length;
+
                     for (var i in ids) {
                         var li = "<li class=\"search-photo\"><p class=\"img-date\"></p>" +
-                            "<img id=\"" + ids[i] + "\" class=\"photo\" src=\"/api/photo/low/" + ids[i] + "\" width=\"100\" height=\"67\" />" +
+                            "<img id=\"" + ids[i] + "\" class=\"photo\" src=\"/api/photo/low/" + ids[i] + "\" />" +
                             "</li>";
                         $("#ul-holder").append(li);
                     }
+
+                    initialize();
                 }
             });
 

@@ -121,7 +121,7 @@ function computeHolderMargin(width) {
     var usedWidth = Math.min(numberOfPhotosAcross, totalPhotoCount) * imgWidth;
     var remainder = totalWidth - usedWidth;
 
-    $(".ul-holder").css("margin-left", (remainder / 2) + "px");
+    $("#ul-holder").css("margin-left", (remainder / 2) + "px");
 }
 
 
