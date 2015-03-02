@@ -13,6 +13,11 @@
 <link href="~/Content/CSS/typeahead.css" rel="stylesheet">
 <script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
 <script src="~/Content/typeahead/typeahead.bundle.js"></script>
+
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoSaveCollection.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoTimelapse.js"></script>
 <script type="text/javascript" src="~/Content/Scripts/PhotoSearchResults.js"></script>
 
 <!-- Knockout.js -->
@@ -20,6 +25,7 @@
 
 <script>
     var visibleItems = "";
+    var saveIds = "";
 
     // dependency variables for PhotoSearchResults.js
     var totalPhotoCount = 0;
@@ -201,50 +207,44 @@
                         <p class="search-results"><strong data-bind="text: query"></strong></p>
                     </div>
                     <div class="col-md-12">
-                        <!-- ko if: queryResults() == 1 -->
-                        <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photo</p>
+                        <!-- ko if: selectedCount() == 0 -->
+                            <!-- ko if: queryResults() == 1 -->
+                            <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photo</p>
+                            <!-- /ko -->
+                            <!-- ko ifnot: queryResults() == 1 -->
+                            <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photos</p>
+                            <!-- /ko -->
                         <!-- /ko -->
-                        <!-- ko ifnot: queryResults() == 1 -->
-                        <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photos</p>
+                        <!-- ko ifnot: selectedCount() == 0 -->
+                            <!-- ko if: selectedCount() == 1 -->
+                            <p class="label label-info"><strong data-bind="text: selectedCount"></strong> of <strong data-bind="text: queryResults"></strong> photo selected</p>
+                            <!-- /ko -->
+                            <!-- ko ifnot: selectedCount() == 1 -->
+                            <p class="label label-info"><strong data-bind="text: selectedCount"></strong> of <strong data-bind="text: queryResults"></strong> photos selected</p>
+                            <!-- /ko -->
+                            <button id="clear-selection" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearSelected, visible: selectedCount() > 0">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
+                            </button>
                         <!-- /ko -->
-
-                        <!-- ko if: selectedCount() == 1 -->
-                        <p class="label label-danger"><strong data-bind="text: selectedCount"></strong> photo selected</p>
-                        <!-- /ko -->
-                        <!-- ko ifnot: selectedCount() == 1 -->
-                        <p class="label label-danger"><strong data-bind="text: selectedCount"></strong> photos selected</p>
-                        <!-- /ko -->
-
                     </div>
                 </div>
             </div>
 
-            <div class="search-row text-center">
+            <div class="search-row">
                 <div class="row">
-                    <div class="btn-group">
-                        <!-- ko if: queryResults() == 1 -->
-                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg"><strong data-bind="text: queryResults"></strong> photo</button>
-                        <!-- /ko -->
-                        <!-- ko ifnot: queryResults() == 1 -->
-                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg"><strong data-bind="text: queryResults"></strong> photos</button>
-                        <!-- /ko -->
-
-                        <!-- ko if: selectedCount() == 1 -->
-                        <button data-bind="click: search, enable: selectedCount() > 0" class="btn btn-info btn-lg">Selected <strong data-bind="text: selectedCount"></strong></button>
-                        <!-- /ko -->
-                        <!-- ko ifnot: selectedCount() == 1 -->
-                        <button data-bind="click: search, enable: selectedCount() > 0" class="btn btn-info btn-lg">Selected <strong data-bind="text: selectedCount"></strong></button>
-                        <!-- /ko -->
-
-                    </div>
-                    @if (Request.IsAuthenticated)
-                    {
-                        <!-- ko if: queryResults() > 0-->
-                        <div class="search-image-save">
-                            <a class="save-button btn btn-info" href="javascript:saveCollectionPrompt()" data-bind="attr : { id: imagePath}">Save This Image</a>
+                    <div class="col-md-12">
+                        <div class="btn-group btn-group-justified">
+                            <a data-bind="click: timelapse, enable: queryResults() > 0" class="btn btn-default">Timelapse</a>
+                            @if (Request.IsAuthenticated)
+                            {
+                                <a data-bind="click: saveCollection, enable: queryResults() > 0" class="btn btn-default">Save</a>
+                            }
+                            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <a data-bind="click: download, enable: queryResults() > 0" class="btn btn-default">Download</a>
+                            }
                         </div>
-                        <!-- /ko -->
-                    }
+                    </div>
                 </div>
             </div>
         </div>
@@ -407,6 +407,15 @@
                 self.toggleAssociation(self.hours()[hour.substring(0,2)]);
             });
             self.selectedHours.removeAll();
+        }
+
+        clearSelected = function() {
+            ko.utils.arrayForEach(self.selectedPhotos(), function (id) {
+                var img = $("#photo-" + id);
+                var selected = img.hasClass('bordered');
+                img.toggleClass('bordered', !selected);
+            })
+            self.selectedPhotos.removeAll();
         }
 
         self.monthText = ko.computed(function () {
@@ -635,6 +644,67 @@
             });
         }, this);
 
+        self.timelapse = function() {
+            var timelapseIds = "";
+
+            if (self.selectedCount() == 0) {
+                timelapseIds = visibleItems;
+            }
+            else {
+                timelapseIds = self.selectedPhotos().join(",");
+            }
+
+            var form;
+            form = $('<form />', {
+                action: '/photo/timelapse',
+                method: 'POST',
+                target: '_blank',
+                style: 'display: none;'
+            });
+
+            form.append($('<input/>', {
+                type: 'hidden',
+                name: 'photoIds',
+                value: timelapseIds
+            }));
+            form.appendTo('body').submit();
+        }
+
+        self.saveCollection = function() {
+            if (self.selectedCount() == 0) {
+                saveIds = visibleItems;
+            }
+            else {
+                saveIds = self.selectedPhotos().join(",");
+            }
+            saveCollectionPrompt();
+        }
+
+        self.download = function() {
+            bootbox.confirm("Are you sure you want to download the images? The download may take some time. A download link will be sent when the process has finished.", function (result) {
+                if (result) {
+                    var downloadIds = "";
+
+                    if (self.selectedCount() == 0) {
+                        downloadIds = visibleItems;
+                    }
+                    else {
+                        downloadIds = self.selectedPhotos().join(",");
+                    }
+
+                    $.ajax({
+                        url: '/api/sitecollection/RawDownload',
+                        data: "photoIds=" + downloadIds,
+                        dataType: "string",
+                        type: "POST",
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert(errorThrown);
+                        }
+                    })
+                }
+            });
+        }
+
         self.search = function() {
             $("#ul-holder").find("li").remove();
 
@@ -777,19 +847,6 @@
 
 
     //User Defined Collection
-    var imageID;
-    function saveCollectionPrompt() {
-        var id = $(".save-button").attr('id');
-        var split = id.split('/');
-        imageID = split[split.length - 1];
-
-        $('#userCollectionModal').modal({
-            show: true,
-            backdrop: 'static',
-            closeOnEscape: true
-        });
-    }
-
     var collectionIds = [];
     function registerCollectionSelection(collectionId) {
         if (jQuery.inArray(collectionId, collectionIds) == -1) {
@@ -817,14 +874,14 @@
 
     function addToCollection(collectionIds) {
         $.ajax({
-            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+imageID,
+            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+saveIds,
             type : 'POST'
         });
     }
 
     function saveCollection(collectionName) {
         $.ajax({
-            url : '/api/usercollection/SaveUserCollection?photoIds='+imageID+'&collectionName='+collectionName,
+            url : '/api/usercollection/SaveUserCollection?photoIds='+saveIds+'&collectionName='+collectionName,
             type : "POST"
         });
     }
