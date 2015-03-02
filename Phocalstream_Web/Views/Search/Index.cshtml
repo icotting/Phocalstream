@@ -91,6 +91,8 @@
                 </div>
             </div>
 
+            <hr class="featurette-divider" />
+
             <!-- Filters -->
             <div class="search-row">
                 <div class="row">
@@ -98,7 +100,6 @@
                         <strong>Filters</strong>
                     </div>
                 </div>
-                <hr class="featurette-divider" />
             </div>
 
 
@@ -106,7 +107,7 @@
             <div class="search-row">
                 <div class="row">
                     <div class="col-md-12">
-                        Sites
+                        <label class="filter-label">Sites</label>
                     </div>
                 </div>
                 <div class="row">
@@ -123,7 +124,7 @@
             <div class="search-row">
                 <div class="row">
                     <div class="col-md-12">
-                        Tags
+                        <label class="filter-label">Tags</label>
                     </div>
                 </div>
                 <div class="row">
@@ -137,7 +138,7 @@
             <div class="search-row">
                 <div class="row">
                     <div class="col-md-12">
-                        Dates
+                        <label class="filter-label">Dates</label>
                     </div>
                 </div>
                 <div class="row">
@@ -151,7 +152,7 @@
             <div class="search-row">
                 <div class="row">
                     <div class="col-md-8">
-                        Months
+                        <label class="filter-label">Months</label>
                     </div>
                     <div class="col-md-4">
                         <button id="clear-months" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearMonths, visible: selectedMonths().length > 0">
@@ -173,7 +174,7 @@
             <div class="search-row">
                 <div class="row">
                     <div class="col-md-8">
-                        Times of Day
+                        <label class="filter-label">Times of Day</label>
                     </div>
                     <div class="col-md-4">
                         <button id="clear-times" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearTimes, visible: selectedHours().length > 0">
@@ -201,24 +202,40 @@
                     </div>
                     <div class="col-md-12">
                         <!-- ko if: queryResults() == 1 -->
-                        <p class="search-results">Found <strong data-bind="text: queryResults"></strong> photo</p>
+                        <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photo</p>
                         <!-- /ko -->
                         <!-- ko ifnot: queryResults() == 1 -->
                         <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photos</p>
                         <!-- /ko -->
+
+                        <!-- ko if: selectedCount() == 1 -->
+                        <p class="label label-danger"><strong data-bind="text: selectedCount"></strong> photo selected</p>
+                        <!-- /ko -->
+                        <!-- ko ifnot: selectedCount() == 1 -->
+                        <p class="label label-danger"><strong data-bind="text: selectedCount"></strong> photos selected</p>
+                        <!-- /ko -->
+
                     </div>
                 </div>
             </div>
 
             <div class="search-row text-center">
                 <div class="row">
-                    <div class="">
+                    <div class="btn-group">
                         <!-- ko if: queryResults() == 1 -->
                         <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg"><strong data-bind="text: queryResults"></strong> photo</button>
                         <!-- /ko -->
                         <!-- ko ifnot: queryResults() == 1 -->
                         <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg"><strong data-bind="text: queryResults"></strong> photos</button>
                         <!-- /ko -->
+
+                        <!-- ko if: selectedCount() == 1 -->
+                        <button data-bind="click: search, enable: selectedCount() > 0" class="btn btn-info btn-lg">Selected <strong data-bind="text: selectedCount"></strong></button>
+                        <!-- /ko -->
+                        <!-- ko ifnot: selectedCount() == 1 -->
+                        <button data-bind="click: search, enable: selectedCount() > 0" class="btn btn-info btn-lg">Selected <strong data-bind="text: selectedCount"></strong></button>
+                        <!-- /ko -->
+
                     </div>
                     @if (Request.IsAuthenticated)
                     {
@@ -232,8 +249,12 @@
             </div>
         </div>
         <div id="partial" class="col-md-9">
-            <ul id="ul-holder">
 
+            <ul id="ul-holder" data-bind="foreach: photos">
+                <li data-bind="attr: { id: 'photo-li-' + $data }" class="search-photo">
+                    <p class="img-date"></p>
+                    <img data-bind="attr: { id: 'photo-' + $data, src: '/api/photo/low/' + $data }, click: $root.selectPhoto" class="photo" />
+                </li>
             </ul>
         </div>
     </div>
@@ -275,6 +296,31 @@
 
         self.group = ko.observable("site");
 
+        self.selectedPhotos = ko.observableArray();
+        self.selectedCount = ko.computed(function() {
+            return self.selectedPhotos().length;
+        });
+
+        self.selectPhoto = function (item) {
+            var id = item;
+
+            var img = $("#photo-" + id);
+
+             var selected = img.hasClass('bordered');
+             img.toggleClass('bordered', !selected);
+
+
+             if (self.selectedPhotos.indexOf(id) == -1) {
+                 self.selectedPhotos.push(id);
+             }
+             else {
+                 self.selectedPhotos.remove(id);
+             }
+
+            return true;
+        }
+
+
         self.sizes = [{name: "Small"}, {name: "Medium"}, {name: "Large"}]; 
         self.size = ko.observable(self.sizes[0]);
 
@@ -291,6 +337,8 @@
                     break;
             }
         });
+
+        self.photos = ko.observableArray([]);
 
         self.siteNames = ko.observable();
         self.tagNames = ko.observable();
@@ -538,8 +586,6 @@
         }, this);
 
         self.imagePath = asyncComputed(function() {
-            $("#ul-holder").find("li").remove();
-
             $.ajax("/api/search/getphotos", {
                 data: {
                     hours: this.hourQuery(),
@@ -558,12 +604,21 @@
                     visibleItems = data;
                     totalPhotoCount = ids.length;
 
-                    for (var i in ids) {
-                        var li = "<li class=\"search-photo\"><p class=\"img-date\"></p>" +
-                            "<img id=\"" + ids[i] + "\" class=\"photo\" src=\"/api/photo/low/" + ids[i] + "\" />" +
-                            "</li>";
-                        $("#ul-holder").append(li);
-                    }
+                    self.selectedPhotos.removeAll();
+
+                    self.photos.removeAll();
+                    var array = self.photos();
+                    ko.utils.arrayPushAll(array, ids);
+                    self.photos.valueHasMutated();
+
+                 //   for (var i in ids) {
+                   //     var li = "<li id=\"" + ids[i] + "\"  class=\"search-photo\"><p class=\"img-date\"></p>" +
+//                            attr: {id: month, value: month}, checked: $root.selectedMonths, click: $root.toggleAssociation
+                     //       "<img id=\"" + ids[i] + "\" class=\"photo\" src=\"/api/photo/low/" + ids[i] + "\"" +
+                       //         "data-bind=\"click: $root.toggleAssociation\" />" +
+                     //       "</li>";
+                      //  $("#ul-holder").append(li);
+                    //}
 
                     initialize();
                 }

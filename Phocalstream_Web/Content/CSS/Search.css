@@ -56,7 +56,7 @@
 }
 
 label {
-    color: gray;
+    color: #aaa;
 }
 
 .row {
@@ -176,8 +176,11 @@ input[type=checkbox] {
 }
 
 .featurette-divider {
-    margin: 0px;
-    border-top: 1px solid darkgray;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: -15px;
+    margin-right: -15px;
+    border-top: 1px solid lightgray;
 }
 
 label.btn > input[type='radio']
@@ -187,4 +190,11 @@ label.btn > input[type='radio']
 
 .filter-label {
     margin-top: 4.5px;
+    color: #555;
+}
+
+img.bordered { 
+   border: 2px solid red;
+}
+
 }
