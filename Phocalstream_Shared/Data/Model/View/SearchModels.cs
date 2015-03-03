@@ -26,6 +26,10 @@ namespace Phocalstream_Shared.Data.Model.View
 
         public string Group { get; set; }
 
+        public int Index { get; set; }
+
+        public int Limit { get; set; }
+
         public ICollection<string> SiteNames { get; set; }
         public ICollection<string> AvailableTags { get; set; }
         public UserCollectionList UserCollections { get; set; }

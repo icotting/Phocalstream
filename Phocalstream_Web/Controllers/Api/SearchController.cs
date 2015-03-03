@@ -72,7 +72,7 @@ namespace Phocalstream_Web.Controllers.Api
 
         [HttpGet]
         [ActionName("getphotos")]
-        public HttpResponseMessage SearchGetPhotos(string hours, string months, string sites, string tags, string dates, string group)
+        public HttpResponseMessage SearchGetPhotos(string hours, string months, string sites, string tags, string dates, string group, int index, int limit)
         {
             SearchModel model = new SearchModel();
             model.Sites = sites;
@@ -81,6 +81,8 @@ namespace Phocalstream_Web.Controllers.Api
             model.Hours = hours;
             model.Months = months;
             model.Group = group;
+            model.Index = index;
+            model.Limit = limit;
 
             List<long> ids = SearchService.SearchResultPhotoIds(model);
 
