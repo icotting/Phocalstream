@@ -18,9 +18,6 @@ namespace Phocalstream_Service.Service
     public class SearchService : ISearchService
     {
         [Dependency]
-        public IPhotoRepository PhotoRepo { get; set; }
-
-        [Dependency]
         public IEntityRepository<Photo> PhotoRepository { get; set; }
 
         [Dependency]
