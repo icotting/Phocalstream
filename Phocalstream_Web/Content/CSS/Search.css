@@ -161,9 +161,28 @@ input[type=checkbox] {
 .search-params {
     padding-top: 10px;
     margin-top: 25px;
+    position: absolute;
+    top: 50px;
+    left: 25px;
+    width: 300px;
     color: black;
     background-color: whitesmoke;
     border: 1px solid lightgray;
+}
+
+.results {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: absolute;
+    left: 325px;
+    height: 90vh !important;
+    top: 50px;
+    right: 0px;
+}
+
+.container {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .section-header {
