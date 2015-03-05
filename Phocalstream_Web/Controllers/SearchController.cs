@@ -50,7 +50,7 @@ namespace Phocalstream_Web.Controllers
         public ICollectionService CollectionService { get; set; }
 
 
-        public ActionResult Index(int e = 0)
+        public ActionResult Index(string tag = "", string site = "")
         {
             SearchModel model = new SearchModel();
 
@@ -69,34 +69,12 @@ namespace Phocalstream_Web.Controllers
                 model.UserCollections = userCollectionModel;
             }
 
-
-            if (e == 1)
-            {
-                ViewBag.Message = "Zero photos matched those parameters, please try again.";
-            }
-            else if (e == 2)
-            {
-                ViewBag.Message = "Please enter at least one (1) search parameter.";
-            }
+            ViewBag.Tag = tag;
+            ViewBag.Site = site;
 
             return View(model);
         }
         
-        public ActionResult TagSearch(string tag)
-        {
-            if (String.IsNullOrWhiteSpace(tag))
-            {
-                return RedirectToAction("Index", "Home", new { e = 2 });
-            }
-            else
-            {
-                SearchModel model = new SearchModel();
-                model.Tags = tag;
-
-                return RedirectToAction("AdvancedSearch", model);
-            }
-        }
-
         public ActionResult KnockoutAdvancedSearch(string hours, string months, string sites, string tags, string dates)
         {
             SearchModel model = new SearchModel();

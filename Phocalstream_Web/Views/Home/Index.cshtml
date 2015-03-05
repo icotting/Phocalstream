@@ -158,36 +158,26 @@
                     <h2>Image Search</h2>
                     <h3>Quickly find images matching a descriptive tag</h3>
                 </div>
-                @using (@Html.BeginForm("TagSearch", "Search"))
-                { 
-                    <div class="row">
-                        <div class="col-sm-9">
-                            <input type="text" id="tag-field" name="tag" placeholder="river, sunset, cows, etc." />
-                        </div>
-                        <div class="col-sm-3">
-                            <button class="btn btn-lg btn-success full-width" type="submit">Search</button>
-                        </div>
-                    </div>
-                }
                 <div class="row">
                     @if (Model.Tags.Count > 2)
                     {
                         for (int i = 0; i < 3; i++)
                         {
                             <div class="col-lg-3">
-                                @Html.ActionLink("View the " + @Model.Tags[i] + " collection", "TagSearch", "Search", new { @tag = @Model.Tags[i] }, new { @class = "btn btn-primary full-width" })
+                                @Html.ActionLink("View the " + @Model.Tags[i] + " collection", "Index", "Search", new { @tag = @Model.Tags[i] }, new { @class = "btn btn-primary full-width" })
                             </div>
                         }
-                    <div class="col-lg-3">
-                        <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
-                    </div>
+                        <div class="col-sm-3">
+                            <a class="btn btn-success full-width" href="@Url.Action("Index", "Search", null)" role="button">Search &raquo;</a>
+                        </div>
                     }
                     else
                     {
                     <div class="col-lg-4 col-lg-offset-4">
-                        <a class="btn btn-default full-width" href="@Url.Action("Index", "Search", null)" role="button">Advanced Search &raquo;</a>
+                        <a class="btn btn-success full-width" href="@Url.Action("Index", "Search", null)" role="button">Search &raquo;</a>
                     </div>
                     }
+
                 </div>
             </div>
         

@@ -799,12 +799,25 @@
         }, $('#site-field')));
 
         //add a random site or tag
+        /*       
         var bool = (Math.random() > 0.5);
         if (bool) {
             $('#site-field').tagsinput('add', sites[Math.floor(Math.random() * sites.length)]);
         }
         else {
             $('#tag-field').tagsinput('add', availableTags[Math.floor(Math.random() * availableTags.length)]);
+        }
+        */
+
+        // Check the view bag for tag params
+        var tag = '@ViewBag.Tag';
+        if (availableTags.indexOf(tag) != -1) {
+            $('#tag-field').tagsinput('add', tag);
+        }
+
+        var site = '@ViewBag.Site';
+        if (sites.indexOf(site) != -1) {
+            $('#site-field').tagsinput('add', site);
         }
     });
 

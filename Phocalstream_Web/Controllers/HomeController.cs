@@ -183,7 +183,7 @@ namespace Phocalstream_Web.Controllers
                     Last = details.Last,
                     PhotoCount = details.PhotoCount,
                     CoverPhotoID = details.CoverPhotoID,
-                    Link = "/search/tagsearch?tag=" + details.TagName
+                    Link = "/search/index?tag=" + details.TagName
                 };
         }
 

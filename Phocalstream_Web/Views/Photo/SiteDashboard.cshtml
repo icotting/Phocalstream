@@ -68,8 +68,8 @@
                             <a class="pull-left" href="@Url.Action("Index", "Photo", new { @photoId = t.Item3})">
                                 <img class="media-object" src="/api/photo/low/@t.Item3" alt="...">
                             </a>
-                            <span class="badge">@t.Item2</span><p class="tag">@Html.ActionLink(Html.DisplayFor(model => t.Item1).ToString(), "KnockoutAdvancedSearch", "Search", new {
-                                    @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = @t.Item1, @dates = ""
+                            <span class="badge">@t.Item2</span><p class="tag">@Html.ActionLink(Html.DisplayFor(model => t.Item1).ToString(), "Index", "Search", new {
+                                    @site = @Model.CollectionViewModel.Collection.Site.Name, @tag = @t.Item1
                                 }, new { @class = "" })</p>
                         </li>
                     }
