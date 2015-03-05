@@ -205,6 +205,9 @@
 </div>
 <div class="results">
     <div id="partial" class="row">
+    <div data-bind="visible: search() === false" class="col-md-10 col-md-offset-1">
+        <p class="alert alert-warning"><strong>Please selected at least one search parameter.</strong></p>
+    </div>
     <ul id="ul-holder" class="col-md-12" data-bind="foreach: photos">
         <li data-bind="attr: { id: 'photo-li-' + $data }" class="search-photo">
             <p class="img-date"></p>
@@ -249,6 +252,8 @@
 
     function ViewModel() {
         var self = this;
+        
+        self.search = ko.observable(false);
 
         self.index = ko.observable(0);
         self.index.extend({ notify: 'always' });
@@ -578,66 +583,85 @@
             });
         }, this);
         self.queryResults.extend({ notify: 'always' });
+        
+        self.getPhotos = function() {
+            if (self.query() == "Searching for all photos") {
+                self.search(false);
 
+                self.photos.removeAll();
+                self.selectedPhotos.removeAll();
 
-        self.imagePath = asyncComputed(function() {
-            $.ajax("/api/search/getphotos", {
-                data: {
-                    hours: this.hourQuery(),
-                    months: this.selectedMonths().toString(),
-                    sites: this.siteNames,
-                    tags: this.tagNames,
-                    dates: this.dates,
-                    group: this.group(),
-                    index: this.index,
-                    limit: limit
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert(textStatus + ': ' + errorThrown);
-                },
-                success: function(data) {
-                    // Split the data into an array of photo ids
-                    var ids = data.split(',');
+                visibleItems = "";
+                totalPhotoCount = 0;
+            }
+            else {
+                self.search(true);
+
+                $.ajax("/api/search/getphotos", {
+                    data: {
+                        hours: this.hourQuery(),
+                        months: this.selectedMonths().toString(),
+                        sites: this.siteNames,
+                        tags: this.tagNames,
+                        dates: this.dates,
+                        group: this.group(),
+                        index: this.index,
+                        limit: limit
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert(textStatus + ': ' + errorThrown);
+                    },
+                    success: function(data) {
+                        // Split the data into an array of photo ids
+                        var ids = data.split(',');
                     
-                    // If the index == 0, then this is the first batch of photos for the query
-                    // So the previous query should be removed
-                    if (self.index() == 0) {
-                        self.photos.removeAll();
-                        self.selectedPhotos.removeAll();
+                        // If the index == 0, then this is the first batch of photos for the query
+                        // So the previous query should be removed
+                        if (self.index() == 0) {
+                            self.photos.removeAll();
+                            self.selectedPhotos.removeAll();
 
-                        visibleItems = data;
-                        totalPhotoCount = ids.length;
-                    } 
-                        // Else, just append the data and sum the length
-                    else {
-                        visibleItems += "," + data;
-                        totalPhotoCount += ids.length;
+                            visibleItems = data;
+                            totalPhotoCount = ids.length;
+                        } 
+                            // Else, just append the data and sum the length
+                        else {
+                            visibleItems += "," + data;
+                            totalPhotoCount += ids.length;
+                        }
+
+                        // Add the new photos to the array, then let Knockout know the value changed
+                        var array = self.photos();
+                        ko.utils.arrayPushAll(array, ids);
+                        self.photos.valueHasMutated();
+
+                        // Initialize the views for proper size
+                        initialize();
                     }
+                });
+            }
+        }
 
-                    // Add the new photos to the array, then let Knockout know the value changed
-                    var array = self.photos();
-                    ko.utils.arrayPushAll(array, ids);
-                    self.photos.valueHasMutated();
-
-                    // Initialize the views for proper size
-                    initialize();
-                }
-            });
-
-            return $.ajax("/api/search/photoId", {
-                data: {
-                    hours: this.hourQuery(),
-                    months: this.selectedMonths().toString(),
-                    sites: this.siteNames,
-                    tags: this.tagNames,
-                    dates: this.dates
-                }
-            });
-        }, this);
+        self.selectedMonths.subscribe(function(newValue) {
+            self.getPhotos();
+        });
+        self.selectedHours.subscribe(function(newValue) {
+            self.getPhotos();
+        });
+        self.siteNames.subscribe(function(newValue) {
+            self.getPhotos();
+        });
+        self.tagNames.subscribe(function(newValue) {
+            self.getPhotos();
+        });
+        self.dates.subscribe(function(newValue) {
+            self.getPhotos();
+        });
+        self.index.subscribe(function(newValue) {
+            self.getPhotos();
+        });
 
         self.loadMore = function() {
-            console.log("Load more");
-
             var previousIndex = self.index();
             self.index(previousIndex + 1);
         }
@@ -702,77 +726,6 @@
                 }
             });
         }
-
-        self.search = function() {
-            $("#ul-holder").find("li").remove();
-
-            $.ajax("/api/search/getphotos", {
-                data: {
-                    hours: this.hourQuery(),
-                    months: this.selectedMonths().toString(),
-                    sites: this.siteNames,
-                    tags: this.tagNames,
-                    dates: this.dates
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert(textStatus + ': ' + errorThrown);
-                },
-                success: function(data) {
-                    var ids = data.split(',');
-
-                    for (var i in ids) {
-                        var li = "<li class=\"search-photo\"><p class=\"img-date\"></p>" +
-                            "<img id=\"" + ids[i] + "\" class=\"photo\" src=\"/api/photo/low/" + ids[i] + "\" width=\"100\" height=\"67\" />" +
-                            "</li>";
-                        $("#ul-holder").append(li);
-                    }
-                }
-            });
-
-            /*
-            var form;
-            form = $('<form />', {
-                action: '/search/knockoutadvancedsearch',
-                method: 'POST',
-                style: 'display: none;'
-            });
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'hours',
-                value: self.hourQuery()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'months',
-                value: self.selectedMonths().toString()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'sites',
-                value: self.siteNames()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'tags',
-                value: self.tagNames()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'dates',
-                value: self.dates()
-            }));
-            form.appendTo('body').submit();
-            */
-        };
-        
-        //
-        //
-        //inViewport(document.getElementById('load-more'), self.loadMore)
     }
 
     ko.applyBindings(new ViewModel())
