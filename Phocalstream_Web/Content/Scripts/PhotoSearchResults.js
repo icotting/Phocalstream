@@ -14,7 +14,7 @@ $("img.photo").lazyload({
 });
 
 /* Initial slized value, which equals image width. */
-var initialSliderValue = 100;
+var initialSliderValue = 400;
 
 /* Handles showing and sizing the date label. */
 var imgDateSmall = false;

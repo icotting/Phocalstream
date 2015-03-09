@@ -364,6 +364,7 @@
     <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\bootbox.min.js" />
     <Content Include="Content\Scripts\ClientBin.js" />
+    <Content Include="Content\Scripts\InfiniteScroll.js" />
     <Content Include="Content\Scripts\jquery-lazyload.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
     <Content Include="Content\Scripts\jquery-2.1.1.js" />
@@ -382,6 +383,7 @@
     <Content Include="Content\Scripts\PhotoSearchResults.js" />
     <Content Include="Content\Scripts\PhotoTimelapse.js" />
     <Content Include="Content\Scripts\seadragon-min.js" />
+    <Content Include="Content\Scripts\SearchViewModel.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Scripts\TimeLapse.js" />
     <Content Include="Content\Site.css" />

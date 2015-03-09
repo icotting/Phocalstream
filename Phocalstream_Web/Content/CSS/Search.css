@@ -78,17 +78,22 @@ input[type=checkbox] {
 }
 
 .results {
-    height: 94% !important;
-
     position: absolute;
     left: 330px;
     top: 72px;
     right: 0px;
-
-    overflow-y: scroll;
+    bottom: 10px;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
+#ul-holder {
+    position: absolute;
+
+    left: 0px;
+    right: 00px;
+    overflow-y: scroll;
+}
 
 .search-row {
     margin-bottom: 10px;
