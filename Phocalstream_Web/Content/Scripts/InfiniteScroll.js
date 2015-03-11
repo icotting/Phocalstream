@@ -1,173 +1,118 @@
 ﻿// I get more list items and either prepend them or append
 // them to the list depending on the target area.
 function getMoreListItems(container, targetArea, onComplete){
-    // Get the min and max offsets of the current
-    // container.
-    var minIndex = (container.data( "minOffset" ) || 0);
-    var maxIndex = (container.data( "maxOffset" ) || 0);
 
-    // The count of list items to load per AJAX request.
-    // We are calling it a "chunk" size because each
-    // list chunk will be stored in its own sub-container
-    // to make DOM manipulation easier.
-    var chunkSize = 15;
+    var chunkSize = 1;
 
-    // Check our target area to see what our next offset
-    // for loading should be.
+    var minIndex = container.data("minOffset");
+    var maxIndex = container.data("maxOffset");
+
+    if (minIndex == null | maxIndex == null) {
+        console.log("Null index");
+        minIndex = -1;
+        maxIndex = -1;
+    }
+
     if (targetArea == "top"){
-        // We are prepending list items.
-        var nextOffset = (minIndex - 1 - chunkSize);
+        var nextOffset = (minIndex - 1);
     } else {
-        // We are appending list items.
         var nextOffset = (maxIndex + 1);
     }
 
     if (photoIds.length > 0) {
         var slice = photoIds.slice(nextOffset, nextOffset + chunkSize);
         console.log(slice);
-        applyListItems(container, targetArea, slice, nextOffset, nextOffset + chunkSize);
+        applyListItems(container, targetArea, slice, nextOffset);
         onComplete();
     }
-    // Launch AJAX request for next set of results and
-    // store the resultant XHR request with the container.
-    /*
-    container.data(
-        "xhr",
-        $.ajax({
-            type: "get",
-            url: "./bidirectional.cfm",
-            data: {
-                offset: nextOffset,
-                count: chunkSize
-            },
-            dataType: "json",
-            success: function( response ){
-                // Apply the response to the container
-                // for the given target area.
-                applyListItems( container, targetArea, response );
-            },
-            complete: function(){
-                // Remove the stored AJAX request. This
-                // will allow subsequent AJAX requests
-                // to execute.
-                container.removeData( "xhr" );
-
-                // Call the onComplete callback.
-                onComplete();
-            }
-        })
-    );
-    */
 }
 
-
-// I apply the given AJAX response to the container.
-function applyListItems( container, targetArea, items, min, max ){
-    // Get a reference to our HTML template for a new
-    // list item.
+function applyListItems( container, targetArea, items, start){
     var template = $("#list-item-template");
 
     // Create an array to hold our HTML buffer - this will
     // be faster than creating individual DOM elements and
     // appending them piece-wise.
-    var htmlBuffer = [];
+    // var image = "";
 
     // Loop over the array to create each list element.
-    $.each(items, function( index, item ){
-            // Modify the template and append the result
-            // to the HTML buffer.
-            htmlBuffer.push(
-                template.html().replace(
-                    new RegExp( "\\$\\{(id)\\}", "g" ), item)
-            );
+    $.each(items, function (index, item) {
+        // Modify the template and append the result
+        // to the HTML buffer.
+        var image = $(template.html().replace(new RegExp("\\$\\{(id)\\}", "g"), item));
+        image.data("index", start + index);
+
+        //        }
+        //  );
+
+        // Create a list chunk which will hold our data.
+        //    var chunk = $( "<div class='list-chunk'></div>" );
+        //var chunk = $("");
+
+        // Append the list item html buffer to the chunk.
+        //  chunk.append( htmlBuffer.join( "" ) );
+
+        // Create the min and max offset of the chunk.
+        // chunk.data( "minOffset", min );
+        // chunk.data( "maxOffset", max );
+
+        // Check to see which target area we are adding the
+        // list items to (top vs. bottom).
+        if (targetArea == "top") {
+
+            // Get the current window scroll before we update
+            // the list contente.
+            var topBefore = container.scrollTop();
+
+            // Prepend list items.
+            container.prepend(image);
+            container.scrollTop(topBefore + image.height());
+
+            // Now that we moved the list up, let's remove
+            // the last chunk from the list.
+            //        container.find( "> div.list-chunk:last" ).remove();
+
+            if (container.children().size() > 100) {
+                var oldChunk = container.children(":last");
+
+                oldChunkBottom = oldChunk.offset().top + oldChunk.height();
+                oldChunk.remove();
+                
+//                var viewBottom = $(window).
+            }
+
+        } else {
+
+            var topBefore = container.scrollTop();
+
+            console.log("BEFORE: ScrollHeight: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
+
+            // Append list items.
+            container.append(image);
+            container.scrollTop(topBefore - image.height());
+
+            console.log("AFTER: ScrollHieght: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
+            
+            if (container.children().size() > 100) {
+                var oldChunk = container.children(":first");
+
+                console.log("BEFORE: ScrollHeight: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
+
+                var oldChuckTop = oldChunk.offset().top;
+                oldChunk.remove();
+
+                console.log("AFTER: ScrollHieght: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
+
+                //var viewTop = container.scrollTop();
+                //var difference = (-oldChuckTop + 3 + container.offset().top) - viewTop;
+
+//                container.scrollTop(viewTop - difference);
+            }
         }
-    );
+    });
 
-    // Create a list chunk which will hold our data.
-    var chunk = $( "<div class='list-chunk'></div>" );
-    //var chunk = $("");
-
-    // Append the list item html buffer to the chunk.
-    chunk.append( htmlBuffer.join( "" ) );
-
-    // Create the min and max offset of the chunk.
-    chunk.data( "minOffset", min );
-    chunk.data( "maxOffset", max );
-
-    // Check to see which target area we are adding the
-    // list items to (top vs. bottom).
-    if (targetArea == "top"){
-
-        // Get the current window scroll before we update
-        // the list contente.
-        var viewTop = $(window).scrollTop();
-
-        // Prepend list items.
-        container.prepend( chunk );
-
-        // Now that the chunk has been added to the page,
-        // it should have a height that can be calculated.
-        var chunkHeight = chunk.height();
-
-        // Re-adjust the scroll of the window to make sure
-        // the user doesn't suddenly jump to a crazy place.
-        $( window ).scrollTop( viewTop + chunkHeight );
-
-        // Now that we moved the list up, let's remove
-        // the last chunk from the list.
-//        container.find( "> div.list-chunk:last" ).remove();
-
-    } else {
-
-        // Append list items.
-        container.append(chunk);
-
-        console.log("Chunk height: " + chunk.height());
-
-        // Check to see if we have more chunks than we
-        // want (an arbitrary number, but enough to make
-        // sure we can comfortable fill the page).
-        if (container.children().size() > 3){
-
-            // We want to remove the first chunk in the
-            // list to free up some browser memory.
-
-            // Get the current window scroll before we
-            // remove a chunk.
-            var viewTop = $( window ).scrollTop();
-
-            // Get the chunk that we are going to remove.
-            var oldChunk = container.children( ":first" );
-
-            // Get the height of the chunk we are about
-            // to remove.
-            var oldChunkHeight = oldChunk.height();
-
-            // Remove the hunk.
-//            oldChunk.remove();
-
-            // Now, we need to ajust the scroll offset
-            // of the window so the user is not jumped
-            // around to a crazy place.
-            $( window ).scrollTop( viewTop - oldChunkHeight );
-
-        }
-
-    }
-
-    // Now that we have updated the chunks in the
-    // container, let's update the min / max offsets of
-    // the container (which will be used on subsequent
-    // AJAX requests).
-    container.data(
-        "minOffset",
-        container.children( ":first" ).data( "minOffset" )
-    );
-
-    container.data(
-        "maxOffset",
-        container.children( ":last" ).data( "maxOffset" )
-    );
+    container.data("minOffset", container.children( ":first" ).data( "index" ));
+    container.data("maxOffset", container.children( ":last" ).data( "index" ));
 }
 
 
@@ -183,9 +128,7 @@ function applyListItems( container, targetArea, items, min, max ){
 // business logic might be required to see if loading
 // truly needs to take place).
 function isMoreListItemsNeeded( container ){
-    // Create a default return. This return value contains
-    // requirements for both the top and bottom of the
-    // content list.
+
     var result = {
         top: false,
         bottom: false
@@ -198,49 +141,33 @@ function isMoreListItemsNeeded( container ){
     var viewBottom = (viewTop + $( window ).height());
 
     // Get the offset of the top of the list container.
-    var containerTop = container.offset().top;
+    var containerTop = container.scrollTop();
+    var containerBottom = container.prop('scrollHeight') - containerTop;
+    // var containerBottom = Math.floor(containerTop + container.height());
 
-    // Get the offset of the bottom of the list container.
-    var containerBottom = Math.floor(containerTop + container.height());
-
-    // I am the scroll buffers for the top and the bottom;
-    // this is the amount of pre-top and pre-bottom space
-    // we want to take into account before we start
-    // loading the next items.
-    //
     // NOTE: The top buffer is a bit bigger only to make
     // the transition feel a bit *safer*.
-    var topScrollBuffer = 500;
-    var bottomScrollBuffer = 200;
+    var topScrollBuffer = 1000;
+    var bottomScrollBuffer = 500;
 
-    // Check to see if the container top is close enough
-    // (with buffer) to the top scroll of the view frame
-    // to trigger loading more items (at the top).
-    if ((containerTop + topScrollBuffer) >= viewTop){
-        // Flag requirement at top.
+//    console.log("viewBottom: " + viewBottom + ", containerTop: " + containerTop + ", containerBottom: " + containerBottom);
+
+    // TOP
+    if (topMoved && containerTop < bottomScrollBuffer){
         result.top = true;
     }
-    result.top = false;
+    // Check for the view to have moved out of the 
+    // threshhold before trying to load above it
+    else if (containerTop > topScrollBuffer) {
+        topMoved = true;
+    }
 
-    // Check to see if the container bottom is close
-    // enought (with buffer) to the scroll of the view
-    // frame to trigger loading more items (at the
-    // bottom).
+    // BOTTOM
     if ((containerBottom - bottomScrollBuffer) <= viewBottom){
-        // Flag requirement at bottom.
         result.bottom = true;
     }
 
-
-    //========================//
-    //========================//
-
-    console.log("viewTop: " + viewTop + ", viewBottom: " + viewBottom + ", containerTop: " + containerTop + ", containerBottom: " + containerBottom);
-    console.log(result);
-
-    //========================//
-    //========================//
-
+//    console.log(result);
 
     // Return the requirments for the loading.
     return( result );
@@ -273,7 +200,7 @@ function checkListItemContents( container ){
     var max = (container.data("maxOffset") || 0);
 
     if (isMoreLoading.top && container.data("minOffset") &&
-            (container.data("minOffset") > 1)) {
+            (container.data("minOffset") > 0)) {
 
         // Load and prepend more list items.
         getMoreListItems(container, "top", onComplete);
@@ -307,6 +234,11 @@ jQuery(function( $ ){
             // Hand the control-flow off to the method
             // that worries about the list content.
             checkListItemContents( container );
+        }
+    );
+
+    $("#ul-holder").bind("scroll", function (event) {
+            checkListItemContents(container);
         }
     );
 

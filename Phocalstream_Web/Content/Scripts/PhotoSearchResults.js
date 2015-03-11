@@ -153,6 +153,8 @@ function resizeThumbnail(size) {
     scaleOrHideLabel(size);
     computeHolderMargin(size);
 
+    checkListItemContents($("#ul-holder"));
+
 }
 
 /*

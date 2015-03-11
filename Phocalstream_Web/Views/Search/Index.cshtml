@@ -29,6 +29,7 @@
     var limit = 1000;
     var visibleItems = "";
     var saveIds = "";
+    var topMoved = false;
 
     // dependency variables for PhotoSearchResults.js
     var totalPhotoCount = 0;
@@ -45,6 +46,13 @@
 
 <!-- LEFT: Search Parameters-->
 <div class="search-params">
+    <div data-bind="visible: search() === false" class="col-md-12">
+        <p class="alert alert-warning"><strong>Please selected at least one search parameter.</strong></p>
+    </div>
+    <div data-bind="visible: queryResults() == 0" class="col-md-12">
+        <p class="alert alert-info"><strong>No images found.</strong></p>
+    </div>
+
     <!-- Sort By -->
     <div class="search-row row">
         <div class="col-md-12">
@@ -220,30 +228,19 @@
 </div>
 
 <!-- RIGHT: Results-->
-<div class="results">
-    <div id="partial" class="">
-        <div data-bind="visible: search() === false" class="col-md-10 col-md-offset-1">
-            <p class="alert alert-warning"><strong>Please selected at least one search parameter.</strong></p>
-        </div>
-        <div data-bind="visible: queryResults() == 0" class="col-md-10 col-md-offset-1">
-            <p class="alert alert-info"><strong>No images found.</strong></p>
-        </div>
+<ul id="ul-holder" data-bind=""> </ul>
 
-        <ul id="ul-holder" class="col-md-12" data-bind=""> </ul>
-
-            <!--
-        <ul id="ul-holder" class="col-md-12" data-bind="visible: queryResults() > 0, foreach: photos">
-            <li data-bind="attr: { id: 'photo-li-' + $data }" class="search-photo">
-                <p class="img-date"></p>
-                <img data-bind="attr: { id: 'photo-' + $data, src: '/api/photo/low/' + $data }, click: $root.selectPhoto" class="photo" />
-            </li>
-        </ul>
-        -->
-            <div class="col-md-4 col-md-offset-4">
-                <button id="load-more" class="btn btn-info full-width" data-bind="click: loadMore, visible: remainingCount() > 0">Load <span data-bind="text: remainingCount"></span> More Photos</button>
-            </div>
-</div>
-</div>
+    <!--
+<ul id="ul-holder" class="col-md-12" data-bind="visible: queryResults() > 0, foreach: photos">
+    <li data-bind="attr: { id: 'photo-li-' + $data }" class="search-photo">
+        <p class="img-date"></p>
+        <img data-bind="attr: { id: 'photo-' + $data, src: '/api/photo/low/' + $data }, click: $root.selectPhoto" class="photo" />
+    </li>
+</ul>
+-->
+    <div class="col-md-4 col-md-offset-4">
+        <button id="load-more" class="btn btn-info full-width" data-bind="click: loadMore, visible: remainingCount() > 0">Load <span data-bind="text: remainingCount"></span> More Photos</button>
+    </div>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -386,7 +383,7 @@
 <script id="list-item-template" type="application/template">
     <li id="photo-li-${id}" class="search-photo">
         <p class="img-date"></p>
-        <img src="/api/photo/low/${id}" id="photo-${id}" data-bind="click: $root.selectPhoto" class="photo" style="height: 267px;"/>
+        <img src="/api/photo/low/${id}" id="photo-${id}" data-bind="click: $root.selectPhoto" class="photo" style="width: 400px; height: 267px;"/>
     </li>
 </script>
 
