@@ -39,7 +39,11 @@ function applyListItems( container, targetArea, items, start){
     $.each(items, function (index, item) {
         // Modify the template and append the result
         // to the HTML buffer.
-        var image = $(template.html().replace(new RegExp("\\$\\{(id)\\}", "g"), item));
+        var image = $(template.html()
+                .replace(new RegExp("\\$\\{(id)\\}", "g"), item)
+                .replace(new RegExp("\\$\\{(width)\\}", "g"), initialSliderValue)
+                .replace(new RegExp("\\$\\{(height)\\}", "g"), getImgHeight(initialSliderValue))
+            );
         image.data("index", start + index);
 
         //        }
@@ -59,54 +63,35 @@ function applyListItems( container, targetArea, items, start){
         // Check to see which target area we are adding the
         // list items to (top vs. bottom).
         if (targetArea == "top") {
-
             // Get the current window scroll before we update
-            // the list contente.
             var topBefore = container.scrollTop();
 
             // Prepend list items.
             container.prepend(image);
             container.scrollTop(topBefore + image.height());
 
-            // Now that we moved the list up, let's remove
-            // the last chunk from the list.
-            //        container.find( "> div.list-chunk:last" ).remove();
-
-            if (container.children().size() > 100) {
+            // see if items need to be removed
+            if (container.children().size() > limit) {
                 var oldChunk = container.children(":last");
 
                 oldChunkBottom = oldChunk.offset().top + oldChunk.height();
                 oldChunk.remove();
-                
-//                var viewBottom = $(window).
             }
-
-        } else {
-
+        } 
+        else {
+            // Get the current window scroll before we update
             var topBefore = container.scrollTop();
-
-            console.log("BEFORE: ScrollHeight: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
 
             // Append list items.
             container.append(image);
             container.scrollTop(topBefore - image.height());
 
-            console.log("AFTER: ScrollHieght: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
-            
-            if (container.children().size() > 100) {
+            // see if items need to be removed
+            if (container.children().size() > limit) {
                 var oldChunk = container.children(":first");
-
-                console.log("BEFORE: ScrollHeight: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
 
                 var oldChuckTop = oldChunk.offset().top;
                 oldChunk.remove();
-
-                console.log("AFTER: ScrollHieght: " + container.prop('scrollHeight') + ", ScrollTop: " + container.scrollTop());
-
-                //var viewTop = container.scrollTop();
-                //var difference = (-oldChuckTop + 3 + container.offset().top) - viewTop;
-
-//                container.scrollTop(viewTop - difference);
             }
         }
     });
@@ -121,12 +106,6 @@ function applyListItems( container, targetArea, items, start){
 // the container. I return a complex result that not only
 // determines IF more list items are needed, but on what
 // end of the list.
-//
-// NOTE: These calculate are based ONLY on the offset of
-// the list container in the context of the view frame.
-// This does not take anything else into account (more
-// business logic might be required to see if loading
-// truly needs to take place).
 function isMoreListItemsNeeded( container ){
 
     var result = {
@@ -134,23 +113,16 @@ function isMoreListItemsNeeded( container ){
         bottom: false
     };
 
-    // Get the view frame for the window - this is the
-    // top and bottom coordinates of the visible slice of
-    // the document.
-    var viewTop = $( window ).scrollTop();
-    var viewBottom = (viewTop + $( window ).height());
+    var viewTop = $(window).scrollTop();
+    var viewBottom = (viewTop + $(window).height());
 
     // Get the offset of the top of the list container.
     var containerTop = container.scrollTop();
     var containerBottom = container.prop('scrollHeight') - containerTop;
-    // var containerBottom = Math.floor(containerTop + container.height());
 
-    // NOTE: The top buffer is a bit bigger only to make
-    // the transition feel a bit *safer*.
     var topScrollBuffer = 1000;
-    var bottomScrollBuffer = 500;
+    var bottomScrollBuffer = 1000;
 
-//    console.log("viewBottom: " + viewBottom + ", containerTop: " + containerTop + ", containerBottom: " + containerBottom);
 
     // TOP
     if (topMoved && containerTop < bottomScrollBuffer){
@@ -167,9 +139,6 @@ function isMoreListItemsNeeded( container ){
         result.bottom = true;
     }
 
-//    console.log(result);
-
-    // Return the requirments for the loading.
     return( result );
 }
 
@@ -177,8 +146,7 @@ function isMoreListItemsNeeded( container ){
 // I check to see if more list items are needed, and, if
 // they are, I load them.
 function checkListItemContents( container ){
-    // Check to see if more items need to be loaded at
-    // the top or the bottom (based purely on position).
+
     // Returns: { top: boolean, bottom: boolean }.
     var isMoreLoading = isMoreListItemsNeeded( container );
 

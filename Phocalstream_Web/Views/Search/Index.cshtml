@@ -26,7 +26,7 @@
 
 <script>
     var photoIds = [];
-    var limit = 1000;
+    var limit = 50;
     var visibleItems = "";
     var saveIds = "";
     var topMoved = false;
@@ -238,9 +238,6 @@
     </li>
 </ul>
 -->
-    <div class="col-md-4 col-md-offset-4">
-        <button id="load-more" class="btn btn-info full-width" data-bind="click: loadMore, visible: remainingCount() > 0">Load <span data-bind="text: remainingCount"></span> More Photos</button>
-    </div>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -383,7 +380,7 @@
 <script id="list-item-template" type="application/template">
     <li id="photo-li-${id}" class="search-photo">
         <p class="img-date"></p>
-        <img src="/api/photo/low/${id}" id="photo-${id}" data-bind="click: $root.selectPhoto" class="photo" style="width: 400px; height: 267px;"/>
+        <img src="/api/photo/low/${id}" id="photo-${id}" data-bind="click: $root.selectPhoto" class="photo" style="width: ${width}px; height: ${height}px;"/>
     </li>
 </script>
 

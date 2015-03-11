@@ -31,31 +31,6 @@ function ViewModel() {
         
     self.search = ko.observable(false);
 
-    self.index = ko.observable(0);
-    self.index.extend({ notify: 'always' });
-
-    self.remainingCount = ko.computed(function () {
-        var total = 0;
-        if (self.queryResults) {
-            var total = self.queryResults();
-        }
-
-        var currentlyShown = (self.index() + 1) * limit;
-
-        if (total <= currentlyShown) {
-            return 0;
-        }
-        else {
-            var nextShown = currentlyShown + limit;
-            if (total <= nextShown) {
-                return total - currentlyShown;
-            }
-            else {
-                return limit;
-            }
-        }
-    });
-
     self.group = ko.observable("site");
 
     self.selectedPhotos = ko.observableArray();
@@ -344,9 +319,6 @@ function ViewModel() {
     });
 
     self.queryResults = asyncComputed(function () {
-        // This is only trigged if the query changes, so reset paginations
-        self.index(0);
-
         return $.ajax("/api/search/count", {
             data: {
                 hours: this.hourQuery(),
@@ -360,15 +332,25 @@ function ViewModel() {
     }, this);
     self.queryResults.extend({ notify: 'always' });
         
+    self.reset = function () {
+        // reset current list of ids
+        photoIds = [];
+        self.photos.removeAll();
+        self.selectedPhotos.removeAll();
+
+        visibleItems = "";
+        totalPhotoCount = 0;
+
+        // remove current photos
+        $("#ul-holder").empty();
+        $("#ul-holder").data("minOffset", 0);
+        $("#ul-holder").data("maxOffset", 0);
+    }
+
     self.getPhotos = function() {
         if (self.query() == "Searching for all photos") {
             self.search(false);
-
-            self.photos.removeAll();
-            self.selectedPhotos.removeAll();
-
-            visibleItems = "";
-            totalPhotoCount = 0;
+            self.reset();
         }
         else {
             self.search(true);
@@ -380,9 +362,7 @@ function ViewModel() {
                     sites: this.siteNames,
                     tags: this.tagNames,
                     dates: this.dates,
-                    group: this.group(),
-                    index: this.index,
-                    limit: limit
+                    group: this.group()
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     alert(textStatus + ': ' + errorThrown);
@@ -391,32 +371,17 @@ function ViewModel() {
                     // Split the data into an array of photo ids
                     var ids = data.split(',');
                     
-                    // If the index == 0, then this is the first batch of photos for the query
-                    // So the previous query should be removed
-                    if (self.index() == 0) {
-                        photoIds = [];
-
-                        self.photos.removeAll();
-                        self.selectedPhotos.removeAll();
-
-                        photoIds = ids;
-                        visibleItems = data;
-                        totalPhotoCount = ids.length;
-                    } 
-                        // Else, just append the data and sum the length
-                    else {
-                        photoIds.pushAll(ids);
-                        visibleItems += "," + data;
-                        totalPhotoCount += ids.length;
-                    }
+                    photoIds = ids;
+                    visibleItems = data;
+                    totalPhotoCount = ids.length;
 
                     // Add the new photos to the array, then let Knockout know the value changed
                     var array = self.photos();
                     ko.utils.arrayPushAll(array, ids);
                     self.photos.valueHasMutated();
 
+                    // Kick off the lazy loading
                     checkListItemContents($("#ul-holder"));
-//                    applyListItems($("#ul-holder"), "bottom", self.photos());
 
                     // Initialize the views for proper size
                     initialize();
@@ -440,14 +405,6 @@ function ViewModel() {
     self.dates.subscribe(function(newValue) {
         self.getPhotos();
     });
-    self.index.subscribe(function(newValue) {
-        self.getPhotos();
-    });
-
-    self.loadMore = function() {
-        var previousIndex = self.index();
-        self.index(previousIndex + 1);
-    }
 
     self.timelapse = function() {
         var timelapseIds = "";

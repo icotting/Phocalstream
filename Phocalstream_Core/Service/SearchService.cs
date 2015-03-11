@@ -291,10 +291,6 @@ namespace Phocalstream_Service.Service
                }
 
                select.Append(" Photos.Captured");
-
-               // THIS IS DEPENDENT ON A ORDER BY BEING PRESENT
-               select.Append(" OFFSET " + Convert.ToString(model.Index * model.Limit) + " ROWS");
-               select.Append(" FETCH NEXT " + Convert.ToString(model.Limit) + " ROWS ONLY");
            }
  
             return select.ToString();
