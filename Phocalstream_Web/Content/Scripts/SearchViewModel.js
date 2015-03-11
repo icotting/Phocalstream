@@ -32,6 +32,9 @@ function ViewModel() {
     self.search = ko.observable(false);
 
     self.group = ko.observable("site");
+    self.group.subscribe(function (newSize) {
+        self.getPhotos();
+    });
 
     self.selectedPhotos = ko.observableArray();
     self.selectedCount = ko.computed(function() {
@@ -318,20 +321,6 @@ function ViewModel() {
         }
     });
 
-    self.queryResults = asyncComputed(function () {
-        return $.ajax("/api/search/count", {
-            data: {
-                hours: this.hourQuery(),
-                months: this.selectedMonths().toString(),
-                sites: this.siteNames,
-                tags: this.tagNames,
-                dates: this.dates,
-                group: this.group()
-            }
-        });
-    }, this);
-    self.queryResults.extend({ notify: 'always' });
-        
     self.reset = function () {
         // reset current list of ids
         photoIds = [];
@@ -345,8 +334,24 @@ function ViewModel() {
         $("#ul-holder").empty();
         $("#ul-holder").data("minOffset", 0);
         $("#ul-holder").data("maxOffset", 0);
-    }
+    };
 
+    self.queryResults = asyncComputed(function () {
+        self.reset();
+
+        return $.ajax("/api/search/count", {
+            data: {
+                hours: this.hourQuery(),
+                months: this.selectedMonths().toString(),
+                sites: this.siteNames,
+                tags: this.tagNames,
+                dates: this.dates,
+                group: this.group()
+            }
+        });
+    }, this);
+    self.queryResults.extend({ notify: 'always' });
+        
     self.getPhotos = function() {
         if (self.query() == "Searching for all photos") {
             self.search(false);
