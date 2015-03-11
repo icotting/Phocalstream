@@ -24,6 +24,11 @@
 <script src="~/Content/Scripts/knockout-3.2.0.js"></script>
 <script src="~/Content/Scripts/SearchViewModel.js"></script>
 
+<!-- Context Menu -->
+<script src="~/Content/Scripts/jquery.contextMenu.js"></script>
+<script src="~/Content/Scripts/jquery.ui.position.js"></script>
+<link href="~/Content/CSS/jquery.contextMenu.css" rel="stylesheet" >
+
 <script>
     var photoIds = [];
     var limit = 500;
@@ -38,6 +43,18 @@
     $(function(){
         var searchVM = new ViewModel();
         ko.applyBindings(searchVM);
+    
+        $.contextMenu({
+            selector: '.photo', 
+            callback: function(key, options) {
+                if (key == "full") {
+                    window.open(basePhotoUrl + $(this).prop('id').split('-')[1], '_blank');
+                }
+            },
+            items: {
+                "full": {name: "View Full Image", icon: ""},
+            }
+        });
     });
 </script>
 
