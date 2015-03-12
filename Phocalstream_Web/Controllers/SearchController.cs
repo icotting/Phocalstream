@@ -50,7 +50,7 @@ namespace Phocalstream_Web.Controllers
         public ICollectionService CollectionService { get; set; }
 
 
-        public ActionResult Index(string tag = "", string site = "")
+        public ActionResult Index(string tag = "", string site = "", string year = "")
         {
             SearchModel model = new SearchModel();
 
@@ -71,6 +71,7 @@ namespace Phocalstream_Web.Controllers
 
             ViewBag.Tag = tag;
             ViewBag.Site = site;
+            ViewBag.Year = year;
 
             return View(model);
         }

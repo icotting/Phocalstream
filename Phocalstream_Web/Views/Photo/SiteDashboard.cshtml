@@ -27,7 +27,7 @@
                 "This may take some time to load. Please be patient."
         bootbox.confirm(msg, function (result) {
             if (result) {
-                location.href = '@Url.Action("CameraCollection", "Photo", new { @siteID = @Model.CollectionViewModel.Collection.Site.ID })';
+                location.href = '@Url.Action("Index", "Search", new { @site = @Model.CollectionViewModel.Collection.Site.Name })';
             }
         });
             }

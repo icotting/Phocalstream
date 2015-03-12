@@ -36,6 +36,8 @@
     var saveIds = "";
     var topMoved = false;
 
+    var yearQuery = '@ViewBag.Year';
+
     // dependency variables for PhotoSearchResults.js
     var totalPhotoCount = 0;
     var basePhotoUrl = "@Url.Action("Index", "Photo", null)?photoId=";
@@ -141,7 +143,7 @@
     <div class="search-row">
         <div class="input-group">
             <span class="input-group-addon">Dates</span>
-            <input class="form-control" data-bind="value: dates" />
+            <input id="date-field" class="form-control" data-bind="value: dates" />
         </div>
     </div>
 
@@ -336,6 +338,7 @@
         if (sites.indexOf(site) != -1) {
             $('#site-field').tagsinput('add', site);
         }
+
     });
 
 

@@ -357,6 +357,8 @@ namespace Phocalstream_Web.Controllers
         {
             List<ThumbnailModel> Years = new List<ThumbnailModel>();
 
+            string siteName = CollectionRepository.Find(c => c.Site.ID == siteID).FirstOrDefault().Site.Name;
+
             List<int> yearStrings = PhotoRepository.Find(p => p.Site.ID == siteID).Select(p => p.Captured.Year).Distinct().ToList<int>();
 
             foreach (int y in yearStrings)
@@ -370,14 +372,13 @@ namespace Phocalstream_Web.Controllers
                 model.PhotoCount = photos.Count();
                 model.First = photos[0].Captured;
                 model.Last = photos[photos.Count() - 1].Captured;
-
-
+                
                 photos = photos.Where(p => p.Captured.Hour > 12 && p.Captured.Hour < 16).ToArray();
 
                 Random rand = new Random();
                 model.CoverPhotoID = photos[rand.Next(photos.Length)].ID;
 
-                model.Link = "/Photo/CameraCollection?siteID=" + siteID.ToString() + "&year=" + model.Name;
+                model.Link = "/Search/Index?site=" + siteName + "&year=" + model.Name;
 
                 Years.Add(model);
             }

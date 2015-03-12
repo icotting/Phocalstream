@@ -82,7 +82,7 @@ function ViewModel() {
 
     self.siteNames = ko.observable();
     self.tagNames = ko.observable();
-    self.dates = ko.observable();
+    self.dates = ko.observable(yearQuery);
 
     self.selectedMonths = ko.observableArray();
     self.months = ko.observableArray([
