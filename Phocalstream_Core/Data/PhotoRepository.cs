@@ -203,7 +203,6 @@ namespace Phocalstream_Web.Application.Data
             }
             return photos;
         }
-        
 
         public System.Xml.XmlDocument CreateDeepZoomForSite(long siteID)
         {

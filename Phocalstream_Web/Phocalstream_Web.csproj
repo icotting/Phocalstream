@@ -313,6 +313,7 @@
     <Content Include="Content\CSS\bootstrap-slider.css" />
     <Content Include="Content\CSS\CollectionThumbnail.css" />
     <Content Include="Content\CSS\jquery-ui-slider.css" />
+    <Content Include="Content\CSS\jquery.contextMenu.css" />
     <Content Include="Content\CSS\Timelapse.css" />
     <Content Include="Content\file-upload\jquery.fileupload-ui-noscript.css" />
     <Content Include="Content\file-upload\jquery.fileupload-ui.css" />
@@ -364,12 +365,15 @@
     <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\bootbox.min.js" />
     <Content Include="Content\Scripts\ClientBin.js" />
+    <Content Include="Content\Scripts\InfiniteScroll.js" />
     <Content Include="Content\Scripts\jquery-lazyload.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
     <Content Include="Content\Scripts\jquery-2.1.1.js" />
     <Content Include="Content\Scripts\jquery-2.1.1.min.js" />
     <Content Include="Content\Scripts\jquery-ui-1.8.20.min.js" />
     <Content Include="Content\Scripts\jquery-ui-1.9.2.js" />
+    <Content Include="Content\Scripts\jquery.contextMenu.js" />
+    <Content Include="Content\Scripts\jquery.ui.position.js" />
     <Content Include="Content\Scripts\jquery.ui.widget.js" />
     <Content Include="Content\Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Content\Scripts\jquery.validate.min.js" />
@@ -382,6 +386,7 @@
     <Content Include="Content\Scripts\PhotoSearchResults.js" />
     <Content Include="Content\Scripts\PhotoTimelapse.js" />
     <Content Include="Content\Scripts\seadragon-min.js" />
+    <Content Include="Content\Scripts\SearchViewModel.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Scripts\TimeLapse.js" />
     <Content Include="Content\Site.css" />

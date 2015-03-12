@@ -121,7 +121,7 @@ function computeHolderMargin(width) {
     var usedWidth = Math.min(numberOfPhotosAcross, totalPhotoCount) * imgWidth;
     var remainder = totalWidth - usedWidth;
 
-    $(".ul-holder").css("margin-left", (remainder / 2) + "px");
+    $("#ul-holder").css("margin-left", (remainder / 2) + "px");
 }
 
 
@@ -144,6 +144,18 @@ $(function () {
     });
 });
 
+
+function resizeThumbnail(size) {
+    initialSliderValue = size;
+
+    setText(size);
+    setImage(size);
+    scaleOrHideLabel(size);
+    computeHolderMargin(size);
+
+    checkListItemContents($("#ul-holder"));
+
+}
 
 /*
  * Called to initialize the image, text, and margin size

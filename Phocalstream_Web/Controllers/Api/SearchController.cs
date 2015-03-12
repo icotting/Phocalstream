@@ -69,5 +69,26 @@ namespace Phocalstream_Web.Controllers.Api
             return message;
 
         }
+
+        [HttpGet]
+        [ActionName("getphotos")]
+        public HttpResponseMessage SearchGetPhotos(string hours, string months, string sites, string tags, string dates, string group)
+        {
+            SearchModel model = new SearchModel();
+            model.Sites = sites;
+            model.Tags = tags;
+            model.Dates = dates;
+            model.Hours = hours;
+            model.Months = months;
+            model.Group = group;
+
+            List<long> ids = SearchService.SearchResultPhotoIds(model);
+
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+            message.Content = new StringContent(string.Join(",", ids));
+
+            return message;
+
+        }
     }
 }
