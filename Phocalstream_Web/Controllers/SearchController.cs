@@ -50,7 +50,7 @@ namespace Phocalstream_Web.Controllers
         public ICollectionService CollectionService { get; set; }
 
 
-        public ActionResult Index(string tag = "", string site = "", string year = "")
+        public ActionResult Index(long collectionId = -1, string tag = "", string site = "", string year = "")
         {
             SearchModel model = new SearchModel();
 
@@ -69,6 +69,22 @@ namespace Phocalstream_Web.Controllers
                 model.UserCollections = userCollectionModel;
             }
 
+
+            Collection collection = CollectionRepository.Find(c => c.ID == collectionId).FirstOrDefault();
+            if (collection != null && collection.Type == CollectionType.USER) 
+            {
+                // If the collection is a user collection, and it does not belong to current user
+                if (User == null || collection.Owner.ID != User.ID)
+                {
+                    collection = null;
+                }
+            }
+            // Either not a user collection, or a properly owned user collection
+            if (collection != null)
+            {
+                ViewBag.CollectionId = collection.ID;
+            }
+            
             ViewBag.Tag = tag;
             ViewBag.Site = site;
             ViewBag.Year = year;

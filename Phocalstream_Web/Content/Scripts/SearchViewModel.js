@@ -28,19 +28,23 @@ function asyncComputed(evaluator, owner) {
 
 function ViewModel() {
     var self = this;
-        
+    
+    // a boolean that marks whether a search parameter has been entered
     self.search = ko.observable(false);
 
+    // controls the toggle for grouping photos by site
     self.group = ko.observable("site");
     self.group.subscribe(function (newSize) {
         self.getPhotos();
     });
 
+    // array containing ids of photos the user selected
     self.selectedPhotos = ko.observableArray();
     self.selectedCount = ko.computed(function() {
         return self.selectedPhotos().length;
     });
 
+    // function to handle selecting a photo
     self.selectPhoto = function (item) {
         var id = item;
 
@@ -60,10 +64,9 @@ function ViewModel() {
         return true;
     }
 
-
+    // handle changes to thumbnail size
     self.sizes = [{name: "Small"}, {name: "Medium"}, {name: "Large"}]; 
     self.size = ko.observable(self.sizes[0]);
-
     self.size.subscribe(function (newSize) {
         switch (newSize.name) {
             case 'Small' :
@@ -78,7 +81,12 @@ function ViewModel() {
         }
     });
 
-    self.photos = ko.observableArray([]);
+    // selected collection id
+    self.collectionId = ko.observable();
+    self.collectionId.subscribe(function (newSize) {
+        self.query();
+        self.getPhotos();
+    });
 
     self.siteNames = ko.observable();
     self.tagNames = ko.observable();
@@ -86,46 +94,20 @@ function ViewModel() {
 
     self.selectedMonths = ko.observableArray();
     self.months = ko.observableArray([
-        new Month(1, "January"),
-        new Month(2, "February"),
-        new Month(3, "March"),
-        new Month(4, "April"),
-        new Month(5, "May"),
-        new Month(6, "June"),
-        new Month(7, "July"),
-        new Month(8, "August"),
-        new Month(9, "September"),
-        new Month(10, "October"),
-        new Month(11, "November"),
-        new Month(12, "December")
+        new Month(1, "January"),     new Month(2, "February"),  new Month(3, "March"),
+        new Month(4, "April"),       new Month(5, "May"),       new Month(6, "June"),
+        new Month(7, "July"),        new Month(8, "August"),    new Month(9, "September"),
+        new Month(10, "October"),    new Month(11, "November"), new Month(12, "December")
     ]);
 
     self.selectedHours = ko.observableArray();
     self.hours = ko.observableArray([
-        new Hour(0, "0000"),
-        new Hour(1, "0100"),
-        new Hour(2, "0200"),
-        new Hour(3, "0300"),
-        new Hour(4, "0400"),
-        new Hour(5, "0500"),
-        new Hour(6, "0600"),
-        new Hour(7, "0700"),
-        new Hour(8, "0800"),
-        new Hour(9, "0900"),
-        new Hour(10, "1000"),
-        new Hour(11, "1100"),
-        new Hour(12, "1200"),
-        new Hour(13, "1300"),
-        new Hour(14, "1400"),
-        new Hour(15, "1500"),
-        new Hour(16, "1600"),
-        new Hour(17, "1700"),
-        new Hour(18, "1800"),
-        new Hour(19, "1900"),
-        new Hour(20, "2000"),
-        new Hour(21, "2100"),
-        new Hour(22, "2200"),
-        new Hour(23, "2300")
+        new Hour(0, "0000"),        new Hour(1, "0100"),        new Hour(2, "0200"),        new Hour(3, "0300"),
+        new Hour(4, "0400"),        new Hour(5, "0500"),        new Hour(6, "0600"),        new Hour(7, "0700"),
+        new Hour(8, "0800"),        new Hour(9, "0900"),        new Hour(10, "1000"),       new Hour(11, "1100"),
+        new Hour(12, "1200"),       new Hour(13, "1300"),       new Hour(14, "1400"),       new Hour(15, "1500"),
+        new Hour(16, "1600"),       new Hour(17, "1700"),       new Hour(18, "1800"),       new Hour(19, "1900"),
+        new Hour(20, "2000"),       new Hour(21, "2100"),       new Hour(22, "2200"),       new Hour(23, "2300")
     ]);
 
     self.toggleAssociation = function (item) {
@@ -135,6 +117,7 @@ function ViewModel() {
         return true;
     }
 
+    // utilty function to clear the selected months
     clearMonths = function() {
         ko.utils.arrayForEach(self.selectedMonths(), function(month) {
             self.toggleAssociation(self.months()[month - 1]);
@@ -142,6 +125,7 @@ function ViewModel() {
         self.selectedMonths.removeAll();
     }
 
+    // utilty function to clear the selected times
     clearTimes = function() {
         ko.utils.arrayForEach(self.selectedHours(), function(hour) {
             self.toggleAssociation(self.hours()[hour.substring(0,2)]);
@@ -149,6 +133,7 @@ function ViewModel() {
         self.selectedHours.removeAll();
     }
 
+    // utilty function to clear the selected photos
     clearSelected = function() {
         ko.utils.arrayForEach(self.selectedPhotos(), function (id) {
             var img = $("#photo-" + id);
@@ -158,6 +143,7 @@ function ViewModel() {
         self.selectedPhotos.removeAll();
     }
 
+    // utility function to create month query string
     self.monthText = ko.computed(function () {
         var monthsSelected = self.selectedMonths();
         monthsSelected.sort(function(a, b){return a-b} );
@@ -175,6 +161,7 @@ function ViewModel() {
         return monthNameArray.join(', ');
     });
 
+    // utility function to create hour query string
     self.hourText = ko.computed(function () {
         var hoursSelected = self.selectedHours();
         hoursSelected.sort();
@@ -182,6 +169,7 @@ function ViewModel() {
         return hoursSelected.join(', ');
     });
 
+    // utility function to create hour query string
     self.hourQuery = ko.computed(function () {
         var hours = self.selectedHours();
 
@@ -193,11 +181,23 @@ function ViewModel() {
         return trimmedHours.toString();
     });
 
+    // array of photo ids
+    self.photos = ko.observableArray();
+
     self.query = ko.computed(function () {
         var found = false;
         var q = "Searching for photos ";
 
+        if (self.collectionId() != null && self.collectionId() != "") {
+            q += "from collection " + self.collectionId() + "";
+            found = true;
+        }
+
         if (self.siteNames() != null && self.siteNames().length != 0) {
+            if (found) {
+                q += ", and "
+            }
+
             var siteSplit = self.siteNames().split(',');
 
             if (siteSplit.length == 1) {
@@ -341,6 +341,7 @@ function ViewModel() {
 
         return $.ajax("/api/search/count", {
             data: {
+                collectionId: this.collectionId,
                 hours: this.hourQuery(),
                 months: this.selectedMonths().toString(),
                 sites: this.siteNames,
@@ -362,6 +363,7 @@ function ViewModel() {
 
             $.ajax("/api/search/getphotos", {
                 data: {
+                    collectionId: this.collectionId,
                     hours: this.hourQuery(),
                     months: this.selectedMonths().toString(),
                     sites: this.siteNames,

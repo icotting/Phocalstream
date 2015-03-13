@@ -23,14 +23,8 @@
 <script type="text/javascript">
 
     function viewAll() {
-        var msg = "Are you sure you want to view all @Html.DisplayFor(model => Model.CollectionViewModel.SiteDetails.PhotoCount) images? \n" +
-                "This may take some time to load. Please be patient."
-        bootbox.confirm(msg, function (result) {
-            if (result) {
-                location.href = '@Url.Action("Index", "Search", new { @site = @Model.CollectionViewModel.Collection.Site.Name })';
-            }
-        });
-            }
+        location.href = '@Url.Action("Index", "Search", new { @site = @Model.CollectionViewModel.Collection.Site.Name })';
+    }
 
 </script>
 
