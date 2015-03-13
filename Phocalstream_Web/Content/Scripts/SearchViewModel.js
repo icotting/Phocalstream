@@ -82,16 +82,18 @@ function ViewModel() {
     });
 
     // selected collection id
-    self.collectionId = ko.observable();
+    self.collectionId = ko.observable(initialCollection);
     self.collectionId.subscribe(function (newSize) {
         self.query();
         self.getPhotos();
     });
 
+    // site, tags, and dates
     self.siteNames = ko.observable();
     self.tagNames = ko.observable();
     self.dates = ko.observable(yearQuery);
 
+    // months
     self.selectedMonths = ko.observableArray();
     self.months = ko.observableArray([
         new Month(1, "January"),     new Month(2, "February"),  new Month(3, "March"),
@@ -100,6 +102,7 @@ function ViewModel() {
         new Month(10, "October"),    new Month(11, "November"), new Month(12, "December")
     ]);
 
+    // hours
     self.selectedHours = ko.observableArray();
     self.hours = ko.observableArray([
         new Hour(0, "0000"),        new Hour(1, "0100"),        new Hour(2, "0200"),        new Hour(3, "0300"),
@@ -110,6 +113,7 @@ function ViewModel() {
         new Hour(20, "2000"),       new Hour(21, "2100"),       new Hour(22, "2200"),       new Hour(23, "2300")
     ]);
 
+    // utility function to toggle css for selected labels
     self.toggleAssociation = function (item) {
         var selected = item.Selected();
         item.Selected(!selected);
@@ -339,6 +343,13 @@ function ViewModel() {
     self.queryResults = asyncComputed(function () {
         self.reset();
 
+        if (self.query() == "Searching for all photos") {
+            self.search(false);
+        }
+        else {
+            self.search(true);
+        }
+
         return $.ajax("/api/search/count", {
             data: {
                 collectionId: this.collectionId,
@@ -412,6 +423,9 @@ function ViewModel() {
     self.dates.subscribe(function(newValue) {
         self.getPhotos();
     });
+
+
+
 
     self.timelapse = function() {
         var timelapseIds = "";

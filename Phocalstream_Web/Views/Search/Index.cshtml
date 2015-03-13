@@ -48,8 +48,7 @@
         var searchVM = new ViewModel();
         ko.applyBindings(searchVM);
 
-        // set up first selections
-        searchVM.collectionId = ko.observable(initialCollection);
+        searchVM.getPhotos();
 
         $.contextMenu({
             selector: '.photo',
@@ -346,7 +345,6 @@
         if (sites.indexOf(site) != -1) {
             $('#site-field').tagsinput('add', site);
         }
-
     });
 
 
