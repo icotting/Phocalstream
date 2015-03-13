@@ -30,11 +30,15 @@
 <link href="~/Content/CSS/jquery.contextMenu.css" rel="stylesheet" >
 
 <script>
+    var initialCollection = '@ViewBag.CollectionId';
+
     var photoIds = [];
     var limit = 500;
     var visibleItems = "";
     var saveIds = "";
     var topMoved = false;
+
+    var yearQuery = '@ViewBag.Year';
 
     // dependency variables for PhotoSearchResults.js
     var totalPhotoCount = 0;
@@ -43,9 +47,11 @@
     $(function(){
         var searchVM = new ViewModel();
         ko.applyBindings(searchVM);
-    
+
+        searchVM.getPhotos();
+
         $.contextMenu({
-            selector: '.photo', 
+            selector: '.photo',
             callback: function(key, options) {
                 if (key == "full") {
                     window.open(basePhotoUrl + $(this).prop('id').split('-')[1], '_blank');
@@ -55,6 +61,9 @@
                 "full": {name: "View Full Image", icon: ""},
             }
         });
+
+        checkListItemContents($("#ul-holder"));
+
     });
 </script>
 
@@ -64,10 +73,10 @@
 <!-- LEFT: Search Parameters-->
 <div class="search-params">
     <div data-bind="visible: search() === false" class="col-md-12">
-        <p class="alert alert-warning"><strong>Please selected at least one search parameter.</strong></p>
+        <p class="alert alert-warning text-center"><strong>Please selected at least one search parameter.</strong></p>
     </div>
     <div data-bind="visible: queryResults() == 0" class="col-md-12">
-        <p class="alert alert-info"><strong>No images found.</strong></p>
+        <p class="alert alert-info text-center"><strong>No images found.</strong></p>
     </div>
 
     <!-- Sort By -->
@@ -106,7 +115,7 @@
                 <ul class="dropdown-menu" role="menu" data-bind="foreach: sizes">
                     <!-- Disable item if selected -->
                     <li data-bind="css: {'active' : name == $parent.size().name}">
-                        <!-- This is where I need to bind the click to change the value of the status -->
+                        <!-- This is where I need to bind the click to change the value of the status -->`
                         <a href="#" data-bind="click: $parent.size"><span data-bind="text: name"></span></a>
                     </li>
                 </ul>
@@ -141,7 +150,7 @@
     <div class="search-row">
         <div class="input-group">
             <span class="input-group-addon">Dates</span>
-            <input class="form-control" data-bind="value: dates" />
+            <input id="date-field" class="form-control" data-bind="value: dates" />
         </div>
     </div>
 

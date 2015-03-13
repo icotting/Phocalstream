@@ -206,6 +206,7 @@ namespace Phocalstream_Service.Service
 
             StringBuilder publicPhotosBuilder = new StringBuilder();
 
+            StringBuilder collectionBuilder = new StringBuilder();
             StringBuilder sitesBuilder = new StringBuilder();
             StringBuilder tagBuilder = new StringBuilder();
             StringBuilder monthBuilder = new StringBuilder();
@@ -214,6 +215,10 @@ namespace Phocalstream_Service.Service
 
             publicPhotosBuilder = PublicPhotosQuery();
 
+            if (!String.IsNullOrWhiteSpace(model.CollectionId))
+            {
+                collectionBuilder = CollectionQuery(model.CollectionId);
+            }
 
             //Sites
             if (!String.IsNullOrWhiteSpace(model.Sites))
@@ -250,6 +255,12 @@ namespace Phocalstream_Service.Service
             select.Append("select Photos.ID from Photos ");
 
             parameters.Append("(" + publicPhotosBuilder + ")");
+
+            if (collectionBuilder.Length != 0)
+            {
+                select.Append("INNER JOIN CollectionPhotos ON Photos.ID = CollectionPhotos.PhotoId ");
+                parameters.Append(" AND " + "(" + collectionBuilder + ")");
+            }
 
             if (sitesBuilder.Length != 0)
             {
@@ -304,6 +315,23 @@ namespace Phocalstream_Service.Service
                 "(SELECT Site_ID from Collections WHERE Collections.Type = 0)");
 
             return publicQuery;
+        }
+
+        private StringBuilder CollectionQuery(string collectionId)
+        {
+            StringBuilder collectionBuilder = new StringBuilder();
+
+            try
+            {
+                var id = long.Parse(collectionId);
+                collectionBuilder.Append(string.Format("CollectionPhotos.CollectionId = {0}", id));
+            }
+            catch (FormatException ex)
+            {
+
+            }
+
+            return collectionBuilder;
         }
 
         private StringBuilder SiteQuery(string query)
