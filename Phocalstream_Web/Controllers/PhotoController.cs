@@ -445,7 +445,12 @@ namespace Phocalstream_Web.Controllers
                 }
 
             }
-            data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+
+            // Only remove the ending comma if it was added
+            if (data.chartDataValues.Length > 0)
+            {
+                data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+            }
 
             return data;
         } //End Load DM Data
