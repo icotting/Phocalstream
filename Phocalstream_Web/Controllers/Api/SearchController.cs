@@ -30,9 +30,10 @@ namespace Phocalstream_Web.Controllers.Api
 
         [HttpGet]
         [ActionName("count")]
-        public HttpResponseMessage SearchCount(string collectionId, string hours, string months, string sites, string tags, string dates)
+        public HttpResponseMessage SearchCount(string userId, string collectionId, string hours, string months, string sites, string tags, string dates)
         {
             SearchModel model = new SearchModel();
+            model.UserId = userId;
             model.CollectionId = collectionId;
             model.Sites = sites;
             model.Tags = tags;
@@ -73,9 +74,10 @@ namespace Phocalstream_Web.Controllers.Api
 
         [HttpGet]
         [ActionName("getphotos")]
-        public HttpResponseMessage SearchGetPhotos(string collectionId, string hours, string months, string sites, string tags, string dates, string group)
+        public HttpResponseMessage SearchGetPhotos(string userId, string collectionId, string hours, string months, string sites, string tags, string dates, string group)
         {
             SearchModel model = new SearchModel();
+            model.UserId = userId;
             model.CollectionId = collectionId;
             model.Sites = sites;
             model.Tags = tags;
