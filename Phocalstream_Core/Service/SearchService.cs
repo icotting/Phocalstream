@@ -213,7 +213,7 @@ namespace Phocalstream_Service.Service
             StringBuilder dateBuilder = new StringBuilder();
             StringBuilder hourBuilder = new StringBuilder();
 
-            publicPhotosBuilder = PublicPhotosQuery();
+            publicPhotosBuilder = PublicPhotosQuery(model.UserId);
 
             if (!String.IsNullOrWhiteSpace(model.CollectionId))
             {
@@ -307,12 +307,21 @@ namespace Phocalstream_Service.Service
             return select.ToString();
         }
 
-        private StringBuilder PublicPhotosQuery()
+        private StringBuilder PublicPhotosQuery(string userId)
         {
             StringBuilder publicQuery = new StringBuilder();
 
-            publicQuery.Append("Photos.Site_ID IN " +
-                "(SELECT Site_ID from Collections WHERE Collections.Type = 0)");
+
+            if (!String.IsNullOrWhiteSpace(userId))
+            {
+                publicQuery.Append(string.Format("Photos.Site_ID IN (SELECT Site_ID from Collections WHERE Collections.Type = 0 " +
+                    "OR (Collections.Type = 1 AND Collections.Owner_ID = {0}))", userId));
+            }
+            else
+            {
+                publicQuery.Append("Photos.Site_ID IN " +
+                    "(SELECT Site_ID from Collections WHERE Collections.Type = 0)");
+            }
 
             return publicQuery;
         }

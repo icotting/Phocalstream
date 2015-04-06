@@ -184,6 +184,12 @@ function checkListItemContents( container ){
 }
 
 
+// If the user changes the query, reset the indexes
+function resetView( container ) {
+    container.data("minOffset", -1);
+    container.data("maxOffset", -1);
+}
+
 // -------------------------------------------------- //
 // -------------------------------------------------- //
 

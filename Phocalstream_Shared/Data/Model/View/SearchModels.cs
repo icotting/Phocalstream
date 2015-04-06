@@ -11,6 +11,8 @@ namespace Phocalstream_Shared.Data.Model.View
 {
     public class SearchModel
     {
+        public string UserId { get; set; }
+
         public string CollectionId { get; set; }
 
         [Display(Name = "Sites")]

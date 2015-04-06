@@ -67,6 +67,8 @@ namespace Phocalstream_Web.Controllers
                 userCollectionModel.User = User;
                 userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
                 model.UserCollections = userCollectionModel;
+
+                ViewBag.UserId = User.ID;
             }
 
 

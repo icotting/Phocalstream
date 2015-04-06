@@ -352,6 +352,7 @@ function ViewModel() {
 
         return $.ajax("/api/search/count", {
             data: {
+                userId: userId,
                 collectionId: this.collectionId,
                 hours: this.hourQuery(),
                 months: this.selectedMonths().toString(),
@@ -374,6 +375,7 @@ function ViewModel() {
 
             $.ajax("/api/search/getphotos", {
                 data: {
+                    userId: userId,
                     collectionId: this.collectionId,
                     hours: this.hourQuery(),
                     months: this.selectedMonths().toString(),
@@ -397,6 +399,8 @@ function ViewModel() {
                     var array = self.photos();
                     ko.utils.arrayPushAll(array, ids);
                     self.photos.valueHasMutated();
+
+                    resetView($("#ul-holder"));
 
                     // Kick off the lazy loading
                     checkListItemContents($("#ul-holder"));
