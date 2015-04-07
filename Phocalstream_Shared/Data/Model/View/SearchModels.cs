@@ -11,6 +11,10 @@ namespace Phocalstream_Shared.Data.Model.View
 {
     public class SearchModel
     {
+        public string UserId { get; set; }
+
+        public string CollectionId { get; set; }
+
         [Display(Name = "Sites")]
         public string Sites { get; set; }
 
@@ -23,6 +27,8 @@ namespace Phocalstream_Shared.Data.Model.View
         public string Months { get; set; }
         
         public string Hours { get; set; }
+
+        public string Group { get; set; }
 
         public ICollection<string> SiteNames { get; set; }
         public ICollection<string> AvailableTags { get; set; }

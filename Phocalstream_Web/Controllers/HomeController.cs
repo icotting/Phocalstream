@@ -85,7 +85,7 @@ namespace Phocalstream_Web.Controllers
                     Last = col.Photos.Last().Captured,
                     PhotoCount = col.Photos.Count,
                     CoverPhotoID = col.CoverPhoto.ID,
-                    Link = "/account/userdefinedcollection?collectionId=" + col.ID.ToString()
+                    Link = "/search/index?collectionId=" + col.ID.ToString()
                 });
             }
 
@@ -183,7 +183,7 @@ namespace Phocalstream_Web.Controllers
                     Last = details.Last,
                     PhotoCount = details.PhotoCount,
                     CoverPhotoID = details.CoverPhotoID,
-                    Link = "/search/tagsearch?tag=" + details.TagName
+                    Link = "/search/index?tag=" + details.TagName
                 };
         }
 

@@ -102,27 +102,35 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult SiteDashboard(long siteID)
         {
-            SiteDashboardViewModel model = new SiteDashboardViewModel();
+            // Make sure the siteID belongs to a CameraSite
+            if (CollectionRepository.Find(c => c.Site.ID == siteID && c.Type == CollectionType.SITE).FirstOrDefault() == null)
+            {
+                return RedirectToAction("SiteList", "Home", null);
+            }
+            else
+            {
+                SiteDashboardViewModel model = new SiteDashboardViewModel();
 
-            model.CollectionViewModel = GetCollectionViewModel(siteID, -1);
-            model.Years = GetSiteYearSummary(siteID);
-            model.Tags = PhotoService.GetPopularTagsForSite(siteID);
+                model.CollectionViewModel = GetCollectionViewModel(siteID, -1);
+                model.Years = GetSiteYearSummary(siteID);
+                model.Tags = PhotoService.GetPopularTagsForSite(siteID);
 
-            //Photo Frequency
-            model.PhotoFrequency = GetPhotoFrequencyData(siteID);
-            model.PhotoFrequency.SiteName = model.CollectionViewModel.Collection.Site.Name;
-            model.PhotoFrequency.StartDate = model.CollectionViewModel.SiteDetails.First;
+                //Photo Frequency
+                model.PhotoFrequency = GetPhotoFrequencyData(siteID);
+                model.PhotoFrequency.SiteName = model.CollectionViewModel.Collection.Site.Name;
+                model.PhotoFrequency.StartDate = model.CollectionViewModel.SiteDetails.First;
 
-            Photo lastPhoto = PhotoRepository.Find(p => p.Site.ID == siteID).OrderBy(p => p.Captured).Last();
-            DateTime lastPhotoDate = lastPhoto.Captured;
+                Photo lastPhoto = PhotoRepository.Find(p => p.Site.ID == siteID).OrderBy(p => p.Captured).Last();
+                DateTime lastPhotoDate = lastPhoto.Captured;
 
-            model.DroughtMonitorData = LoadDMData(DMDataType.COUNTY, lastPhotoDate, model.CollectionViewModel.Collection.Site.CountyFips);
-            model.DroughtMonitorData.PhotoID = lastPhoto.ID;
+                model.DroughtMonitorData = LoadDMData(DMDataType.COUNTY, lastPhotoDate, model.CollectionViewModel.Collection.Site.CountyFips);
+                model.DroughtMonitorData.PhotoID = lastPhoto.ID;
 
-            model.WaterData = LoadWaterData(model.CollectionViewModel.Collection.Site.Latitude, model.CollectionViewModel.Collection.Site.Longitude, lastPhotoDate);
-            model.WaterData.PhotoID = lastPhoto.ID;
+                model.WaterData = LoadWaterData(model.CollectionViewModel.Collection.Site.Latitude, model.CollectionViewModel.Collection.Site.Longitude, lastPhotoDate);
+                model.WaterData.PhotoID = lastPhoto.ID;
 
-            return View(model);
+                return View(model);
+            }
         }
 
         public ActionResult CameraCollection(long siteID, long year = -1)
@@ -357,6 +365,8 @@ namespace Phocalstream_Web.Controllers
         {
             List<ThumbnailModel> Years = new List<ThumbnailModel>();
 
+            string siteName = CollectionRepository.Find(c => c.Site.ID == siteID).FirstOrDefault().Site.Name;
+
             List<int> yearStrings = PhotoRepository.Find(p => p.Site.ID == siteID).Select(p => p.Captured.Year).Distinct().ToList<int>();
 
             foreach (int y in yearStrings)
@@ -370,14 +380,13 @@ namespace Phocalstream_Web.Controllers
                 model.PhotoCount = photos.Count();
                 model.First = photos[0].Captured;
                 model.Last = photos[photos.Count() - 1].Captured;
-
-
+                
                 photos = photos.Where(p => p.Captured.Hour > 12 && p.Captured.Hour < 16).ToArray();
 
                 Random rand = new Random();
                 model.CoverPhotoID = photos[rand.Next(photos.Length)].ID;
 
-                model.Link = "/Photo/CameraCollection?siteID=" + siteID.ToString() + "&year=" + model.Name;
+                model.Link = "/Search/Index?site=" + siteName + "&year=" + model.Name;
 
                 Years.Add(model);
             }
@@ -444,7 +453,12 @@ namespace Phocalstream_Web.Controllers
                 }
 
             }
-            data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+
+            // Only remove the ending comma if it was added
+            if (data.chartDataValues.Length > 0)
+            {
+                data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+            }
 
             return data;
         } //End Load DM Data

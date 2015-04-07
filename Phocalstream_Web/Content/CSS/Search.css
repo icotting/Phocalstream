@@ -1,70 +1,16 @@
 ﻿body {
 }
 
-.title {
-    color: #333;
-}
-
-.search-title {
-    color: white !important;
-}
-
-.background {
-    position: fixed; 
-    top: -50%; 
-    left: -50%; 
-    width: 200%; 
-    height: 200%;
-}
-
-.shadow {
-    position: fixed; 
-    top: -50%; 
-    left: -50%; 
-    width: 200%; 
-    height: 200%;
-    opacity: 0.5;
-    background-color: black;
-}
-
-.background-img {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    right: 0; 
-    bottom: 0; 
-    margin: auto; 
-    min-width: 50%;
-    min-height: 50%;
-}
-
-.container {
-    vertical-align: middle;
-    margin: auto;
-    position: absolute;
-    top: 0; 
-    left: 0; 
-    bottom: 0; 
-    right: 0;
-}
-
-.content {
-    width: 100%;
-    position: relative;
-    z-index: 100;
-    color: white;
-}
-
 label {
-    color: white;
+    color: #aaa;
 }
 
-.search-row {
-    margin-bottom: 25px;
+.row {
+    margin-bottom: 0px;
 }
 
 input[type=checkbox] {
-    visibility: hidden;
+    display: none;
 }
 
 .sel-header {
@@ -85,11 +31,9 @@ input[type=checkbox] {
 }
 
 .search-results {
+    color: black;
+    font-size: 12px;
     margin: 0px !important;
-}
-
-.search-results-box {
-    margin-top: 75px;
 }
 
 .search-image-save {
@@ -101,35 +45,6 @@ input[type=checkbox] {
 /* Search Navbar Fix */
 .navbar {
     position: fixed;
-}
-
-/* Search Photo Wall */
-#slider {
-    margin-top: 4.5px;
-    background-color: whitesmoke;
-}
-
-.ui-slider-handle {
-    margin-top: 2.25px;
-}
-
-#img-size {
-    padding-top: 0.3em !important;
-}
-
-.btn-disabled {
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.fit-width {
-    margin: auto;
-    max-width: 960px;
-}
-
-.ul-holder {
-    padding: 0px;
-    overflow: auto;
 }
 
 .search-photo {
@@ -147,4 +62,54 @@ input[type=checkbox] {
 
     background: rgba(0, 0, 0, .5);
     color: white !important;
+}
+
+.search-params {
+    background-color: whitesmoke;
+    border: 1px solid lightgray;
+
+    width: 300px;
+
+    position: absolute;
+    top: 75px;
+    left: 25px;
+
+    padding: 10px;
+}
+
+
+#ul-holder {
+    position: absolute;
+    left: 330px;
+    top: 72px;
+    right: 0px;
+    bottom: 0px;
+
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.search-row {
+    margin-bottom: 10px;
+}
+
+.featurette-divider {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border-top: 1px solid lightgray;
+}
+
+label.btn > input[type='radio'] {
+    display: none;
+}
+
+.filter-label {
+    margin-top: 4.5px;
+    color: #555;
+}
+
+img.bordered { 
+   border: 2px solid red;
 }

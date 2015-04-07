@@ -97,6 +97,7 @@
 
 li {
     font-size: 12pt;
+    overflow: hidden;
 }
 
 ul {

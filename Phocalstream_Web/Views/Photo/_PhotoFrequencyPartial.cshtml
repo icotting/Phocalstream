@@ -10,9 +10,10 @@
             }
         });
 
-        $('#photoFrequency').highcharts({
+        var frequency = new Highcharts.Chart({
             colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
             chart: {
+                renderTo: 'photoFrequency',
                 type: 'line',
                 zoomType: 'x',
                 spacingRight: 20,
@@ -32,6 +33,7 @@
             title: {
                 text: 'Photo Frequency for @Html.DisplayFor(model => model.SiteName)'
             },
+            legend: true,
             xAxis: {
                 type: 'datetime',
                 maxZoom: 7 * 24 * 3600 * 1000, // seven days
@@ -62,6 +64,12 @@
                     }
                 }
             },
+            tooltip: {
+                formatter: function () {
+                    return '' + this.series.name +
+                        ': ' + this.y;
+                }
+            },
             plotOptions: {
                 area: {
                     fillColor: {
@@ -90,11 +98,9 @@
                 pointInterval: 24 * 60 * 60 * 1000,
                 pointStart: Date.parse("@Html.DisplayFor(model => model.StartDate.Date)"),
                 data: [@Html.DisplayFor(model => model.FrequencyDataValues)]
-                }]
-            });
+            }]
         });
-
-
+    })
 </script>
 
 

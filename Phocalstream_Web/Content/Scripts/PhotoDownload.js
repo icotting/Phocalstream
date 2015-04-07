@@ -26,7 +26,12 @@ function downloadPrompt() {
  */
 function downloadImages() {
     $.ajax({
-        url: '/api/sitecollection/RawDownload?photoIds=' + visibleItems,
-        type: "POST"
+        url: '/api/sitecollection/RawDownload',
+        data: "photoIds=" + visibleItems,
+        dataType: "string",
+        type: "POST",
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
     })
 }

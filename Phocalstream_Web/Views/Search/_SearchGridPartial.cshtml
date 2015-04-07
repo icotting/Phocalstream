@@ -3,52 +3,85 @@
 
 <div id="partial">
 
-    <div class="fit-width">
-        <div class="btn-toolbar">
-                <div class="btn-group pull-left">
-                    <span id="page-info" class="btn btn-default btn-disabled">@Model.Description</span>
-                </div>
-                <div class="btn-group pull-right">
-                    @if (Model.Index == 0)
-                {
-                        <a href="" class="btn btn-default disabled">Previous</a>
-                }
-                else
-                {
-                        <a href="javascript:reloadPage(@Model.Index - 1)" class="btn btn-default">Previous</a>
-                }
-
-                    @if (Model.Index == (Model.TotalPages - 1))
-                {
-                        <a href="" class="btn btn-default disabled">Next</a>
-                }
-                else
-                {
-                        <a href="javascript:reloadPage(@Model.Index + 1)" class="btn btn-default">Next</a>
-                }
-                </div>
-                <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                        Jump To <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        @for (var i = 0; i < @Model.TotalPages; i++)
-                        {
-                            if (i == Model.Index)
+    <div class="">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="search-params row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-default btn-group-justified dropdown-toggle" data-toggle="dropdown">
+                            Thumbnail Size <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li class="active"><a href="javascript:resizeThumbnail(100)">Small</a></li>
+                            <li><a href="javascript:resizeThumbnail(200)">Medium</a></li>
+                            <li><a href="javascript:resizeThumbnail(400)">Large</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-default btn-group-justified dropdown-toggle" data-toggle="dropdown">
+                            Jump To <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            @for (var i = 0; i < @Model.TotalPages; i++)
                             {
-                                <li class="active"><a href="#">Page @(i + 1)</a></li>
+                                if (i == Model.Index)
+                                {
+                                    <li class="active"><a href="#">Page @(i + 1)</a></li>
+                                }
+                                else
+                                {
+                                    <li><a href="javascript:reloadPage(@i)">Page @(i + 1)</a></li>
+                                }
+                            }
+                        </ul>
+
+                    </div>
+                    <div class="col-md-12">
+                        <div class="btn-group btn-group-justified">
+                            @if (Model.Index == 0)
+                            {
+                                <a href="" class="btn btn-default disabled">Previous</a>
                             }
                             else
                             {
-                                <li><a href="javascript:reloadPage(@i)">Page @(i + 1)</a></li>
+                                <a href="javascript:reloadPage(@Model.Index - 1)" class="btn btn-default">Previous</a>
                             }
-                        }
-                    </ul>
-                </div>
-                </div>
-               
-        <hr class="featurette-divider" />
+
+                            @if (Model.Index == (Model.TotalPages - 1))
+                            {
+                                <a href="" class="btn btn-default disabled">Next</a>
+                            }
+                            else
+                            {
+                                <a href="javascript:reloadPage(@Model.Index + 1)" class="btn btn-default">Next</a>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 section-header">Months</div>
+                            <div class="col-md-6">January</div>
+                            <div class="col-md-6">February</div>
+                            <div class="col-md-6">March</div>
+                            <div class="col-md-6">April</div>
+                            <div class="col-md-6">May</div>
+                            <div class="col-md-6">June</div>
+                            <div class="col-md-6">July</div>
+                            <div class="col-md-6">August</div>
+                            <div class="col-md-6">September</div>
+                            <div class="col-md-6">October</div>
+                            <div class="col-md-6">November</div>
+                            <div class="col-md-6">December</div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+            <div class="col-md-9">
+
+            </div>
         </div>
+    </div>
             
     <ul class="ul-holder">
         @foreach (var p in Model.Photos)

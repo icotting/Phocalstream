@@ -166,12 +166,17 @@ function bufferData() {
 
 function updateData() {
     var results = dataBuffer[dataPos++ % dataBufferLen];
-    dmChart.series[0].setData([results.DMData.US.NonDrought, results.DMData.STATE.NonDrought, results.DMData.COUNTY.NonDrought], true);
-    dmChart.series[1].setData([results.DMData.US.D0, results.DMData.STATE.D0, results.DMData.COUNTY.DO], true);
-    dmChart.series[2].setData([results.DMData.US.D1, results.DMData.STATE.D1, results.DMData.COUNTY.D1], true);
-    dmChart.series[3].setData([results.DMData.US.D2, results.DMData.STATE.D2, results.DMData.COUNTY.D2], true);
-    dmChart.series[4].setData([results.DMData.US.D3, results.DMData.STATE.D3, results.DMData.COUNTY.D3], true);
-    dmChart.series[5].setData([results.DMData.US.D4, results.DMData.STATE.D4, results.DMData.COUNTY.D4], true);
+
+    try {
+        dmChart.series[0].setData([results.DMData.US.NonDrought, results.DMData.STATE.NonDrought, results.DMData.COUNTY.NonDrought], true);
+        dmChart.series[1].setData([results.DMData.US.D0, results.DMData.STATE.D0, results.DMData.COUNTY.DO], true);
+        dmChart.series[2].setData([results.DMData.US.D1, results.DMData.STATE.D1, results.DMData.COUNTY.D1], true);
+        dmChart.series[3].setData([results.DMData.US.D2, results.DMData.STATE.D2, results.DMData.COUNTY.D2], true);
+        dmChart.series[4].setData([results.DMData.US.D3, results.DMData.STATE.D3, results.DMData.COUNTY.D3], true);
+        dmChart.series[5].setData([results.DMData.US.D4, results.DMData.STATE.D4, results.DMData.COUNTY.D4], true);
+    } catch (err) {
+        console.log("Error updating the data: " + err);
+    }
 
     $("#discharge").empty();
     $("#discharge").append(results.AverageDischarge);

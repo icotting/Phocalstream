@@ -9,7 +9,7 @@
 
 <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-<script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
+<script src="http://code.highcharts.com/2.2.4/highcharts.js" type="text/javascript"></script>
 <script type="text/javascript">
 	    Highcharts.theme = {
 	        colors: ["#DCDCDC", "#F5E938", "#FECC6E", "#FD9827", "#FC3638", "#650205", "#ff0066", "#eeaaee",
@@ -23,14 +23,8 @@
 <script type="text/javascript">
 
     function viewAll() {
-        var msg = "Are you sure you want to view all @Html.DisplayFor(model => Model.CollectionViewModel.SiteDetails.PhotoCount) images? \n" +
-                "This may take some time to load. Please be patient."
-        bootbox.confirm(msg, function (result) {
-            if (result) {
-                location.href = '@Url.Action("CameraCollection", "Photo", new { @siteID = @Model.CollectionViewModel.Collection.Site.ID })';
-            }
-        });
-            }
+        location.href = '@Url.Action("Index", "Search", new { @site = @Model.CollectionViewModel.Collection.Site.Name })';
+    }
 
 </script>
 
@@ -68,8 +62,8 @@
                             <a class="pull-left" href="@Url.Action("Index", "Photo", new { @photoId = t.Item3})">
                                 <img class="media-object" src="/api/photo/low/@t.Item3" alt="...">
                             </a>
-                            <span class="badge">@t.Item2</span><p class="tag">@Html.ActionLink(Html.DisplayFor(model => t.Item1).ToString(), "KnockoutAdvancedSearch", "Search", new {
-                                    @hours = "", @months = "", @sites = @Model.CollectionViewModel.Collection.Site.Name, @tags = @t.Item1, @dates = ""
+                            <span class="badge">@t.Item2</span><p class="tag">@Html.ActionLink(Html.DisplayFor(model => t.Item1).ToString(), "Index", "Search", new {
+                                    @site = @Model.CollectionViewModel.Collection.Site.Name, @tag = @t.Item1
                                 }, new { @class = "" })</p>
                         </li>
                     }

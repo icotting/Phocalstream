@@ -125,7 +125,7 @@
                 },
                 done: function (e, data) {
                     data.context.text('');
-                    $('</div><img class="siteImage" src="/api/photo/low/' + data.result.id + '" alt="" />').appendTo(data.context);
+                    $('</div><img class="upload-image" src="/api/photo/low/' + data.result.id + '" alt="" />').appendTo(data.context);
                     if (done) {
                         bootbox.confirm("Images successfully uploaded. View them now?", function (result) {
                             if (result) {
@@ -147,7 +147,7 @@
         });
 
         function showCollection() {
-            location.href = '@Url.Action("UserDefinedCollection", "Account")' + '?collectionID=' + selectedCollectionID;
+            location.href = '@Url.Action("Index", "Search")' + '?collectionID=' + selectedCollectionID;
         }
     </script>
 }

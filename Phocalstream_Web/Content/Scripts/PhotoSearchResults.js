@@ -14,7 +14,7 @@ $("img.photo").lazyload({
 });
 
 /* Initial slized value, which equals image width. */
-var initialSliderValue = 400;
+var initialSliderValue = 100;
 
 /* Handles showing and sizing the date label. */
 var imgDateSmall = false;
@@ -121,7 +121,7 @@ function computeHolderMargin(width) {
     var usedWidth = Math.min(numberOfPhotosAcross, totalPhotoCount) * imgWidth;
     var remainder = totalWidth - usedWidth;
 
-    $(".ul-holder").css("margin-left", (remainder / 2) + "px");
+    $("#ul-holder").css("margin-left", (remainder / 2) + "px");
 }
 
 
@@ -145,12 +145,29 @@ $(function () {
 });
 
 
+function resizeThumbnail(size) {
+    initialSliderValue = size;
+
+    setText(size);
+    setImage(size);
+    scaleOrHideLabel(size);
+    computeHolderMargin(size);
+
+    checkListItemContents($("#ul-holder"));
+
+}
+
 /*
  * Called to initialize the image, text, and margin size
  * based on initial size of window and photo count.
  */
-$(function () {
+function initialize() {
     setText(initialSliderValue);
     setImage(initialSliderValue);
     computeHolderMargin(initialSliderValue);
+    scaleOrHideLabel(initialSliderValue);
+}
+
+$(function () {
+    initialize()
 });

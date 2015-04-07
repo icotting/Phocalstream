@@ -116,6 +116,14 @@ namespace Phocalstream_Service.Service
             }
         }
 
+        public List<long> SearchResultPhotoIds(SearchModel model)
+        {
+            string select = GetSearchQuery(model);
+            List<long> ids = QuickSearch(select);
+
+            return ids;
+        }
+
 
         public List<long> QuickSearch(string query)
         {
@@ -198,14 +206,19 @@ namespace Phocalstream_Service.Service
 
             StringBuilder publicPhotosBuilder = new StringBuilder();
 
+            StringBuilder collectionBuilder = new StringBuilder();
             StringBuilder sitesBuilder = new StringBuilder();
             StringBuilder tagBuilder = new StringBuilder();
             StringBuilder monthBuilder = new StringBuilder();
             StringBuilder dateBuilder = new StringBuilder();
             StringBuilder hourBuilder = new StringBuilder();
 
-            publicPhotosBuilder = PublicPhotosQuery();
+            publicPhotosBuilder = PublicPhotosQuery(model.UserId);
 
+            if (!String.IsNullOrWhiteSpace(model.CollectionId))
+            {
+                collectionBuilder = CollectionQuery(model.CollectionId);
+            }
 
             //Sites
             if (!String.IsNullOrWhiteSpace(model.Sites))
@@ -243,6 +256,12 @@ namespace Phocalstream_Service.Service
 
             parameters.Append("(" + publicPhotosBuilder + ")");
 
+            if (collectionBuilder.Length != 0)
+            {
+                select.Append("INNER JOIN CollectionPhotos ON Photos.ID = CollectionPhotos.PhotoId ");
+                parameters.Append(" AND " + "(" + collectionBuilder + ")");
+            }
+
             if (sitesBuilder.Length != 0)
             {
                 select.Append("INNER JOIN CameraSites ON Photos.Site_ID = CameraSites.ID ");
@@ -272,18 +291,56 @@ namespace Phocalstream_Service.Service
             }
 
            select.Append("WHERE " + parameters);
+
+           if (!String.IsNullOrWhiteSpace(model.Group))
+           {
+               select.Append(" ORDER BY");
+
+               if (model.Group.Equals("site"))
+               {
+                   select.Append(" Photos.Site_ID,");
+               }
+
+               select.Append(" Photos.Captured");
+           }
  
-           return select.ToString();
+            return select.ToString();
         }
 
-        private StringBuilder PublicPhotosQuery()
+        private StringBuilder PublicPhotosQuery(string userId)
         {
             StringBuilder publicQuery = new StringBuilder();
 
-            publicQuery.Append("Photos.Site_ID IN " +
-                "(SELECT Site_ID from Collections WHERE Collections.Type = 0)");
+
+            if (!String.IsNullOrWhiteSpace(userId))
+            {
+                publicQuery.Append(string.Format("Photos.Site_ID IN (SELECT Site_ID from Collections WHERE Collections.Type = 0 " +
+                    "OR (Collections.Type = 1 AND Collections.Owner_ID = {0}))", userId));
+            }
+            else
+            {
+                publicQuery.Append("Photos.Site_ID IN " +
+                    "(SELECT Site_ID from Collections WHERE Collections.Type = 0)");
+            }
 
             return publicQuery;
+        }
+
+        private StringBuilder CollectionQuery(string collectionId)
+        {
+            StringBuilder collectionBuilder = new StringBuilder();
+
+            try
+            {
+                var id = long.Parse(collectionId);
+                collectionBuilder.Append(string.Format("CollectionPhotos.CollectionId = {0}", id));
+            }
+            catch (FormatException ex)
+            {
+
+            }
+
+            return collectionBuilder;
         }
 
         private StringBuilder SiteQuery(string query)
@@ -299,14 +356,15 @@ namespace Phocalstream_Service.Service
             {
                 if (siteNames.Contains(site))
                 {
+                    string new_site = site.Replace("'", "''");
                     if (first)
                     {
-                        sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", site));
+                        sitesBuilder.Append(string.Format("CameraSites.Name = '{0}' ", new_site));
                         first = false;
                     }
                     else
                     {
-                        sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", site));
+                        sitesBuilder.Append(string.Format("OR CameraSites.Name = '{0}' ", new_site));
                     }
                 }
             }
@@ -328,14 +386,15 @@ namespace Phocalstream_Service.Service
                 {
                     if (tagNames.Contains(tag))
                     {
+                        string new_tag = tag.Replace("'", "''");
                         if (tagFirst)
                         {
-                            tagBuilder.Append(string.Format("Tags.Name = '{0}'", tag));
+                            tagBuilder.Append(string.Format("Tags.Name = '{0}'", new_tag));
                             tagFirst = false;
                         }
                         else
                         {
-                            tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", tag));
+                            tagBuilder.Append(string.Format("OR Tags.Name = '{0}'", new_tag));
                         }
                     }
                     else

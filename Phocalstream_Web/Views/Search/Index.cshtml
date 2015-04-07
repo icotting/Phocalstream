@@ -5,111 +5,195 @@
 }
 @Styles.Render("~/Content/CSS/Search.css")
 
+@Scripts.Render("~/Content/Scripts/jquery-ui-1.9.2.js",
+                "~/Content/Scripts/jquery-lazyload.js")
+
 <!-- Bootstrap Tags Input CSS and JS Files -->
 <link href="~/Content/bootstrap-tags/css/bootstrap-tagsinput.css" rel="stylesheet">
 <link href="~/Content/CSS/typeahead.css" rel="stylesheet">
 <script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.js"></script>
 <script src="~/Content/typeahead/typeahead.bundle.js"></script>
 
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoDownload.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoSaveCollection.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoTimelapse.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/PhotoSearchResults.js"></script>
+
 <!-- Knockout.js -->
 <script src="~/Content/Scripts/knockout-3.2.0.js"></script>
+<script src="~/Content/Scripts/SearchViewModel.js"></script>
+
+<!-- Context Menu -->
+<script src="~/Content/Scripts/jquery.contextMenu.js"></script>
+<script src="~/Content/Scripts/jquery.ui.position.js"></script>
+<link href="~/Content/CSS/jquery.contextMenu.css" rel="stylesheet" >
+
+<script>
+    var userId = '@ViewBag.UserId';
+    var initialCollection = '@ViewBag.CollectionId';
+
+    var photoIds = [];
+    var limit = 500;
+    var visibleItems = "";
+    var saveIds = "";
+    var topMoved = false;
+
+    var yearQuery = '@ViewBag.Year';
+
+    // dependency variables for PhotoSearchResults.js
+    var totalPhotoCount = 0;
+    var basePhotoUrl = "@Url.Action("Index", "Photo", null)?photoId=";
+
+    $(function(){
+        var searchVM = new ViewModel();
+        ko.applyBindings(searchVM);
+
+        searchVM.getPhotos();
+
+        $.contextMenu({
+            selector: '.photo',
+            callback: function(key, options) {
+                if (key == "full") {
+                    window.open(basePhotoUrl + $(this).prop('id').split('-')[1], '_blank');
+                }
+            },
+            items: {
+                "full": {name: "View Full Image", icon: ""},
+            }
+        });
+
+        checkListItemContents($("#ul-holder"));
+
+    });
+</script>
+
+<script type="text/javascript" src="~/Content/Scripts/InfiniteScroll.js"></script>
 
 
-<div class="background">
-    <img class="background-img" data-bind="attr:{src: imagePath}"/>
-</div>
+<!-- LEFT: Search Parameters-->
+<div class="search-params">
+    <div data-bind="visible: search() === false" class="col-md-12">
+        <p class="alert alert-warning text-center"><strong>Please selected at least one search parameter.</strong></p>
+    </div>
+    <div data-bind="visible: queryResults() == 0" class="col-md-12">
+        <p class="alert alert-info text-center"><strong>No images found.</strong></p>
+    </div>
 
-<div class="shadow">
-
-</div>
-
-<div class="container">
-    <div class="content">
-
-        @if (@ViewBag.Message != null)
-        {
-            <div class="alert alert-info alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                @ViewBag.Message
-            </div>
-        }
-
-        <div class="text-center">
-            <h1 class="page-header search-title">Power Search</h1>
+    <!-- Sort By -->
+    <div class="search-row row">
+        <div class="col-md-12">
+            <strong>Results</strong>
         </div>
-
-        <!-- Sites -->
-        <div class="search-row">
-            <div class="row">
-                <div class="col-md-4">
-                    Sites
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <input id="site-field" data-bind="value: siteNames" />
-                </div>
+    </div>
+    <div class="search-row row">
+        <div class="col-md-4">
+            <label class="filter-label">Sort By</label>
+        </div>
+        <div class="col-md-8">
+            <div class="btn-group btn-group-justified">
+                <label class="btn btn-default" data-bind="css: { 'active': group() === 'date' }">
+                    <input type="radio" name="sortoptions" id="date" data-bind="checked: group, checkedValue: 'date'">Date
+                </label>
+                <label class="btn btn-default" data-bind="css: { 'active': group() === 'site' }">
+                    <input type="radio" name="sortoptions" id="group" data-bind="checked: group, checkedValue: 'site'">Site
+                </label>
             </div>
         </div>
+    </div>
+    <div class="search-row row">
+        <div class="col-md-4">
+            <label class="filter-label">Thumbnails</label>
+        </div>
+        <div class="col-md-8">
+            <div class="btn-group full-width">
+                <!-- Change button type based on status -->
+                <button type="button" class="btn btn-default full-width dropdown-toggle" data-toggle="dropdown">
+                    <span data-bind="text: size().name"> </span> <span class="caret"></span>
+                </button>
 
-        <!-- Tags -->
-        <div class="search-row">
-            <div class="row">
-                <div class="col-md-4">
-                    Tags
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <input id="tag-field" data-bind="value: tagNames" />
-                </div>
+                <!-- Loop for status -->
+                <ul class="dropdown-menu" role="menu" data-bind="foreach: sizes">
+                    <!-- Disable item if selected -->
+                    <li data-bind="css: {'active' : name == $parent.size().name}">
+                        <!-- This is where I need to bind the click to change the value of the status -->`
+                        <a href="#" data-bind="click: $parent.size"><span data-bind="text: name"></span></a>
+                    </li>
+                </ul>
             </div>
         </div>
+    </div>
+    
+    <hr class="featurette-divider" />
 
-        <!-- Dates -->
-        <div class="search-row">
-            <div class="row">
-                <div class="col-md-4">
-                    Dates
-                </div>
+    <!-- FILTERS -->
+    <div class="search-row">
+        <strong>Filters</strong>
+    </div>
+
+    <!-- Sites -->
+    <div class="search-row">
+        <div class="input-group">
+            <span class="input-group-addon">Sites</span>
+            <input id="site-field" data-bind="value: siteNames" />
+        </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="search-row">
+        <div class="input-group">
+            <span class="input-group-addon">Tags</span>
+            <input id="tag-field" data-bind="value: tagNames" />
+        </div>
+    </div>
+
+    <!-- Dates -->
+    <div class="search-row">
+        <div class="input-group">
+            <span class="input-group-addon">Dates</span>
+            <input id="date-field" class="form-control" data-bind="value: dates" />
+        </div>
+    </div>
+
+    <!-- Months -->
+    <div class="search-row">
+        <div class="row">
+            <div class="col-md-8">
+                <label class="filter-label" data-toggle="collapse" data-target="#months-collapse" aria-expanded="false" aria-controls="months-collapse">Months <span class="caret"></span></label>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <input class="form-control" data-bind="value: dates" />
-                </div>
+            <div class="col-md-4">
+                <button id="clear-months" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearMonths, visible: selectedMonths().length > 0">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
+                </button>
             </div>
         </div>
-
-        <!-- Months -->
-        <div class="search-row">
-            <div class="page-header">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Months</label>
-                    </div>
-                </div>
-            </div>
+        <div class="collapse" id="months-collapse">
             <div class="row text-center" data-bind="foreach: months">
-                <div class="col-md-2">
+                <div class="col-md-6">
                     <label>
-                        <input type="checkbox" data-bind="value: month, checked: $root.selectedMonths, click: $root.toggleAssociation" />
+                        <input type="checkbox" data-bind="attr: {id: month, value: month}, checked: $root.selectedMonths, click: $root.toggleAssociation" />
                         <span data-bind="css: { 'selected' : Selected }, text: name"></span>
                     </label>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Hours -->
-        <div class="search-row">
-            <div class="page-header">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Times Of Day</label>
-                    </div>
-                </div>
+    <!-- Hours -->
+    <div class="search-row">
+        <div class="row">
+            <div class="col-md-8">
+                <label class="filter-label" data-toggle="collapse" data-target="#hours-collapse" aria-expanded="false" aria-controls="hours-collapse">Times of Day <span class="caret"></span></label>
             </div>
+            <div class="col-md-4">
+                <button id="clear-times" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearTimes, visible: selectedHours().length > 0">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
+                </button>
+            </div>
+        </div>
+        <div class="collapse" id="hours-collapse">
             <div class="row text-center" data-bind="foreach: hours">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label>
                         <input type="checkbox" data-bind="value: name, checked: $root.selectedHours, click: $root.toggleAssociation" />
                         <span data-bind="css: { 'selected' : Selected }, text: name"></span>
@@ -117,360 +201,70 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- BOTTOM DIV -->
+    <div data-bind="visible: search">
+        <hr class="featurette-divider" />
+        
         <!-- Query and Results -->
-        <div class="search-results-box">
-            <div class="search-row text-center">
-                <div class="search-title page-header">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3 class="search-results"><strong data-bind="text: query"></strong></h3>
-                        </div>
-                    </div>
+        <div class="search-row text-center">
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="search-results"><strong data-bind="text: query"></strong></p>
+                </div>
+                <div class="col-md-12">
+                    <!-- ko if: selectedCount() == 0 -->
+                    <!-- ko if: queryResults() == 1 -->
+                    <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photo</p>
+                    <!-- /ko -->
+                    <!-- ko ifnot: queryResults() == 1 -->
+                    <p class="label label-info">Found <strong data-bind="text: queryResults"></strong> photos</p>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko ifnot: selectedCount() == 0 -->
+                    <!-- ko if: selectedCount() == 1 -->
+                    <p class="label label-info"><strong data-bind="text: selectedCount"></strong> of <strong data-bind="text: queryResults"></strong> photo selected</p>
+                    <!-- /ko -->
+                    <!-- ko ifnot: selectedCount() == 1 -->
+                    <p class="label label-info"><strong data-bind="text: selectedCount"></strong> of <strong data-bind="text: queryResults"></strong> photos selected</p>
+                    <!-- /ko -->
+                    <button id="clear-selection" type="button" class="btn btn-danger btn-xs pull-right" data-bind="click: clearSelected, visible: selectedCount() > 0">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Clear
+                    </button>
+                    <!-- /ko -->
                 </div>
             </div>
+        </div>
 
-            <div class="search-row text-center">
-                <div class="row">
-                    <div class="">
-                        <!-- ko if: queryResults() == 1 -->
-                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photo</button>
-                        <!-- /ko -->
-                        <!-- ko ifnot: queryResults() == 1 -->
-                        <button data-bind="click: search, enable: queryResults() > 0" class="btn btn-success btn-lg">Show me <strong data-bind="text: queryResults"></strong> photos</button>
-                        <!-- /ko -->
-                    </div>
-                    @if (Request.IsAuthenticated)
-                    { 
-                        <!-- ko if: queryResults() > 0-->
-                        <div class="search-image-save">
-                            <a class="save-button btn btn-info" href="javascript:saveCollectionPrompt()" data-bind="attr{ id: imagePath}">Save This Image</a>
-                        </div>
-                        <!-- /ko -->
-                    }
-                </div>
+        <!-- Timelapse, Save, Download -->
+        <div class="search-row">
+            <div class="btn-group btn-group-justified">
+                <a data-bind="click: timelapse, enable: queryResults() > 0" class="btn btn-default">Timelapse</a>
+                @if (Request.IsAuthenticated)
+            {
+                    <a data-bind="click: saveCollection, enable: queryResults() > 0" class="btn btn-default">Save</a>
+            }
+                @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                    <a data-bind="click: download, enable: queryResults() > 0" class="btn btn-default">Download</a>
+            }
             </div>
         </div>
     </div>
 </div>
 
-<script type="text/javascript">
+<!-- RIGHT: Results-->
+<ul id="ul-holder" data-bind=""> </ul>
 
-    function Month(month, name) {
-        var self = this;
-
-        self.month = month;
-        self.name = name;
-        self.Selected = ko.observable(false);
-    }
-
-    function Hour(hour, name) {
-        var self = this;
-
-        self.hour = hour;
-        self.name = name;
-        self.Selected = ko.observable(false);
-    }
-
-    function asyncComputed(evaluator, owner) {
-        var result = ko.observable();
-
-        ko.computed(function () {
-            // Get the $.Deferred value, and then set up a callback so that when it's done,
-            // the output is transferred onto our "result" observable
-            evaluator.call(owner).done(result);
-        });
-
-        return result;
-    }
-
-    function ViewModel() {
-        var self = this;
-
-        self.siteNames = ko.observable();
-        self.tagNames = ko.observable();
-        self.dates = ko.observable();
-
-        self.selectedMonths = ko.observableArray();
-        self.months = ko.observableArray([
-            new Month(1, "January"),
-            new Month(2, "February"),
-            new Month(3, "March"),
-            new Month(4, "April"),
-            new Month(5, "May"),
-            new Month(6, "June"),
-            new Month(7, "July"),
-            new Month(8, "August"),
-            new Month(9, "September"),
-            new Month(10, "October"),
-            new Month(11, "November"),
-            new Month(12, "December")
-        ]);
-
-        self.selectedHours = ko.observableArray();
-        self.hours = ko.observableArray([
-            new Hour(0, "0000"),
-            new Hour(1, "0100"),
-            new Hour(2, "0200"),
-            new Hour(3, "0300"),
-            new Hour(4, "0400"),
-            new Hour(5, "0500"),
-            new Hour(6, "0600"),
-            new Hour(7, "0700"),
-            new Hour(8, "0800"),
-            new Hour(9, "0900"),
-            new Hour(10, "1000"),
-            new Hour(11, "1100"),
-            new Hour(12, "1200"),
-            new Hour(13, "1300"),
-            new Hour(14, "1400"),
-            new Hour(15, "1500"),
-            new Hour(16, "1600"),
-            new Hour(17, "1700"),
-            new Hour(18, "1800"),
-            new Hour(19, "1900"),
-            new Hour(20, "2000"),
-            new Hour(21, "2100"),
-            new Hour(22, "2200"),
-            new Hour(23, "2300")
-        ]);
-
-        self.toggleAssociation = function (item) {
-            var selected = item.Selected();
-            item.Selected(!selected);
-            return true;
-        }
-
-        self.monthText = ko.computed(function () {
-            var monthsSelected = self.selectedMonths();
-            monthsSelected.sort(function(a, b){return a-b} );
-
-            var months = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ]
-
-            var monthNameArray = [];
-            for (var i = 0; i < monthsSelected.length; i++) {
-                var index = monthsSelected[i];
-                monthNameArray.push(months[index - 1]);
-            }
-
-            return monthNameArray.join(', ');
-        });
-
-        self.hourText = ko.computed(function () {
-            var hoursSelected = self.selectedHours();
-            hoursSelected.sort();
-
-            return hoursSelected.join(', ');
-        });
-
-        self.hourQuery = ko.computed(function () {
-            var hours = self.selectedHours();
-
-            var trimmedHours = []
-            for (var i = 0; i < hours.length; i++) {
-                trimmedHours.push(hours[i].substring(0, 2));
-            }
-
-            return trimmedHours.toString();
-        });
-
-        self.query = ko.computed(function () {
-            var found = false;
-            var q = "Searching for photos ";
-
-            if (self.siteNames() != null && self.siteNames().length != 0) {
-                var siteSplit = self.siteNames().split(',');
-
-                if (siteSplit.length == 1) {
-                    q += "from " + siteSplit[0] + "";
-                }
-                else if (siteSplit.length == 2) {
-                    q += "from " + siteSplit[0] + " or " + siteSplit[1] + "";
-                }
-                else {
-                    q += "from ";
-                    for (var i = 0; i < siteSplit.length - 1; i++)
-                    {
-                        q += siteSplit[i] + ", ";
-                    }
-                    q += " or " + siteSplit[siteSplit.length - 1] + "";
-                }
-                found = true;
-            }
-
-            if (self.tagNames() != null && self.tagNames().length != 0) {
-                if (found) {
-                    q += ", and "
-                }
-                
-                var tagSplit = self.tagNames().split(',');
-
-                if (tagSplit.length == 1) {
-                    q += "tagged with " + tagSplit[0] + "";
-                }
-                else if (tagSplit.length == 2) {
-                    q += "tagged with " + tagSplit[0] + " or " + tagSplit[1] + "";
-                }
-                else {
-                    q += "tagged with ";
-                    for (var i = 0; i < tagSplit.length - 1; i++)
-                    {
-                        q += tagSplit[i] + ", ";
-                    }
-                    q += " or " + tagSplit[tagSplit.length - 1] + "";
-                }
-                found = true;
-            }
-
-            if (self.dates() != null && self.dates().length != 0) {
-                if (found) {
-                    q += ", and "
-                }
-
-                var dateSplit = self.dates().split(',');
-
-                if (dateSplit.length == 1) {
-                    q += "taken on " + dateSplit[0] + "";
-                }
-                else if (dateSplit.length == 2) {
-                    q += "taken on " + dateSplit[0] + " or " + dateSplit[1] + "";
-                }
-                else {
-                    q += "taken on ";
-                    for (var i = 0; i < dateSplit.length - 1; i++)
-                    {
-                        q += dateSplit[i] + ", ";
-                    }
-                    q += " or " + dateSplit[dateSplit.length - 1] + "";
-                }
-                found = true;
-            }
-
-            if (self.selectedMonths().length != 0) {
-                if (found) {
-                    q += ", and "
-                }
-
-                var monthSplit = self.monthText().split(',');
-
-                if (monthSplit.length == 1) {
-                    q += "taken during the month of " + monthSplit[0] + "";
-                }
-                else if (monthSplit.length == 2) {
-                    q += "taken during the months of " + monthSplit[0] + " or " + monthSplit[1] + "";
-                }
-                else {
-                    q += "taken during the months of ";
-                    for (var i = 0; i < monthSplit.length - 1; i++)
-                    {
-                        q += monthSplit[i] + ", ";
-                    }
-                    q += " or " + monthSplit[monthSplit.length - 1] + "";
-                }
-                found = true;
-            }
-
-            if (self.selectedHours().length != 0) {
-                if (found) {
-                    q += ", and "
-                }
-
-                var hourSplit = self.hourText().split(',');
-
-                if (hourSplit.length == 1) {
-                    q += "taken during the hour of " + hourSplit[0] + "";
-                }
-                else if (hourSplit.length == 2) {
-                    q += "taken during the hours of " + hourSplit[0] + " or " + hourSplit[1] + "";
-                }
-                else {
-                    q += "taken during the hours of ";
-                    for (var i = 0; i < hourSplit.length - 1; i++)
-                    {
-                        q += hourSplit[i] + ", ";
-                    }
-                    q += " or " + hourSplit[hourSplit.length - 1] + "";
-                }
-                found = true;
-            }
-
-            if (found) {
-                return q;
-            }
-            else {
-                return "Searching for all photos";
-            }
-        });
-
-        self.queryResults = asyncComputed(function () {
-            return $.ajax("/api/search/count", {
-                data: {
-                    hours: this.hourQuery(),
-                    months: this.selectedMonths().toString(),
-                    sites: this.siteNames,
-                    tags: this.tagNames,
-                    dates: this.dates
-                }
-            });
-        }, this);
-
-        self.imagePath = asyncComputed(function() {
-            return $.ajax("/api/search/photoId", {
-                data: {
-                    hours: this.hourQuery(),
-                    months: this.selectedMonths().toString(),
-                    sites: this.siteNames,
-                    tags: this.tagNames,
-                    dates: this.dates
-                }
-            });
-        }, this);
-
-        self.search = function() {
-            var form;
-            form = $('<form />', {
-                action: '/search/knockoutadvancedsearch',
-                method: 'POST',
-                style: 'display: none;'
-            });
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'hours',
-                value: self.hourQuery()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'months',
-                value: self.selectedMonths().toString()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'sites',
-                value: self.siteNames()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'tags',
-                value: self.tagNames()
-            }));
-
-            form.append($('<input/>', {
-                type: 'hidden',
-                name: 'dates',
-                value: self.dates()
-            }));
-            form.appendTo('body').submit();
-        };
-    }
-
-    ko.applyBindings(new ViewModel())
-</script>
+    <!--
+<ul id="ul-holder" class="col-md-12" data-bind="visible: queryResults() > 0, foreach: photos">
+    <li data-bind="attr: { id: 'photo-li-' + $data }" class="search-photo">
+        <p class="img-date"></p>
+        <img data-bind="attr: { id: 'photo-' + $data, src: '/api/photo/low/' + $data }, click: $root.selectPhoto" class="photo" />
+    </li>
+</ul>
+-->
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -532,6 +326,7 @@
         }, $('#site-field')));
 
         //add a random site or tag
+        /*       
         var bool = (Math.random() > 0.5);
         if (bool) {
             $('#site-field').tagsinput('add', sites[Math.floor(Math.random() * sites.length)]);
@@ -539,23 +334,22 @@
         else {
             $('#tag-field').tagsinput('add', availableTags[Math.floor(Math.random() * availableTags.length)]);
         }
+        */
+
+        // Check the view bag for tag params
+        var tag = '@ViewBag.Tag';
+        if (availableTags.indexOf(tag) != -1) {
+            $('#tag-field').tagsinput('add', tag);
+        }
+
+        var site = '@ViewBag.Site';
+        if (sites.indexOf(site) != -1) {
+            $('#site-field').tagsinput('add', site);
+        }
     });
 
 
     //User Defined Collection
-    var imageID;
-    function saveCollectionPrompt() {
-        var id = $(".save-button").attr('id');
-        var split = id.split('/');
-        imageID = split[split.length - 1];
-
-        $('#userCollectionModal').modal({
-            show: true,
-            backdrop: 'static',
-            closeOnEscape: true
-        });
-    }
-
     var collectionIds = [];
     function registerCollectionSelection(collectionId) {
         if (jQuery.inArray(collectionId, collectionIds) == -1) {
@@ -583,14 +377,14 @@
 
     function addToCollection(collectionIds) {
         $.ajax({
-            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+imageID,
+            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+saveIds,
             type : 'POST'
         });
     }
 
     function saveCollection(collectionName) {
         $.ajax({
-            url : '/api/usercollection/SaveUserCollection?photoIds='+imageID+'&collectionName='+collectionName,
+            url : '/api/usercollection/SaveUserCollection?photoIds='+saveIds+'&collectionName='+collectionName,
             type : "POST"
         });
     }
@@ -604,6 +398,19 @@
     });
 
 </script>
+
+
+<!------------------------------------------------------>
+<!--              TEMPLATE FOR IMAGE                  -->
+<!------------------------------------------------------>
+
+<script id="list-item-template" type="application/template">
+    <li id="photo-li-${id}" class="search-photo">
+        <p class="img-date"></p>
+        <img src="/api/photo/low/${id}" id="photo-${id}" data-bind="click: $root.selectPhoto" class="photo" style="width: ${width}px; height: ${height}px;"/>
+    </li>
+</script>
+
 
 <!-- Save User Collection Modal -->
 <div id="userCollectionModal" class="modal fade">

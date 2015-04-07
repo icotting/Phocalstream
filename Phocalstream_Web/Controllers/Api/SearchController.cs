@@ -30,9 +30,11 @@ namespace Phocalstream_Web.Controllers.Api
 
         [HttpGet]
         [ActionName("count")]
-        public HttpResponseMessage SearchCount(string hours, string months, string sites, string tags, string dates)
+        public HttpResponseMessage SearchCount(string userId, string collectionId, string hours, string months, string sites, string tags, string dates)
         {
             SearchModel model = new SearchModel();
+            model.UserId = userId;
+            model.CollectionId = collectionId;
             model.Sites = sites;
             model.Tags = tags;
             model.Dates = dates;
@@ -65,6 +67,29 @@ namespace Phocalstream_Web.Controllers.Api
 
             HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
             message.Content = new StringContent("/api/photo/high/" + Convert.ToString(id));
+
+            return message;
+
+        }
+
+        [HttpGet]
+        [ActionName("getphotos")]
+        public HttpResponseMessage SearchGetPhotos(string userId, string collectionId, string hours, string months, string sites, string tags, string dates, string group)
+        {
+            SearchModel model = new SearchModel();
+            model.UserId = userId;
+            model.CollectionId = collectionId;
+            model.Sites = sites;
+            model.Tags = tags;
+            model.Dates = dates;
+            model.Hours = hours;
+            model.Months = months;
+            model.Group = group;
+
+            List<long> ids = SearchService.SearchResultPhotoIds(model);
+
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+            message.Content = new StringContent(string.Join(",", ids));
 
             return message;
 

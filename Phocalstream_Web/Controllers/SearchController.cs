@@ -50,7 +50,7 @@ namespace Phocalstream_Web.Controllers
         public ICollectionService CollectionService { get; set; }
 
 
-        public ActionResult Index(int e = 0)
+        public ActionResult Index(long collectionId = -1, string tag = "", string site = "", string year = "")
         {
             SearchModel model = new SearchModel();
 
@@ -67,36 +67,33 @@ namespace Phocalstream_Web.Controllers
                 userCollectionModel.User = User;
                 userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
                 model.UserCollections = userCollectionModel;
+
+                ViewBag.UserId = User.ID;
             }
 
 
-            if (e == 1)
+            Collection collection = CollectionRepository.Find(c => c.ID == collectionId).FirstOrDefault();
+            if (collection != null && collection.Type == CollectionType.USER) 
             {
-                ViewBag.Message = "Zero photos matched those parameters, please try again.";
+                // If the collection is a user collection, and it does not belong to current user
+                if (User == null || collection.Owner.ID != User.ID)
+                {
+                    collection = null;
+                }
             }
-            else if (e == 2)
+            // Either not a user collection, or a properly owned user collection
+            if (collection != null)
             {
-                ViewBag.Message = "Please enter at least one (1) search parameter.";
+                ViewBag.CollectionId = collection.ID;
             }
+            
+            ViewBag.Tag = tag;
+            ViewBag.Site = site;
+            ViewBag.Year = year;
 
             return View(model);
         }
         
-        public ActionResult TagSearch(string tag)
-        {
-            if (String.IsNullOrWhiteSpace(tag))
-            {
-                return RedirectToAction("Index", "Home", new { e = 2 });
-            }
-            else
-            {
-                SearchModel model = new SearchModel();
-                model.Tags = tag;
-
-                return RedirectToAction("AdvancedSearch", model);
-            }
-        }
-
         public ActionResult KnockoutAdvancedSearch(string hours, string months, string sites, string tags, string dates)
         {
             SearchModel model = new SearchModel();

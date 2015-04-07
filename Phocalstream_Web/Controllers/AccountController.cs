@@ -219,7 +219,7 @@ namespace Phocalstream_Web.Controllers
                     ID = col.ID,
                     Name = col.Name,
                     PhotoCount = col.Photos.Count,
-                    Link = "/account/userdefinedcollection?collectionId=" + col.ID.ToString(),
+                    Link = "/search/index?collectionId=" + col.ID.ToString(),
 
                     CanEdit = true,
                     EditLink = "/Account/EditUserCollection?collectionID=" + col.ID.ToString(),
