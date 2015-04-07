@@ -389,7 +389,7 @@
     <Content Include="Content\Scripts\SearchViewModel.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Scripts\TimeLapse.js" />
-    <Content Include="Content\Site.css" />
+    <Content Include="Content\CSS\Site.css" />
     <Content Include="Content\typeahead\typeahead.bundle.js" />
     <Content Include="Global.asax" />
     <Content Include="Content\Scripts\Silverlight.js" />
