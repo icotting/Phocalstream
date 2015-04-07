@@ -11,6 +11,14 @@
         });
 
         var count = @Model.WaterDataValues.Count;
+        var startDate = "1/1/1970 12:00:00 AM";
+
+        // Only attempt to access the real start data if there is data at the first position
+        @if (Model.WaterDataValues.Count > 0) {
+            <text>
+                startDate = '@Html.DisplayFor(model => model.WaterDataValues.ElementAt(0).DateOf)';
+            </text>
+        }
 
         var waterChart;
         if (count > 0) {
@@ -91,14 +99,14 @@
                         },
                         threshold: null
                     }
-                }, 
+                },
                 series: [{
                     name: '@Html.DisplayFor(model => model.ParameterInfo.ParameterDesc) - @Html.DisplayFor(model => model.ParameterInfo.StatisticDesc)',
                     color: '#4572A7',
                     pointInterval: 24 * 3600 * 1000,
-                    pointStart: Date.parse("@Html.DisplayFor(model => model.WaterDataValues.ElementAt(0).DateOf)") - 1000,
+                    pointStart: Date.parse(startDate) - 1000,
                     data: [@Html.DisplayFor(model => model.chartDataValues)]
-                }]                
+                }]
             });
         }
     });
