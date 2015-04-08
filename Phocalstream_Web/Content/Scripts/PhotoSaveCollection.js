@@ -72,13 +72,19 @@ function addToCollection(collectionIds) {
     });
 
     // Update the documents on the page to reflect the changes
+
+    // Number of photos added
     var photoCount = visibleItems.split(',').length;
 
+    // Loop over the collections and update photo counts and removed .list-group-item-success
     for (var i = 0; i < collectionIds.length; i++) {
         var currentCount = $('li#' + collectionIds[i] + ' span').text();
         $('li#' + collectionIds[i] + ' span').text((parseInt(currentCount) + photoCount));
+        $('li#' + collectionIds[i]).removeClass('list-group-item-success');
     }
 
+    // Removed the selected collections from the array
+    collectionIds = [];
 }
 
 /*
@@ -96,7 +102,7 @@ function saveCollection(collectionName) {
  */
 $(document).ready(function () {
     $('.list-group-item').click(function () {
-        $(this).addClass("list-group-item-success");
+        $(this).toggleClass("list-group-item-success");
 
         registerCollectionSelection($(this).attr('id'));
     });
