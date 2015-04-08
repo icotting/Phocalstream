@@ -102,7 +102,7 @@ function saveCollection(collectionName) {
  */
 $(document).ready(function () {
     $('.list-group-item').click(function () {
-        $(this).toggleClass("list-group-item-success");
+        $(this).toggleClass('list-group-item-success');
 
         registerCollectionSelection($(this).attr('id'));
     });
