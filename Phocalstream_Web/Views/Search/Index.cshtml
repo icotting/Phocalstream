@@ -349,54 +349,6 @@
     });
 
 
-    //User Defined Collection
-    var collectionIds = [];
-    function registerCollectionSelection(collectionId) {
-        if (jQuery.inArray(collectionId, collectionIds) == -1) {
-            collectionIds.push(collectionId);
-        }
-        else {
-            var index = collectionIds.indexOf(collectionId);
-            collectionIds.splice(index, 1);
-        }
-    }
-
-    function saveCollectionModalButton() {
-        var newName = $('#newCollectionName').val();
-        if (newName != "") {
-            saveCollection(newName);
-        }
-
-        if (collectionIds.length > 0) {
-            addToCollection(collectionIds);
-        }
-    }
-
-    function cancelCollectionModalButton() {
-    }
-
-    function addToCollection(collectionIds) {
-        $.ajax({
-            url : '/api/usercollection/AddToCollection?collectionIds='+collectionIds.join(',')+'&photoIds='+saveIds,
-            type : 'POST'
-        });
-    }
-
-    function saveCollection(collectionName) {
-        $.ajax({
-            url : '/api/usercollection/SaveUserCollection?photoIds='+saveIds+'&collectionName='+collectionName,
-            type : "POST"
-        });
-    }
-    
-    $(document).ready(function() { 
-        $('.list-group-item').click(function () {
-            $(this).toggleClass('list-group-item-success');
-
-            registerCollectionSelection($(this).attr('id'));
-        });
-    });
-
 </script>
 
 

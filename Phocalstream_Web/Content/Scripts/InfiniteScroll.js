@@ -21,7 +21,6 @@ function getMoreListItems(container, targetArea, onComplete){
 
     if (photoIds.length > 0) {
         var slice = photoIds.slice(nextOffset, nextOffset + chunkSize);
-        console.log(slice);
         applyListItems(container, targetArea, slice, nextOffset);
         onComplete();
     }

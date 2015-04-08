@@ -65,10 +65,20 @@ function saveCollectionModalButton() {
  * POST the collection Ids and photo Ids to the User Collection API contoller.
  */
 function addToCollection(collectionIds) {
+    // Make the call to add the given photos to the collection
     $.ajax({
         url: '/api/usercollection/AddToCollection?collectionIds=' + collectionIds.join(',') + '&photoIds=' + visibleItems,
         type: 'POST'
     });
+
+    // Update the documents on the page to reflect the changes
+    var photoCount = visibleItems.split(',').length;
+
+    for (var i = 0; i < collectionIds.length; i++) {
+        var currentCount = $('li#' + collectionIds[i] + ' span').text();
+        $('li#' + collectionIds[i] + ' span').text((parseInt(currentCount) + photoCount));
+    }
+
 }
 
 /*
@@ -86,7 +96,7 @@ function saveCollection(collectionName) {
  */
 $(document).ready(function () {
     $('.list-group-item').click(function () {
-        $(this).toggleClass('list-group-item-success');
+        $(this).addClass("list-group-item-success");
 
         registerCollectionSelection($(this).attr('id'));
     });
