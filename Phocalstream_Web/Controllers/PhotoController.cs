@@ -223,23 +223,8 @@ namespace Phocalstream_Web.Controllers
         [HttpPost]
         public ActionResult TimeLapse(string photoIds)
         {
-            TimelapseModel model = new TimelapseModel();
-            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray<long>();
-
-            model.DmWeeks = DZPhotoRepository.FindDmDatesForPhotos(ids);
-            model.Frames = PhotoService.CreateTimeLapseFramesFromIDs(ids);
-
-            long id = model.Frames.FirstOrDefault().PhotoID;
-
-            Photo first = PhotoRepository.Find(p => p.ID == id, p => p.Site).FirstOrDefault();
-            model.CountyFips = first.Site.CountyFips;
-            model.Latitude = first.Site.Latitude;
-            model.Longitude = first.Site.Longitude;
-
-            model.Width = first.Width;
-            model.Height = first.Height;
-
-            return View(model);
+            long id = CollectionService.NewTimelapseCollection("", photoIds);
+            return RedirectToAction("Timelapse", new { @collectionId = id });
         }
 
         [HttpPost]
