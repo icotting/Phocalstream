@@ -241,5 +241,46 @@ namespace Phocalstream_Service.Service
             collection.Public = publish;
             Unit.Commit();
         }
+
+        public long NewTimelapseCollection(string timelapseName, string photoIds)
+        {
+            // Use the hash of the photoIds as the container id so we can check if timelapse already exists
+            string containerID = Convert.ToString(photoIds.GetHashCode());
+
+            Collection existingCollection = CollectionRepository.Find(c => c.ContainerID == containerID).FirstOrDefault();
+            if (existingCollection != null)
+            {
+                return existingCollection.ID;
+            }
+            else
+            {
+                List<Photo> photos;
+                long[] ids;
+                if (!String.IsNullOrWhiteSpace(photoIds))
+                {
+                    ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray();
+                    photos = PhotoRepository.Find(p => ids.Contains(p.ID), p => p.Site).ToList();
+
+                    Collection c = new Collection()
+                    {
+                        Name = timelapseName,
+                        ContainerID = containerID.ToString(),
+                        Owner = null,
+                        Type = CollectionType.TIMELAPSE,
+                        Status = CollectionStatus.COMPLETE,
+                        Photos = photos
+                    };
+                    CollectionRepository.Insert(c);
+                    Unit.Commit();
+
+                    return c.ID;
+                }
+                else
+                {
+                    // no photos selected, so return -1
+                    return -1;
+                }
+            }
+        }
     }
 }
