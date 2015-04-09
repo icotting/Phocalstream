@@ -168,26 +168,63 @@ namespace Phocalstream_Web.Controllers
             return PartialView("_DmPartial", model);
         } //End DroughtMonitorData
 
+        [HttpGet]
+        public ActionResult Timelapse(long collectionId)
+        {
+            TimelapseModel model = new TimelapseModel();
+            Collection collection = CollectionRepository.Find(c => c.ID == collectionId, c => c.Photos, c => c.Site).FirstOrDefault();
+
+            if (collection != null)
+            {
+                model.Name = !String.IsNullOrWhiteSpace(collection.Name) ? collection.Name : "Dynamic Timelapse";
+
+                long[] ids;
+                switch (collection.Type)
+                {
+                    case CollectionType.SITE:
+                        ids = PhotoRepository.Find(p => p.Site.ID == collection.Site.ID).Select(p => p.ID).ToArray<long>();
+                        break;
+                    case CollectionType.USER: 
+                        ids = collection.Photos.Select(p => p.ID).ToArray<long>();
+                        break;
+                    case CollectionType.SEARCH: 
+                        ids = collection.Photos.Select(p => p.ID).ToArray<long>();
+                        break;
+                    case CollectionType.TIMELAPSE:
+                        ids = collection.Photos.Select(p => p.ID).ToArray<long>();
+                        break;
+                    default:
+                        ids = new long[0];
+                        break;
+                }
+
+                if (ids.Length > 0)
+                {
+                    model.DmWeeks = DZPhotoRepository.FindDmDatesForPhotos(ids);
+                    model.Frames = PhotoService.CreateTimeLapseFramesFromIDs(ids);
+
+                    long id = model.Frames.FirstOrDefault().PhotoID;
+
+                    Photo first = PhotoRepository.Find(p => p.ID == id, p => p.Site).FirstOrDefault();
+                    model.CountyFips = first.Site.CountyFips;
+                    model.Latitude = first.Site.Latitude;
+                    model.Longitude = first.Site.Longitude;
+
+                    model.Width = first.Width;
+                    model.Height = first.Height;
+
+                    return View(model);
+                }
+            }
+
+            return RedirectToAction("Index", "Search", null);
+        }
+
         [HttpPost]
         public ActionResult TimeLapse(string photoIds)
         {
-            TimelapseModel model = new TimelapseModel();
-            long[] ids = photoIds.Split(',').Select(i => Convert.ToInt64(i)).ToArray<long>();
-
-            model.DmWeeks = DZPhotoRepository.FindDmDatesForPhotos(ids);
-            model.Frames = PhotoService.CreateTimeLapseFramesFromIDs(ids);
-
-            long id = model.Frames.FirstOrDefault().PhotoID;
-
-            Photo first = PhotoRepository.Find(p => p.ID == id, p => p.Site).FirstOrDefault();
-            model.CountyFips = first.Site.CountyFips;
-            model.Latitude = first.Site.Latitude;
-            model.Longitude = first.Site.Longitude;
-
-            model.Width = first.Width;
-            model.Height = first.Height;
-
-            return View(model);
+            long id = CollectionService.NewTimelapseCollection("", photoIds);
+            return RedirectToAction("Timelapse", new { @collectionId = id });
         }
 
         [HttpPost]

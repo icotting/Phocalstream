@@ -20,6 +20,7 @@ namespace Phocalstream_Shared.Service
         void TogglePhotoInUserCollection(long photoID, long collectionID);
         void UpdateUserCollection(Collection collection);
         void SetUserCollectionCoverPhoto(User user, long collectionID, long photoID);
-        void SetUserCollectionPublic(User user, long collectionID, bool publish);        
+        void SetUserCollectionPublic(User user, long collectionID, bool publish);
+        long NewTimelapseCollection(string timelapseName, string photoIds);
     }
 }
