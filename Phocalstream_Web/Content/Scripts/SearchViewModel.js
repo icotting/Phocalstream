@@ -431,9 +431,9 @@ function ViewModel() {
 
 
 
-    self.timelapse = function() {
+    self.timelapse = function () {
+        // get either the visible items, or the selected photos
         var timelapseIds = "";
-
         if (self.selectedCount() == 0) {
             timelapseIds = visibleItems;
         }
@@ -441,20 +441,34 @@ function ViewModel() {
             timelapseIds = self.selectedPhotos().join(",");
         }
 
-        var form;
-        form = $('<form />', {
-            action: '/photo/timelapse',
-            method: 'POST',
-            target: '_blank',
-            style: 'display: none;'
-        });
+        // prompt the user to name timelapse
+        var timelapseName = "";
+        if (userId != "") {
+            bootbox.prompt({
+                title: "Name your timelapse video?",
+                buttons: {
+                    cancel: {
+                        label: "No, thanks.",
+                        className: "btn-default pull-left"
+                    },
+                    confirm: {
+                        label: "Definitely!",
+                        className: "btn-success pull-right"
+                    }
+                },
+                callback: function (result) {
+                    if (result === null) {
 
-        form.append($('<input/>', {
-            type: 'hidden',
-            name: 'photoIds',
-            value: timelapseIds
-        }));
-        form.appendTo('body').submit();
+                    } else {
+                        timelapseName = result;
+                    }
+                    generateTimelapse(timelapseIds, timelapseName);
+                }
+            });
+        }
+        else {
+            generateTimelapse(timelapseIds, timelapseName);
+        }
     }
 
     self.saveCollection = function() {
