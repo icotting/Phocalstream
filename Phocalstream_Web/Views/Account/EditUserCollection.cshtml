@@ -23,6 +23,14 @@
                 </div>
             }
 
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <strong>@ViewBag.Message</strong>
+                </div>
+            }
+
             <div class="save-changes invisible">
                 <button onclick="javascript:cancel()" class="btn btn-warning">Discard</button>
                 <button onclick="javascript:save()" class="btn btn-success">Save Changes</button>
@@ -54,6 +62,8 @@
 </div>
 
 <script type="text/javascript">
+
+    var baseURL = window.location.href.split('&')[0];
 
     $("img.thumbnail-image").lazyload({
         threshold: 400
@@ -116,8 +126,6 @@
 
             }
         });
-
-
     });
 
     function save() {
@@ -125,13 +133,14 @@
             url: '/api/usercollection/RemoveFromCollection?collectionId=' + @Model.Collection.ID.ToString() + '&photoIds=' + toRemove.join(','),
             type: 'POST',
             success: function (data) {
-                location.reload();
+                window.location.replace(baseURL + "&count=" + toRemove.length);
             },
         });
     }
 
     function cancel() {
-        location.reload();
+        
+        window.location.replace(baseURL);
     }
 
     function setCoverPhoto(id) {

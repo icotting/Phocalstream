@@ -314,11 +314,23 @@ namespace Phocalstream_Web.Controllers
             return RedirectToAction("UserCollections", "Account");
         }
 
-        public ActionResult EditUserCollection(long collectionID)
+        public ActionResult EditUserCollection(long collectionID, int count = -1)
         {
             EditUserCollection model = new EditUserCollection();
             model.Collection = CollectionRepository.First(c => c.ID == collectionID, c => c.Photos);
             model.CoverPhotoId = model.Collection.CoverPhoto != null ? model.Collection.CoverPhoto.ID : 0;
+
+            if (count != -1)
+            {
+                if (count == 1)
+                {
+                    ViewBag.Message = "Successfully deleted " + count.ToString() + " photo.";
+                }
+                else
+                {
+                    ViewBag.Message = "Successfully deleted " + count.ToString() + " photos.";
+                }
+            }
 
             return View(model);
         }
