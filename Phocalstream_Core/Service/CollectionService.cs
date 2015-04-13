@@ -257,6 +257,13 @@ namespace Phocalstream_Service.Service
                 Collection existingUserCollection = CollectionRepository.Find(c => c.ContainerID == containerID & c.Owner.ID == user.ID).FirstOrDefault();
                 if (existingUserCollection != null)
                 {
+                    // see if the name is the same, if not, overwrite
+                    if (!existingUserCollection.Name.Equals(timelapseName))
+                    {
+                        existingUserCollection.Name = timelapseName;
+                        Unit.Commit();
+                    }
+
                     return existingUserCollection.ID;
                 }
                 else

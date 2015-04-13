@@ -429,8 +429,6 @@ function ViewModel() {
     });
 
 
-
-
     self.timelapse = function () {
         // get either the visible items, or the selected photos
         var timelapseIds = "";
