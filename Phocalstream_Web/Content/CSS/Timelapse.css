@@ -38,3 +38,7 @@
 #open_container {
     margin-top: 10px;
 }
+
+.form-control[readonly] {
+    cursor: pointer;
+}

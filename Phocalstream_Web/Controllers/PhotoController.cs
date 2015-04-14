@@ -176,8 +176,9 @@ namespace Phocalstream_Web.Controllers
 
             if (collection != null)
             {
+                model.CollectionId = collection.ID; 
                 model.Name = !String.IsNullOrWhiteSpace(collection.Name) ? collection.Name : "Dynamic Timelapse";
-
+               
                 long[] ids;
                 switch (collection.Type)
                 {
