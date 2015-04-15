@@ -68,27 +68,6 @@ namespace Phocalstream_Web.Controllers
 
             model.SiteIndex = new Random().Next(model.Sites.Count());
 
-            model.PublicCollectionThumbnails = new List<ThumbnailModel>();
-            var publicCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Public, c => c.Photos).ToList();
-            foreach (var col in publicCollections)
-            {
-                if (col.CoverPhoto == null)
-                {
-                    col.CoverPhoto = col.Photos.LastOrDefault();
-                }
-
-                model.PublicCollectionThumbnails.Add(new ThumbnailModel()
-                {
-                    ID = col.ID,
-                    Name = col.Name,
-                    First = col.Photos.First().Captured,
-                    Last = col.Photos.Last().Captured,
-                    PhotoCount = col.Photos.Count,
-                    CoverPhotoID = col.CoverPhoto.ID,
-                    Link = "/search/index?collectionId=" + col.ID.ToString()
-                });
-            }
-
             if (e == 2)
             {
                 ViewBag.Message = "Please enter at lease one search parameter.";
