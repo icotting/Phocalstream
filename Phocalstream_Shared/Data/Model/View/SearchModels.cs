@@ -15,6 +15,10 @@ namespace Phocalstream_Shared.Data.Model.View
 
         public string CollectionId { get; set; }
 
+        public bool CameraSites { get; set; }
+
+        public bool PublicUserCollections { get; set; }
+
         [Display(Name = "Sites")]
         public string Sites { get; set; }
 

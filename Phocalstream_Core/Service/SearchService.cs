@@ -149,7 +149,7 @@ namespace Phocalstream_Service.Service
                 }
             }
 
-            return Ids;
+            return Ids.Distinct().ToList<long>();
         }
 
         public void ValidateCache(SearchModel model, int currentCount)
@@ -213,7 +213,7 @@ namespace Phocalstream_Service.Service
             StringBuilder dateBuilder = new StringBuilder();
             StringBuilder hourBuilder = new StringBuilder();
 
-            publicPhotosBuilder = PublicPhotosQuery(model.UserId);
+            publicPhotosBuilder = PublicPhotosQuery(model.UserId, model.CameraSites, model.PublicUserCollections);
 
             if (!String.IsNullOrWhiteSpace(model.CollectionId))
             {
@@ -252,13 +252,13 @@ namespace Phocalstream_Service.Service
 
 
             //merge the builders
-            select.Append("select Photos.ID from Photos ");
-
+            select.Append("SELECT Photos.ID from Photos ");
+            select.Append("INNER JOIN CollectionPhotos ON Photos.ID = CollectionPhotos.PhotoId ");
+            
             parameters.Append("(" + publicPhotosBuilder + ")");
 
             if (collectionBuilder.Length != 0)
             {
-                select.Append("INNER JOIN CollectionPhotos ON Photos.ID = CollectionPhotos.PhotoId ");
                 parameters.Append(" AND " + "(" + collectionBuilder + ")");
             }
 
@@ -290,37 +290,48 @@ namespace Phocalstream_Service.Service
                 parameters.Append(" AND " + "(" + tagBuilder + ")");
             }
 
-           select.Append("WHERE " + parameters);
+            select.Append("WHERE " + parameters);
 
-           if (!String.IsNullOrWhiteSpace(model.Group))
-           {
-               select.Append(" ORDER BY");
+            if (!String.IsNullOrWhiteSpace(model.Group))
+            {
+                select.Append(" ORDER BY");
 
-               if (model.Group.Equals("site"))
-               {
-                   select.Append(" Photos.Site_ID,");
-               }
+                if (model.Group.Equals("site"))
+                {
+                    select.Append(" Photos.Site_ID,");
+                }
 
-               select.Append(" Photos.Captured");
-           }
- 
+                select.Append(" Photos.Captured");
+            }
+
             return select.ToString();
         }
 
-        private StringBuilder PublicPhotosQuery(string userId)
+        private StringBuilder PublicPhotosQuery(string userId, bool cameraSites, bool publicUserCollections)
         {
             StringBuilder publicQuery = new StringBuilder();
 
-
-            if (!String.IsNullOrWhiteSpace(userId))
+            // Initial query to capture photos from sites
+            if (cameraSites) 
             {
-                publicQuery.Append(string.Format("Photos.Site_ID IN (SELECT Site_ID from Collections WHERE Collections.Type = 0 " +
-                    "OR (Collections.Type = 1 AND Collections.Owner_ID = {0}))", userId));
+                publicQuery.Append("Photos.Site_ID IN (SELECT Site_ID from Collections WHERE Collections.Type = 0) ");
             }
             else
             {
-                publicQuery.Append("Photos.Site_ID IN " +
-                    "(SELECT Site_ID from Collections WHERE Collections.Type = 0)");
+                publicQuery.Append("Photos.Site_ID NOT IN (SELECT Site_ID from Collections WHERE Collections.Type = 0) ");
+            }
+
+            if (publicUserCollections)
+            {
+                publicQuery.Append("OR ");
+                publicQuery.Append("CollectionPhotos.CollectionId IN (SELECT ID from Collections WHERE Collections.[Public] = 1) ");
+
+                // If a user is signed in, capture their private collections
+                if (!String.IsNullOrWhiteSpace(userId))
+                {
+                    publicQuery.Append("OR ");
+                    publicQuery.Append(string.Format("CollectionPhotos.CollectionId IN (SELECT ID from Collections WHERE Collections.Type = 1 AND Collections.Owner_ID = {0}) ", userId));
+                }
             }
 
             return publicQuery;

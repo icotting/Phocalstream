@@ -81,6 +81,16 @@ function ViewModel() {
         }
     });
 
+    self.cameraSites = ko.observable(true);
+    self.cameraSites.subscribe(function (newSize) {
+        self.getPhotos();
+    });
+
+    self.publicUserCollections = ko.observable(true);
+    self.publicUserCollections.subscribe(function (newSize) {
+        self.getPhotos();
+    });
+
     // selected collection id
     self.collectionId = ko.observable(initialCollection);
     self.collectionId.subscribe(function (newSize) {
@@ -354,6 +364,8 @@ function ViewModel() {
             data: {
                 userId: userId,
                 collectionId: this.collectionId,
+                cameraSites: this.cameraSites,
+                publicUserCollections: this.publicUserCollections,
                 hours: this.hourQuery(),
                 months: this.selectedMonths().toString(),
                 sites: this.siteNames,
@@ -366,7 +378,7 @@ function ViewModel() {
     self.queryResults.extend({ notify: 'always' });
         
     self.getPhotos = function() {
-        if (self.query() == "Searching for all photos") {
+        if (self.query() == "Searching for all photos" || !(self.cameraSites || self.publicUserCollections)) {
             self.search(false);
             self.reset();
         }
@@ -377,6 +389,8 @@ function ViewModel() {
                 data: {
                     userId: userId,
                     collectionId: this.collectionId,
+                    cameraSites: this.cameraSites,
+                    publicUserCollections: this.publicUserCollections,
                     hours: this.hourQuery(),
                     months: this.selectedMonths().toString(),
                     sites: this.siteNames,
