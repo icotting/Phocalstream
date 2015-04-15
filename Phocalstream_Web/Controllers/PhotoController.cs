@@ -176,8 +176,9 @@ namespace Phocalstream_Web.Controllers
 
             if (collection != null)
             {
+                model.CollectionId = collection.ID; 
                 model.Name = !String.IsNullOrWhiteSpace(collection.Name) ? collection.Name : "Dynamic Timelapse";
-
+               
                 long[] ids;
                 switch (collection.Type)
                 {
@@ -221,9 +222,10 @@ namespace Phocalstream_Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult TimeLapse(string photoIds)
+        public ActionResult TimeLapse(string photoIds, string timelapseName = "")
         {
-            long id = CollectionService.NewTimelapseCollection("", photoIds);
+            Phocalstream_Shared.Data.Model.Photo.User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            long id = CollectionService.NewTimelapseCollection(user, timelapseName, photoIds);
             return RedirectToAction("Timelapse", new { @collectionId = id });
         }
 

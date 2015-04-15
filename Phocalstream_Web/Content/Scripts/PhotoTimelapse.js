@@ -1,12 +1,9 @@
 ﻿// Script to handle photo timelapse generation functionality
 
-// Dependencies:
-// ** visibleItems, a global variable containing a comma-separated list of photo Ids
-
 /*
  * POST the photo Ids to the Timelapse method of the Photo controller.
  */
-function generateTimelapse() {
+function generateTimelapse(photoIds, timelapseName) {
     var form;
     form = $('<form />', {
         action: '/photo/timelapse',
@@ -18,7 +15,13 @@ function generateTimelapse() {
     form.append($('<input/>', {
         type: 'hidden',
         name: 'photoIds',
-        value: visibleItems
+        value: photoIds
+    }));
+
+    form.append($('<input/>', {
+        type: 'hidden',
+        name: 'timelapseName',
+        value: timelapseName
     }));
     form.appendTo('body').submit();
 }

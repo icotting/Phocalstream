@@ -19,6 +19,7 @@
 
 @section Scripts
 {
+    <script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
     <script src="http://code.highcharts.com/2.2.4/highcharts.js" type="text/javascript"></script>
   
     <script type="text/javascript">
@@ -45,6 +46,9 @@
         var lon = @Model.Longitude;
 
         var imageRes = "@RESOLUTION";
+
+        var timelapseUrl = window.location.href;
+        var collectionUrl = "@Url.Action("Index", "Search", new { @collectionId = @Model.CollectionId }, Request.Url.Scheme)"
     </script>
 }   <script src="~/Content/Scripts/TimeLapse.js" type="text/javascript"></script>
 
@@ -86,7 +90,10 @@
                             <label class="btn btn-primary">
                                 <input type="radio" name="framerate" id="fast" onchange="setFrameRate(75)"> Fast
                             </label>
-                        </div>
+                        </div>&nbsp;
+                        <button class="btn btn-success" onclick="share()">
+                            <span id="sharebtn" class="glyphicon glyphicon-share"></span>
+                        </button>
                     </div>
                 </div>
             </div>

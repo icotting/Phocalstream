@@ -273,3 +273,34 @@ function startStop() {
         nextImage();
     }
 }
+
+function share() {
+    bootbox.dialog({
+        title: "Share these photos:",
+        message: '<div class="row">' +
+                    '<div class="col-md-12">' +
+                        '<div class="input-group">' +
+                            '<span class="input-group-addon"><strong>Timelapse</strong></span>' +
+                            '<input id="timelapse-field" type="url" value="' + timelapseUrl + '" class="form-control input-md" onclick="this.setSelectionRange(0, this.value.length)" readonly="readonly"> ' +
+                        '</div>' +
+                    '</div>' +
+                 '</div>' +
+                 '<div class="row">' +
+                    '<div class="col-md-12">' +
+                        '<div class="input-group">' +
+                            '<span class="input-group-addon"><strong>Collection</strong></span>' +
+                            '<input id="collection-field" type="url" value="' + collectionUrl + '" class="form-control input-md" onclick="this.setSelectionRange(0, this.value.length)" readonly="readonly"> ' +
+                        '</div>' +
+                    '</div>' +
+                 '</div>',
+        buttons: {
+            success: {
+                label: "Close",
+                className: "btn-default",
+                callback: function () {
+                    /* Just close the dialog */
+                }
+            }
+        }
+    });
+}
