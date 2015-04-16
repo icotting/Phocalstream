@@ -73,7 +73,7 @@ namespace Phocalstream_Web.Controllers
 
 
             Collection collection = CollectionRepository.Find(c => c.ID == collectionId).FirstOrDefault();
-            if (collection != null && collection.Type == CollectionType.USER) 
+            if (collection != null && !collection.Public && collection.Type == CollectionType.USER)
             {
                 // If the collection is a user collection, and it does not belong to current user
                 if (User == null || collection.Owner.ID != User.ID)
@@ -81,7 +81,7 @@ namespace Phocalstream_Web.Controllers
                     collection = null;
                 }
             }
-            // Either not a user collection, or a properly owned user collection
+
             if (collection != null)
             {
                 ViewBag.CollectionId = collection.ID;

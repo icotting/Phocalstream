@@ -13,15 +13,12 @@
     <div class="content">
         <div class="text-center relative">
             <h1 class="page-header">@Model.Collection.Name</h1>
-            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
-            {
                 <div id="published" class="publish">
                     <button onclick="javascript:unpublish()" id="publishButton" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Published</button>
                 </div>
                 <div id="publish" class="publish">
                     <button onclick="javascript:publish()" id="publishButton" class="btn btn-info">Publish</button>
                 </div>
-            }
 
             @if (ViewBag.Message != null)
             {

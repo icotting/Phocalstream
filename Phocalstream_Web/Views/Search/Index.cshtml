@@ -116,7 +116,7 @@
                 <ul class="dropdown-menu" role="menu" data-bind="foreach: sizes">
                     <!-- Disable item if selected -->
                     <li data-bind="css: {'active' : name == $parent.size().name}">
-                        <!-- This is where I need to bind the click to change the value of the status -->`
+                        <!-- This is where I need to bind the click to change the value of the status -->
                         <a href="#" data-bind="click: $parent.size"><span data-bind="text: name"></span></a>
                     </li>
                 </ul>
@@ -124,6 +124,30 @@
         </div>
     </div>
     
+    <hr class="featurette-divider" />
+
+    <!-- Image Source -->
+    <div class="search-row">
+        <strong>Image Source</strong>
+    </div>
+
+    <div class="search-row row">
+        <div class="col-md-12">
+            <div class="btn-group btn-group-justified">
+                <label class="btn btn-default" data-bind="css: { 'active': source() === 'sites' }">
+                    <input type="radio" name="sourceOptions" id="cameraSites" data-bind="checked: source, checkedValue: 'sites'">Camera Sites
+                </label>
+                <label class="btn btn-default" data-bind="css: { 'active': source() === 'public' }">
+                    <input type="radio" name="sourceOptions" id="publicUser" data-bind="checked: source, checkedValue: 'public'">User Collections
+                </label>
+                <label class="btn btn-default" data-bind="css: { 'active': source() === 'both' }">
+                    <input type="radio" name="sourceOptions" id="both" data-bind="checked: source, checkedValue: 'both'">
+                    Both
+                </label>
+            </div>
+        </div>
+    </div>
+
     <hr class="featurette-divider" />
 
     <!-- FILTERS -->

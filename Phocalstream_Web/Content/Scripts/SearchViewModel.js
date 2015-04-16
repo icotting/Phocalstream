@@ -81,6 +81,12 @@ function ViewModel() {
         }
     });
 
+    // controls the toggle for photo source
+    self.source = ko.observable("sites");
+    self.source.subscribe(function (newSize) {
+        self.getPhotos();
+    });
+
     // selected collection id
     self.collectionId = ko.observable(initialCollection);
     self.collectionId.subscribe(function (newSize) {
@@ -354,6 +360,8 @@ function ViewModel() {
             data: {
                 userId: userId,
                 collectionId: this.collectionId,
+                cameraSites: (this.source() === 'sites' || this.source() === 'both'),
+                publicUserCollections: (this.source() === 'public' || this.source() === 'both'),
                 hours: this.hourQuery(),
                 months: this.selectedMonths().toString(),
                 sites: this.siteNames,
@@ -377,6 +385,8 @@ function ViewModel() {
                 data: {
                     userId: userId,
                     collectionId: this.collectionId,
+                    cameraSites: (this.source() === 'sites' || this.source() === 'both'),
+                    publicUserCollections: (this.source() === 'public' || this.source() === 'both'),
                     hours: this.hourQuery(),
                     months: this.selectedMonths().toString(),
                     sites: this.siteNames,
