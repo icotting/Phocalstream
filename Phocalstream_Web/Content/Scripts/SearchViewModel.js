@@ -81,13 +81,9 @@ function ViewModel() {
         }
     });
 
-    self.cameraSites = ko.observable(true);
-    self.cameraSites.subscribe(function (newSize) {
-        self.getPhotos();
-    });
-
-    self.publicUserCollections = ko.observable(true);
-    self.publicUserCollections.subscribe(function (newSize) {
+    // controls the toggle for photo source
+    self.source = ko.observable("sites");
+    self.source.subscribe(function (newSize) {
         self.getPhotos();
     });
 
@@ -364,8 +360,8 @@ function ViewModel() {
             data: {
                 userId: userId,
                 collectionId: this.collectionId,
-                cameraSites: this.cameraSites,
-                publicUserCollections: this.publicUserCollections,
+                cameraSites: (this.source() === 'sites' || this.source() === 'both'),
+                publicUserCollections: (this.source() === 'public' || this.source() === 'both'),
                 hours: this.hourQuery(),
                 months: this.selectedMonths().toString(),
                 sites: this.siteNames,
@@ -378,7 +374,7 @@ function ViewModel() {
     self.queryResults.extend({ notify: 'always' });
         
     self.getPhotos = function() {
-        if (self.query() == "Searching for all photos" || !(self.cameraSites || self.publicUserCollections)) {
+        if (self.query() == "Searching for all photos") {
             self.search(false);
             self.reset();
         }
@@ -389,8 +385,8 @@ function ViewModel() {
                 data: {
                     userId: userId,
                     collectionId: this.collectionId,
-                    cameraSites: this.cameraSites,
-                    publicUserCollections: this.publicUserCollections,
+                    cameraSites: (this.source() === 'sites' || this.source() === 'both'),
+                    publicUserCollections: (this.source() === 'public' || this.source() === 'both'),
                     hours: this.hourQuery(),
                     months: this.selectedMonths().toString(),
                     sites: this.siteNames,
