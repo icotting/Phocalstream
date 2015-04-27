@@ -65,6 +65,21 @@
     margin-top: 8px;
 }
 
+.validationMessage {
+    display: none !important;
+}
+
+#addressView {
+    margin-top: 73px;
+}
+
+div.alert-danger {
+    position: absolute;
+    top: 0px;
+    right: 15px;
+    left: 15px;
+}
+
 /* Login Fail */
 .login-fail-label {
     cursor: pointer;

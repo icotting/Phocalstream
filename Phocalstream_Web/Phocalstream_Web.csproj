@@ -365,6 +365,7 @@
     <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\bootbox.min.js" />
     <Content Include="Content\Scripts\ClientBin.js" />
+    <Content Include="Content\Scripts\CreateUserSiteViewModel.js" />
     <Content Include="Content\Scripts\InfiniteScroll.js" />
     <Content Include="Content\Scripts\jquery-lazyload.js" />
     <Content Include="Content\Scripts\jquery-1.7.1.min.js" />
@@ -380,6 +381,7 @@
     <Content Include="Content\Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\Scripts\knockout-2.1.0.js" />
     <Content Include="Content\Scripts\knockout-3.2.0.js" />
+    <Content Include="Content\Scripts\knockout.validation.min.js" />
     <Content Include="Content\Scripts\modernizr-2.5.3.js" />
     <Content Include="Content\Scripts\PhotoDownload.js" />
     <Content Include="Content\Scripts\PhotoSaveCollection.js" />
