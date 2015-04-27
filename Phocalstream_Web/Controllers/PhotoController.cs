@@ -557,7 +557,7 @@ namespace Phocalstream_Web.Controllers
                 model.PhotoID = photoID;
 
                 List<UserCollection> userCollections = new List<UserCollection>();
-                IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
+                IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Site == null && c.Type != CollectionType.TIMELAPSE, c => c.Photos);
 
                 foreach (var col in collections)
                 {
