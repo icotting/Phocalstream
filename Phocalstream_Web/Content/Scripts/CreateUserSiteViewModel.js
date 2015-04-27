@@ -1,16 +1,4 @@
-﻿function asyncComputed(evaluator, owner) {
-    var result = ko.observable();
-
-    ko.computed(function () {
-        // Get the $.Deferred value, and then set up a callback so that when it's done,
-        // the output is transferred onto our "result" observable
-        evaluator.call(owner).done(result);
-    });
-
-    return result;
-}
-
-function ViewModel() {
+﻿function ViewModel() {
     var self = this;
 
     self.cameraSiteName = ko.observable().extend({ required: true });
