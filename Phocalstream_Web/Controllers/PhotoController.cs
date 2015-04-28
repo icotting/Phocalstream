@@ -69,11 +69,27 @@ namespace Phocalstream_Web.Controllers
 
             model.Photo.AvailableTags = PhotoService.GetUnusedTagNames(photoID);
 
-            model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
+            Collection collection = CollectionRepository.Single(c => c.Site.ID == model.Photo.Site.ID, c => c.Owner);
+            if (collection.Type == CollectionType.USER)
+            {
+                model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}{4}/{5}/{6}.phocalstream/Tiles.dzi", Request.Url.Scheme,
                     Request.Url.Host,
                     Request.Url.Port,
-                    model.Photo.Site.Name,
+                    PathManager.UserCollectionPath,
+                    collection.Owner.ID,
+                    model.Photo.Site.ContainerID,
                     model.Photo.BlobID);
+
+            }
+            else
+            {
+                model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
+                        Request.Url.Host,
+                        Request.Url.Port,
+                        model.Photo.Site.Name,
+                        model.Photo.BlobID);
+
+            }
 
             model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
             model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
