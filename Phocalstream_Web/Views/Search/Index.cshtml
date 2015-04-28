@@ -45,8 +45,10 @@
     var totalPhotoCount = 0;
     var basePhotoUrl = "@Url.Action("Index", "Photo", null)?photoId=";
 
+    var searchVM;
+
     $(function(){
-        var searchVM = new ViewModel();
+        searchVM = new ViewModel();
         ko.applyBindings(searchVM);
 
         searchVM.getPhotos();
@@ -381,9 +383,9 @@
 <!------------------------------------------------------>
 
 <script id="list-item-template" type="application/template">
-    <li id="photo-li-${id}" class="search-photo">
+    <li id="photo-li-${id}" class="search-photo" onclick="searchVM.selectPhoto('${id}')">
         <p class="img-date"></p>
-        <img src="/api/photo/low/${id}" id="photo-${id}" data-bind="click: $root.selectPhoto" class="photo" style="width: ${width}px; height: ${height}px;"/>
+        <img src="/api/photo/low/${id}" id="photo-${id}" class="photo" style="width: ${width}px; height: ${height}px;" />
     </li>
 </script>
 
