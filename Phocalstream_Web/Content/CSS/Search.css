@@ -117,3 +117,6 @@ img.bordered {
 label.btn {
     white-space: normal !important;
 }
+
+span.tag.label {
+    white-space: normal !important;
