@@ -247,9 +247,14 @@ namespace Phocalstream_Web.Controllers
         
         public ActionResult UploadPhotos(long collectionID = 0)
         {
-            UserPhotoUpload model = new UserPhotoUpload();
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
 
-            model.UserSiteCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Site != null, c => c.Site).ToList();
+            UserPhotoUpload model = new UserPhotoUpload();
+            model.UserSiteCollections = CollectionRepository.Find(c => c.Type == CollectionType.USER && c.Owner.ID == user.ID && c.Site != null, c => c.Site).ToList();
 
             if (model.UserSiteCollections.Count == 0)
             {
