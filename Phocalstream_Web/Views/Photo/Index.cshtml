@@ -49,8 +49,8 @@
                 return;
             };
 
-            viewer.openDzi("@Html.DisplayFor(model => model.ImageUrl)");
-        </script>
+            viewer.openDzi("@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.ImageUrl))");
+</script>
         <div class="data-partial">
             @{ Html.RenderPartial("_DmMapPartial", new Phocalstream_Web.Models.ViewModels.DmMapData() {
                    SiteName = Model.Photo.Site.Name,
