@@ -1,5 +1,4 @@
-﻿using Microsoft.DeepZoomTools;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Practices.Unity;
 using Phocalstream_Service.Data;
 using Phocalstream_Service.Service;
@@ -28,27 +27,12 @@ namespace Phocalstream_PhotoProcessor
 
         private static string _path;
         private static bool _break;
-        private static bool _buildCollections = false;
-        private static bool _buildPivot = false;
-        private static bool _runFullImport = false;
 
         private static IPhotoService _service;
         private static IUnitOfWork _unit;
 
         static void Main(string[] args)
         {
-            if (args.Contains<string>(@"buildcollections"))
-            {
-                _buildCollections = true;
-            }
-            else if (args.Contains<string>(@"buildpivot"))
-            {
-                _buildPivot = true;
-            } else if (args.Contains<string>(@"runFullImport"))
-            {
-                _runFullImport = true;
-            }
-
             IUnityContainer container = BuildUnityContainer();
 
             _service = container.Resolve<IPhotoService>();
@@ -73,25 +57,6 @@ namespace Phocalstream_PhotoProcessor
 
             foreach (XmlNode siteNode in siteList)
             {
-
-                if (_buildCollections == true || _buildPivot == true)
-                {
-                    Collection collection = _service.GetCollectionForProcessing(siteNode);
-                    CameraSite site = collection.Site;
-
-                    if (_buildCollections == true)
-                    {
-                        Console.WriteLine(string.Format("Building deep zoom site collection for site {0}", site.Name));
-                        _service.ProcessCollection(collection, false);
-                    }
-                    else if (_buildPivot == true)
-                    {
-                        Console.WriteLine(string.Format("Building pivot collection for site {0}", site.Name));
-                        _service.ProcessCollection(collection, true);
-                    }
-                }
-                else if (_runFullImport == true)
-                {
                     string dirName = siteNode["Folder"].InnerText;
                     string[] files = Directory.GetFiles(Path.Combine(_path, dirName), "*.JPG", SearchOption.AllDirectories);
                     files = files.Select(f => f.Replace(_path, "")).ToArray<string>();
@@ -133,7 +98,16 @@ namespace Phocalstream_PhotoProcessor
                         foreach (string file in toProcess)
                         {
                             Console.Write("\rFile {0} of {1}", index++, len);
-                            _service.ProcessPhoto(file, site);
+
+                            try
+                            {
+                                _service.ProcessPhoto(file, site);
+                            }
+                            catch ( Exception e )
+                            {
+                                Console.WriteLine("Skipping image, error: {0}", e.Message);
+                            }
+
                             if (index % 500 == 0)
                             {
                                 _unit.Commit();
@@ -145,16 +119,11 @@ namespace Phocalstream_PhotoProcessor
                         Console.WriteLine("");
                         _unit.Commit();
 
-                        Console.WriteLine(string.Format("Building deep zoom site collection for site {0}", site.Name));
-                        _service.ProcessCollection(collection, false);
-                        _unit.Commit();
-
                         if (_break)
                         {
                             break;
                         }
                     }
-                }
             }
             Console.WriteLine("Import process complete");
         }

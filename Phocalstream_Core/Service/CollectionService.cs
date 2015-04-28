@@ -1,5 +1,4 @@
-﻿using Microsoft.DeepZoomTools;
-using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Service;
@@ -95,15 +94,6 @@ namespace Phocalstream_Service.Service
             }
         }
 
-        public void GenerateCollectionManifest(List<string> fileNames, string savePath)
-        {
-            CollectionCreator creator = new CollectionCreator();
-            creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-            creator.TileOverlap = 1;
-            creator.TileSize = 256;
-
-            creator.Create(fileNames, savePath);
-        }
 
         public void NewUserCollection(User user, string collectionName, string photoIds)
         {
@@ -134,12 +124,6 @@ namespace Phocalstream_Service.Service
             };
             CollectionRepository.Insert(c);
             Unit.Commit();
-
-            //only generate the manifest if there are photos in the collection
-            if (photos.Count > 0)
-            {
-                GenerateManifests(containerID.ToString(), ids, photos);
-            }
         }
 
         public void AddToExistingUserCollection(User user, string collectionIds, string photoIds)
@@ -194,37 +178,10 @@ namespace Phocalstream_Service.Service
     
         public void UpdateUserCollection(Collection collection)
         {
-            DeleteManifests(collection.ContainerID);
-            GenerateManifests(collection.ContainerID, collection.Photos.Select(p => p.ID).ToArray(), collection.Photos.ToList());
-
             collection.Status = CollectionStatus.COMPLETE;
             Unit.Commit();
         }
 
-        private void DeleteManifests(string containerID)
-        {
-            string collectionPath = ValidateAndGetUserCollectionPath();
-
-            string collectionManifestPath = Path.Combine(collectionPath, containerID, "collection.dzc");
-            if (File.Exists(collectionManifestPath))
-            {
-                File.Delete(collectionManifestPath);
-            }
-
-            string pivotManifestPath = Path.Combine(collectionPath, containerID, "site.cxml");
-            if (File.Exists(pivotManifestPath))
-            {
-                File.Delete(pivotManifestPath);
-            }
-        }
-
-        private void GenerateManifests(string containerID, long[] ids, List<Photo> photos)
-        {
-            string collectionPath = ValidateAndGetUserCollectionPath();
-            GenerateCollectionManifest(PhotoService.GetFileNames(photos),
-                Path.Combine(collectionPath, containerID, "collection.dzc"));
-            PhotoService.GeneratePivotManifest(collectionPath, containerID, String.Join(",", ids), CollectionType.USER);
-        }
 
         public void SetUserCollectionCoverPhoto(User user, long collectionID, long photoID)
         {
