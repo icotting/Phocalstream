@@ -15,7 +15,7 @@
     var marker = new google.maps.Marker({
         position: myLatlng,
         map: map,
-        title: '@Html.DisplayFor(model => Model.SiteName) Camera Site'
+        title: '@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.SiteName)) Camera Site'
     });
 
     var kmzAddress = 'http://droughtmonitor.unl.edu/data/kmz/usdm_20' + '@Html.DisplayFor(model => model.DataWeek)' + '.kmz';
