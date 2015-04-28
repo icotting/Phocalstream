@@ -14,13 +14,6 @@ namespace Phocalstream_Shared.Service
         Collection GetCollectionForProcessing(XmlNode siteData);
         Photo ProcessPhoto(string fileName, CameraSite site);
         Photo ProcessUserPhoto(Stream stream, string fileName, User user, long collectionID);
-        void ProcessCollection(Collection collection, bool buildPivotOnly);
-        void GeneratePivotManifest(CameraSite site);
-
-        void GenerateSubSetManifest(CameraSite site, string subsetName, string photoList);
-        
-        void GeneratePivotManifest(string basePath, string collectionID, string photoList, CollectionType type);
-
         List<string> GetUnusedTagNames(long photoID);
         List<string> GetTagNames();
         Photo AddTag(long photoID, string tags);

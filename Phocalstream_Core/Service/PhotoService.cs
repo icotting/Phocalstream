@@ -1,5 +1,4 @@
-﻿using Microsoft.DeepZoomTools;
-using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.External;
 using Phocalstream_Shared.Data.Model.Photo;
@@ -121,22 +120,6 @@ namespace Phocalstream_Service.Service
                         ResizeImageTo(fileName, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
                         ResizeImageTo(fileName, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
                         ResizeImageTo(fileName, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
-
-                        // create a DeepZoom image creater to generate the tile set for each raw image
-                        ImageCreator creator = new ImageCreator();
-                        creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-                        creator.TileOverlap = 1;
-                        creator.TileSize = 256;
-
-                        string dziPath = Path.Combine(basePath, "Tiles.dzi");
-                        try
-                        {
-                            creator.Create(fileName, dziPath); // create the DeepZoom tileset
-                        }
-                        catch (Exception e)
-                        {
-                            throw new Exception(String.Format("Error of tyep {0} creating deep zoom tiles for file {1}: {2}", e.GetType(), fileName, e.Message));
-                        }
                     }
                     
                     return photo;
@@ -198,86 +181,14 @@ namespace Phocalstream_Service.Service
                         ResizeImageTo(savePath, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
                         ResizeImageTo(savePath, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
                         ResizeImageTo(savePath, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
-
-                        // create a DeepZoom image creater to generate the tile set for each raw image
-                        ImageCreator creator = new ImageCreator();
-                        creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-                        creator.TileOverlap = 1;
-                        creator.TileSize = 256;
-
-                        string dziPath = Path.Combine(basePath, "Tiles.dzi");
-                        try
-                        {
-                            creator.Create(savePath, dziPath); // create the DeepZoom tileset
-                        }
-                        catch (Exception e)
-                        {
-                            throw new Exception(String.Format("Error creating deep zoom tiles for file {0}: {1}", fileName, e.Message));
-                        }
                     }
-
-
-
                     return photo;
                 }
             }
             catch (Exception e)
             {
-                // this should be logged
                 throw new Exception(string.Format("Exception processing photo {0}. Message: {1}", fileName, e.Message));
             }
-        }
-
-        public void ProcessCollection(Collection collection, bool buildPivotOnly)
-        {
-            CameraSite site = collection.Site;
-            CollectionCreator creator = new CollectionCreator();
-            creator.TileFormat = Microsoft.DeepZoomTools.ImageFormat.Jpg;
-            creator.TileOverlap = 1;
-            creator.TileSize = 256;
-
-            string rootDeepZoomPath = Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName);
-
-            List<Tuple<String, DateTime, long>> files = new List<Tuple<String, DateTime, long>>();
-            using (SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
-            {
-                conn.Open();
-                using (SqlCommand command = new SqlCommand("select BlobID, Captured, Photos.ID from Photos inner join CameraSites on CameraSites.ID = Photos.Site_ID where CameraSites.Name = @name", conn))
-                {
-                    command.Parameters.AddWithValue("@name", site.DirectoryName);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            files.Add(new Tuple<String, DateTime, long>(reader.GetString(0), reader.GetDateTime(1), reader.GetInt64(2)));
-                        }
-                    }
-                }
-            }
-
-            if (buildPivotOnly == false)
-            {
-                List<string> filenames = files.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p.Item1), "Tiles.dzi"))).ToList<string>();
-                creator.Create(filenames, Path.Combine(rootDeepZoomPath, "collection.dzc"));
-            }
-
-            GeneratePivotManifest(site);
-
-            var groups = files.GroupBy(f => f.Item2.Year);
-            foreach (var group in groups)
-            {
-                if (buildPivotOnly == false)
-                {
-                    var photos = group.Select(v => v.Item1).ToList();
-
-                    photos = photos.Select(p => Path.Combine(rootDeepZoomPath, Path.Combine(string.Format(@"{0}.phocalstream", p), "Tiles.dzi"))).ToList<string>();
-                    creator.Create(photos, Path.Combine(rootDeepZoomPath, string.Format("{0}_collection.dzc", group.Key)));
-                }
-                this.GenerateSubSetManifest(site, group.Select(v => v.Item2.Year).First().ToString(), string.Join(",", group.Select(v => v.Item3).ToArray<long>()));
-            }
-
-            collection.Status = CollectionStatus.COMPLETE;
-            CollectionRepository.Update(collection);
         }
 
         private void ResizeImageTo(string fileName, int width, int height, string destination, bool portrait)
@@ -408,30 +319,6 @@ namespace Phocalstream_Service.Service
             }
 
             return photo;
-        }
-
-        public void GeneratePivotManifest(CameraSite site)
-        {
-            string rootDeepZoomPath = Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName);
-            XmlDocument doc = PhotoRepo.CreatePivotCollectionForSite(site.ID);
-
-            doc.Save(Path.Combine(rootDeepZoomPath, "site.cxml"));
-        }
-
-        public void GenerateSubSetManifest(CameraSite site, string subsetName, string photoList)
-        {
-            string rootPath = Path.Combine(PathManager.GetPhotoPath(), site.DirectoryName);
-            XmlDocument doc = PhotoRepo.CreatePivotCollectionForList(site.Name, photoList, CollectionType.SUBSET, subsetName);
-
-            doc.Save(Path.Combine(rootPath, string.Format("{0}_site.cxml", subsetName)));
-        }
-
-        public void GeneratePivotManifest(string basePath, string collectionID, string photoList, CollectionType type)
-        {
-            string rootPath = Path.Combine(basePath, collectionID);
-            XmlDocument doc = PhotoRepo.CreatePivotCollectionForList(collectionID, photoList, type);
-
-            doc.Save(Path.Combine(rootPath, "site.cxml"));
         }
 
         public List<string> GetUnusedTagNames(long photoID)

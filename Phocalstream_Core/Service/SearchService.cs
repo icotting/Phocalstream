@@ -1,5 +1,4 @@
-﻿using Microsoft.DeepZoomTools;
-using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Service;
