@@ -137,7 +137,7 @@ namespace Phocalstream_Web.Application.Admin
                         if (type != DMDataType.ALL)
                         {
                             //Get information
-                            string url = String.Format(@"http://usdmdataservices.unl.edu/?mode=table&aoi={0}&date={1}", type.ToString().ToLower(), week.ToString("yyyyMMdd"));
+                            string url = String.Format(@"http://droughtmonitor.unl.edu/USDMStatistics.ashx/?mode=table&aoi={0}&date={1}", type.ToString().ToLower(), week.ToString("yyyyMMdd"));
                             WebClient client = new WebClient();
                             string response = client.DownloadString(url);
 
@@ -177,8 +177,11 @@ namespace Phocalstream_Web.Application.Admin
                     continue;
                 }
 
+                // remove the \" from the line
+                string newLine = line.Replace("\"", "");
+                
                 // split out each column
-                string[] cols = line.Split(',');
+                string[] cols = newLine.Split(',');
 
                 int offset = 2; // Offset is 2 for the State and US data sets, but is 4 for the County data
                 switch (type)
