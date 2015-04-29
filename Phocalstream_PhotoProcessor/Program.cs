@@ -27,6 +27,7 @@ namespace Phocalstream_PhotoProcessor
 
         private static string _path;
         private static bool _break;
+        private static bool _forceCollectionBuild = false;
 
         private static IPhotoService _service;
         private static IUnitOfWork _unit;
@@ -39,6 +40,11 @@ namespace Phocalstream_PhotoProcessor
             _unit = container.Resolve<IUnitOfWork>();
 
             _path = PathManager.GetRawPath();
+
+            if (args.Contains<string>(@"rebuild"))
+            {
+                _forceCollectionBuild = true;
+            }
 
             Thread t = new Thread(new ThreadStart(BeginProcess));
             t.Start();
@@ -85,7 +91,7 @@ namespace Phocalstream_PhotoProcessor
                     siteFiles = new List<string>();
                     files = new string[0];
 
-                    if (toProcess.Count() != 0)
+                    if (toProcess.Count() != 0 || _forceCollectionBuild) 
                     {
                         Collection collection = _service.GetCollectionForProcessing(siteNode);
                         CameraSite site = collection.Site;
