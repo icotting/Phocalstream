@@ -123,6 +123,9 @@ namespace Phocalstream_PhotoProcessor
                         {
                             break;
                         }
+
+                        _service.FinishCollectionProcessing(collection);
+                        _unit.Commit();
                     }
             }
             Console.WriteLine("Import process complete");

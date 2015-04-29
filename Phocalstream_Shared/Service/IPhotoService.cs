@@ -12,6 +12,8 @@ namespace Phocalstream_Shared.Service
     public interface IPhotoService
     {
         Collection GetCollectionForProcessing(XmlNode siteData);
+        void FinishCollectionProcessing(Collection collection);
+
         Photo ProcessPhoto(string fileName, CameraSite site);
         Photo ProcessUserPhoto(Stream stream, string fileName, User user, long collectionID);
         List<string> GetUnusedTagNames(long photoID);
