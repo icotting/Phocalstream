@@ -490,29 +490,37 @@ namespace Phocalstream_Web.Controllers
         private WaterFlowData LoadWaterData(double siteLat, double siteLong, DateTime date)
         {
             WaterFlowData data = new WaterFlowData();
-            data.DataTypes = WaterRepository.FetchBestDataTypesForStationDate(WaterRepository.GetClosestStations(siteLat, siteLong, 1), date).ElementAt(0);
-            data.WaterDataValues = WaterRepository.FetchByDateRange(data.DataTypes.StationID, data.DataTypes.DataID, date.AddDays(-42), date);
-            data.ParameterInfo = WaterRepository.GetParameterCodeInfoFromDataType(data.DataTypes.DataID);
-            data.ClosestStation = WaterRepository.GetStationInfo(data.DataTypes.StationID);
-
+            data.DataTypes = WaterRepository.FetchBestDataTypesForStationDate(WaterRepository.GetClosestStations(siteLat, siteLong, 1), date).FirstOrDefault();
             data.chartDataValues = "";
-            foreach (WaterDataValue value in data.WaterDataValues)
+            
+            if (data.DataTypes != null)
             {
-                if (value.Value == -999999)
+                data.WaterDataValues = WaterRepository.FetchByDateRange(data.DataTypes.StationID, data.DataTypes.DataID, date.AddDays(-42), date);
+                data.ParameterInfo = WaterRepository.GetParameterCodeInfoFromDataType(data.DataTypes.DataID);
+                data.ClosestStation = WaterRepository.GetStationInfo(data.DataTypes.StationID);
+
+                foreach (WaterDataValue value in data.WaterDataValues)
                 {
-                    data.chartDataValues += "null, ";
-                }
-                else
-                {
-                    data.chartDataValues += value.Value + ", ";
+                    if (value.Value == -999999)
+                    {
+                        data.chartDataValues += "null, ";
+                    }
+                    else
+                    {
+                        data.chartDataValues += value.Value + ", ";
+                    }
+
                 }
 
+                // Only remove the ending comma if it was added
+                if (data.chartDataValues.Length > 0)
+                {
+                    data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+                }
             }
-
-            // Only remove the ending comma if it was added
-            if (data.chartDataValues.Length > 0)
+            else
             {
-                data.chartDataValues = data.chartDataValues.Substring(0, data.chartDataValues.Length - 2);
+                data.WaterDataValues = new List<WaterDataValue>();
             }
 
             return data;
