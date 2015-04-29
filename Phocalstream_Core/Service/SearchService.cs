@@ -252,7 +252,7 @@ namespace Phocalstream_Service.Service
 
             //merge the builders
             select.Append("SELECT Photos.ID from Photos ");
-            select.Append("INNER JOIN CollectionPhotos ON Photos.ID = CollectionPhotos.PhotoId ");
+            select.Append("LEFT JOIN CollectionPhotos ON Photos.ID = CollectionPhotos.PhotoId ");
             
             parameters.Append("(" + publicPhotosBuilder + ")");
 
