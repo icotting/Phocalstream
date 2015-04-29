@@ -64,7 +64,7 @@ namespace Phocalstream_Web.Controllers
             {
                 UserCollectionList userCollectionModel = new UserCollectionList();
                 userCollectionModel.User = User;
-                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
+                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Site == null && c.Type == CollectionType.USER, c => c.Photos).ToList();
                 model.UserCollections = userCollectionModel;
 
                 ViewBag.UserId = User.ID;
