@@ -83,6 +83,12 @@ namespace Phocalstream_Service.Service
             return collection;
         }
 
+        public void FinishCollectionProcessing(Collection collection)
+        {
+            collection.Status = CollectionStatus.COMPLETE;
+            CollectionRepository.Update(collection);
+        }
+
         public Phocalstream_Shared.Data.Model.Photo.Photo ProcessPhoto(string fileName, CameraSite site)
         {
             string relativeName = fileName;
