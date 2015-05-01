@@ -384,7 +384,6 @@
     <Content Include="Content\Scripts\PhotoSaveCollection.js" />
     <Content Include="Content\Scripts\PhotoSearchResults.js" />
     <Content Include="Content\Scripts\PhotoTimelapse.js" />
-    <Content Include="Content\Scripts\seadragon-min.js" />
     <Content Include="Content\Scripts\SearchViewModel.js" />
     <Content Include="Content\Scripts\SiteSelection.js" />
     <Content Include="Content\Scripts\TimeLapse.js" />
