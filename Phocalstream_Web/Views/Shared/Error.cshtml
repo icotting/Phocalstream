@@ -1,19 +1,21 @@
 ﻿@model System.Web.Mvc.HandleErrorInfo
-
 @{
-    Layout = null;
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Error</title>
-</head>
-<body>
-    <div>
-        The error was @Model.Exception.ToString()
+<div class="container">
+    <div class="content">
+        <div class="error-body text-center">
+            <div class="row">
+                <h2>Unfortunately, an unexpected error has occured.</h2>
+                <h4>@Html.ActionLink("Return to the home page", "Index", "Home", null, new { @class = "" }), or just enjoy the photo below.</h4>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <img class="error-image" src="~/Api/Photo/High/111" />
+                </div>
+            </div>        
+        </div>
     </div>
-</body>
-</html>
+</div>
