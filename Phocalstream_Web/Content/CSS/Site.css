@@ -113,3 +113,8 @@ h2 {
     margin-top: 10px;
     margin-right: 15px;
 }
+
+/* Error Page */
+.error-body {
+    margin-top: 150px;
+}
