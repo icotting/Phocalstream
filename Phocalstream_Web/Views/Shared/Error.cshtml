@@ -6,16 +6,9 @@
 
 <div class="container">
     <div class="content">
-        <div class="error-body text-center">
-            <div class="row">
-                <h2>Unfortunately, an unexpected error has occured.</h2>
-                <h4>@Html.ActionLink("Return to the home page", "Index", "Home", null, new { @class = "" }), or just enjoy the photo below.</h4>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <img class="error-image" src="~/Api/Photo/High/111" />
-                </div>
-            </div>        
+        <div class="error-body text-center well">
+            <h2>Unfortunately, an unexpected error has occured.</h2>
+            <h4>@Html.ActionLink("Return to the Home Page", "Index", "Home", null, new { @class = "btn btn-info" })</h4>
         </div>
     </div>
 </div>
