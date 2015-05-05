@@ -302,6 +302,21 @@ namespace Phocalstream_Web.Controllers
             return RedirectToAction("Downloads", "Home");
         }
 
+        [Authorize(Roles = @"Admin")] 
+        public ActionResult Tags()
+        {
+            var tags = TagRepository.GetAll(t => t.Photos).ToList();
+            Tag tag = new Tag();
+            return View(tags);
+        }
+
+        [Authorize(Roles = @"Admin")]
+        public ActionResult DeleteTag(long tagID)
+        {
+            PhotoService.DeleteTag(tagID);
+            return RedirectToAction("Tags");
+        }
+
         public void Download(string fileName)
         {
             System.IO.Stream iStream = null;

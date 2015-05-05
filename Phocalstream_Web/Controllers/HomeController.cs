@@ -122,6 +122,7 @@ namespace Phocalstream_Web.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = @"Admin")] 
         public ActionResult Downloads()
         {
             DownloadViewModel model = new DownloadViewModel();

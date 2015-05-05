@@ -376,6 +376,16 @@ namespace Phocalstream_Service.Service
             return photo;
         }
 
+        public void DeleteTag(long tagID)
+        {
+            Tag tag = TagRepository.Single(t => t.ID == tagID);
+            if (tag != null)
+            {
+                TagRepository.Delete(tag);
+                Unit.Commit();
+            }
+        }
+
         public List<Tuple<string, int, long>> GetPopularTagsForSite(long siteID)
         {
             List<Tuple<string, int, long>> PopularTags = new List<Tuple<string, int, long>>();
