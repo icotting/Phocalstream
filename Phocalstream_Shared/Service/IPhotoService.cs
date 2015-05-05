@@ -20,6 +20,7 @@ namespace Phocalstream_Shared.Service
         List<string> GetTagNames();
         Photo AddTag(long photoID, string tags);
         void DeleteTag(long tagID);
+        Photo DeleteTagFromPhoto(long photoID, long tagID);
         List<Tuple<string, int, long>> GetPopularTagsForSite(long siteID);
         List<string> GetFileNames(List<Photo> photos);
         ICollection<TimeLapseFrame> CreateTimeLapseFramesFromIDs(long[] photoIDs);

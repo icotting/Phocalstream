@@ -386,6 +386,24 @@ namespace Phocalstream_Service.Service
             }
         }
 
+        public Photo DeleteTagFromPhoto(long photoID, long tagID)
+        {
+            Photo photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site, p => p.Tags);
+            Tag tag = TagRepository.Single(t => t.ID == tagID);
+
+            if (photo == null || tag == null)
+            {
+                return null;   
+            }
+
+            photo.Tags.Remove(tag);
+            Unit.Commit();
+
+            photo.AvailableTags = GetUnusedTagNames(photoID);
+
+            return photo;
+        }
+
         public List<Tuple<string, int, long>> GetPopularTagsForSite(long siteID)
         {
             List<Tuple<string, int, long>> PopularTags = new List<Tuple<string, int, long>>();

@@ -258,6 +258,20 @@ namespace Phocalstream_Web.Controllers
             return PartialView("_TagPartial", photo);
         }
 
+        [Authorize(Roles = @"Admin")]
+        [HttpPost]
+        public ActionResult DeleteTagFromPhoto(long photoID, long tagID)
+        {
+            Photo photo = PhotoService.DeleteTagFromPhoto(photoID, tagID);
+
+            if (photo == null)
+            {
+                return new HttpNotFoundResult(string.Format("Photo {0} was not found", photoID));
+            }
+
+            return PartialView("_TagPartial", photo);
+        }
+
         [HttpPost]
         public ActionResult TogglePhotoInUserCollection(long photoID, long collectionID)
         {
