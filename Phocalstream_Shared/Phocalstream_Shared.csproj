@@ -67,6 +67,7 @@
     <Compile Include="Data\Model\External\WaterDataValue.cs" />
     <Compile Include="Data\Model\External\WaterParameterCode.cs" />
     <Compile Include="Data\Model\Photo\CameraSite.cs" />
+    <Compile Include="Data\Model\Photo\PixelColor.cs" />
     <Compile Include="Data\Model\Photo\Collection.cs" />
     <Compile Include="Data\Model\Photo\CollectionStatus.cs" />
     <Compile Include="Data\Model\Photo\CollectionType.cs" />

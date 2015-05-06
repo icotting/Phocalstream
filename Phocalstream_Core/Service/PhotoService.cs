@@ -197,6 +197,26 @@ namespace Phocalstream_Service.Service
             }
         }
 
+        public Photo ProcessRGBForExistingPhoto(long photoID)
+        {
+            Photo photo = PhotoRepository.Single(p => p.ID == photoID);
+            if (photo == null)
+            {
+                return null;
+            }
+
+            int[] counts = CountRGBPixels(string.Format("{0}{1}", PathManager.GetRawPath(), photo.FileName));
+            float[] percentages = ConvertCountsToPercentage(counts);
+
+            photo.Black = percentages[(int)PixelColor.BLACK];
+            photo.White = percentages[(int)PixelColor.WHITE];
+            photo.Red = percentages[(int)PixelColor.RED];
+            photo.Green = percentages[(int)PixelColor.GREEN];
+            photo.Blue = percentages[(int)PixelColor.BLUE];
+
+            return photo;
+        }
+        
         private void ResizeImageTo(string fileName, int width, int height, string destination, bool portrait)
         {
             using (System.Drawing.Image image = System.Drawing.Image.FromFile(fileName))
@@ -236,6 +256,83 @@ namespace Phocalstream_Service.Service
                     result.Save(destination);
                 }
             }
+        }
+
+        private int[] CountRGBPixels(string fileName)
+        {
+            using (System.Drawing.Bitmap bitmap = new Bitmap(System.Drawing.Image.FromFile(fileName)))
+            {
+                int width = bitmap.Width;
+                int height = bitmap.Height;
+
+                var counts = new int[] { 0, 0, 0, 0, 0 };
+                
+                Color pixel;
+                PixelColor value;
+                for (var x = 0; x < width; x++)
+                {
+                    for (var y = 0; y < height; y++)
+                    {
+                        pixel = bitmap.GetPixel(x, y);
+                        value = ComputePixelColor(pixel);
+                        counts[(int)value] += 1;
+                    }
+                }
+
+                return counts;
+            }
+        }
+
+        private PixelColor ComputePixelColor(Color pixel)
+        {
+            byte r = pixel.R;
+            byte g = pixel.G;
+            byte b = pixel.B;
+
+            // BLACK or WHITE
+            if (r == g && g == b && b == r)
+            {
+                if (r < 128)
+                {
+                    return PixelColor.BLACK;
+                }
+                else
+                {
+                    return PixelColor.WHITE;
+                }
+            }
+            else
+            {
+                if (r > g && r > b)
+                {
+                    return PixelColor.RED;
+                }
+                else if (g > b)
+                {
+                    return PixelColor.GREEN;
+                }
+                else
+                {
+                    return PixelColor.BLUE;
+                }
+            }
+        }
+
+        private float[] ConvertCountsToPercentage(int[] counts)
+        {
+            float max = 0;
+            foreach (var c in counts)
+            {
+                max += c;
+            }
+
+            float[] percentages = new float[counts.Length];
+            for (var i = 0; i < counts.Length; i++)
+            {
+                percentages[i] = ((float) counts[i]) / max;
+            }
+
+            return percentages;
         }
    
         private Photo CreatePhotoWithProperties(System.Drawing.Image img, string name)

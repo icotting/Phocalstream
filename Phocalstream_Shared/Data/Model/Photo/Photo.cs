@@ -28,6 +28,12 @@ namespace Phocalstream_Shared.Data.Model.Photo
         public int Height { get; set; }
         public string FileName { get; set; }
 
+        public float Black { get; set; }
+        public float White { get; set; }
+        public float Red { get; set; }
+        public float Green { get; set; }
+        public float Blue { get; set; }
+
         [NotMapped]
         public bool Portrait { get; set; }
 
