@@ -127,6 +127,13 @@ namespace Phocalstream_Service.Service
                         ResizeImageTo(fileName, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
                         ResizeImageTo(fileName, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
                     }
+
+                    float[] percentages = ConvertCountsToPercentage(CountRGBPixels(new Bitmap(img)));
+                    photo.Black = percentages[(int)PixelColor.BLACK];
+                    photo.White = percentages[(int)PixelColor.WHITE];
+                    photo.Red = percentages[(int)PixelColor.RED];
+                    photo.Green = percentages[(int)PixelColor.GREEN];
+                    photo.Blue = percentages[(int)PixelColor.BLUE];
                     
                     return photo;
                 }
@@ -205,16 +212,19 @@ namespace Phocalstream_Service.Service
                 return null;
             }
 
-            int[] counts = CountRGBPixels(string.Format("{0}{1}", PathManager.GetRawPath(), photo.FileName));
-            float[] percentages = ConvertCountsToPercentage(counts);
+            using (System.Drawing.Bitmap bitmap = new Bitmap(System.Drawing.Image.FromFile(string.Format("{0}{1}", PathManager.GetRawPath(), photo.FileName))))
+            {
+                int[] counts = CountRGBPixels(bitmap);
+                float[] percentages = ConvertCountsToPercentage(counts);
 
-            photo.Black = percentages[(int)PixelColor.BLACK];
-            photo.White = percentages[(int)PixelColor.WHITE];
-            photo.Red = percentages[(int)PixelColor.RED];
-            photo.Green = percentages[(int)PixelColor.GREEN];
-            photo.Blue = percentages[(int)PixelColor.BLUE];
+                photo.Black = percentages[(int)PixelColor.BLACK];
+                photo.White = percentages[(int)PixelColor.WHITE];
+                photo.Red = percentages[(int)PixelColor.RED];
+                photo.Green = percentages[(int)PixelColor.GREEN];
+                photo.Blue = percentages[(int)PixelColor.BLUE];
 
-            return photo;
+                return photo;
+            }
         }
         
         private void ResizeImageTo(string fileName, int width, int height, string destination, bool portrait)
@@ -258,29 +268,26 @@ namespace Phocalstream_Service.Service
             }
         }
 
-        private int[] CountRGBPixels(string fileName)
+        private int[] CountRGBPixels(Bitmap bitmap)
         {
-            using (System.Drawing.Bitmap bitmap = new Bitmap(System.Drawing.Image.FromFile(fileName)))
-            {
-                int width = bitmap.Width;
-                int height = bitmap.Height;
+            int width = bitmap.Width;
+            int height = bitmap.Height;
 
-                var counts = new int[] { 0, 0, 0, 0, 0 };
+            var counts = new int[] { 0, 0, 0, 0, 0 };
                 
-                Color pixel;
-                PixelColor value;
-                for (var x = 0; x < width; x++)
+            Color pixel;
+            PixelColor value;
+            for (var x = 0; x < width; x++)
+            {
+                for (var y = 0; y < height; y++)
                 {
-                    for (var y = 0; y < height; y++)
-                    {
-                        pixel = bitmap.GetPixel(x, y);
-                        value = ComputePixelColor(pixel);
-                        counts[(int)value] += 1;
-                    }
+                    pixel = bitmap.GetPixel(x, y);
+                    value = ComputePixelColor(pixel);
+                    counts[(int)value] += 1;
                 }
-
-                return counts;
             }
+
+            return counts;
         }
 
         private PixelColor ComputePixelColor(Color pixel)
