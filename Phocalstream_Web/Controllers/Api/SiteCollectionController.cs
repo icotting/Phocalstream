@@ -50,15 +50,18 @@ namespace Phocalstream_Web.Controllers.Api
 
         [HttpGet]
         [ActionName("updatecover")]
-        public void SetCoverPhoto(long photoId, long collectionId)
+        public void SetCoverPhoto(long photoId)
         {
-            Collection col = CollectionRepository.Single(c => c.ID == collectionId);
-            Photo photo = PhotoEntityRepository.Single(p => p.ID == photoId);
-            col.CoverPhoto = photo;
-            CollectionRepository.Update(col);
-            Unit.Commit();
+            Photo photo = PhotoEntityRepository.Single(p => p.ID == photoId, p => p.Site);
+            Collection col = CollectionRepository.Single(c => c.Site.ID == photo.Site.ID && c.Type == CollectionType.SITE);
+            if (col != null)
+            {
+                col.CoverPhoto = photo;
+                CollectionRepository.Update(col);
+                Unit.Commit();
+            }
         }
-
+        
         [HttpGet]
         [ActionName("list")]
         public IEnumerable<Object> GetSites()

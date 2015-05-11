@@ -47,6 +47,23 @@
 
     var searchVM;
 
+    function setCover(photoId) {
+        var form;
+        form = $('<form />', {
+            action: '/api/sitecollection/updatecover',
+            method: 'GET',
+            style: 'display: none;'
+        });
+
+        form.append($('<input/>', {
+            type: 'hidden',
+            name: 'photoId',
+            value: photoId
+        }));
+
+        form.appendTo('body').submit();
+    }
+
     $(function(){
         searchVM = new ViewModel();
         ko.applyBindings(searchVM);
@@ -59,14 +76,20 @@
                 if (key == "full") {
                     window.open(basePhotoUrl + $(this).prop('id').split('-')[1], '_blank');
                 }
+                else if (key == "cover") {
+                    setCover($(this).prop('id').split('-')[1])
+                }
             },
             items: {
-                "full": {name: "View Full Image", icon: ""},
+                "full": {name: "View Full Image", icon: ""}
+                @if (Request.IsAuthenticated && User.IsInRole("Admin")) 
+                { 
+                    <text>, "cover": {name: "Set Cover Photo", icon: ""} </text> 
+                }
             }
         });
 
         checkListItemContents($("#ul-holder"));
-
     });
 </script>
 
