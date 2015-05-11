@@ -5,6 +5,7 @@
 <link href="~/Content/CSS/typeahead.css" rel="stylesheet">
 <script src="~/Content/bootstrap-tags/js/bootstrap-tagsinput.min.js"></script>
 <script src="~/Content/typeahead/typeahead.bundle.js"></script>
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
 
 <div style="clear: both;"></div>
 
@@ -17,7 +18,14 @@
         <ul>
             @foreach (var tag in Model.Tags)
             {
-                <li class="tag label label-primary">@tag.Name</li>
+                if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <li class="tag label label-primary delete-tag" onclick="javascript:deleteTagPrompt('@tag.ID', '@tag.Name')">@tag.Name <span class="glyphicon glyphicon-remove"></span></li>
+                }
+                else
+                {
+                    <li class="tag label label-primary">@tag.Name</li>
+                }
             }
         </ul>
     }
@@ -95,5 +103,42 @@
                 }
             });
         });
+
+        $(".delete-tag").hover(
+            function() {
+                $(this).removeClass('label-primary');
+                $(this).addClass('label-warning');
+            }, function() {
+                $(this).removeClass('label-warning');
+                $(this).addClass('label-primary');
+            }
+        );
     });
+
+    function deleteTagPrompt(id, name) {
+        bootbox.confirm("Are you sure you want to remove the tag <strong>" + name + "</strong> from this image?", function (result) {
+            if (result) {
+                deleteTag(id);
+            }
+        });
+    }
+
+    function deleteTag(tagID) {
+        $.ajax({
+            url: '@Url.Action("DeleteTagFromPhoto", "Photo")',
+            type: 'POST',
+            cache: false,
+            data: {
+                photoID: @Model.ID,
+                tagID: tagID
+            },
+            success: function (data) {
+                $('#tagPartial').html(data);
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+
 </script>
