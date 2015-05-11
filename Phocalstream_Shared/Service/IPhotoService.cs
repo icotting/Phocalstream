@@ -16,6 +16,7 @@ namespace Phocalstream_Shared.Service
 
         Photo ProcessPhoto(string fileName, CameraSite site);
         Photo ProcessUserPhoto(Stream stream, string fileName, User user, long collectionID);
+        Photo ProcessRGBForExistingPhoto(long photoID);
         List<string> GetUnusedTagNames(long photoID);
         List<string> GetTagNames();
         Photo AddTag(long photoID, string tags);
