@@ -435,6 +435,7 @@
     <Content Include="Views\Search\_SearchGridPartial.cshtml" />
     <Content Include="Views\Shared\_CollectionThumbnail.cshtml" />
     <Content Include="Views\Shared\_SaveUserCollectionModal.cshtml" />
+    <Content Include="Views\Photo\Tags.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

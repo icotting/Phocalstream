@@ -148,6 +148,10 @@ ul {
     margin-top: 20px;
 }
 
+.delete-tag {
+    cursor: pointer;
+}
+
 /* DmMapData Partial */
 #droughtMap {
     top: 0px; 
