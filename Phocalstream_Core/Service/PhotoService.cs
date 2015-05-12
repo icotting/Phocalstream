@@ -61,6 +61,10 @@ namespace Phocalstream_Service.Service
                     site.Longitude = Convert.ToDouble(siteData["Location"].Attributes["longitude"].Value);
                 }
 
+                var county = siteData["County"].InnerText;
+                var state = siteData["State"].InnerText;
+                site.CountyFips = DMRepository.GetFipsForCountyAndState(county, state);
+
                 collection = new Collection()
                 {
                     ContainerID = site.ContainerID,
