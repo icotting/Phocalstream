@@ -95,12 +95,16 @@
     padding-left: 5px;
 }
 
-li {
+#WaterInfo li,
+#popularTags li,
+#siteInfo li {
     font-size: 12pt;
     overflow: hidden;
 }
 
-ul {
+#WaterInfo ul,
+#popularTags ul,
+#siteInfo ul {
     margin-top: 20px;
     list-style: none;
     margin-left: 0px;
