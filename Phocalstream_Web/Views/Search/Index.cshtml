@@ -40,6 +40,8 @@
     var topMoved = false;
 
     var yearQuery = '@ViewBag.Year';
+    var tag = '@ViewBag.Tag';
+    var site = '@ViewBag.Site';
 
     // dependency variables for PhotoSearchResults.js
     var totalPhotoCount = 0;
@@ -65,11 +67,83 @@
     }
 
     $(function(){
+        // Set up the Knockout ViewModel
         searchVM = new ViewModel();
         ko.applyBindings(searchVM);
 
+        // Typeahead 
+        var availableTags = @Html.Raw(Json.Encode(Model.AvailableTags));
+        var sites = @Html.Raw(Json.Encode(Model.SiteNames));
+
+        var substringMatcher = function(strs) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
+
+                // an array that will be populated with substring matches
+                matches = [];
+
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
+
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                    if (substrRegex.test(str)) {
+
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({ value: str });
+                    }
+                });
+
+                cb(matches);
+            };
+        };
+
+        // tags tags input
+        $('#tag-field').tagsinput();
+        $('#tag-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'available-tags',
+            source: substringMatcher(availableTags)
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#tag-field')));
+
+        // site tags input
+        $('#site-field').tagsinput();
+        $('#site-field').tagsinput('input').typeahead({
+            minLength: 2,
+            highlight: true,
+        },
+        {
+            name: 'sites',
+            source: substringMatcher(sites)
+        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
+            this.tagsinput('add', datum.value);
+            this.tagsinput('input').typeahead('val', '');
+        }, $('#site-field')));
+
+
+        // If the viewbag had valid sites or tags, add them to the input field
+        if (availableTags.indexOf(tag) != -1) {
+            $('#tag-field').tagsinput('add', tag);
+        }
+
+        if (sites.indexOf(site) != -1) {
+            $('#site-field').tagsinput('add', site);
+        }
+
+
+        // Do initial search for photos
         searchVM.getPhotos();
 
+
+        // Set up the right click listener for the images
         $.contextMenu({
             selector: '.photo',
             callback: function(key, options) {
@@ -82,13 +156,14 @@
             },
             items: {
                 "full": {name: "View Full Image", icon: ""}
-                @if (Request.IsAuthenticated && User.IsInRole("Admin")) 
-                { 
-                    <text>, "cover": {name: "Set Cover Photo", icon: ""} </text> 
+                @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <text>, "cover": {name: "Set Cover Photo", icon: ""} </text>
                 }
             }
         });
 
+        // Attempt to load the page using InfiniteScroll.js
         checkListItemContents($("#ul-holder"));
     });
 </script>
@@ -306,7 +381,7 @@
 <!-- RIGHT: Results-->
 <ul id="ul-holder" data-bind=""> </ul>
 
-    <!--
+<!--
 <ul id="ul-holder" class="col-md-12" data-bind="visible: queryResults() > 0, foreach: photos">
     <li data-bind="attr: { id: 'photo-li-' + $data }" class="search-photo">
         <p class="img-date"></p>
@@ -314,92 +389,6 @@
     </li>
 </ul>
 -->
-
-<script type="text/javascript">
-    $(document).ready(function() {
-
-        var availableTags = @Html.Raw(Json.Encode(Model.AvailableTags));
-        var sites = @Html.Raw(Json.Encode(Model.SiteNames));
-
-        var substringMatcher = function(strs) {
-            return function findMatches(q, cb) {
-                var matches, substringRegex;
-
-                // an array that will be populated with substring matches
-                matches = [];
-
-                // regex used to determine if a string contains the substring `q`
-                substrRegex = new RegExp(q, 'i');
-
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                $.each(strs, function(i, str) {
-                    if (substrRegex.test(str)) {
-
-                        // the typeahead jQuery plugin expects suggestions to a
-                        // JavaScript object, refer to typeahead docs for more info
-                        matches.push({ value: str });
-                    }
-                });
-
-                cb(matches);
-            };
-        };
-
-        // tags tags input
-        $('#tag-field').tagsinput();
-        $('#tag-field').tagsinput('input').typeahead({
-            minLength: 2,
-            highlight: true,
-        },
-        {
-            name: 'available-tags',
-            source: substringMatcher(availableTags)
-        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
-            this.tagsinput('add', datum.value);
-            this.tagsinput('input').typeahead('val', '');
-        }, $('#tag-field')));
-
-        // site tags input
-        $('#site-field').tagsinput();
-        $('#site-field').tagsinput('input').typeahead({
-            minLength: 2,
-            highlight: true,
-        },
-        {
-            name: 'sites',
-            source: substringMatcher(sites)
-        }).bind('typeahead:selected', $.proxy(function (obj, datum) {
-            this.tagsinput('add', datum.value);
-            this.tagsinput('input').typeahead('val', '');
-        }, $('#site-field')));
-
-        //add a random site or tag
-        /*       
-        var bool = (Math.random() > 0.5);
-        if (bool) {
-            $('#site-field').tagsinput('add', sites[Math.floor(Math.random() * sites.length)]);
-        }
-        else {
-            $('#tag-field').tagsinput('add', availableTags[Math.floor(Math.random() * availableTags.length)]);
-        }
-        */
-
-        // Check the view bag for tag params
-        var tag = '@ViewBag.Tag';
-        if (availableTags.indexOf(tag) != -1) {
-            $('#tag-field').tagsinput('add', tag);
-        }
-
-        var site = '@ViewBag.Site';
-        if (sites.indexOf(site) != -1) {
-            $('#site-field').tagsinput('add', site);
-        }
-    });
-
-
-</script>
-
 
 <!------------------------------------------------------>
 <!--              TEMPLATE FOR IMAGE                  -->
