@@ -17,7 +17,7 @@
 {
     <div class="row collection-row">
         <div class="col-md-9">
-            <h4>@Html.ActionLink(@col.CollectionName, "SearchResult", "Search", new { collectionId = @col.CollectionID }, null)</h4>
+            <h4>@Html.ActionLink(@col.CollectionName, "Index", "Search", new { collectionId = @col.CollectionID }, null)</h4>
         </div>
         <div class="col-md-3 collection-button">
             @if (col.Added)
