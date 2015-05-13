@@ -101,7 +101,7 @@
     <div data-bind="visible: search() === false" class="col-md-12">
         <p class="alert alert-warning text-center"><strong>Please selected at least one search parameter.</strong></p>
     </div>
-    <div data-bind="visible: queryResults() == 0" class="col-md-12">
+    <div data-bind="visible: search() === true && queryResults() == 0" class="col-md-12">
         <p class="alert alert-info text-center"><strong>No images found.</strong></p>
     </div>
 
