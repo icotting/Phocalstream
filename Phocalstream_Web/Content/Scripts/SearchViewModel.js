@@ -346,34 +346,11 @@ function ViewModel() {
         $("#ul-holder").data("maxOffset", 0);
     };
 
-    self.queryResults = asyncComputed(function () {
-        self.reset();
+    self.queryResults = ko.computed(function () {
+        return self.photos().length;
+    });
 
-        if (self.query() == "Searching for all photos") {
-            self.search(false);
-        }
-        else {
-            self.search(true);
-        }
-
-        return $.ajax("/api/search/count", {
-            data: {
-                userId: userId,
-                collectionId: this.collectionId,
-                cameraSites: (this.source() === 'sites' || this.source() === 'both'),
-                publicUserCollections: (this.source() === 'public' || this.source() === 'both'),
-                hours: this.hourQuery(),
-                months: this.selectedMonths().toString(),
-                sites: this.siteNames,
-                tags: this.tagNames,
-                dates: this.dates,
-                group: this.group()
-            }
-        });
-    }, this);
-    self.queryResults.extend({ notify: 'always' });
-        
-    self.getPhotos = function() {
+    self.getPhotos = function () {
         if (self.query() == "Searching for all photos") {
             self.search(false);
             self.reset();
@@ -397,26 +374,31 @@ function ViewModel() {
                 error: function(jqXHR, textStatus, errorThrown) {
                     alert(textStatus + ': ' + errorThrown);
                 },
-                success: function(data) {
-                    // Split the data into an array of photo ids
-                    var ids = data.split(',');
-                    
-                    photoIds = ids;
-                    visibleItems = data;
-                    totalPhotoCount = ids.length;
+                success: function (data) {
+                    // Clear the old data
+                    self.reset();
 
-                    // Add the new photos to the array, then let Knockout know the value changed
-                    var array = self.photos();
-                    ko.utils.arrayPushAll(array, ids);
-                    self.photos.valueHasMutated();
+                    if (data != "") {
+                        // Split the data into an array of photo ids
+                        var ids = data.split(',');
 
-                    resetView($("#ul-holder"));
+                        photoIds = ids;
+                        visibleItems = data;
+                        totalPhotoCount = ids.length;
 
-                    // Kick off the lazy loading
-                    checkListItemContents($("#ul-holder"));
+                        // Add the new photos to the array, then let Knockout know the value changed
+                        var array = self.photos();
+                        ko.utils.arrayPushAll(array, ids);
+                        self.photos.valueHasMutated();
 
-                    // Initialize the views for proper size
-                    initialize();
+                        resetView($("#ul-holder"));
+
+                        // Kick off the lazy loading
+                        checkListItemContents($("#ul-holder"));
+
+                        // Initialize the views for proper size
+                        initialize();
+                    }
                 }
             });
         }
