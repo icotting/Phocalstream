@@ -436,6 +436,7 @@
     <Content Include="Views\Shared\_CollectionThumbnail.cshtml" />
     <Content Include="Views\Shared\_SaveUserCollectionModal.cshtml" />
     <Content Include="Views\Photo\Tags.cshtml" />
+    <Content Include="Views\Photo\_RGBPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

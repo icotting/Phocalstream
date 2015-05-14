@@ -1,0 +1,76 @@
+﻿@model Phocalstream_Shared.Data.Model.Photo.Photo
+
+<div id="rgbChart"></div>
+
+<script type="text/javascript">
+    $(function () {
+
+        var red = @Model.Red;
+        var green = @Model.Green;
+        var blue = @Model.Blue;
+        var white = @Model.White;
+        var black = @Model.Black;
+
+        var chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'rgbChart',
+                type: 'column'
+            },
+            title: {
+                text: 'Photo Color Analysis'
+            },
+            legend: false,
+            xAxis: {
+                categories: [
+                    'Red',
+                    'Green',
+                    'Blue',
+                    'White',
+                    'Black'
+                ]
+            },
+            yAxis: {
+                min: 0,
+                max: Math.max(red, green, blue, white, black) * 1.1,
+                title: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '' + this.series.name + 
+                        ': ' + (this.y * 100) + ' %';
+                }
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Percentage',
+                data: [{
+                    name: 'Red',
+                    color: '#FF0000',
+                    y: red
+                }, {
+                    name: 'Green',
+                    color: '#00FF00',
+                    y: green
+                }, {
+                    name: 'Blue',
+                    color: '#0000FF',
+                    y: blue
+                }, {
+                    name: 'White',
+                    color: '#FFFFFF',
+                    y: white
+                }, {
+                    name: 'Black',
+                    color: '#000000',
+                    y: black
+                }]
+            }]
+        });
+    });
+
+</script>
