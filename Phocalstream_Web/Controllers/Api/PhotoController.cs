@@ -34,6 +34,37 @@ namespace Phocalstream_Web.Controllers.Api
         [Dependency]
         public IPhotoService PhotoService { get; set; }
 
+        /* not sure if this is the right API controller for this (IC)
+         * 
+         * This method will download 1MB of data to the client and will be
+         * used to determine the network speed of the client network. Based
+         * on the determined speed, a cookie will be set to limit the image
+         * sizes being returned by this controller. 
+         */
+        [HttpGet]
+        [ActionName("speedtest")]
+        public HttpResponseMessage TestConnectionSpeed()
+        {
+            byte[] data = new byte[1024];
+            Random r = new Random();
+            r.NextBytes(data);
+
+            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+            message.Content = new StreamContent(new MemoryStream(data));
+            message.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+            return message;
+        }
+
+        [HttpGet]
+        [ActionName("auto")]
+        public HttpResponseMessage GetAutoResPhoto(long id)
+        {
+            CookieHeaderValue cookie = Request.Headers.GetCookies("image-size").FirstOrDefault();
+            var res = cookie == null ? "low" : cookie["image-size"].Value;
+            return loadPhoto(id, res);
+        }
+
         [HttpGet]
         [ActionName("high")]
         public HttpResponseMessage GetHighResPhoto(long id)

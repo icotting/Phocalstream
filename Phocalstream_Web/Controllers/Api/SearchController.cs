@@ -68,7 +68,7 @@ namespace Phocalstream_Web.Controllers.Api
             long id = SearchService.SearchResultPhotoId(model);
 
             HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
-            message.Content = new StringContent("/api/photo/high/" + Convert.ToString(id));
+            message.Content = new StringContent("/api/photo/auto/" + Convert.ToString(id));
 
             return message;
 
