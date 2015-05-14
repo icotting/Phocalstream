@@ -359,7 +359,6 @@
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\bootbox.min.js" />
-    <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\CreateUserSiteViewModel.js" />
     <Content Include="Content\Scripts\InfiniteScroll.js" />
     <Content Include="Content\Scripts\jquery-lazyload.js" />
@@ -388,7 +387,6 @@
     <Content Include="Content\CSS\Site.css" />
     <Content Include="Content\typeahead\typeahead.bundle.js" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Scripts\Silverlight.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

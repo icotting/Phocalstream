@@ -138,7 +138,6 @@
                                         <ul class="dropdown-menu">
                                             <li>@Html.ActionLink("Settings", "Index", "Settings", null, null)</li>
                                             <li>@Html.ActionLink("Downloads", "Downloads", "Home", null, null)</li>
-                                            <li>@Html.ActionLink("Searches", "List", "Search", null, null)</li>
                                         </ul>
                                     </li>
                                 }
@@ -272,61 +271,11 @@
 </html>
 
 <script type="text/javascript">
-
     $(function() {
         $(window).scroll( function(){
             var scroll = $(document).scrollTop()
             var opacity = (300 - scroll) / 300;
             $('.background-info').fadeTo(0, opacity);
-       //     $('.navbar-wrapper').fadeTo(0, opacity);
         });
-    });
-    
-    $(document).ready(function() {
-        var availableTags = @Html.Raw(Json.Encode(Model.Tags));
-
-        var substringMatcher = function(strs) {
-            return function findMatches(q, cb) {
-                var matches, substringRegex;
-
-                // an array that will be populated with substring matches
-                matches = [];
-
-                // regex used to determine if a string contains the substring `q`
-                substrRegex = new RegExp(q, 'i');
-
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                $.each(strs, function(i, str) {
-                    if (substrRegex.test(str)) {
-
-                        // the typeahead jQuery plugin expects suggestions to a
-                        // JavaScript object, refer to typeahead docs for more info
-                        matches.push({ value: str });
-                    }
-                });
-
-                cb(matches);
-            };
-        };
-
-        $('#tag-field').tagsinput();
-
-        $('#tag-field').tagsinput('input').typeahead({
-            minLength: 2,
-            highlight: true,
-        },
-        {
-            name: 'available-tags',
-            source: substringMatcher(availableTags)
-        }).bind('typeahead:selected', $.proxy(function (obj, datum) {  
-            this.tagsinput('add', datum.value);
-            this.tagsinput('input').typeahead('val', '');
-
-            if(this.tagsinput('items').length != 0) {
-                this.tagsinput('input').attr('placeholder','');
-            }
-
-        }, $('#tag-field')));
     });
 </script>
