@@ -160,7 +160,7 @@ function bufferData() {
     };
 
     // set the source of the image being buffered which will cause the event handler to be invoked when the image has loaded
-    imageObj.src = "/api/photo/" + imageRes + "/" + frameset[bufferPos].PhotoID;
+    imageObj.src = "/api/photo/auto/" + frameset[bufferPos].PhotoID;
     buffer.push(imageObj); // store the image object in the buffer
 }
 
@@ -237,7 +237,7 @@ function nextImage() {
          * of the image data that was just displayed. In MAX cycles, this
          * data will be pulled from the buffer and displayed. This gives
          * sufficient time for the data to load before it is needed. */
-        imageObj.src = "/api/photo/" + imageRes + "/" + frameset[bufferPos % len].PhotoID;
+        imageObj.src = "/api/photo/auto/" + frameset[bufferPos % len].PhotoID;
         buffer[bufferPos++ % bufferLen] = imageObj;
     }
 

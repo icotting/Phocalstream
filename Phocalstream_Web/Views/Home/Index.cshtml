@@ -37,6 +37,42 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 
+    <script type="text/javascript">
+        // check the speed
+        (function() { 
+            if ( !getCookie("image-size") ) {
+                var start = new Date().getTime();
+                $.get("api/photo/speedtest", function (data) {
+                    var now = new Date().getTime();
+                    var timeToLoad = Math.round((now - start)/10)/100;
+                    var connSpeed = Math.round(1024 / timeToLoad/1000);
+
+                    var res = "high";
+                    if ( connSpeed <= 4 ) {
+                        res = "low";
+                    } else if ( connSpeed <= 6 ) {
+                        res = "medium";
+                    }
+
+                    document.cookie = "image-size="+res;
+                    location.reload();
+                });
+            }
+        })();
+
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0; i<ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1);
+                if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+            }
+            return null;
+        }
+    </script>
+
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -128,7 +164,7 @@
     </div>
     
     <div class="background">
-        <img class="background-img" src="/api/photo/high/@Model.Sites.ElementAt(Model.SiteIndex).CoverPhotoID" alt="@Model.Sites.ElementAt(Model.SiteIndex).SiteName">
+        <img class="background-img" src="/api/photo/auto/@Model.Sites.ElementAt(Model.SiteIndex).CoverPhotoID" alt="@Model.Sites.ElementAt(Model.SiteIndex).SiteName">
     </div>
 
     <div class="background-info">
@@ -236,6 +272,7 @@
 </html>
 
 <script type="text/javascript">
+
     $(function() {
         $(window).scroll( function(){
             var scroll = $(document).scrollTop()
