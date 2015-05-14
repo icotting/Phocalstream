@@ -48,10 +48,10 @@
                     var connSpeed = Math.round(1024 / timeToLoad/1000);
 
                     var res = "high";
-                    if ( connSpeed <= 5 ) {
+                    if ( connSpeed <= 4 ) {
                         res = "low";
-                    } else if ( connSpeed <= 7 ) {
-                        res = "low";
+                    } else if ( connSpeed <= 6 ) {
+                        res = "medium";
                     }
 
                     document.cookie = "image-size="+res;
