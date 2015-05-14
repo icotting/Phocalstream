@@ -1,24 +1,12 @@
 ﻿@model Phocalstream_Shared.Data.Model.View.SiteDetails
 
+<div class="thumbnail-column">
+    <img class="thumbnail-image" src="@Model.LastPhotoURL" alt="@Model.SiteName" />
 
-<script type="text/javascript">
-    viewer = new Seadragon.Viewer("imageContainer");
-    viewer.clearControls();
-    viewer.openDzi("@Html.DisplayFor(model => model.LastPhotoURL)");
-</script>
-
-<div class="siteImage" id="imageContainer">
-
-</div>
-
-<div class="row">
-    <div class="mapSiteCaption">
-        <div class="col-md-8">
-            <h1>@Html.DisplayFor(model => model.SiteName)</h1>
-            <p>@Html.DisplayFor(model => model.PhotoCount) photos from @Html.DisplayFor(model => model.First) to @Html.DisplayFor(model => model.Last)</p>
-        </div>
-        <div class="col-md-4 text-right">
-            <a class="siteCollection btn btn-default" href="/photo/sitedetails?siteId=@Model.SiteID">View Collection</a>
-        </div>
+    <!-- Centered info about collection -->
+    <div class="thumbnail-info">
+        <h3>@Html.DisplayFor(model => model.SiteName)</h3>
+        <p>@Html.DisplayFor(model => model.First) to @Html.DisplayFor(model => model.Last)</p>
+        <a class="btn btn-bordered button-override" href="/photo/sitedashboard?siteId=@Model.SiteID">View @Html.DisplayFor(model => model.PhotoCount) Images</a>
     </div>
 </div>

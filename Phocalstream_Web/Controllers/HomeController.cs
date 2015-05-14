@@ -104,11 +104,10 @@ namespace Phocalstream_Web.Controllers
 
             Phocalstream_Shared.Data.Model.View.SiteDetails details = PhotoRepository.GetSiteDetails(collection.Site);
 
-            details.LastPhotoURL = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
+            details.LastPhotoURL = string.Format("{0}://{1}:{2}/api/photo/auto/{3}", Request.Url.Scheme,
                 Request.Url.Host,
                 Request.Url.Port,
-                collection.Site.Name,
-                collection.CoverPhoto == null ? PhotoEntityRepository.First(p => p.ID == details.LastPhotoID).BlobID : collection.CoverPhoto.BlobID);
+                collection.CoverPhoto == null ? details.LastPhotoID : collection.CoverPhoto.ID);
 
             return PartialView("_SiteDetails", details);
         }
