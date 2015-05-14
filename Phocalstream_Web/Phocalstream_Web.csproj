@@ -284,7 +284,6 @@
     <Compile Include="Models\ViewModels\DownloadViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
-    <Compile Include="Models\ViewModels\SearchViewModel.cs" />
     <Compile Include="Models\ViewModels\SettingsViewModel.cs" />
     <Compile Include="Models\ViewModels\SiteDashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\TagViewModel.cs" />
@@ -415,11 +414,9 @@
     <Content Include="Views\Photo\_WaterDataPartial.cshtml" />
     <Content Include="Views\Photo\_WaterChartPartial.cshtml" />
     <Content Include="Views\Home\SiteList.cshtml" />
-    <Content Include="Views\Photo\CameraCollection.cshtml" />
     <Content Include="Views\Photo\_TagPartial.cshtml" />
     <Content Include="Views\Home\Downloads.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Account\UserCollections.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
@@ -430,8 +427,6 @@
     <Content Include="Views\Photo\SiteDashboard.cshtml" />
     <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
     <Content Include="Views\Account\CreateUserSite.cshtml" />
-    <Content Include="Views\Search\SearchResults.cshtml" />
-    <Content Include="Views\Search\_SearchGridPartial.cshtml" />
     <Content Include="Views\Shared\_CollectionThumbnail.cshtml" />
     <Content Include="Views\Shared\_SaveUserCollectionModal.cshtml" />
     <Content Include="Views\Photo\Tags.cshtml" />

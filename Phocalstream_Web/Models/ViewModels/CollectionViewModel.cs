@@ -11,7 +11,6 @@ namespace Phocalstream_Web.Models.ViewModels
     public class CollectionViewModel
     {
         public Collection Collection { get; set; }
-        public string CollectionUrl { get; set; }
         public string SiteCoords { get; set; }
         public SiteDetails SiteDetails { get; set; }
         public UserCollectionList UserCollections { get; set; }

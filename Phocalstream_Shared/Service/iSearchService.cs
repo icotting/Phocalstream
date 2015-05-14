@@ -11,13 +11,7 @@ namespace Phocalstream_Shared.Service
     public interface ISearchService
     {
         string ValidateAndGetSearchPath();
-        void DeleteSearch(long collectionID);
-        void DeleteAllSearches();
         List<string> GetSiteNames();
-        int SearchResultCount(SearchModel model);
-        long SearchResultPhotoId(SearchModel model);
         List<long> SearchResultPhotoIds(SearchModel model);
-        void ValidateCache(SearchModel model, int currentCount);
-        SearchMatches Search(SearchModel model);
     }
 }

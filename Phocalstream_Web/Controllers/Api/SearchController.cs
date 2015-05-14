@@ -29,52 +29,6 @@ namespace Phocalstream_Web.Controllers.Api
         public ISearchService SearchService { get; set; }
 
         [HttpGet]
-        [ActionName("count")]
-        public HttpResponseMessage SearchCount(string userId, string collectionId, string cameraSites, string publicUserCollections, string hours, string months, string sites, string tags, string dates)
-        {
-            SearchModel model = new SearchModel();
-            model.UserId = userId;
-            model.CollectionId = collectionId;
-            model.CameraSites = Convert.ToBoolean(cameraSites);
-            model.PublicUserCollections = Convert.ToBoolean(publicUserCollections);
-            model.Sites = sites;
-            model.Tags = tags;
-            model.Dates = dates;
-            model.Hours = hours;
-            model.Months = months;
-
-            int count = SearchService.SearchResultCount(model);
-
-            //check the search cache
-            SearchService.ValidateCache(model, count);
-
-            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
-            message.Content = new StringContent(Convert.ToString(count));
-
-            return message;
-        }
-
-        [HttpGet]
-        [ActionName("photoId")]
-        public HttpResponseMessage SearchPhotoId(string hours, string months, string sites, string tags, string dates)
-        {
-            SearchModel model = new SearchModel();
-            model.Sites = sites;
-            model.Tags = tags;
-            model.Dates = dates;
-            model.Hours = hours;
-            model.Months = months;
-
-            long id = SearchService.SearchResultPhotoId(model);
-
-            HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
-            message.Content = new StringContent("/api/photo/auto/" + Convert.ToString(id));
-
-            return message;
-
-        }
-
-        [HttpGet]
         [ActionName("getphotos")]
         public HttpResponseMessage SearchGetPhotos(string userId, string collectionId, string cameraSites, string publicUserCollections, string hours, string months, string sites, string tags, string dates, string group)
         {
