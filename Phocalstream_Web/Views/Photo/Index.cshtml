@@ -63,6 +63,11 @@
             @{ Html.RenderPartial("_TagPartial", Model.Photo); }
         </div>
 
+        <!-- RGB Analysis -->
+        <div class="data-partial dashboardData" id="rgbPartial">
+            @{ Html.RenderPartial("_RGBPartial", Model.Photo); }
+        </div>
+
         <!-- Drought Monitor Charts-->
         <div class="data-partial dashboardData" id="dmPartial">
             @{ Html.RenderPartial("_DmPartial", Model.DroughtMonitorData); }
