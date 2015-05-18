@@ -43,43 +43,6 @@ namespace Phocalstream_Service.Service
             return search_path;
         }
 
-        public void DeleteSearch(long collectionID)
-        {
-            Collection col = CollectionRepository.First(c => c.ID == collectionID && c.Type == CollectionType.SEARCH);
-
-            if (col != null)
-            {
-                string filePath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
-
-                if (System.IO.Directory.Exists(filePath))
-                {
-                    System.IO.Directory.Delete(filePath, true);
-                }
-
-                CollectionRepository.Delete(col);
-                Unit.Commit();
-            }
-        }
-
-        //Do these delete methods need to be secured?
-        public void DeleteAllSearches()
-        {
-            IEnumerable<Collection> collections = CollectionRepository.Find(c => c.Type == CollectionType.SEARCH);
-
-            foreach (var col in collections)
-            {
-                string filePath = Path.Combine(PathManager.GetSearchPath(), col.ContainerID);
-
-                if (System.IO.Directory.Exists(filePath))
-                {
-                    System.IO.Directory.Delete(filePath, true);
-                }
-
-                CollectionRepository.Delete(col);
-                Unit.Commit();
-            }
-        }
-
         public List<string> GetSiteNames()
         {
             //get the site ids that are actual camera sites
@@ -89,30 +52,6 @@ namespace Phocalstream_Service.Service
             List<string> siteNames = SiteRepository.Find(s => ids.Contains(s.ID)).Select(s => s.Name).ToList<string>();
 
             return siteNames;
-        }
-
-        public int SearchResultCount(SearchModel model)
-        {
-            string select = GetSearchQuery(model);
-            List<long> ids = QuickSearch(select);
-            return ids.Count;
-        }
-
-        public long SearchResultPhotoId(SearchModel model)
-        {
-            string select = GetSearchQuery(model);
-            List<long> ids = QuickSearch(select);
-
-            if (ids.Count > 0)
-            {
-                Random r = new Random();
-                int index = r.Next(ids.Count);
-                return ids[index];
-            }
-            else
-            {
-                return 0;
-            }
         }
 
         public List<long> SearchResultPhotoIds(SearchModel model)
@@ -149,53 +88,6 @@ namespace Phocalstream_Service.Service
             }
 
             return Ids.Distinct().ToList<long>();
-        }
-
-        public void ValidateCache(SearchModel model, int currentCount)
-        {
-            var collectionName = model.CreateCollectionName();
-            var containerID = collectionName.GetHashCode().ToString();
-
-            Collection collection = CollectionRepository.Find(c => c.ContainerID == containerID, c => c.Photos).FirstOrDefault();
-
-            if (collection != null)
-            {
-                if (collection.Photos.Count() != currentCount)
-                {
-                    DeleteSearch(collection.ID);
-                }
-            }
-        }
-
-        public SearchMatches Search(SearchModel model)
-        {
-            SearchMatches result = new SearchMatches();
-            result.Ids = new List<long>();
-            
-            string select = GetSearchQuery(model);
-
-            if (!String.IsNullOrWhiteSpace(select)) 
-            {
-                //run the query (only if there are parameters selected)
-                using (SqlConnection conn = new SqlConnection(PathManager.GetDbConnection()))
-                {
-                    conn.Open();
-
-                    using (SqlCommand command = new SqlCommand(select.ToString(), conn))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                result.Ids.Add((long)reader["ID"]);
-                            }
-                        }
-                    }
-                }
-                result.Matches = PhotoRepository.Find(p => result.Ids.Contains(p.ID), p => p.Site).ToList<Photo>();
-            }
-            
-            return result;
         }
 
         private String GetSearchQuery(SearchModel model)

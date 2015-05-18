@@ -31,10 +31,6 @@
           </StartWorkingDirectory>
           <EnableENC>True</EnableENC>
           <AlwaysStartWebServerOnDebug>True</AlwaysStartWebServerOnDebug>
-          <ProjectOutputReferences>
-            <Ref Project="{845BAD36-AE55-4513-8811-C3E1A58198AE}" Folder="ClientBin">Phocalstream_PivotView.xap</Ref>
-            <Ref Project="{1A755100-1294-437C-837D-516C9D1BCB2B}" Folder="ClientBin">Phocalstream_TimeLapse.xap</Ref>
-          </ProjectOutputReferences>
         </WebProjectProperties>
       </FlavorProperties>
     </VisualStudio>

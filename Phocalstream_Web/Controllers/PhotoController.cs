@@ -69,28 +69,6 @@ namespace Phocalstream_Web.Controllers
 
             model.Photo.AvailableTags = PhotoService.GetUnusedTagNames(photoID);
 
-            Collection collection = CollectionRepository.Single(c => c.Site.ID == model.Photo.Site.ID, c => c.Owner);
-            if (collection.Type == CollectionType.USER)
-            {
-                model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}{4}/{5}/{6}.phocalstream/Tiles.dzi", Request.Url.Scheme,
-                    Request.Url.Host,
-                    Request.Url.Port,
-                    PathManager.UserCollectionPath,
-                    collection.Owner.ID,
-                    model.Photo.Site.ContainerID,
-                    model.Photo.BlobID);
-
-            }
-            else
-            {
-                model.ImageUrl = string.Format("{0}://{1}:{2}/dzc/{3}/{4}.phocalstream/Tiles.dzi", Request.Url.Scheme,
-                        Request.Url.Host,
-                        Request.Url.Port,
-                        model.Photo.Site.Name,
-                        model.Photo.BlobID);
-
-            }
-
             model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
             model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
             model.SiteCoords = string.Format("{0}, {1}", model.Photo.Site.Latitude, model.Photo.Site.Longitude);
@@ -104,16 +82,6 @@ namespace Phocalstream_Web.Controllers
             model.UserCollections = LoadUserCollections(photoID);
             
             return View(model);
-        }
-
-        public PartialViewResult PhotoDetails(long photoID)
-        {
-            PhotoViewModel model = new PhotoViewModel();
-            model.Photo = PhotoRepository.Single(p => p.ID == photoID, p => p.Site);
-            model.PhotoDate = model.Photo.Captured.ToString("MMM dd, yyyy");
-            model.PhotoTime = model.Photo.Captured.ToString("h:mm:ss tt");
-
-            return PartialView("_PhotoInfo", model);
         }
 
         public ActionResult SiteDashboard(long siteID)
@@ -147,12 +115,6 @@ namespace Phocalstream_Web.Controllers
 
                 return View(model);
             }
-        }
-
-        public ActionResult CameraCollection(long siteID, long year = -1)
-        {
-            CollectionViewModel model = GetCollectionViewModel(siteID, year);
-            return View(model);
         }
 
         [HttpGet]
@@ -407,22 +369,6 @@ namespace Phocalstream_Web.Controllers
             CollectionViewModel model = new CollectionViewModel();
 
             model.Collection = CollectionRepository.First(c => c.Site.ID == siteID);
-
-            if (year == -1)
-            {
-                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
-                    Request.Url.Host,
-                    Request.Url.Port,
-                    model.Collection.ID);
-            }
-            else
-            {
-                model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}&year={4}", Request.Url.Scheme,
-                    Request.Url.Host,
-                    Request.Url.Port,
-                    model.Collection.ID, year);
-            }
-
             model.SiteCoords = string.Format("{0}, {1}", model.Collection.Site.Latitude, model.Collection.Site.Longitude);
 
             List<Photo> photos = PhotoRepository.Find(p => p.Site.ID == model.Collection.Site.ID).OrderBy(p => p.Captured).ToList<Photo>();

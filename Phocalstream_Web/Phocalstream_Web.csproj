@@ -23,7 +23,8 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
-    <SilverlightApplicationList>{845BAD36-AE55-4513-8811-C3E1A58198AE}|..\Phocalstream_PivotView\Phocalstream_PivotView.csproj|ClientBin|False,{1A755100-1294-437C-837D-516C9D1BCB2B}|..\Phocalstream_TimeLapse\Phocalstream_TimeLapse.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>
+    </SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -257,7 +258,6 @@
     <Compile Include="Application\Admin\DroughtMonitorImporter.cs" />
     <Compile Include="Application\Admin\Scheduler.cs" />
     <Compile Include="Application\Admin\WaterDataImporter.cs" />
-    <Compile Include="Application\DzcProxy.cs" />
     <Compile Include="Application\ExceptionFilter.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
@@ -268,7 +268,6 @@
     <Compile Include="Controllers\Api\SiteCollectionController.cs" />
     <Compile Include="Controllers\Api\UploadController.cs" />
     <Compile Include="Controllers\Api\UserCollectionController.cs" />
-    <Compile Include="Controllers\Api\WaterDataType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -284,7 +283,6 @@
     <Compile Include="Models\ViewModels\DownloadViewModel.cs" />
     <Compile Include="Models\ViewModels\HomeViewModel.cs" />
     <Compile Include="Models\ViewModels\PhotoViewModel.cs" />
-    <Compile Include="Models\ViewModels\SearchViewModel.cs" />
     <Compile Include="Models\ViewModels\SettingsViewModel.cs" />
     <Compile Include="Models\ViewModels\SiteDashboardViewModel.cs" />
     <Compile Include="Models\ViewModels\TagViewModel.cs" />
@@ -296,8 +294,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="App_Readme\Elmah.txt" />
-    <Content Include="ClientBin\Phocalstream_PivotView.xap" />
-    <Content Include="ClientBin\Phocalstream_TimeLapse.xap" />
     <Content Include="Content\bootstrap-tags\css\bootstrap-tagsinput.css" />
     <Content Include="Content\bootstrap-tags\js\bootstrap-tagsinput-angular.js" />
     <Content Include="Content\bootstrap-tags\js\bootstrap-tagsinput.js" />
@@ -361,7 +357,6 @@
     <None Include="Content\Scripts\jquery-1.7.1.intellisense.js" />
     <Content Include="Content\Images\wff.jpg" />
     <Content Include="Content\Scripts\bootbox.min.js" />
-    <Content Include="Content\Scripts\ClientBin.js" />
     <Content Include="Content\Scripts\CreateUserSiteViewModel.js" />
     <Content Include="Content\Scripts\InfiniteScroll.js" />
     <Content Include="Content\Scripts\jquery-lazyload.js" />
@@ -390,7 +385,6 @@
     <Content Include="Content\CSS\Site.css" />
     <Content Include="Content\typeahead\typeahead.bundle.js" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Scripts\Silverlight.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -415,24 +409,18 @@
     <Content Include="Views\Photo\_WaterDataPartial.cshtml" />
     <Content Include="Views\Photo\_WaterChartPartial.cshtml" />
     <Content Include="Views\Home\SiteList.cshtml" />
-    <Content Include="Views\Photo\CameraCollection.cshtml" />
     <Content Include="Views\Photo\_TagPartial.cshtml" />
     <Content Include="Views\Home\Downloads.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Search\List.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Account\UserCollections.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Photo\_UserCollectionPartial.cshtml" />
     <Content Include="Views\Home\TagList.cshtml" />
-    <Content Include="Views\Account\UserDefinedCollection.cshtml" />
     <Content Include="Views\Account\EditUserCollection.cshtml" />
     <Content Include="Views\Account\UploadPhotos.cshtml" />
     <Content Include="Views\Photo\SiteDashboard.cshtml" />
     <Content Include="Views\Photo\_PhotoFrequencyPartial.cshtml" />
     <Content Include="Views\Account\CreateUserSite.cshtml" />
-    <Content Include="Views\Search\SearchResults.cshtml" />
-    <Content Include="Views\Search\_SearchGridPartial.cshtml" />
     <Content Include="Views\Shared\_CollectionThumbnail.cshtml" />
     <Content Include="Views\Shared\_SaveUserCollectionModal.cshtml" />
     <Content Include="Views\Photo\Tags.cshtml" />
@@ -440,8 +428,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Upload\" />
-    <Folder Include="Views\UserCollection\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

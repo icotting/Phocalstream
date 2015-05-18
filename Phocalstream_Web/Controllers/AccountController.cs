@@ -329,54 +329,17 @@ namespace Phocalstream_Web.Controllers
             {
                 if (count == 1)
                 {
-                    ViewBag.Message = "Successfully deleted " + count.ToString() + " photo.";
+                    ViewBag.Message = "Successfully deleted 1 photo.";
                 }
                 else
                 {
-                    ViewBag.Message = "Successfully deleted " + count.ToString() + " photos.";
+                    ViewBag.Message = string.Format("Successfully deleted {0} photos.",  count.ToString());
                 }
             }
 
             return View(model);
         }
 
-        public ActionResult UserDefinedCollection(long collectionID)
-        {
-            UserDefinedCollection model = new UserDefinedCollection();
-            
-            Collection collection = CollectionRepository.First(col => col.ID == collectionID, col => col.Photos);
-            model.CollectionName = collection.Name;
-
-            if (collection.Photos.Count == 0)
-            {
-                return RedirectToAction("UserCollections", new { e = 1 });
-            }
-
-            model.First = collection.Photos.First().Captured;
-            model.Last = collection.Photos.Last().Captured;
-            model.PhotoCount = collection.Photos.Count;
-
-            model.CollectionUrl = string.Format("{0}://{1}:{2}/api/sitecollection/pivotcollectionfor?id={3}", Request.Url.Scheme,
-                Request.Url.Host,
-                Request.Url.Port,
-                collection.ID);
-
-            if (collection.Status == CollectionStatus.INVALID)
-            {
-                CollectionService.UpdateUserCollection(collection);
-            }
-
-            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
-            if (User != null)
-            {
-                UserCollectionList userCollectionModel = new UserCollectionList();
-                userCollectionModel.User = User;
-                userCollectionModel.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID && c.Type == CollectionType.USER, c => c.Photos).ToList();
-                model.UserCollections = userCollectionModel;
-            }
-
-            return View(model);
-        }
 
         #region Helpers
         private ActionResult RedirectToLocal(string returnUrl)
