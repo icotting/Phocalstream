@@ -10,6 +10,7 @@ using Phocalstream_Service.Service;
 using System.Data.Entity;
 using Phocalstream_Web.Application.Admin;
 using System.Web.Http;
+using Microsoft.Practices.ServiceLocation;
 
 namespace Phocalstream_Web
 {
@@ -45,6 +46,10 @@ namespace Phocalstream_Web
             DependencyResolver.SetResolver(new Unity.Mvc5.UnityDependencyResolver(container));
 
             GlobalConfiguration.Configuration.DependencyResolver = new Unity.WebApi.UnityDependencyResolver(container);
+
+            UnityServiceLocator locator = new UnityServiceLocator(container);
+            ServiceLocator.SetLocatorProvider(() => locator);
+
         }
     }
 }
