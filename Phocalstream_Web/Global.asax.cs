@@ -42,31 +42,5 @@ namespace Phocalstream_Web
             Scheduler.getInstance().AddJobToSchedule(new DmImporterJob());
             Scheduler.getInstance().AddJobToSchedule(new WaterImporterJob());
         }
-
-        /* Handler for authentication from the mobile app using Facebook */
-        protected void FormsAuthentication_OnAuthenticate(Object sender, FormsAuthenticationEventArgs e)
-        {
-            if (FormsAuthentication.CookiesSupported == true)
-            {
-                if (Request.Cookies[FormsAuthentication.FormsCookieName] != null)
-                {
-                    string username = FormsAuthentication.Decrypt(Request.Cookies[FormsAuthentication.FormsCookieName].Value).Name;
-                    IEntityRepository<User> userRepository = ServiceLocator.Current.GetInstance<IEntityRepository<User>>();
-
-                    User user = userRepository.Find(u => u.ProviderID == username).FirstOrDefault();
-                    if  (user == null)
-                    {
-                        FormsAuthentication.SignOut();
-                    }
-                    else
-                    {
-                        MobileIdentityPrincipal principal = new MobileIdentityPrincipal(user);
-                        HttpContext.Current.User = principal;
-                        System.Threading.Thread.CurrentPrincipal = principal;
-
-                    }
-                }
-            }
-        }
     }
 }

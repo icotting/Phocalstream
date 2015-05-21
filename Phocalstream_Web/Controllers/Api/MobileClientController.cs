@@ -1,4 +1,5 @@
 ﻿using Microsoft.Practices.Unity;
+using Microsoft.Web.WebPages.OAuth;
 using Newtonsoft.Json;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
@@ -37,13 +38,15 @@ namespace Phocalstream_Web.Controllers.Api
                 }
             }
 
-            if ( values.ContainsKey("email") )
+            if ( values.ContainsKey("email") && values.ContainsKey("id") )
             {
                 string email = values["email"];
+                string fbID = values["id"];
+
                 var user = UserRepository.Find(u => u.ProviderID == email).FirstOrDefault();
                 if ( user != null )
                 {
-                    FormsAuthentication.SetAuthCookie(user.ProviderID, false);
+                    OAuthWebSecurity.Login("facebook", fbID, false);
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
                 else
