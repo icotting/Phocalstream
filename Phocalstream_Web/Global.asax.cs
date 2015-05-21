@@ -1,6 +1,10 @@
-﻿using Phocalstream_Web.Application;
+﻿using Microsoft.Practices.ServiceLocation;
+using Phocalstream_Shared.Data;
+using Phocalstream_Shared.Data.Model.Photo;
+using Phocalstream_Web.Application;
 using Phocalstream_Web.Application.Admin;
 using Phocalstream_Web.Application.Data;
+using Phocalstream_Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -9,6 +13,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Security;
 using WebMatrix.WebData;
 
 namespace Phocalstream_Web

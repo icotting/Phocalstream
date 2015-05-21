@@ -1,9 +1,11 @@
-﻿ using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using Phocalstream_Shared.Data;
 using Phocalstream_Shared.Data.Model.Photo;
 using Phocalstream_Shared.Service;
+using Phocalstream_Web.Models.Api;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,6 +16,7 @@ using System.Web.Http;
 
 namespace Phocalstream_Web.Controllers.Api
 {
+    [Authorize]
     public class UserCollectionController : ApiController
     {
         [Dependency]
@@ -34,6 +37,23 @@ namespace Phocalstream_Web.Controllers.Api
         [Dependency]
         public ICollectionService CollectionService { get; set; }
 
+
+        [HttpGet, ActionName("UserSites")]
+        public List<UserSite> GetUserSites()
+        {
+            var user = UserRepository.Find(u => u.ProviderID == User.Identity.Name).FirstOrDefault();
+            Debug.Assert(user != null);
+
+            var collections = CollectionRepository.Find(c => c.Owner.ID == user.ID, c => c.Owner, c => c.Photos, c => c.CoverPhoto);
+            return collections.Select(c => new UserSite
+            {
+                CoverPhotoID = c.CoverPhoto == null ? c.Photos.First().ID : c.CoverPhoto.ID,
+                From = c.Photos.First().Captured,
+                To = c.Photos.Last().Captured,
+                Name = c.Name,
+                PhotoCount = c.Photos.Count
+            }).ToList<UserSite>();
+        }
 
         [HttpPost, ActionName("SaveUserCollection")]
         public void SaveUserCollection(string collectionName, string photoIds)
