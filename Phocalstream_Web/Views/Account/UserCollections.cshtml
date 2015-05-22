@@ -36,24 +36,79 @@
             </div>
         }
 
+        <div role="tabpanel">
 
-        @if (Model.Thumbnails.Count() == 0)
-        {
-            <div class="col-md-12 well text-center">
-                You haven't created any collections yet!
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#collections" aria-controls="home" role="tab" data-toggle="tab">Your Collections</a></li>
+                <li role="presentation"><a href="#sites" aria-controls="profile" role="tab" data-toggle="tab">Your Camera Sites</a></li>
+                <li role="presentation"><a href="#timelapse" aria-controls="messages" role="tab" data-toggle="tab">Your Timelapse Movies</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="collections">
+                    @if (Model.CollectionThumbnails.Count() == 0)
+                    {
+                        <div class="col-md-12 well text-center">
+                            You haven't created any collections yet!
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- New Format -->
+                        <div class="row">
+                            @foreach (var col in Model.CollectionThumbnails)
+                            {
+                                <div class="col-md-6">
+                                    @Html.Partial("_CollectionThumbnail", col)
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <div role="tabpanel" class="tab-pane" id="sites">
+                    @if (Model.SiteThumbnails.Count() == 0)
+                    {
+                        <div class="col-md-12 well text-center">
+                            You haven't created any camera sites yet!
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- New Format -->
+                        <div class="row">
+                            @foreach (var col in Model.SiteThumbnails)
+                            {
+                                <div class="col-md-6">
+                                    @Html.Partial("_CollectionThumbnail", col)
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <div role="tabpanel" class="tab-pane " id="timelapse">
+                    @if (Model.TimelapseThumbnails.Count() == 0)
+                    {
+                        <div class="col-md-12 well text-center">
+                            You haven't created any timelapses yet!
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- New Format -->
+                        <div class="row">
+                            @foreach (var col in Model.TimelapseThumbnails)
+                            {
+                                <div class="col-md-6">
+                                    @Html.Partial("_CollectionThumbnail", col)
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
-        }
-        else
-        {
-            <!-- New Format -->
-            <div class="row">
-                @foreach (var col in Model.Thumbnails)
-                {
-                    <div class="col-md-6">
-                        @Html.Partial("_CollectionThumbnail", col)
-                    </div>
-                }
-            </div>
-        }
+
+        </div>
     </div>
 </div>
