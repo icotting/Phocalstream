@@ -7,6 +7,17 @@
 @Styles.Render("~/Content/CSS/Account.css")
 @Styles.Render("~/Content/CSS/CollectionThumbnail.css")
 
+<script type="text/javascript" src="~/Content/Scripts/bootbox.min.js"></script>
+<script type="text/javascript">
+    function deleteCollection(link) {
+        bootbox.confirm("Are you sure you want to delete this collection?", function (result) {
+            if (result) {
+                window.location.href = link;
+            }
+        });
+    }
+</script>
+
 <div class="container">
     <div class="content">
         <div class="text-center relative">
