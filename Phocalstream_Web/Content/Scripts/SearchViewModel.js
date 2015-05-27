@@ -82,7 +82,7 @@ function ViewModel() {
     });
 
     // controls the toggle for photo source
-    self.source = ko.observable("sites");
+    self.source = ko.observable("both");
     self.source.subscribe(function (newSize) {
         self.getPhotos();
     });
