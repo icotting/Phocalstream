@@ -37,9 +37,9 @@ namespace Phocalstream_Service.Service
             return collection_path;
         }
 
-        public void DeleteUserCollection(long collectionID)
+        public bool DeleteUserCollection(long currentUserId, long collectionID)
         {
-            Collection col = CollectionRepository.First(c => c.ID == collectionID && c.Type == CollectionType.USER);
+            Collection col = CollectionRepository.First(c => c.ID == collectionID && c.Owner.ID == currentUserId && c.Type != CollectionType.SITE);
 
             if (col != null)
             {
@@ -52,7 +52,11 @@ namespace Phocalstream_Service.Service
 
                 CollectionRepository.Delete(col);
                 Unit.Commit();
+
+                return true;
             }
+
+            return false;
         }
 
         public void DeleteUserCollections(long userID)

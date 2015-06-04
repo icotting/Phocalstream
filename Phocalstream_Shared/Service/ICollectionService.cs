@@ -10,7 +10,7 @@ namespace Phocalstream_Shared.Service
     public interface ICollectionService
     {
         string ValidateAndGetUserCollectionPath(); 
-        void DeleteUserCollection(long collectionID);
+        bool DeleteUserCollection(long currentUserId, long collectionID);
         void DeleteUserCollections(long userID);
         void DeleteAllUserCollections();
         void NewUserCollection(User user, string collectionName, string photoIds);

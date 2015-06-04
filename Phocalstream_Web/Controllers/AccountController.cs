@@ -259,6 +259,14 @@ namespace Phocalstream_Web.Controllers
             {
                 ViewBag.Message = "That collection doesn't contain any photos.";
             }
+            else if (e == 2)
+            {
+                ViewBag.Message = "Successfully deleted collection.";
+            }
+            else if (e == 3)
+            {
+                ViewBag.Message = "Error deleting collection.";
+            }
 
             return View(model);
         }
@@ -327,8 +335,16 @@ namespace Phocalstream_Web.Controllers
 
         public ActionResult DeleteUserCollection(long collectionID)
         {
-            CollectionService.DeleteUserCollection(collectionID);
-            return RedirectToAction("UserCollections", "Account");
+            Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            if (User != null)
+            {
+                if (CollectionService.DeleteUserCollection(User.ID, collectionID))
+                {
+                    return RedirectToAction("UserCollections", "Account", new { e = 2 }); // success message
+                }
+            }
+
+            return RedirectToAction("UserCollections", "Account", new { e = 3 }); // error message
         }
 
         public ActionResult DeleteUserCollections()
