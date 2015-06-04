@@ -209,7 +209,7 @@ namespace Phocalstream_Web.Controllers
             model.TimelapseThumbnails = new List<ThumbnailModel>();
             model.CollectionThumbnails = new List<ThumbnailModel>();
 
-            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
+            model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos).ToList<Collection>();
             foreach (var col in model.Collections)
             {
                 if (col.CoverPhoto == null)
