@@ -25,6 +25,10 @@
     position: absolute;
 }
 
+.tab-content {
+    margin-top: 10px;
+}
+
 /* User Photo Upload */
 .total-progress {
     margin-bottom: 0px !important;

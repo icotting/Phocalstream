@@ -205,7 +205,10 @@ namespace Phocalstream_Web.Controllers
             Phocalstream_Shared.Data.Model.Photo.User User = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             model.User = User;
 
-            model.Thumbnails = new List<ThumbnailModel>();
+            model.SiteThumbnails = new List<ThumbnailModel>();
+            model.TimelapseThumbnails = new List<ThumbnailModel>();
+            model.CollectionThumbnails = new List<ThumbnailModel>();
+
             model.Collections = CollectionRepository.Find(c => c.Owner.ID == User.ID, c => c.Photos);
             foreach (var col in model.Collections)
             {
@@ -234,7 +237,22 @@ namespace Phocalstream_Web.Controllers
                     thumb.CoverPhotoID = col.CoverPhoto.ID;
                 }
 
-                model.Thumbnails.Add(thumb);
+                switch (col.Type)
+                {
+                    case CollectionType.TIMELAPSE:
+                        model.TimelapseThumbnails.Add(thumb);
+                        break;
+                    case CollectionType.USER:
+                        if (col.Site == null)
+                        {
+                            model.CollectionThumbnails.Add(thumb);
+                        }
+                        else
+                        {
+                            model.SiteThumbnails.Add(thumb);
+                        }
+                        break;
+                }
             }
 
             if (e == 1)

@@ -13,7 +13,11 @@ namespace Phocalstream_Shared.Data.Model.View
     {
         public User User { get; set; }
         public IEnumerable<Collection> Collections { get; set; }
-        public ICollection<ThumbnailModel> Thumbnails { get; set; }
+        public ICollection<ThumbnailModel> SiteThumbnails { get; set; }
+        public ICollection<ThumbnailModel> TimelapseThumbnails { get; set; }
+        public ICollection<ThumbnailModel> CollectionThumbnails { get; set; }
+
+
     }
 
     public class EditUserCollection

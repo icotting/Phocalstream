@@ -30,7 +30,7 @@
     @if (Model.CanDelete)
     { 
         <div class="siteDelete">
-            <a class="btn text-white no-underline" href="@Model.DeleteLink"><span class="glyphicon glyphicon-remove"></span> Delete</a>
+            <a class="btn text-white no-underline" href="javascript:deleteCollection('@Model.DeleteLink')"><span class="glyphicon glyphicon-remove"></span> Delete</a>
         </div>
     }
 </div>
