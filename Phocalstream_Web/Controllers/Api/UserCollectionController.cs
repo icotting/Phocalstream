@@ -37,6 +37,9 @@ namespace Phocalstream_Web.Controllers.Api
         [Dependency]
         public ICollectionService CollectionService { get; set; }
 
+        [Dependency]
+        public IDroughtMonitorRepository DroughtMonitorRepository { get; set; }
+
 
         [HttpGet, ActionName("UserSites")]
         public List<UserSite> GetUserSites()
@@ -44,7 +47,7 @@ namespace Phocalstream_Web.Controllers.Api
             var user = UserRepository.Find(u => u.ProviderID == User.Identity.Name).FirstOrDefault();
             Debug.Assert(user != null);
 
-            var collections = CollectionRepository.Find(c => c.Owner.ID == user.ID, c => c.Owner, c => c.Photos, c => c.CoverPhoto);
+            var collections = CollectionRepository.Find(c => c.Owner.ID == user.ID & c.Site != null & c.Photos.Count != 0, c => c.Owner, c => c.Photos, c => c.CoverPhoto);
             return collections.Select(c => new UserSite
             {
                 CoverPhotoID = c.CoverPhoto == null ? c.Photos.First().ID : c.CoverPhoto.ID,
@@ -53,6 +56,37 @@ namespace Phocalstream_Web.Controllers.Api
                 Name = c.Name,
                 PhotoCount = c.Photos.Count
             }).ToList<UserSite>();
+        }
+
+        [HttpPost, ActionName("CreateUserCameraSite")]
+        public long CreateUserCameraSite(string siteName, double latitude, double longitude, string county, string state)
+        {
+            User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
+            string guid = Guid.NewGuid().ToString();
+
+            CameraSite newCameraSite = new CameraSite()
+            {
+                Name = siteName,
+                Latitude = latitude,
+                Longitude = longitude,
+                CountyFips = DroughtMonitorRepository.GetFipsForCountyAndState(county, state),
+                ContainerID = guid,
+                DirectoryName = guid
+            };
+
+            Collection newCollection = new Collection()
+            {
+                Name = siteName,
+                Site = newCameraSite,
+                Owner = user,
+                ContainerID = guid,
+                Type = CollectionType.USER
+            };
+
+            CollectionRepository.Insert(newCollection);
+            Unit.Commit();
+
+            return newCollection.ID;
         }
 
         [HttpPost, ActionName("SaveUserCollection")]
