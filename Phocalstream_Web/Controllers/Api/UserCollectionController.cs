@@ -59,24 +59,24 @@ namespace Phocalstream_Web.Controllers.Api
         }
 
         [HttpPost, ActionName("CreateUserCameraSite")]
-        public long CreateUserCameraSite(string siteName, double latitude, double longitude, string county, string state)
+        public long CreateUserCameraSite(NewUserSiteModel model)
         {
             User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
             string guid = Guid.NewGuid().ToString();
 
             CameraSite newCameraSite = new CameraSite()
             {
-                Name = siteName,
-                Latitude = latitude,
-                Longitude = longitude,
-                CountyFips = DroughtMonitorRepository.GetFipsForCountyAndState(county, state),
+                Name = model.SiteName,
+                Latitude = model.Latitude,
+                Longitude = model.Longitude,
+                CountyFips = DroughtMonitorRepository.GetFipsForCountyAndState(model.County, model.State),
                 ContainerID = guid,
                 DirectoryName = guid
             };
 
             Collection newCollection = new Collection()
             {
-                Name = siteName,
+                Name = model.SiteName,
                 Site = newCameraSite,
                 Owner = user,
                 ContainerID = guid,

@@ -13,4 +13,14 @@ namespace Phocalstream_Web.Models.Api
         public DateTime To { get; set; }
         public long CoverPhotoID { get; set; }
     }
+
+    public class NewUserSiteModel
+    {
+        public string SiteName { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string County { get; set; }
+        public string State { get; set; }
+    }
+
 }
