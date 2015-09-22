@@ -199,6 +199,13 @@ namespace Phocalstream_Service.Service
                         ResizeImageTo(savePath, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
                         ResizeImageTo(savePath, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
                     }
+
+                    // if first photo, set as cover photo
+                    if (collection.Photos.Count == 1)
+                    {
+                        collection.CoverPhoto = photo;
+                    }
+
                     return photo;
                 }
             }
@@ -359,6 +366,9 @@ namespace Phocalstream_Service.Service
             photo.AdditionalExifProperties = new List<MetaDatum>();
 
             photo.Portrait = false;
+
+            // initialize the date to something so it doesn't break if the metadata doesn't have a date
+            photo.Captured = DateTime.Now;
 
             // walk the image properties and set the appropriate fields on the image for the various meta data types (EXIF)
             int len = propItems.Length;
