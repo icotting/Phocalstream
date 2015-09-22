@@ -183,6 +183,12 @@ namespace Phocalstream_Service.Service
                     collection.Photos.Add(photo);
                     collection.Status = CollectionStatus.INVALID;
 
+                    // if first photo, set as cover photo
+                    if (collection.Photos.Count == 1)
+                    {
+                        collection.CoverPhoto = photo;
+                    }
+
                     Unit.Commit();
 
                     // only generate the phocalstream image if it has not already been generated
@@ -198,12 +204,6 @@ namespace Phocalstream_Service.Service
                         ResizeImageTo(savePath, 1200, 800, Path.Combine(basePath, @"High.jpg"), photo.Portrait);
                         ResizeImageTo(savePath, 800, 533, Path.Combine(basePath, @"Medium.jpg"), photo.Portrait);
                         ResizeImageTo(savePath, 400, 266, Path.Combine(basePath, @"Low.jpg"), photo.Portrait);
-                    }
-
-                    // if first photo, set as cover photo
-                    if (collection.Photos.Count == 1)
-                    {
-                        collection.CoverPhoto = photo;
                     }
 
                     return photo;
