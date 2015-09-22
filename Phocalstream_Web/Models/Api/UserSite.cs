@@ -7,6 +7,7 @@ namespace Phocalstream_Web.Models.Api
 {
     public class UserSite
     {
+        public long CollectionID { get; set; }
         public string Name { get; set; }
         public int PhotoCount { get; set; }
         public DateTime From { get; set; }
