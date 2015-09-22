@@ -50,6 +50,7 @@ namespace Phocalstream_Web.Controllers.Api
             var collections = CollectionRepository.Find(c => c.Owner.ID == user.ID & c.Site != null & c.Photos.Count != 0, c => c.Owner, c => c.Photos, c => c.CoverPhoto);
             return collections.Select(c => new UserSite
             {
+                CollectionID = c.ID,
                 CoverPhotoID = c.CoverPhoto == null ? c.Photos.First().ID : c.CoverPhoto.ID,
                 From = c.Photos.First().Captured,
                 To = c.Photos.Last().Captured,
