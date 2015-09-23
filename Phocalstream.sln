@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8C1A828E-4468-41EC-9F4C-7FE6A71C1882}"
 	ProjectSection(SolutionItems) = preProject
@@ -21,11 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phocalstream_Web", "Phocals
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phocalstream_Web.Tests", "Phocalstream_Web.Tests\Phocalstream_Web.Tests.csproj", "{CA56E948-DDD9-47BC-AA01-EB1EA8E0FE5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phocalstream_PivotView", "Phocalstream_PivotView\Phocalstream_PivotView.csproj", "{845BAD36-AE55-4513-8811-C3E1A58198AE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phocalstream_Shared", "Phocalstream_Shared\Phocalstream_Shared.csproj", "{9363B507-2FC1-4917-8BB0-87966003DD6A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phocalstream_TimeLapse", "Phocalstream_TimeLapse\Phocalstream_TimeLapse.csproj", "{1A755100-1294-437C-837D-516C9D1BCB2B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phocalstream_PhotoProcessor", "Phocalstream_PhotoProcessor\Phocalstream_PhotoProcessor.csproj", "{D94B38D5-96F4-4351-84F4-B1C1261CE92D}"
 EndProject
@@ -63,16 +59,6 @@ Global
 		{CA56E948-DDD9-47BC-AA01-EB1EA8E0FE5D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CA56E948-DDD9-47BC-AA01-EB1EA8E0FE5D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CA56E948-DDD9-47BC-AA01-EB1EA8E0FE5D}.Release|Win32.ActiveCfg = Release|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{845BAD36-AE55-4513-8811-C3E1A58198AE}.Release|Win32.ActiveCfg = Release|Any CPU
 		{9363B507-2FC1-4917-8BB0-87966003DD6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9363B507-2FC1-4917-8BB0-87966003DD6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9363B507-2FC1-4917-8BB0-87966003DD6A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -83,16 +69,6 @@ Global
 		{9363B507-2FC1-4917-8BB0-87966003DD6A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{9363B507-2FC1-4917-8BB0-87966003DD6A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{9363B507-2FC1-4917-8BB0-87966003DD6A}.Release|Win32.ActiveCfg = Release|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{1A755100-1294-437C-837D-516C9D1BCB2B}.Release|Win32.ActiveCfg = Release|Any CPU
 		{D94B38D5-96F4-4351-84F4-B1C1261CE92D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D94B38D5-96F4-4351-84F4-B1C1261CE92D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D94B38D5-96F4-4351-84F4-B1C1261CE92D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
