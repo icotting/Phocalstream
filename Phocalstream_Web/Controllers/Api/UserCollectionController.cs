@@ -51,7 +51,7 @@ namespace Phocalstream_Web.Controllers.Api
             return collections.Select(c => new UserSite
             {
                 CollectionID = c.ID,
-                CoverPhotoID = c.CoverPhoto == null ? c.Photos.First().ID : c.CoverPhoto.ID,
+                CoverPhotoID = c.Photos.Last().ID,
                 From = c.Photos.First().Captured,
                 To = c.Photos.Last().Captured,
                 Name = c.Name,

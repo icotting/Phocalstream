@@ -39,7 +39,7 @@ namespace Phocalstream_Web.Controllers.Api
             }
 
             User user = UserRepository.First(u => u.ProviderID == this.User.Identity.Name);
-            Photo photo = PhotoService.ProcessUserPhoto(file.InputStream, file.FileName, user, selectedCollectionID);
+            Photo photo = PhotoService.ProcessUserPhoto(file.InputStream, Guid.NewGuid().ToString(), user, selectedCollectionID);
 
             // Now we need to wire up a response so that the calling script understands what happened
             HttpContext.Current.Response.ContentType = "text/plain";
